@@ -15,7 +15,8 @@ sealed trait Integer {
 }
 
 object Integer {
-  def construct[N <: Integer :Constructable] = implicitly[Constructable[N]].construct()
+  private[church] def construct[N <: Integer :Constructable] =
+    implicitly[Constructable[N]].construct()
 
   def value[N <: Integer :Constructable] = construct[N].value
 
