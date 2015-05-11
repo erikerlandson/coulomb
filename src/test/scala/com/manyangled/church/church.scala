@@ -99,4 +99,15 @@ class IntegerSpec extends FlatSpec with Matchers {
     "Equal[_9#Add[_neg9]#Add[_neg9], _neg9]" should compile
     "Equal[_neg9#Add[_9]#Add[_9], _9]" should compile
   }
+
+  it should "support Sub type operator" in {
+    import Integer._
+
+    "Equal[_0#Sub[_1], _neg1]" should compile
+    "Equal[_0#Sub[_1]#Sub[_1], _neg2]" should compile
+    "Equal[_1#Sub[_2], _neg1]" should compile
+    "Equal[_neg4#Sub[_neg9], _5]" should compile
+    "Equal[_9#Sub[_9], _0]" should compile
+    "Equal[_9#Sub[_9]#Sub[_9], _neg9]" should compile
+  }
 }
