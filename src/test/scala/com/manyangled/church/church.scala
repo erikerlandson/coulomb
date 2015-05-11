@@ -52,4 +52,15 @@ class IntegerSpec extends FlatSpec with Matchers {
     "Equal[_1, _neg1]" shouldNot typeCheck
     "Equal[_1, _2]" shouldNot typeCheck
   }
+
+  it should "support Inc type operator" in {
+    import Integer._
+
+    "Equal[_0#Inc, _1]" should compile
+    "Equal[_1#Inc, _2]" should compile
+    "Equal[_0#Inc#Inc, _2]" should compile
+    "Equal[_8#Inc, _9]" should compile
+    "Equal[_neg9#Inc, _neg8]" should compile
+    "Equal[_neg2#Inc, _neg1]" should compile
+  }
 }
