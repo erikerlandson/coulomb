@@ -119,4 +119,11 @@ class IntegerSpec extends FlatSpec with Matchers {
     "Equal[_4#Neg#Inc, _5#Sub[_3]#Neg#Dec]" should compile
     "Equal[_9#Sub[_8]#Inc, _neg9#Neg#Sub[_6]#Dec]" should compile 
   }
+
+  it should "support type system outside of value range" in {
+    import Integer._
+
+    "Equal[_max#Inc, _max#Add[_1]]" should compile
+    "Equal[_min#Dec, _min#Sub[_1]]" should compile
+  }
 }
