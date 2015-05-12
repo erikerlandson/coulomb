@@ -15,6 +15,16 @@ sealed trait Integer {
 }
 
 object Integer {
+  trait Constructable[+T] {
+    def construct(): T
+  }
+
+  object Constructable {
+    def apply[T](blk: => T): Constructable[T] = new Constructable[T] {
+      def construct(): T = blk
+    }
+  }
+
   private[church] def construct[N <: Integer :Constructable] =
     implicitly[Constructable[N]].construct()
 
@@ -48,16 +58,6 @@ object Integer {
 
 object church$detail {
   import Integer._
-
-  trait Constructable[+T] {
-    def construct(): T
-  }
-
-  object Constructable {
-    def apply[T](blk: => T): Constructable[T] = new Constructable[T] {
-      def construct(): T = blk
-    }
-  }
 
   class IncInteger[N <: Integer :Constructable] extends Integer {
     type Inc = IncInteger[IncInteger[N]]
