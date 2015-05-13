@@ -2,6 +2,8 @@ package com.manyangled.church
 
 import scala.language.higherKinds
 
+import com.manyangled.util.Constructable
+
 import church$detail._
 
 sealed trait Integer {
@@ -15,16 +17,6 @@ sealed trait Integer {
 }
 
 object Integer {
-  trait Constructable[+T] {
-    def construct(): T
-  }
-
-  object Constructable {
-    def apply[T](blk: => T): Constructable[T] = new Constructable[T] {
-      def construct(): T = blk
-    }
-  }
-
   private[church] def construct[N <: Integer :Constructable] =
     implicitly[Constructable[N]].construct()
 
