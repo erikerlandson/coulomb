@@ -5,84 +5,85 @@ import scala.language.higherKinds
 import com.manyangled.church
 import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
-trait UnitMeasure[M <: UnitMeasure[M]] {
+trait UnitMeasure[+M <: UnitMeasure[M]] {
+  type RefUnit <: Unit[RefUnit]
 }
 
 trait Length extends UnitMeasure[Length] {
+  type RefUnit = Meter
 }
 
 trait Time extends UnitMeasure[Time] {
+  type RefUnit = Second
 }
 
-trait Convertable[U] {
+trait Convertable[U, R] {
   def cf: Double
 }
 
 object Convertable {
-  def apply[U](blk: => Double): Convertable[U] = new Convertable[U] {
+  def apply[U, R](blk: => Double) = new Convertable[U, R] {
     def cf = blk
   }
 }
 
-abstract class UnitPower[U <: Unit[U], P <: church.Integer](v: Double) {
+abstract class UnitPower[+U <: Unit[U], P <: church.Integer] {
   type Measure <: UnitMeasure[Measure]
-  type Unit = U
-  type Power = P
-  final def value = v
+  type Unit <: U
 }
 
-abstract class Unit[U <: Unit[U]](v: Double) extends UnitPower[U, church.Integer._1](v) {
-}
+abstract class Unit[+U <: Unit[U]] extends UnitPower[U, church.Integer._1]
 
-/*
 object conversion {
   import scala.language.implicitConversions
 
-  class EnrichUnitPower[U <: Unit[U, M] :Convertable, M <: UnitMeasure[M], P <: church.Integer :Constructable](up: UnitPower[U, M, P]) {
-    val toRef = implicitly[Convertable[U]].cf
+  implicit class EnrichUnitValue[U <: Unit[U], P <: church.Integer :Constructable](uv: UnitValue[UnitPower[U, P]])(implicit cu: Convertable[U, U#Measure#RefUnit]) {
+    val cfU = cu.cf
     val p = church.Integer.value[P]
-    def to[U2 <: Unit[U2, M] :Convertable] = {
-      val toU2 = implicitly[Convertable[U2]].cf
-      new UnitPower[U2, M, P](up.value * math.pow(toRef/toU2, p))
+
+    def to[UP <: UnitPower[_, P]](implicit cu2: Convertable[UP#Unit, U#Measure#RefUnit]) = {
+      val cfU2 = cu2.cf
+      new UnitValue[UP](uv.value * math.pow(cfU/cfU2, p))
     }
   }
 
-  implicit def toEnrichUnitPower[U <: Unit[U, M] :Convertable, M <: UnitMeasure[M], P <: church.Integer :Constructable](up: UnitPower[U, M, P]) = new EnrichUnitPower(up)
-
-  implicit val convertMeter: Convertable[Meter] = Convertable[Meter] { 1.0 }
-  implicit val convertFoot = Convertable[Foot] { 0.3048 }
-  implicit val convertSecond = Convertable[Second] { 1.0 }
-  implicit val convertMinute = Convertable[Minute] { 60.0 }
+  implicit val convertMeter = Convertable[Meter, Meter] { 1.0 }
+  implicit val convertFoot = Convertable[Foot, Meter] { 0.3048 }
+  implicit val convertSecond = Convertable[Second, Second] { 1.0 }
+  implicit val convertMinute = Convertable[Minute, Second] { 60.0 }
 }
-*/
 
-class Meter(value: Double) extends Unit[Meter](value) {
+class Meter extends Unit[Meter] {
   type Measure = Length
+  type Unit = Meter
 }
 
-class Foot(value: Double) extends Unit[Foot](value) {
+class Foot extends Unit[Foot] {
   type Measure = Length
+  type Unit = Foot
 }
 
-class Second(value: Double) extends Unit[Second](value) {
+class Second extends Unit[Second] {
   type Measure = Time
+  type Unit = Second
 }
 
-class Minute(value: Double) extends Unit[Minute](value) {
+class Minute extends Unit[Minute] {
   type Measure = Time
+  type Unit = Minute
 }
 
-/*
+class UnitValue[+UP <: UnitPower[_,_]](v: Double) {
+  def value = v
+}
+
 object test {
   import com.manyangled.unit4s.conversion._
-  import com.manyangled.church.Integer._
-  import com.manyangled.church.church$detail._
 
-  val m1 = new Meter(1.2)
-  val f1 = new Foot(3.4)
-  val s1 = new Second(4.5)
-  val mm1 = new Minute(5.6)
+  val m1 = new UnitValue[Meter](1.2)
+  val f1 = new UnitValue[Foot](3.4)
+  val s1 = new UnitValue[Second](4.5)
+  val n1 = new UnitValue[Minute](5.6)
 
   val f2 = m1.to[Foot]
 }
-*/
