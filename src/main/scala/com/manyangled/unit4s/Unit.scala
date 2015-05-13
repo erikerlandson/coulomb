@@ -6,15 +6,12 @@ import com.manyangled.church
 import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
 trait UnitMeasure[M <: UnitMeasure[M]] {
-  type RefUnit <: Unit[RefUnit, M]
 }
 
 trait Length extends UnitMeasure[Length] {
-  type RefUnit = Meter
 }
 
 trait Time extends UnitMeasure[Time] {
-  type RefUnit = Second
 }
 
 trait Convertable[U] {
@@ -27,15 +24,17 @@ object Convertable {
   }
 }
 
-class UnitPower[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer](v: Double) {
+abstract class UnitPower[U <: Unit[U], P <: church.Integer](v: Double) {
+  type Measure <: UnitMeasure[Measure]
   type Unit = U
-  type Measure = M
   type Power = P
   final def value = v
 }
 
-class Unit[U <: Unit[U, M], M <: UnitMeasure[M]](v: Double) extends UnitPower[U, M, church.Integer._1](v)
+abstract class Unit[U <: Unit[U]](v: Double) extends UnitPower[U, church.Integer._1](v) {
+}
 
+/*
 object conversion {
   import scala.language.implicitConversions
 
@@ -55,15 +54,25 @@ object conversion {
   implicit val convertSecond = Convertable[Second] { 1.0 }
   implicit val convertMinute = Convertable[Minute] { 60.0 }
 }
+*/
 
-class Meter(value: Double) extends Unit[Meter, Length](value)
+class Meter(value: Double) extends Unit[Meter](value) {
+  type Measure = Length
+}
 
-class Foot(value: Double) extends Unit[Foot, Length](value)
+class Foot(value: Double) extends Unit[Foot](value) {
+  type Measure = Length
+}
 
-class Second(value: Double) extends Unit[Second, Time](value)
+class Second(value: Double) extends Unit[Second](value) {
+  type Measure = Time
+}
 
-class Minute(value: Double) extends Unit[Minute, Time](value)
+class Minute(value: Double) extends Unit[Minute](value) {
+  type Measure = Time
+}
 
+/*
 object test {
   import com.manyangled.unit4s.conversion._
   import com.manyangled.church.Integer._
@@ -76,3 +85,4 @@ object test {
 
   val f2 = m1.to[Foot]
 }
+*/
