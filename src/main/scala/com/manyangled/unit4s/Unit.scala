@@ -72,31 +72,40 @@ class Meter extends Unit[Meter, Length] {
   type Measure = Length
   type Unit = Meter
 }
+object Meter extends Meter {
+}
 
 class Foot extends Unit[Foot, Length] {
   type Measure = Length
   type Unit = Foot
 }
+object Foot extends Foot
 
 class Second extends Unit[Second, Time] {
   type Measure = Time
   type Unit = Second
 }
+object Second extends Second
 
 class Minute extends Unit[Minute, Time] {
   type Measure = Time
   type Unit = Minute
 }
+object Minute extends Minute
 
 class UnitValue[UP <: UnitPower[_,_,_]](v: Double) {
   def value = v
 }
 
+object UnitValue {
+  def apply[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer](v: Double, u: UnitPower[U, M, P]) = new UnitValue[UnitPower[U,M,P]](v) with UnitMeasurePower[M, P]
+}
+
 object test {
   import com.manyangled.unit4s.conversion._
 
-  val m1 = new UnitValue[Meter](1.2)
-  val f1 = new UnitValue[Foot](3.4)
+  val m1 = UnitValue(1.2, Meter)
+  val f1 = UnitValue(3.4, Foot)
   val s1 = new UnitValue[Second](4.5)
   val n1 = new UnitValue[Minute](5.6)
 
@@ -104,5 +113,5 @@ object test {
 
   case class Equal[A >: B <: B, B]()
 
-  
+  def f[UV <: UnitValue[_] with Length](v: UV) = v.value
 }
