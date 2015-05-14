@@ -51,6 +51,13 @@ object conversion {
   implicit val convertFoot = Convertable[Foot, Meter] { 0.3048 }
   implicit val convertSecond = Convertable[Second, Second] { 1.0 }
   implicit val convertMinute = Convertable[Minute, Second] { 60.0 }
+
+  implicit def convertUV[U1 <: Unit[U1], U2 <: Unit[U2], P <: church.Integer: Constructable](uv1: UnitValue[UnitPower[U1, P]])(implicit cu1: Convertable[U1, U1#Measure#RefUnit], cu2: Convertable[U2, U2#Measure#RefUnit]): UnitValue[UnitPower[U2, P]] = {
+    val p = church.Integer.value[P]
+    val cf1 = cu1.cf
+    val cf2 = cu2.cf
+    new UnitValue[UnitPower[U2, P]](uv1.value * math.pow(cf1/cf2, p))
+  }
 }
 
 class Meter extends Unit[Meter] {
@@ -86,4 +93,8 @@ object test {
   val n1 = new UnitValue[Minute](5.6)
 
   val f2 = m1.to[Foot]
+
+  case class Equal[A >: B <: B, B]()
+
+  
 }
