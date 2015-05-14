@@ -5,10 +5,10 @@ import scala.language.higherKinds
 import com.manyangled.church
 import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
-trait UnitMeasurePower[+M <: UnitMeasure[M], P <: church.Integer] {
+trait UnitMeasurePower[M <: UnitMeasure[M], P <: church.Integer] {
 }
 
-trait UnitMeasure[+M <: UnitMeasure[M]] extends UnitMeasurePower[M, church.Integer._1] {
+trait UnitMeasure[M <: UnitMeasure[M]] extends UnitMeasurePower[M, church.Integer._1] {
   type RefUnit <: Unit[RefUnit, M]
 }
 
@@ -30,14 +30,14 @@ object Convertable {
   }
 }
 
-abstract class UnitPower[+U <: Unit[U, M], +M <: UnitMeasure[M], P <: church.Integer] extends UnitMeasurePower[M, P] {
+abstract class UnitPower[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer] extends UnitMeasurePower[M, P] {
   type Measure <: M
   type Unit <: U
 }
 
-abstract class Unit[+U <: Unit[U, M], +M <: UnitMeasure[M]] extends UnitPower[U, M, church.Integer._1]
-
-//Power[+U <: UnitPower[_, _, _]
+abstract class Unit[U <: Unit[U, M], M <: UnitMeasure[M]] extends UnitPower[U, M, church.Integer._1] {
+  type Pow[Q <: church.Integer] = UnitPower[U, M, Q]
+}
 
 object conversion {
   import scala.language.implicitConversions
@@ -88,7 +88,7 @@ class Minute extends Unit[Minute, Time] {
   type Unit = Minute
 }
 
-class UnitValue[+UP <: UnitPower[_,_,_]](v: Double) {
+class UnitValue[UP <: UnitPower[_,_,_]](v: Double) {
   def value = v
 }
 
