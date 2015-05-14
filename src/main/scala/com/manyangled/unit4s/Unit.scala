@@ -5,8 +5,11 @@ import scala.language.higherKinds
 import com.manyangled.church
 import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
-trait UnitMeasure[+M <: UnitMeasure[M]] {
-  type RefUnit <: Unit[RefUnit]
+trait UnitMeasurePower[+M <: UnitMeasure[M], P <: church.Integer] {
+}
+
+trait UnitMeasure[+M <: UnitMeasure[M]] extends UnitMeasurePower[M, church.Integer._1] {
+  type RefUnit <: Unit[RefUnit, M]
 }
 
 trait Length extends UnitMeasure[Length] {
@@ -27,15 +30,19 @@ object Convertable {
   }
 }
 
-abstract class UnitPower[+U <: Unit[U], P <: church.Integer] {
-  type Measure <: UnitMeasure[Measure]
+abstract class UnitPower[+U <: Unit[U, M], +M <: UnitMeasure[M], P <: church.Integer] extends UnitMeasurePower[M, P] {
+  type Measure <: M
   type Unit <: U
 }
 
-abstract class Unit[+U <: Unit[U]] extends UnitPower[U, church.Integer._1]
+abstract class Unit[+U <: Unit[U, M], +M <: UnitMeasure[M]] extends UnitPower[U, M, church.Integer._1]
+
+//Power[+U <: UnitPower[_, _, _]
 
 object conversion {
   import scala.language.implicitConversions
+
+/*
 
   implicit class EnrichUnitValue[U <: Unit[U], P <: church.Integer :Constructable](uv: UnitValue[UnitPower[U, P]])(implicit cu: Convertable[U, U#Measure#RefUnit]) {
     val cfU = cu.cf
@@ -58,29 +65,30 @@ object conversion {
     val cf2 = cu2.cf
     new UnitValue[UnitPower[U2, P]](uv1.value * math.pow(cf1/cf2, p))
   }
+*/
 }
 
-class Meter extends Unit[Meter] {
+class Meter extends Unit[Meter, Length] {
   type Measure = Length
   type Unit = Meter
 }
 
-class Foot extends Unit[Foot] {
+class Foot extends Unit[Foot, Length] {
   type Measure = Length
   type Unit = Foot
 }
 
-class Second extends Unit[Second] {
+class Second extends Unit[Second, Time] {
   type Measure = Time
   type Unit = Second
 }
 
-class Minute extends Unit[Minute] {
+class Minute extends Unit[Minute, Time] {
   type Measure = Time
   type Unit = Minute
 }
 
-class UnitValue[+UP <: UnitPower[_,_]](v: Double) {
+class UnitValue[+UP <: UnitPower[_,_,_]](v: Double) {
   def value = v
 }
 
@@ -92,7 +100,7 @@ object test {
   val s1 = new UnitValue[Second](4.5)
   val n1 = new UnitValue[Minute](5.6)
 
-  val f2 = m1.to[Foot]
+//  val f2 = m1.to[Foot]
 
   case class Equal[A >: B <: B, B]()
 
