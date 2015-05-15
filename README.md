@@ -8,6 +8,11 @@ I want units to be related by their exponents, and I want the exponent to also b
 ``` scala
 type Length = DimensionPower[Length, church.Integer._1]
 type Area = DimensionPower[Length, church.Integer._2]
+
+// Meter <: Length
+type Meter = UnitPower[Meter, church.Integer._1]
+// SquareMeter <: Area
+type SquareMeter = UnitPower[Meter, church.Integer._2]
 ```
 
 **Support easy context bounds for Dimension**
@@ -22,6 +27,8 @@ def f[UnitValue :Length](x: UnitValue) {
 **Support easy conversion between units**
 ``` scala
 val feet = Meter(1.0).to[Foot]
+val squareFeet = SquareMeter(1.0).to[SquareFoot]
+val sf2 = SquareMeter(1.0).to[Power[Foot, church.Integer._2]]
 ```
 Did this successfully using implicits, so far.  Might be a bit inconvenient for a user to code, but not sure any user will need to.
 
