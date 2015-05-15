@@ -79,17 +79,19 @@ class UnitValue[UP <: UnitPower[_,_,_]](v: Double) {
   def value = v
 }
 
+/*
 object UnitValue {
   def apply[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer](v: Double, u: UnitPower[U, M, P]) = new UnitValue[UnitPower[U,M,P]](v) with UnitConstraint[UnitMeasurePower[M, P]]
 }
+*/
 
 object test {
   import com.manyangled.unit4s.conversion._
 
-  val m1 = UnitValue(1.2, Meter)
-  val f1 = UnitValue(3.4, Foot)
-  val s1 = UnitValue(4.5, Second)
-  val n1 = UnitValue(5.6, Minute)
+  val m1 = Meter(1.2)
+  val f1 = Foot(3.4)
+  val s1 = Second(4.5)
+  val n1 = Minute(5.6)
 
   val f2 = m1.to(Foot)
 
@@ -102,7 +104,7 @@ object test {
   type SquareFoot = Foot#Pow[church.Integer._2]
   object SquareFoot extends SquareFoot
 
-  val sqm1 = UnitValue(4.0, SquareMeter)
+  val sqm1 = SquareMeter(4.0)
   val sqf1 = sqm1.to(SquareFoot)
 
   def h[UV <: UnitValue[_] with UnitConstraint[Area]](v: UV) = v.value
