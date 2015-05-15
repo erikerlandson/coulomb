@@ -1,6 +1,4 @@
-package com.manyangled
-
-object unit4s {
+package com.manyangled.unit4s
 
 import scala.language.higherKinds
 
@@ -35,25 +33,25 @@ object Convertable {
   }
 }
 
-class UnitPower[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer] {
-  final def apply(v: Double) = new UnitValue[UnitPower[U, M, P]](v) with UnitConstraint[UnitMeasurePower[M, P]]
+trait UnitPower[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer] {
+  final def apply(v: Double) = new UnitValue[U, M, P](v)
 }
 
-class Unit[U <: Unit[U, M], M <: UnitMeasure[M]] extends UnitPower[U, M, church.Integer._1] {
+trait Unit[U <: Unit[U, M], M <: UnitMeasure[M]] extends UnitPower[U, M, church.Integer._1] {
   type Pow[Q <: church.Integer] = UnitPower[U, M, Q]
 }
 
 object conversion {
   import scala.language.implicitConversions
 
-  implicit class EnrichUnitValue[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer :Constructable](uv: UnitValue[UnitPower[U, M, P]]) {
+  implicit class EnrichUnitValue[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer :Constructable](uv: UnitValue[U, M, P]) {
     def to[U2 <: Unit[U2, M]](up: UnitPower[U2, M, P])(implicit
       cu: Convertable[U, M#RefUnit],
       cu2: Convertable[U2, M#RefUnit]) = {
       val cfU = cu.cf
       val cfU2 = cu2.cf
       val p = church.Integer.value[P]
-      new UnitValue[UnitPower[U2, M, P]](uv.value * math.pow(cfU/cfU2, p)) with UnitConstraint[UnitMeasurePower[M, P]]
+      new UnitValue[U2, M, P](uv.value * math.pow(cfU/cfU2, p))
     }
   }
 
@@ -75,15 +73,13 @@ object Second extends Second
 class Minute extends Unit[Minute, Time]
 object Minute extends Minute
 
-class UnitValue[UP <: UnitPower[_,_,_]](v: Double) {
-  def value = v
+trait UValue {
+  def value: Double
 }
 
-/*
-object UnitValue {
-  def apply[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer](v: Double, u: UnitPower[U, M, P]) = new UnitValue[UnitPower[U,M,P]](v) with UnitConstraint[UnitMeasurePower[M, P]]
+class UnitValue[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer](v: Double) extends UValue with UnitPower[U, M, P] with UnitConstraint[UnitMeasurePower[M, P]] {
+  def value = v
 }
-*/
 
 object test {
   import com.manyangled.unit4s.conversion._
@@ -95,8 +91,8 @@ object test {
 
   val f2 = m1.to(Foot)
 
-  def f[UV <: UnitValue[_] with UnitConstraint[Length]](v: UV) = v.value
-  def g[UV <: UnitValue[_] with UnitConstraint[Time#Pow[church.Integer._1]]](v: UV) = v.value
+  def f[UV <: UValue with UnitConstraint[Length]](v: UV) = v.value
+  def g[UV <: UValue with UnitConstraint[Time#Pow[church.Integer._1]]](v: UV) = v.value
 
   type Area = Length#Pow[church.Integer._2]
   type SquareMeter = Meter#Pow[church.Integer._2]
@@ -107,7 +103,5 @@ object test {
   val sqm1 = SquareMeter(4.0)
   val sqf1 = sqm1.to(SquareFoot)
 
-  def h[UV <: UnitValue[_] with UnitConstraint[Area]](v: UV) = v.value
-}
-
+  def h[UV <: UValue with UnitConstraint[Area]](v: UV) = v.value
 }
