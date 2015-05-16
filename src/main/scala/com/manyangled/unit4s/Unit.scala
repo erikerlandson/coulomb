@@ -107,4 +107,10 @@ object test {
   def h[UV <: UValue with UnitConstraint[Area]](v: UV) = v.value
 
   def j[UV <: UValue with WithUnit[Meter]](v: UV) = v.value
+
+  def k[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer :Constructable](v: UValue with WithUnit[UnitPower[U, M, P]]) = {
+    val p = church.Integer.value[P]
+    println(s"p = $p")
+    v.value
+  }
 }
