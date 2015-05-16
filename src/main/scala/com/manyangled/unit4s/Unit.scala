@@ -14,6 +14,7 @@ trait UnitMeasure[M <: UnitMeasure[M]] extends UnitMeasurePower[M, church.Intege
 
 // contravariance!
 trait UnitConstraint[-UMP <: UnitMeasurePower[_,_]]
+trait WithUnit[-UP <: UnitPower[_,_,_]]
 
 trait Length extends UnitMeasure[Length] {
   type RefUnit = Meter
@@ -77,7 +78,7 @@ trait UValue {
   def value: Double
 }
 
-class UnitValue[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer](v: Double) extends UValue with UnitPower[U, M, P] with UnitConstraint[UnitMeasurePower[M, P]] {
+class UnitValue[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer](v: Double) extends UValue with WithUnit[UnitPower[U, M, P]] with UnitConstraint[UnitMeasurePower[M, P]] {
   def value = v
 }
 
@@ -104,4 +105,6 @@ object test {
   val sqf1 = sqm1.to(SquareFoot)
 
   def h[UV <: UValue with UnitConstraint[Area]](v: UV) = v.value
+
+  def j[UV <: UValue with WithUnit[Meter]](v: UV) = v.value
 }
