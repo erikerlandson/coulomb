@@ -111,6 +111,17 @@ class IntegerSpec extends FlatSpec with Matchers {
     "Equal[_9#Sub[_9]#Sub[_9], _neg9]" should compile
   }
 
+  it should "support Mul type operator" in {
+    import Integer._
+    "Equal[_0#Mul[_1], _0]" should compile
+    "Equal[_0#Mul[_2], _0]" should compile
+    "Equal[_2#Mul[_0], _0]" should compile
+    "Equal[_2#Mul[_2], _4]" should compile
+    "Equal[_2#Mul[_neg2], _neg4]" should compile
+    "Equal[_neg2#Mul[_2], _neg4]" should compile
+    "Equal[_neg2#Mul[_neg2], _4]" should compile
+  }
+
   it should "support composed type operators" in {
     import Integer._
 
