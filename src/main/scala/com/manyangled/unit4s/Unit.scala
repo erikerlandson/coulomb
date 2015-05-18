@@ -92,57 +92,70 @@ object UVal {
 } // infra
 } // unit4s
 
+object ISQ {
+  type Length = infra.Length#Type
+  type Time = infra.Time#Type
+
+  object infra {
+    import com.manyangled.unit4s.infra._
+
+    trait Length extends BaseQuantity[Length] {
+      type RefUnit = Meter
+    }
+
+    trait Time extends BaseQuantity[Time] {
+      type RefUnit = Second
+    }
+
+    class Meter extends BaseUnit[Meter, Length]
+    object Meter {
+      implicit val convertMeter = Convertable[Meter, Meter] { 1.0 }
+    }
+
+    class Second extends BaseUnit[Second, Time]
+    object Second {
+      implicit val convertSecond = Convertable[Second, Second] { 1.0 }
+    }
+  }
+}
+
+object ISU {
+  type Meter = ISQ.infra.Meter#Type
+  object Meter extends ISQ.infra.Meter
+
+  type Second = ISQ.infra.Second#Type
+  object Second extends ISQ.infra.Second
+}
+
 // test definition of a new set of units
-object testunits {
-import com.manyangled.unit4s.infra._
+object custom {
+  type Foot = infra.Foot#Type
+  object Foot extends infra.Foot
 
-object defined {
+  type Minute = infra.Minute#Type
+  object Minute extends infra.Minute
 
-trait Length extends BaseQuantity[Length] {
-  type RefUnit = Meter
+  object infra {
+    import com.manyangled.unit4s.infra._
+    import com.manyangled.ISQ.infra._
+
+    class Foot extends BaseUnit[Foot, Length]
+    object Foot {
+      implicit val convertFoot = Convertable[Foot, Meter] { 0.3048 }
+    }
+
+    class Minute extends BaseUnit[Minute, Time]
+    object Minute {
+      implicit val convertMinute = Convertable[Minute, Second] { 60.0 }
+    }
+  }
 }
-
-trait Time extends BaseQuantity[Time] {
-  type RefUnit = Second
-}
-
-class Meter extends BaseUnit[Meter, Length]
-class Foot extends BaseUnit[Foot, Length]
-
-class Second extends BaseUnit[Second, Time]
-class Minute extends BaseUnit[Minute, Time]
-
-} // defined
-
-object conversion {
-  implicit val convertMeter = Convertable[defined.Meter, defined.Meter] { 1.0 }
-  implicit val convertFoot = Convertable[defined.Foot, defined.Meter] { 0.3048 }
-  implicit val convertSecond = Convertable[defined.Second, defined.Second] { 1.0 }
-  implicit val convertMinute = Convertable[defined.Minute, defined.Second] { 60.0 }
-}
-
-type Length = defined.Length#Type
-type Time = defined.Time#Type
-
-type Meter = defined.Meter#Type
-object Meter extends defined.Meter
-
-type Foot = defined.Foot#Type
-object Foot extends defined.Foot
-
-type Second = defined.Second#Type
-object Second extends defined.Second
-
-type Minute = defined.Minute#Type
-object Minute extends defined.Minute
-
-} // testunits
-
 
 object test {
   import com.manyangled.unit4s._
-  import com.manyangled.testunits._
-  import com.manyangled.testunits.conversion._
+  import com.manyangled.ISQ._
+  import com.manyangled.ISU._
+  import com.manyangled.custom._
 
   val m1 = Meter(1.2)
   val f1 = Foot(3.4)
