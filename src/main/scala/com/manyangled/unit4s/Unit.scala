@@ -32,7 +32,7 @@ object Convertable {
 }
 
 abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable] {
-  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UVal[U, Q, P](v) with QuantityOf[Quantity[Q, P]]
+  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UVal[U, Q, P](v)
   type Type = Unit[U, Q, P]
   type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
 }
@@ -81,7 +81,7 @@ object UVal {
       val cfU = cu.cf
       val cfU2 = cu2.cf
       val p = church.Integer.value[P]
-      new UVal[U2, Q, P](uv.value * math.pow(cfU/cfU2, p)) with QuantityOf[Quantity[Q, P]]
+      new UVal[U2, Q, P](uv.value * math.pow(cfU/cfU2, p))
     }
   }
 }
