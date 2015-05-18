@@ -11,11 +11,11 @@ object framework {
 
 trait UnitMeasurePower[M <: UnitMeasure[M], P <: church.Integer] {
   type Type = UnitMeasurePower[M, P]
+  type Pow[Q <: church.Integer] = UnitMeasurePower[M, P#Mul[Q]]
 }
 
 trait UnitMeasure[M <: UnitMeasure[M]] extends UnitMeasurePower[M, church.Integer._1] {
   type RefUnit <: Unit[RefUnit, M]
-  type Pow[Q <: church.Integer] = UnitMeasurePower[M, Q]
 }
 
 trait UnitConstraint[UMP <: UnitMeasurePower[_,_]]
@@ -34,10 +34,10 @@ object Convertable {
 abstract class UnitPower[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer :Constructable] {
   final def apply(v: Double)(implicit x: Convertable[U, M#RefUnit]) = new UnitValue[U, M, P](v) with UnitConstraint[UnitMeasurePower[M, P]]
   type Type = UnitPower[U, M, P]
+  type Pow[Q <: church.Integer] = UnitPower[U, M, P#Mul[Q]]
 }
 
 abstract class Unit[U <: Unit[U, M], M <: UnitMeasure[M]] extends UnitPower[U, M, church.Integer._1] {
-  type Pow[Q <: church.Integer] = UnitPower[U, M, Q]
 }
 
 trait UValue {
@@ -151,7 +151,6 @@ object test {
   def f(v: UValue with UnitConstraint[Length]) = v.to(Meter)
   def j(v: UValue with WithUnit[Meter]) = v.value
 
-/*
   def g(v: UValue with UnitConstraint[Time#Pow[church.Integer._1]]) = v.to(Second)
 
   type Area = Length#Pow[church.Integer._2]
@@ -163,12 +162,12 @@ object test {
   val sqm1 = SquareMeter(4.0)
   val sqf1 = sqm1.to(SquareFoot)
 
-  def h[UV <: UValue with UnitConstraint[Area]](v: UV) = v.value
+  def h(v: UValue with UnitConstraint[Area]) = v.to(SquareMeter)
 
+  import com.manyangled.util.Constructable
   def k[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer :Constructable](v: UValue with WithUnit[UnitPower[U, M, P]]) = {
     val p = church.Integer.value[P]
-    println(s"p = $p")
+    println(s"v= ${v.value}  p= $p")
     v.value
   }
-*/
 } // test
