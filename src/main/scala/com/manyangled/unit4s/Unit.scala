@@ -18,8 +18,8 @@ trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] 
   type RefUnit <: BaseUnit[RefUnit, Q]
 }
 
-trait UnitConstraint[UMP <: Quantity[_,_]]
-trait WithUnit[UP <: Unit[_,_,_]]
+trait QuantityOf[UMP <: Quantity[_,_]]
+trait UnitOf[UP <: Unit[_,_,_]]
 
 trait Convertable[U, R] {
   def cf: Double
@@ -32,7 +32,7 @@ object Convertable {
 }
 
 abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable] {
-  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UnitValue[U, Q, P](v) with UnitConstraint[Quantity[Q, P]]
+  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UnitValue[U, Q, P](v) with QuantityOf[Quantity[Q, P]]
   type Type = Unit[U, Q, P]
   type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
 }
@@ -46,7 +46,7 @@ trait UValue {
 }
 
 object UValue {
-  implicit class EnrichWithDimension[Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with UnitConstraint[Quantity[Q, P]]) {
+  implicit class EnrichWithDimension[Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with QuantityOf[Quantity[Q, P]]) {
     def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = uv.cfRef
@@ -55,7 +55,7 @@ object UValue {
       new UnitValue[U2, Q, P](uv.value * math.pow(cfU/cfU2, p))
     }
   }
-  implicit class EnrichWithUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with WithUnit[Unit[U, Q, P]]) {
+  implicit class EnrichUnitOf[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with UnitOf[Unit[U, Q, P]]) {
     def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = uv.cfRef
@@ -66,7 +66,7 @@ object UValue {
   }
 }
 
-class UnitValue[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UValue with WithUnit[Unit[U, Q, P]] with UnitConstraint[Quantity[Q, P]] {
+class UnitValue[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
   def value = v
   def cfRef = cu.cf
 }
@@ -81,7 +81,7 @@ object UnitValue {
       val cfU = cu.cf
       val cfU2 = cu2.cf
       val p = church.Integer.value[P]
-      new UnitValue[U2, Q, P](uv.value * math.pow(cfU/cfU2, p)) with UnitConstraint[Quantity[Q, P]]
+      new UnitValue[U2, Q, P](uv.value * math.pow(cfU/cfU2, p)) with QuantityOf[Quantity[Q, P]]
     }
   }
 }
@@ -148,10 +148,10 @@ object test {
 
   val f2 = m1.to(Foot)
 
-  def f(v: UValue with UnitConstraint[Length]) = v.to(Meter)
-  def j(v: UValue with WithUnit[Meter]) = v.value
+  def f(v: UValue with QuantityOf[Length]) = v.to(Meter)
+  def j(v: UValue with UnitOf[Meter]) = v.value
 
-  def g(v: UValue with UnitConstraint[Time#Pow[church.Integer._1]]) = v.to(Second)
+  def g(v: UValue with QuantityOf[Time#Pow[church.Integer._1]]) = v.to(Second)
 
   type Area = Length#Pow[church.Integer._2]
   type SquareMeter = Meter#Pow[church.Integer._2]
@@ -162,10 +162,10 @@ object test {
   val sqm1 = SquareMeter(4.0)
   val sqf1 = sqm1.to(SquareFoot)
 
-  def h(v: UValue with UnitConstraint[Area]) = v.to(SquareMeter)
+  def h(v: UValue with QuantityOf[Area]) = v.to(SquareMeter)
 
   import com.manyangled.util.Constructable
-  def k[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UValue with WithUnit[Unit[U, Q, P]]) = {
+  def k[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UValue with UnitOf[Unit[U, Q, P]]) = {
     val p = church.Integer.value[P]
     println(s"v= ${v.value}  p= $p")
     v.value
