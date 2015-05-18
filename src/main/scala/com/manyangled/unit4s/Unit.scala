@@ -15,11 +15,11 @@ trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
 }
 
 trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] {
-  type RefUnit <: Unit[RefUnit, Q]
+  type RefUnit <: BaseUnit[RefUnit, Q]
 }
 
 trait UnitConstraint[UMP <: Quantity[_,_]]
-trait WithUnit[UP <: UnitPower[_,_,_]]
+trait WithUnit[UP <: Unit[_,_,_]]
 
 trait Convertable[U, R] {
   def cf: Double
@@ -31,13 +31,13 @@ object Convertable {
   }
 }
 
-abstract class UnitPower[U <: Unit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable] {
+abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable] {
   final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UnitValue[U, Q, P](v) with UnitConstraint[Quantity[Q, P]]
-  type Type = UnitPower[U, Q, P]
-  type Pow[K <: church.Integer] = UnitPower[U, Q, P#Mul[K]]
+  type Type = Unit[U, Q, P]
+  type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
 }
 
-abstract class Unit[U <: Unit[U, Q], Q <: BaseQuantity[Q]] extends UnitPower[U, Q, church.Integer._1] {
+abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1] {
 }
 
 trait UValue {
@@ -47,7 +47,7 @@ trait UValue {
 
 object UValue {
   implicit class EnrichWithDimension[Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with UnitConstraint[Quantity[Q, P]]) {
-    def to[U2 <: Unit[U2, Q]](up: UnitPower[U2, Q, P])(implicit
+    def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = uv.cfRef
       val cfU2 = cu2.cf
@@ -55,8 +55,8 @@ object UValue {
       new UnitValue[U2, Q, P](uv.value * math.pow(cfU/cfU2, p))
     }
   }
-  implicit class EnrichWithUnit[U <: Unit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with WithUnit[UnitPower[U, Q, P]]) {
-    def to[U2 <: Unit[U2, Q]](up: UnitPower[U2, Q, P])(implicit
+  implicit class EnrichWithUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with WithUnit[Unit[U, Q, P]]) {
+    def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = uv.cfRef
       val cfU2 = cu2.cf
@@ -66,7 +66,7 @@ object UValue {
   }
 }
 
-class UnitValue[U <: Unit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UValue with WithUnit[UnitPower[U, Q, P]] with UnitConstraint[Quantity[Q, P]] {
+class UnitValue[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UValue with WithUnit[Unit[U, Q, P]] with UnitConstraint[Quantity[Q, P]] {
   def value = v
   def cfRef = cu.cf
 }
@@ -74,8 +74,8 @@ class UnitValue[U <: Unit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Cons
 object UnitValue {
   import scala.language.implicitConversions
 
-  implicit class EnrichUnitValue[U <: Unit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue[U, Q, P]) {
-    def to[U2 <: Unit[U2, Q]](up: UnitPower[U2, Q, P])(implicit
+  implicit class EnrichUnitValue[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue[U, Q, P]) {
+    def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu: Convertable[U, Q#RefUnit],
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = cu.cf
@@ -103,11 +103,11 @@ trait Time extends BaseQuantity[Time] {
   type RefUnit = Second
 }
 
-class Meter extends Unit[Meter, Length]
-class Foot extends Unit[Foot, Length]
+class Meter extends BaseUnit[Meter, Length]
+class Foot extends BaseUnit[Foot, Length]
 
-class Second extends Unit[Second, Time]
-class Minute extends Unit[Minute, Time]
+class Second extends BaseUnit[Second, Time]
+class Minute extends BaseUnit[Minute, Time]
 
 } // defined
 
@@ -165,7 +165,7 @@ object test {
   def h(v: UValue with UnitConstraint[Area]) = v.to(SquareMeter)
 
   import com.manyangled.util.Constructable
-  def k[U <: Unit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UValue with WithUnit[UnitPower[U, Q, P]]) = {
+  def k[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UValue with WithUnit[Unit[U, Q, P]]) = {
     val p = church.Integer.value[P]
     println(s"v= ${v.value}  p= $p")
     v.value
