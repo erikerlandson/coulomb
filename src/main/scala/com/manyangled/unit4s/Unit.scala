@@ -11,7 +11,7 @@ object framework {
 
 trait UnitMeasurePower[M <: UnitMeasure[M], P <: church.Integer] {
   type Type = UnitMeasurePower[M, P]
-  type Pow[Q <: church.Integer] = UnitMeasurePower[M, P#Mul[Q]]
+  type Pow[K <: church.Integer] = UnitMeasurePower[M, P#Mul[K]]
 }
 
 trait UnitMeasure[M <: UnitMeasure[M]] extends UnitMeasurePower[M, church.Integer._1] {
@@ -34,7 +34,7 @@ object Convertable {
 abstract class UnitPower[U <: Unit[U, M], M <: UnitMeasure[M], P <: church.Integer :Constructable] {
   final def apply(v: Double)(implicit x: Convertable[U, M#RefUnit]) = new UnitValue[U, M, P](v) with UnitConstraint[UnitMeasurePower[M, P]]
   type Type = UnitPower[U, M, P]
-  type Pow[Q <: church.Integer] = UnitPower[U, M, P#Mul[Q]]
+  type Pow[K <: church.Integer] = UnitPower[U, M, P#Mul[K]]
 }
 
 abstract class Unit[U <: Unit[U, M], M <: UnitMeasure[M]] extends UnitPower[U, M, church.Integer._1] {
