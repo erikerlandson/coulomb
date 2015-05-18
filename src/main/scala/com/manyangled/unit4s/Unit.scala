@@ -7,38 +7,10 @@ import scala.language.higherKinds
 import com.manyangled.church
 import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
-object framework {
-
-trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
-  type Type = Quantity[Q, P]
-  type Pow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
-}
-
-trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] {
-  type RefUnit <: BaseUnit[RefUnit, Q]
-}
+import infra._
 
 trait QuantityOf[UMP <: Quantity[_,_]]
 trait UnitOf[UP <: Unit[_,_,_]]
-
-trait Convertable[U, R] {
-  def cf: Double
-}
-
-object Convertable {
-  def apply[U, R](blk: => Double) = new Convertable[U, R] {
-    def cf = blk
-  }
-}
-
-abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable] {
-  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UVal[U, Q, P](v)
-  type Type = Unit[U, Q, P]
-  type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
-}
-
-abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1] {
-}
 
 trait UnitValue {
   def value: Double
@@ -66,6 +38,37 @@ object UnitValue {
   }
 }
 
+object infra {
+
+trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
+  type Type = Quantity[Q, P]
+  type Pow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
+}
+
+trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] {
+  type RefUnit <: BaseUnit[RefUnit, Q]
+}
+
+trait Convertable[U, R] {
+  def cf: Double
+}
+
+object Convertable {
+  def apply[U, R](blk: => Double) = new Convertable[U, R] {
+    def cf = blk
+  }
+}
+
+abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable] {
+  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UVal[U, Q, P](v)
+  type Type = Unit[U, Q, P]
+  type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
+}
+
+abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1] {
+}
+
+
 class UVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UnitValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
   def value = v
   def cfRef = cu.cf
@@ -86,12 +89,12 @@ object UVal {
   }
 }
 
-} // framework
+} // infra
 } // unit4s
 
 // test definition of a new set of units
 object testunits {
-import com.manyangled.unit4s.framework._
+import com.manyangled.unit4s.infra._
 
 object defined {
 
@@ -137,7 +140,7 @@ object Minute extends defined.Minute
 
 
 object test {
-  import com.manyangled.unit4s.framework._
+  import com.manyangled.unit4s._
   import com.manyangled.testunits._
   import com.manyangled.testunits.conversion._
 
@@ -164,10 +167,13 @@ object test {
 
   def h(v: UnitValue with QuantityOf[Area]) = v.to(SquareMeter)
 
-  import com.manyangled.util.Constructable
-  def k[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UnitValue with UnitOf[Unit[U, Q, P]]) = {
-    val p = church.Integer.value[P]
-    println(s"v= ${v.value}  p= $p")
-    v.value
+  object subtest {
+    import com.manyangled.unit4s.infra._
+    import com.manyangled.util.Constructable
+    def k[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UnitValue with UnitOf[Unit[U, Q, P]]) = {
+      val p = church.Integer.value[P]
+      println(s"v= ${v.value}  p= $p")
+      v.value
+    }
   }
 } // test
