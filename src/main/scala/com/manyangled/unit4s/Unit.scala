@@ -46,7 +46,7 @@ trait UnitValue {
 }
 
 object UnitValue {
-  implicit class EnrichWithDimension[Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue with QuantityOf[Quantity[Q, P]]) {
+  implicit class EnrichQuantityOf[Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue with QuantityOf[Quantity[Q, P]]) {
     def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = uv.cfRef
