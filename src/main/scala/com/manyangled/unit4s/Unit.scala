@@ -32,7 +32,7 @@ object Convertable {
 }
 
 abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable] {
-  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UnitValue[U, Q, P](v) with QuantityOf[Quantity[Q, P]]
+  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UVal[U, Q, P](v) with QuantityOf[Quantity[Q, P]]
   type Type = Unit[U, Q, P]
   type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
 }
@@ -40,48 +40,48 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
 abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1] {
 }
 
-trait UValue {
+trait UnitValue {
   def value: Double
   def cfRef: Double
 }
 
-object UValue {
-  implicit class EnrichWithDimension[Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with QuantityOf[Quantity[Q, P]]) {
+object UnitValue {
+  implicit class EnrichWithDimension[Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue with QuantityOf[Quantity[Q, P]]) {
     def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = uv.cfRef
       val cfU2 = cu2.cf
       val p = church.Integer.value[P]
-      new UnitValue[U2, Q, P](uv.value * math.pow(cfU/cfU2, p))
+      new UVal[U2, Q, P](uv.value * math.pow(cfU/cfU2, p))
     }
   }
-  implicit class EnrichUnitOf[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UValue with UnitOf[Unit[U, Q, P]]) {
+  implicit class EnrichUnitOf[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue with UnitOf[Unit[U, Q, P]]) {
     def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = uv.cfRef
       val cfU2 = cu2.cf
       val p = church.Integer.value[P]
-      new UnitValue[U2, Q, P](uv.value * math.pow(cfU/cfU2, p))
+      new UVal[U2, Q, P](uv.value * math.pow(cfU/cfU2, p))
     }
   }
 }
 
-class UnitValue[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
+class UVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UnitValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
   def value = v
   def cfRef = cu.cf
 }
 
-object UnitValue {
+object UVal {
   import scala.language.implicitConversions
 
-  implicit class EnrichUnitValue[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue[U, Q, P]) {
+  implicit class EnrichUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UVal[U, Q, P]) {
     def to[U2 <: BaseUnit[U2, Q]](up: Unit[U2, Q, P])(implicit
       cu: Convertable[U, Q#RefUnit],
       cu2: Convertable[U2, Q#RefUnit]) = {
       val cfU = cu.cf
       val cfU2 = cu2.cf
       val p = church.Integer.value[P]
-      new UnitValue[U2, Q, P](uv.value * math.pow(cfU/cfU2, p)) with QuantityOf[Quantity[Q, P]]
+      new UVal[U2, Q, P](uv.value * math.pow(cfU/cfU2, p)) with QuantityOf[Quantity[Q, P]]
     }
   }
 }
@@ -148,10 +148,10 @@ object test {
 
   val f2 = m1.to(Foot)
 
-  def f(v: UValue with QuantityOf[Length]) = v.to(Meter)
-  def j(v: UValue with UnitOf[Meter]) = v.value
+  def f(v: UnitValue with QuantityOf[Length]) = v.to(Meter)
+  def j(v: UnitValue with UnitOf[Meter]) = v.value
 
-  def g(v: UValue with QuantityOf[Time#Pow[church.Integer._1]]) = v.to(Second)
+  def g(v: UnitValue with QuantityOf[Time#Pow[church.Integer._1]]) = v.to(Second)
 
   type Area = Length#Pow[church.Integer._2]
   type SquareMeter = Meter#Pow[church.Integer._2]
@@ -162,10 +162,10 @@ object test {
   val sqm1 = SquareMeter(4.0)
   val sqf1 = sqm1.to(SquareFoot)
 
-  def h(v: UValue with QuantityOf[Area]) = v.to(SquareMeter)
+  def h(v: UnitValue with QuantityOf[Area]) = v.to(SquareMeter)
 
   import com.manyangled.util.Constructable
-  def k[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UValue with UnitOf[Unit[U, Q, P]]) = {
+  def k[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UnitValue with UnitOf[Unit[U, Q, P]]) = {
     val p = church.Integer.value[P]
     println(s"v= ${v.value}  p= $p")
     v.value
