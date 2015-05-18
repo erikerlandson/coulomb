@@ -11,6 +11,7 @@ sealed trait Integer {
   type Dec <: Integer
   type Add[K <: Integer] <: Integer
   type Sub[K <: Integer] <: Integer
+  type Mul[K <: Integer] <: Integer
   type Neg <: Integer
 
   private[church] def value: Int
@@ -56,6 +57,7 @@ object church$detail {
     type Dec = N
     type Add[K <: Integer] = N#Add[K]#Inc
     type Sub[K <: Integer] = N#Sub[K]#Inc
+    type Mul[K <: Integer] = K#Add[N#Mul[K]]
     type Neg = N#Neg#Dec
 
     private[church] def value = {
@@ -68,6 +70,7 @@ object church$detail {
     type Dec = DecInteger[DecInteger[N]]
     type Add[K <: Integer] = N#Add[K]#Dec
     type Sub[K <: Integer] = N#Sub[K]#Dec
+    type Mul[K <: Integer] = Neg#Mul[K]#Neg
     type Neg = N#Neg#Inc
 
     private[church] def value = {
@@ -80,6 +83,7 @@ object church$detail {
     type Dec = DecInteger[Zero]
     type Add[K <: Integer] = K
     type Sub[K <: Integer] = K#Neg
+    type Mul[K <: Integer] = Zero
     type Neg = Zero
 
     private[church] def value = 0
