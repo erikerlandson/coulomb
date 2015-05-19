@@ -117,13 +117,11 @@ class PrefixUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer 
 class UVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UnitValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
   def value = v
   def cfRef = cu.cf
-  def prefix = UnitPrefix
+  def prefix: Prefix = UnitPrefix
 }
 
-class PrefixUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double, pre: Prefix)(implicit cu: Convertable[U, Q#RefUnit]) extends UnitValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
-  def value = v
-  def cfRef = cu.cf
-  def prefix = pre
+class PrefixUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double, pre: Prefix)(implicit cu: Convertable[U, Q#RefUnit]) extends UVal(v) with UnitValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
+  override def prefix = pre
 }
 
 object UVal {
@@ -147,6 +145,7 @@ object UVal {
       new PrefixUVal[U2, Q, P](uv.value * uv.prefix.factor * math.pow(cfU/cfU2, p) / u.prefix.factor, u.prefix)
     }
   }
+
 }
 
 } // infra
