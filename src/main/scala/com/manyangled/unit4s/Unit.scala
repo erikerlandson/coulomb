@@ -245,6 +245,8 @@ object test {
   val v2 = Kilo*Meter(2.0)
   val v3 = Meter(4000).to(Kilo*Meter)
 
+  val vec1: Vector[UnitValue with QuantityOf[Length]] = Vector(Meter(1.0), Foot(2.0), Milli*Meter(3.0))
+
   object subtest {
     import com.manyangled.unit4s.infra._
     import com.manyangled.util.Constructable
