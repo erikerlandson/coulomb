@@ -32,6 +32,7 @@ trait Prefix {
       override def unit = u
       override def value = u.value
       override def prefix = self
+      def power = u.power
     }
   }
   final override def toString = name
@@ -71,19 +72,33 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
   type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
   def name: String
   def cf: Double
+  def power: Int
   def value: Double = 1.0
   def prefix: Prefix = UnitPrefix
   def unit = this
   def apply(v: Double) = new Unit[U, Q, P] {
     def name = self.name
     def cf = self.cf
+    def power = self.power
     override def unit = self
     override def value = v
     override def prefix = self.prefix
   }
+  override def toString = {
+    val pre = if (prefix == UnitPrefix) "" else s"${prefix}-"
+    val exp =
+      if (power == 0) ""
+      else if (power == 1) ""
+      else if (power > 1) s"^$power"
+      else s"^($power)"
+    val u = if (power == 0) "" else s"($pre$name$exp)"
+    s"($value)$u"
+  }
 }
 
-abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1]
+abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1] {
+  def power = 1
+}
 
 } // infra
 } // unit4s
