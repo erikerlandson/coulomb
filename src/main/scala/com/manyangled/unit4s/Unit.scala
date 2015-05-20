@@ -9,67 +9,6 @@ import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
 import infra._
 
-trait QuantityOf[UMP <: Quantity[_,_]]
-trait UnitOf[UP <: Unit[_,_,_]]
-
-trait UnitValue {
-  def value: Double
-  def cfRef: Double
-  def prefix: Prefix
-}
-
-object UnitValue {
-  implicit class EnrichQuantityOf[Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue with QuantityOf[Quantity[Q, P]]) {
-    def to[U2 <: BaseUnit[U2, Q]](u: Unit[U2, Q, P])(implicit
-      cu2: Convertable[U2, Q#RefUnit]) = {
-      val cfU = uv.cfRef
-      val cfU2 = cu2.cf
-      val p = church.Integer.value[P]
-      new UVal[U2, Q, P](uv.value * uv.prefix.factor * math.pow(cfU/cfU2, p))
-    }
-    def to[U2 <: BaseUnit[U2, Q]](u: PrefixUnit[U2, Q, P])(implicit
-      cu2: Convertable[U2, Q#RefUnit]) = {
-      val cfU = uv.cfRef
-      val cfU2 = cu2.cf
-      val p = church.Integer.value[P]
-      new PrefixUVal[U2, Q, P](uv.value * uv.prefix.factor * math.pow(cfU/cfU2, p) / u.prefix.factor, u.prefix)
-    }
-/*
-    two problems: (1), what do I return in this case, as I have no LHS unit information
-    (2) overloading '+' with enrichment class appears to not resolve, although it compiles.
-    I assume same is true for '-','*','/'
-
-    def +[U2 <: BaseUnit[U2, Q]](uv2: UVal[U2, Q, P])(implicit
-      cu2: Convertable[U2, Q#RefUnit]): UVal[U, Q, P] = {
-      val cfU = uv.cfRef
-      val cfU2 = cu2.cf
-      val p = church.Integer.value[P]
-      val t = uv2.value * uv2.prefix.factor * math.pow(cfU2/cfU, p)
-      if (uv.prefix == UnitPrefix)
-        new UVal[U, Q, P](uv.value + t)
-      else
-        new PrefixUVal[U, Q, P](uv.value + (t / uv.prefix.factor), uv.prefix)
-    }
-*/
-  }
-  implicit class EnrichUnitOf[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue with UnitOf[Unit[U, Q, P]]) {
-    def to[U2 <: BaseUnit[U2, Q]](u: Unit[U2, Q, P])(implicit
-      cu2: Convertable[U2, Q#RefUnit]) = {
-      val cfU = uv.cfRef
-      val cfU2 = cu2.cf
-      val p = church.Integer.value[P]
-      new UVal[U2, Q, P](uv.value * uv.prefix.factor * math.pow(cfU/cfU2, p))
-    }
-    def to[U2 <: BaseUnit[U2, Q]](u: PrefixUnit[U2, Q, P])(implicit
-      cu2: Convertable[U2, Q#RefUnit]) = {
-      val cfU = uv.cfRef
-      val cfU2 = cu2.cf
-      val p = church.Integer.value[P]
-      new PrefixUVal[U2, Q, P](uv.value * uv.prefix.factor * math.pow(cfU/cfU2, p) / u.prefix.factor, u.prefix)
-    }
-  }
-}
-
 object Kilo extends Prefix {
   def factor = 1e3
   def name = "kilo"
@@ -82,102 +21,69 @@ object Milli extends Prefix {
 object infra {
 
 trait Prefix {
+  self =>
   def factor: Double
   def name: String
   final def ==(that: Prefix) = (this.factor == that.factor) && (this.name == that.name)
-  final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](u: Unit[U, Q, P])(implicit x: Convertable[U, Q#RefUnit]): PrefixUnit[U, Q, P] = {
-    new PrefixUnit[U, Q, P](this, u)
-  }
-  final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UVal[U, Q, P])(implicit c: Convertable[U, Q#RefUnit]): PrefixUVal[U, Q, P] = {
-    require(uv.prefix == UnitPrefix, s"UnitValue already has a prefix: (${uv.prefix})")
-    new PrefixUVal[U, Q, P](uv.value, this)
+  final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P]) = {
+    new Unit[U, Q, P] {
+      def name = u.name
+      def cf = u.cf
+      override def unit = u
+      override def value = u.value
+      override def prefix = self
+    }
   }
   final override def toString = name
 }
 object UnitPrefix extends Prefix {
   def factor = 1.0
-  def name = ""
+  def name = "unit"
 }
+
+/*
+trait UnitMeta[U] {
+  def cf: Double
+  def name: String
+}
+
+object UnitMeta {
+  def apply[U](blk: => Double, blkName: => String) = new UnitMeta[U] {
+    def cf = blk
+    def name = blkName
+  }
+}
+*/
 
 trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
   type Type = Quantity[Q, P]
   type Pow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
+  def unit: Unit[_, Q, P]
 }
 
 trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] {
   type RefUnit <: BaseUnit[RefUnit, Q]
 }
 
-trait Convertable[U, R] {
-  def cf: Double
-}
-
-object Convertable {
-  def apply[U, R](blk: => Double) = new Convertable[U, R] {
-    def cf = blk
-  }
-}
-
-class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable] {
+abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer] {
+  self =>
   type Type = Unit[U, Q, P]
   type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
-  final def apply(v: Double)(implicit x: Convertable[U, Q#RefUnit]) = new UVal[U, Q, P](v)
-}
-
-class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1]
-
-class PrefixUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](pre: Prefix, u: Unit[U, Q, P])(implicit x: Convertable[U, Q#RefUnit]) {
-  def prefix = pre
-  def apply(v: Double) = new PrefixUVal[U, Q, P](v, pre)
-}
-
-class UVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double)(implicit cu: Convertable[U, Q#RefUnit]) extends UnitValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
-  def value = v
-  def cfRef = cu.cf
+  def name: String
+  def cf: Double
+  def value: Double = 1.0
   def prefix: Prefix = UnitPrefix
-  def +[U2 <: BaseUnit[U2, Q]](uv2: UVal[U2, Q, P])(implicit
-    cu: Convertable[U, Q#RefUnit],
-    cu2: Convertable[U2, Q#RefUnit]): UVal[U, Q, P] = {
-    val cfU = cu.cf
-    val cfU2 = cu2.cf
-    val p = church.Integer.value[P]
-    val t = uv2.value * uv2.prefix.factor * math.pow(cfU2/cfU, p)
-    if (this.prefix == UnitPrefix)
-      new UVal[U, Q, P](this.value + t)
-    else
-      new PrefixUVal[U, Q, P](this.value + (t / this.prefix.factor), this.prefix)
+  def unit = this
+  def apply(v: Double) = new Unit[U, Q, P] {
+    def name = self.name
+    def cf = self.cf
+    override def unit = self
+    override def value = v
+    override def prefix = self.prefix
   }
 }
 
-class PrefixUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double, pre: Prefix)(implicit cu: Convertable[U, Q#RefUnit]) extends UVal(v) with UnitValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
-  override def prefix = pre
-}
-
-object UVal {
-  import scala.language.implicitConversions
-
-  implicit def toEnrichUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UVal[U, Q, P]) = new EnrichUVal(uv)
-
-  class EnrichUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UVal[U, Q, P]) {
-    def to[U2 <: BaseUnit[U2, Q]](u: Unit[U2, Q, P])(implicit
-      cu: Convertable[U, Q#RefUnit],
-      cu2: Convertable[U2, Q#RefUnit]) = {
-      val cfU = cu.cf
-      val cfU2 = cu2.cf
-      val p = church.Integer.value[P]
-      new UVal[U2, Q, P](uv.value * uv.prefix.factor * math.pow(cfU/cfU2, p))
-    }
-    def to[U2 <: BaseUnit[U2, Q]](u: PrefixUnit[U2, Q, P])(implicit
-      cu: Convertable[U, Q#RefUnit],
-      cu2: Convertable[U2, Q#RefUnit]) = {
-      val cfU = cu.cf
-      val cfU2 = cu2.cf
-      val p = church.Integer.value[P]
-      new PrefixUVal[U2, Q, P](uv.value * uv.prefix.factor * math.pow(cfU/cfU2, p) / u.prefix.factor, u.prefix)
-    }
-  }
-
-}
+abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1]
 
 } // infra
 } // unit4s
@@ -197,14 +103,14 @@ object ISQ {
       type RefUnit = Second
     }
 
-    class Meter extends BaseUnit[Meter, Length]
-    object Meter {
-      implicit val convertMeter = Convertable[Meter, Meter] { 1.0 }
+    class Meter extends BaseUnit[Meter, Length] {
+      def name = "meter"
+      def cf = 1.0
     }
 
-    class Second extends BaseUnit[Second, Time]
-    object Second {
-      implicit val convertSecond = Convertable[Second, Second] { 1.0 }
+    class Second extends BaseUnit[Second, Time] {
+      def name = "second"
+      def cf = 1.0
     }
   }
 }
@@ -217,6 +123,7 @@ object ISU {
   object Second extends ISQ.infra.Second
 }
 
+/*
 // test definition of a new set of units
 object custom {
   type Foot = infra.Foot#Type
@@ -240,18 +147,20 @@ object custom {
     }
   }
 }
+*/
 
 object test {
   import com.manyangled.unit4s._
   import com.manyangled.ISQ._
   import com.manyangled.ISU._
-  import com.manyangled.custom._
+  //import com.manyangled.custom._
 
   val m1 = Meter(1.2)
-  val f1 = Foot(3.4)
+//  val f1 = Foot(3.4)
   val s1 = Second(4.5)
-  val n1 = Minute(5.6)
+//  val n1 = Minute(5.6)
 
+/*
   val sum1 = m1 + (f1)
 
   val f2 = m1.to(Foot)
@@ -279,13 +188,5 @@ object test {
 
   val vec1: Vector[UnitValue with QuantityOf[Length]] = Vector(Meter(1.0), Foot(2.0), Milli*Meter(3.0))
 
-  object subtest {
-    import com.manyangled.unit4s.infra._
-    import com.manyangled.util.Constructable
-    def k[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: UnitValue with UnitOf[Unit[U, Q, P]]) = {
-      val p = church.Integer.value[P]
-      println(s"v= ${v.value}  p= $p")
-      v.value
-    }
-  }
+*/
 } // test
