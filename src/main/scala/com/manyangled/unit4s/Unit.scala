@@ -46,6 +46,10 @@ trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] extends Serializable {
     val lhs = unit.to(rhs)
     Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, lhs.value + rhs.value, rhs.power)
   }
+  def -[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
+    val lhs = unit.to(rhs)
+    Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, lhs.value - rhs.value, rhs.power)
+  }
 }
 
 trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] {
