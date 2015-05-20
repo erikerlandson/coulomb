@@ -3,7 +3,6 @@ package com.manyangled
 object unit4s {
 
 import com.manyangled.church
-import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
 import infra._
 
