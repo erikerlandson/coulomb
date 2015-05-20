@@ -7,69 +7,68 @@ import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
 import infra._
 
-object Kilo extends Prefix {
+class Kilo extends Prefix[Kilo] {
   def factor = 1e3
   def name = "kilo"
 }
-object Milli extends Prefix {
+object Kilo extends Kilo
+
+class Milli extends Prefix[Milli] {
   def factor = 1e-3
   def name = "milli"
 }
+object Milli extends Milli
 
 object infra {
 
-trait Prefix {
+trait Prefix[F <: Prefix[F]] {
   self =>
   def factor: Double
   def name: String
-  final def ==(that: Prefix) = (this.factor == that.factor) && (this.name == that.name)
-  final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P]) = {
-    // to do: some kind of partial-function based concept that maps {Prefix} X {Prefix} to
-    // (Prefix, name, factor, residual-factor), or some such
-    require(u.prefix == UnitPrefix, "Composition of prefixes not yet supported")
-    new Unit[U, Q, P] {
-      def name = s"${self.name}-${u.name}"
-      def cf = self.factor * u.cf
-      def unit = this.asInstanceOf[Unit[U, Q, P]]
+  final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P, UnitPrefix]) = {
+    new Unit[U, Q, P, F] {
+      def name = u.name
+      def cf = u.cf
+      def unit = this.asInstanceOf[Unit[U, Q, P, F]]
       def value = u.value
       def prefix = self
       def power = u.power
     }
   }
-  final override def toString = name
+  final override def toString = s"Prefix($name, $factor)"
 }
-object UnitPrefix extends Prefix {
+
+class UnitPrefix extends Prefix[UnitPrefix] {
   def factor = 1.0
-  def name = "unit"
+  def name = "[unit]"
 }
-
-/*
-trait UnitMeta[U] {
-  def cf: Double
-  def name: String
-}
-
-object UnitMeta {
-  def apply[U](blk: => Double, blkName: => String) = new UnitMeta[U] {
-    def cf = blk
-    def name = blkName
-  }
-}
-*/
+object UnitPrefix extends UnitPrefix
 
 trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
   type QType = Quantity[Q, P]
   type QPow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
-  def unit: Unit[_, Q, P]
-  def to[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P]) = {
-    val v = unit.value * math.pow(unit.cf / u.cf, u.power)
-    new Unit[U, Q, P] {
+  def unit: Unit[_, Q, P, _]
+  def to[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](u: Unit[U, Q, P, F]) = {
+    val v = unit.value * unit.prefix.factor * math.pow(unit.cf / u.cf, u.power) / u.prefix.factor
+    new Unit[U, Q, P, F] {
       def value = v
       def name = u.name
       def cf = u.cf
-      def unit = this.asInstanceOf[Unit[U, Q, P]]
+      def unit = this.asInstanceOf[Unit[U, Q, P, F]]
       def prefix = u.prefix
       def power = u.power
+    }
+  }
+  def +[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
+    val lhs = unit.to(rhs)
+    println(s"unit= ${unit}  lhs= $lhs  rhs= $rhs")
+    new Unit[U, Q, P, F] {
+      def value = lhs.value + rhs.value
+      def name = rhs.name
+      def cf = rhs.cf
+      def unit = this.asInstanceOf[Unit[U, Q, P, F]]
+      def prefix = rhs.prefix
+      def power = rhs.power
     }
   }
 }
@@ -78,38 +77,39 @@ trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] 
   type RefUnit <: BaseUnit[RefUnit, Q]
 }
 
-abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer] extends Quantity[Q, P] {
+abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]] extends Quantity[Q, P] {
   self =>
-  type Type = Unit[U, Q, P]
-  type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
+  type Type = Unit[U, Q, P, F]
+  type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K], F]
   def name: String
   def cf: Double
   def power: Int
   def value: Double
-  def prefix: Prefix
-  def apply(v: Double) = new Unit[U, Q, P] {
+  def prefix: Prefix[_]
+  def apply(v: Double) = new Unit[U, Q, P, F] {
     def name = self.name
     def cf = self.cf
     def power = self.power
-    def unit = this.asInstanceOf[Unit[U, Q, P]]
+    def unit = this.asInstanceOf[Unit[U, Q, P, F]]
     def value = v
     def prefix = self.prefix
   }
   override def toString = {
+    val pre = if ((prefix.factor == UnitPrefix.factor) && (prefix.name == UnitPrefix.name)) "" else s"${prefix.name}-"
     val exp =
       if (power == 0) ""
       else if (power == 1) ""
       else if (power > 1) s"^$power"
       else s"^($power)"
-    val u = if (power == 0) "" else s"($name$exp)"
+    val u = if (power == 0) "" else s"($pre$name$exp)"
     s"($value)$u"
   }
 }
 
-abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1] {
+abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1, UnitPrefix] {
   def power = 1
   def value = 1.0
-  def unit = this.asInstanceOf[Unit[U, Q, church.Integer._1]]
+  def unit = this.asInstanceOf[Unit[U, Q, church.Integer._1, UnitPrefix]]
   def prefix = UnitPrefix
 }
 
