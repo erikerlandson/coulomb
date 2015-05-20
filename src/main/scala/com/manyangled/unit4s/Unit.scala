@@ -24,16 +24,7 @@ trait Prefix[F <: Prefix[F]] extends Serializable {
   self =>
   def factor: Double
   def name: String
-  final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P, UnitPrefix]) = {
-    new Unit[U, Q, P, F] {
-      def name = u.name
-      def cf = u.cf
-      def unit = this.asInstanceOf[Unit[U, Q, P, F]]
-      def value = u.value
-      def prefix = self
-      def power = u.power
-    }
-  }
+  final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P, UnitPrefix]) = Unit[U, Q, P, F](u.name, u.cf, self, u.value, u.power)
   final override def toString = s"Prefix($name, $factor)"
 }
 
@@ -49,26 +40,11 @@ trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] extends Serializable {
   def unit: Unit[_, Q, P, _]
   def to[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](u: Unit[U, Q, P, F]) = {
     val v = unit.value * unit.prefix.factor * math.pow(unit.cf / u.cf, u.power) / u.prefix.factor
-    new Unit[U, Q, P, F] {
-      def value = v
-      def name = u.name
-      def cf = u.cf
-      def unit = this.asInstanceOf[Unit[U, Q, P, F]]
-      def prefix = u.prefix
-      def power = u.power
-    }
+    Unit[U, Q, P, F](u.name, u.cf, u.prefix, v, u.power)
   }
   def +[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
     val lhs = unit.to(rhs)
-    println(s"unit= ${unit}  lhs= $lhs  rhs= $rhs")
-    new Unit[U, Q, P, F] {
-      def value = lhs.value + rhs.value
-      def name = rhs.name
-      def cf = rhs.cf
-      def unit = this.asInstanceOf[Unit[U, Q, P, F]]
-      def prefix = rhs.prefix
-      def power = rhs.power
-    }
+    Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, lhs.value + rhs.value, rhs.power)
   }
 }
 
@@ -85,14 +61,7 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
   def power: Int
   def value: Double
   def prefix: Prefix[_]
-  def apply(v: Double) = new Unit[U, Q, P, F] {
-    def name = self.name
-    def cf = self.cf
-    def power = self.power
-    def unit = this.asInstanceOf[Unit[U, Q, P, F]]
-    def value = v
-    def prefix = self.prefix
-  }
+  def apply(v: Double) = Unit[U, Q, P, F](self.name, self.cf, self.prefix, v, self.power)
   override def toString = {
     val pre = if ((prefix.factor == UnitPrefix.factor) && (prefix.name == UnitPrefix.name)) "" else s"${prefix.name}-"
     val exp =
@@ -103,6 +72,22 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
     val u = if (power == 0) "" else s"($pre$name$exp)"
     s"($value)$u"
   }
+}
+
+object Unit {
+  def apply[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](
+    name_ : String,
+    cf_ : Double,
+    prefix_ : Prefix[_],
+    value_ : Double,
+    power_ : Int) = new Unit[U, Q, P, F] {
+      def name = name_
+      def cf = cf_
+      def prefix = prefix_
+      def value = value_
+      def power = power_
+      def unit = this.asInstanceOf[Unit[U, Q, P, F]]
+    }
 }
 
 abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1, UnitPrefix] {
