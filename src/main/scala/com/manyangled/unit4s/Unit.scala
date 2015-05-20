@@ -34,6 +34,23 @@ object UnitValue {
       val p = church.Integer.value[P]
       new PrefixUVal[U2, Q, P](uv.value * uv.prefix.factor * math.pow(cfU/cfU2, p) / u.prefix.factor, u.prefix)
     }
+/*
+    two problems: (1), what do I return in this case, as I have no LHS unit information
+    (2) overloading '+' with enrichment class appears to not resolve, although it compiles.
+    I assume same is true for '-','*','/'
+
+    def +[U2 <: BaseUnit[U2, Q]](uv2: UVal[U2, Q, P])(implicit
+      cu2: Convertable[U2, Q#RefUnit]): UVal[U, Q, P] = {
+      val cfU = uv.cfRef
+      val cfU2 = cu2.cf
+      val p = church.Integer.value[P]
+      val t = uv2.value * uv2.prefix.factor * math.pow(cfU2/cfU, p)
+      if (uv.prefix == UnitPrefix)
+        new UVal[U, Q, P](uv.value + t)
+      else
+        new PrefixUVal[U, Q, P](uv.value + (t / uv.prefix.factor), uv.prefix)
+    }
+*/
   }
   implicit class EnrichUnitOf[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UnitValue with UnitOf[Unit[U, Q, P]]) {
     def to[U2 <: BaseUnit[U2, Q]](u: Unit[U2, Q, P])(implicit
@@ -118,6 +135,18 @@ class UVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Const
   def value = v
   def cfRef = cu.cf
   def prefix: Prefix = UnitPrefix
+  def +[U2 <: BaseUnit[U2, Q]](uv2: UVal[U2, Q, P])(implicit
+    cu: Convertable[U, Q#RefUnit],
+    cu2: Convertable[U2, Q#RefUnit]): UVal[U, Q, P] = {
+    val cfU = cu.cf
+    val cfU2 = cu2.cf
+    val p = church.Integer.value[P]
+    val t = uv2.value * uv2.prefix.factor * math.pow(cfU2/cfU, p)
+    if (this.prefix == UnitPrefix)
+      new UVal[U, Q, P](this.value + t)
+    else
+      new PrefixUVal[U, Q, P](this.value + (t / this.prefix.factor), this.prefix)
+  }
 }
 
 class PrefixUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](v: Double, pre: Prefix)(implicit cu: Convertable[U, Q#RefUnit]) extends UVal(v) with UnitValue with UnitOf[Unit[U, Q, P]] with QuantityOf[Quantity[Q, P]] {
@@ -127,7 +156,9 @@ class PrefixUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer 
 object UVal {
   import scala.language.implicitConversions
 
-  implicit class EnrichUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UVal[U, Q, P]) {
+  implicit def toEnrichUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UVal[U, Q, P]) = new EnrichUVal(uv)
+
+  class EnrichUVal[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer :Constructable](uv: UVal[U, Q, P]) {
     def to[U2 <: BaseUnit[U2, Q]](u: Unit[U2, Q, P])(implicit
       cu: Convertable[U, Q#RefUnit],
       cu2: Convertable[U2, Q#RefUnit]) = {
@@ -220,6 +251,8 @@ object test {
   val f1 = Foot(3.4)
   val s1 = Second(4.5)
   val n1 = Minute(5.6)
+
+  val sum1 = m1 + (f1)
 
   val f2 = m1.to(Foot)
 
