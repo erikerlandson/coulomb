@@ -21,7 +21,7 @@ object Milli extends Milli
 
 object infra {
 
-trait Prefix[F <: Prefix[F]] {
+trait Prefix[F <: Prefix[F]] extends Serializable {
   self =>
   def factor: Double
   def name: String
@@ -44,7 +44,7 @@ class UnitPrefix extends Prefix[UnitPrefix] {
 }
 object UnitPrefix extends UnitPrefix
 
-trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
+trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] extends Serializable {
   type QType = Quantity[Q, P]
   type QPow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
   def unit: Unit[_, Q, P, _]
