@@ -24,9 +24,12 @@ trait Prefix {
   def name: String
   final def ==(that: Prefix) = (this.factor == that.factor) && (this.name == that.name)
   final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P]) = {
+    // to do: some kind of partial-function based concept that maps {Prefix} X {Prefix} to
+    // (Prefix, name, factor, residual-factor), or some such
+    require(u.prefix == UnitPrefix, "Composition of prefixes not yet supported")
     new Unit[U, Q, P] {
-      def name = u.name
-      def cf = u.cf
+      def name = s"${self.name}-${u.name}"
+      def cf = self.factor * u.cf
       def unit = this.asInstanceOf[Unit[U, Q, P]]
       def value = u.value
       def prefix = self
@@ -59,7 +62,7 @@ trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
   type QPow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
   def unit: Unit[_, Q, P]
   def to[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P]) = {
-    val v = unit.value * unit.prefix.factor * math.pow(unit.cf / u.cf, u.power) / u.prefix.factor
+    val v = unit.value * math.pow(unit.cf / u.cf, u.power)
     new Unit[U, Q, P] {
       def value = v
       def name = u.name
@@ -93,13 +96,12 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
     def prefix = self.prefix
   }
   override def toString = {
-    val pre = if (prefix == UnitPrefix) "" else s"${prefix}-"
     val exp =
       if (power == 0) ""
       else if (power == 1) ""
       else if (power > 1) s"^$power"
       else s"^($power)"
-    val u = if (power == 0) "" else s"($pre$name$exp)"
+    val u = if (power == 0) "" else s"($name$exp)"
     s"($value)$u"
   }
 }
@@ -191,6 +193,13 @@ object test {
 
   def g(v: Time#QPow[church.Integer._1]) = v.to(Second)
 
+  val KiloMeter = Kilo*Meter
+  val v1 = KiloMeter(3.0)
+  val v2 = Kilo*Meter(2.0)
+  val v3 = Meter(4000).to(Kilo*Meter)
+
+  val vec1: Vector[Length] = Vector(Meter(1.0), Foot(2.0), Milli*Meter(3.0))
+
 /*
   val sum1 = m1 + (f1)
 
@@ -207,12 +216,7 @@ object test {
 
   def h(v: UnitValue with QuantityOf[Area]) = v.to(SquareMeter)
 
-  val KiloMeter = Kilo*Meter
-  val v1 = KiloMeter(3.0)
-  val v2 = Kilo*Meter(2.0)
-  val v3 = Meter(4000).to(Kilo*Meter)
 
-  val vec1: Vector[UnitValue with QuantityOf[Length]] = Vector(Meter(1.0), Foot(2.0), Milli*Meter(3.0))
 
 */
 } // test
