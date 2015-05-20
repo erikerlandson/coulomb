@@ -29,9 +29,9 @@ trait Prefix {
     new Unit[U, Q, P] {
       def name = u.name
       def cf = u.cf
-      override def unit = u
-      override def value = u.value
-      override def prefix = self
+      def unit = u.unit
+      def value = u.value
+      def prefix = self
       def power = u.power
     }
   }
@@ -57,32 +57,42 @@ object UnitMeta {
 */
 
 trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
-  type Type = Quantity[Q, P]
-  type Pow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
+  type QType = Quantity[Q, P]
+  type QPow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
   def unit: Unit[_, Q, P]
+  def to[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P]) = {
+    val v = unit.value * unit.prefix.factor * math.pow(unit.cf / u.cf, u.power) / u.prefix.factor
+    new Unit[U, Q, P] {
+      def value = v
+      def name = u.name
+      def cf = u.cf
+      def unit = u.unit
+      def prefix = u.prefix
+      def power = u.power
+    }
+  }
 }
 
 trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] {
   type RefUnit <: BaseUnit[RefUnit, Q]
 }
 
-abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer] {
+abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer] extends Quantity[Q, P] {
   self =>
   type Type = Unit[U, Q, P]
   type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K]]
   def name: String
   def cf: Double
   def power: Int
-  def value: Double = 1.0
-  def prefix: Prefix = UnitPrefix
-  def unit = this
+  def value: Double
+  def prefix: Prefix
   def apply(v: Double) = new Unit[U, Q, P] {
     def name = self.name
     def cf = self.cf
     def power = self.power
-    override def unit = self
-    override def value = v
-    override def prefix = self.prefix
+    def unit = self
+    def value = v
+    def prefix = self.prefix
   }
   override def toString = {
     val pre = if (prefix == UnitPrefix) "" else s"${prefix}-"
@@ -98,14 +108,17 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
 
 abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1] {
   def power = 1
+  def value = 1.0
+  def unit = this
+  def prefix = UnitPrefix
 }
 
 } // infra
 } // unit4s
 
 object ISQ {
-  type Length = infra.Length#Type
-  type Time = infra.Time#Type
+  type Length = infra.Length#QType
+  type Time = infra.Time#QType
 
   object infra {
     import com.manyangled.unit4s.infra._
@@ -138,7 +151,6 @@ object ISU {
   object Second extends ISQ.infra.Second
 }
 
-/*
 // test definition of a new set of units
 object custom {
   type Foot = infra.Foot#Type
@@ -151,34 +163,34 @@ object custom {
     import com.manyangled.unit4s.infra._
     import com.manyangled.ISQ.infra._
 
-    class Foot extends BaseUnit[Foot, Length]
-    object Foot {
-      implicit val convertFoot = Convertable[Foot, Meter] { 0.3048 }
+    class Foot extends BaseUnit[Foot, Length] {
+      def name = "foot"
+      def cf = 0.3048
     }
 
-    class Minute extends BaseUnit[Minute, Time]
-    object Minute {
-      implicit val convertMinute = Convertable[Minute, Second] { 60.0 }
+    class Minute extends BaseUnit[Minute, Time] {
+      def name = "minute"
+      def cf = 60.0
     }
   }
 }
-*/
 
 object test {
   import com.manyangled.unit4s._
   import com.manyangled.ISQ._
   import com.manyangled.ISU._
-  //import com.manyangled.custom._
+  import com.manyangled.custom._
 
   val m1 = Meter(1.2)
-//  val f1 = Foot(3.4)
+  val f1 = Foot(3.4)
   val s1 = Second(4.5)
-//  val n1 = Minute(5.6)
+  val n1 = Minute(5.6)
+
+  val f2 = m1.to(Foot)
+
 
 /*
   val sum1 = m1 + (f1)
-
-  val f2 = m1.to(Foot)
 
   def f(v: UnitValue with QuantityOf[Length]) = v.to(Meter)
   def j(v: UnitValue with UnitOf[Meter]) = v.value
