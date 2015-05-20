@@ -2,8 +2,6 @@ package com.manyangled
 
 object unit4s {
 
-import scala.language.higherKinds
-
 import com.manyangled.church
 import com.manyangled.util.{Constructable,ConstructableFromDouble}
 
@@ -29,7 +27,7 @@ trait Prefix {
     new Unit[U, Q, P] {
       def name = u.name
       def cf = u.cf
-      def unit = u.unit
+      def unit = this.asInstanceOf[Unit[U, Q, P]]
       def value = u.value
       def prefix = self
       def power = u.power
@@ -66,7 +64,7 @@ trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] {
       def value = v
       def name = u.name
       def cf = u.cf
-      def unit = u.unit
+      def unit = this.asInstanceOf[Unit[U, Q, P]]
       def prefix = u.prefix
       def power = u.power
     }
@@ -90,7 +88,7 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
     def name = self.name
     def cf = self.cf
     def power = self.power
-    def unit = self
+    def unit = this.asInstanceOf[Unit[U, Q, P]]
     def value = v
     def prefix = self.prefix
   }
@@ -109,7 +107,7 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
 abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1] {
   def power = 1
   def value = 1.0
-  def unit = this
+  def unit = this.asInstanceOf[Unit[U, Q, church.Integer._1]]
   def prefix = UnitPrefix
 }
 
@@ -188,12 +186,13 @@ object test {
 
   val f2 = m1.to(Foot)
 
+  def f(v: Length) = v.to(Meter)
+  def j(v: Meter) = v.value
+
+  def g(v: Time#QPow[church.Integer._1]) = v.to(Second)
 
 /*
   val sum1 = m1 + (f1)
-
-  def f(v: UnitValue with QuantityOf[Length]) = v.to(Meter)
-  def j(v: UnitValue with UnitOf[Meter]) = v.value
 
   def g(v: UnitValue with QuantityOf[Time#Pow[church.Integer._1]]) = v.to(Second)
 
