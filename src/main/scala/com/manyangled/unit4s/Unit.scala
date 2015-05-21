@@ -1,8 +1,8 @@
 package com.manyangled
 
-object unit4s {
+import com.manyangled.church.{ Integer, IntegerValue }
 
-import com.manyangled.church.Integer
+object unit4s {
 
 object infra {
 
@@ -10,7 +10,7 @@ trait Prefix[F <: Prefix[F]] extends Serializable {
   self =>
   def factor: Double
   def name: String
-  final def *[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer](u: Unit[U, Q, RU, P, UnitPrefix])(implicit bumeta: BaseUnitMeta[U, Q, RU]) = Unit[U, Q, RU, P, F](u.name, u.cf, self, u.value, u.power)
+  final def *[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer](u: Unit[U, Q, RU, P, UnitPrefix])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P]) = Unit[U, Q, RU, P, F](u.name, u.cf, self, u.value, u.power)
   final override def toString = s"Prefix($name, $factor)"
 }
 
@@ -24,23 +24,23 @@ trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer
   type QType = Quantity[Q, RU, P]
   type QPow[K <: Integer] = Quantity[Q, RU, P#Mul[K]]
   def unit: Unit[_, Q, RU, P, _]
-  def to[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU]) = {
+  def to[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
     Unit[U, Q, RU, P, F](u.name, u.cf, u.prefix, v, u.power)
   }
-  def +[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](rhs: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU]) = {
+  def +[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](rhs: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), rhs.power)
     Unit[U, Q, RU, P, F](rhs.name, rhs.cf, rhs.prefix, v + rhs.value, rhs.power)
   }
-  def -[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](rhs: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU]) = {
+  def -[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](rhs: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), rhs.power)
     Unit[U, Q, RU, P, F](rhs.name, rhs.cf, rhs.prefix, v - rhs.value, rhs.power)
   }
-  def *[U <: BaseUnit[U, Q, RU], P2 <: Integer, F <: Prefix[F]](rhs: Unit[U, Q, RU, P2, F])(implicit bumeta: BaseUnitMeta[U, Q, RU]) = {
+  def *[U <: BaseUnit[U, Q, RU], P2 <: Integer, F <: Prefix[F]](rhs: Unit[U, Q, RU, P2, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P#Add[P2]]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), unit.power)
     Unit[U, Q, RU, P#Add[P2], F](rhs.name, rhs.cf, rhs.prefix, v * rhs.value, unit.power + rhs.power)
   }
-  def /[U <: BaseUnit[U, Q, RU], P2 <: Integer, F <: Prefix[F]](rhs: Unit[U, Q, RU, P2, F])(implicit bumeta: BaseUnitMeta[U, Q, RU]) = {
+  def /[U <: BaseUnit[U, Q, RU], P2 <: Integer, F <: Prefix[F]](rhs: Unit[U, Q, RU, P2, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P#Sub[P2]]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), unit.power)
     Unit[U, Q, RU, P#Sub[P2], F](rhs.name, rhs.cf, rhs.prefix, v / rhs.value, unit.power - rhs.power)
   }
@@ -49,13 +49,13 @@ trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer
 trait BaseQuantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]] extends Quantity[Q, RU, Integer._1] {
 }
 
-abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]](implicit bumeta: BaseUnitMeta[U, Q, RU]) extends Quantity[Q, RU, P] {
+abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]](implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P]) extends Quantity[Q, RU, P] {
   self =>
   type Type = Unit[U, Q, RU, P, F]
   type Pow[K <: Integer] = Unit[U, Q, RU, P#Mul[K], F]
   def name: String = bumeta.name
   def cf: Double = bumeta.cf
-  def power: Int
+  def power: Int = ival.value
   def value: Double
   def prefix: Prefix[_]
   def apply(v: Double) = Unit[U, Q, RU, P, F](self.name, self.cf, self.prefix, v, self.power)
@@ -77,18 +77,18 @@ object Unit {
     cf_ : Double,
     prefix_ : Prefix[_],
     value_ : Double,
-    power_ : Int)(implicit bumeta: BaseUnitMeta[U, Q, RU]) = new Unit[U, Q, RU, P, F] {
+    power_ : Int)(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P]) = new Unit[U, Q, RU, P, F] {
 //      def name = name_
 //      def cf = cf_
       def prefix = prefix_
       def value = value_
-      def power = power_
+//      def power = power_
       def unit = this.asInstanceOf[Unit[U, Q, RU, P, F]]
     }
 }
 
-abstract class BaseUnit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]](implicit bumeta: BaseUnitMeta[U, Q, RU]) extends Unit[U, Q, RU, Integer._1, UnitPrefix] {
-  def power = 1
+abstract class BaseUnit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]](implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[Integer._1]) extends Unit[U, Q, RU, Integer._1, UnitPrefix] {
+//  def power = 1
   def value = 1.0
   def unit = this.asInstanceOf[Unit[U, Q, RU, Integer._1, UnitPrefix]]
   def prefix = UnitPrefix
@@ -112,12 +112,12 @@ object ISQ {
     trait Time extends BaseQuantity[Time, Second] {
     }
 
-    class Meter(implicit bumeta: BaseUnitMeta[Meter, Length, Meter]) extends BaseUnit[Meter, Length, Meter]
+    class Meter(implicit bumeta: BaseUnitMeta[Meter, Length, Meter], ival: IntegerValue[Integer._1]) extends BaseUnit[Meter, Length, Meter]
     object Meter {
       implicit val meterMeta = BaseUnitMeta[Meter, Length, Meter]("meter", "m", 1.0)
     }
 
-    class Second(implicit bumeta: BaseUnitMeta[Second, Time, Second]) extends BaseUnit[Second, Time, Second]
+    class Second(implicit bumeta: BaseUnitMeta[Second, Time, Second], ival: IntegerValue[Integer._1]) extends BaseUnit[Second, Time, Second]
     object Second {
       implicit val secondMeta = BaseUnitMeta[Second, Time, Second]("second", "s", 1.0)
     }
@@ -150,12 +150,12 @@ object customInfra {
   import com.manyangled.unit4s.infra._
   import com.manyangled.ISQ.infra._
 
-  class Foot(implicit bumeta: BaseUnitMeta[Foot, Length, Meter]) extends BaseUnit[Foot, Length, Meter]
+  class Foot(implicit bumeta: BaseUnitMeta[Foot, Length, Meter], ival: IntegerValue[Integer._1]) extends BaseUnit[Foot, Length, Meter]
   object Foot {
     implicit val footMeta = BaseUnitMeta[Foot, Length, Meter]("foot", "ft", 0.3048)
   }
 
-  class Minute(implicit bumeta: BaseUnitMeta[Minute, Time, Second]) extends BaseUnit[Minute, Time, Second]
+  class Minute(implicit bumeta: BaseUnitMeta[Minute, Time, Second], ival: IntegerValue[Integer._1]) extends BaseUnit[Minute, Time, Second]
   object Minute {
     implicit val minuteMeta = BaseUnitMeta[Minute, Time, Second]("minute", "min", 60.0)
   }
