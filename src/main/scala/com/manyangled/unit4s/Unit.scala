@@ -7,9 +7,10 @@ object unit4s {
 object infra {
 
 trait Prefix[F <: Prefix[F]] extends Serializable {
-  self =>
   def factor: Double
   def name: String
+  def abbv: String
+
   final def *[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer](u: Unit[U, Q, RU, P, UnitPrefix])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = Unit[U, Q, RU, P, F](u.value)
   final override def toString = s"Prefix($name, $factor)"
 }
@@ -19,6 +20,7 @@ case class PrefixMeta[F <: Prefix[F]](prefix: F)
 class UnitPrefix extends Prefix[UnitPrefix] {
   def factor = 1.0
   def name = "[unit]"
+  def abbv = "[unit]"
 }
 object UnitPrefix extends UnitPrefix {
   implicit val unitPrefixMeta = PrefixMeta(new UnitPrefix)
@@ -121,6 +123,7 @@ object ISQ {
   class Kilo extends com.manyangled.unit4s.infra.Prefix[Kilo] {
     def factor = 1e3
     def name = "kilo"
+    def abbv = "k"
   }
   object Kilo extends Kilo {
     implicit val kiloMeta = com.manyangled.unit4s.infra.PrefixMeta[Kilo](new Kilo)
@@ -129,6 +132,7 @@ object ISQ {
   class Milli extends com.manyangled.unit4s.infra.Prefix[Milli] {
     def factor = 1e-3
     def name = "milli"
+    def abbv = "m"
   }
   object Milli extends Milli {
     implicit val milliMeta = com.manyangled.unit4s.infra.PrefixMeta[Milli](new Milli)
