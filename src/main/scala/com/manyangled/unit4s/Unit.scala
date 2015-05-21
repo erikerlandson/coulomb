@@ -4,20 +4,6 @@ object unit4s {
 
 import com.manyangled.church.Integer
 
-import infra._
-
-class Kilo extends Prefix[Kilo] {
-  def factor = 1e3
-  def name = "kilo"
-}
-object Kilo extends Kilo
-
-class Milli extends Prefix[Milli] {
-  def factor = 1e-3
-  def name = "milli"
-}
-object Milli extends Milli
-
 object infra {
 
 trait Prefix[F <: Prefix[F]] extends Serializable {
@@ -134,6 +120,19 @@ object ISQ {
       def cf = 1.0
     }
   }
+
+  class Kilo extends com.manyangled.unit4s.infra.Prefix[Kilo] {
+    def factor = 1e3
+    def name = "kilo"
+  }
+  object Kilo extends Kilo
+
+  class Milli extends com.manyangled.unit4s.infra.Prefix[Milli] {
+    def factor = 1e-3
+    def name = "milli"
+  }
+  object Milli extends Milli
+
 }
 
 object ISU {
