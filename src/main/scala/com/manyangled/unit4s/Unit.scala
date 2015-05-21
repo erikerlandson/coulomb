@@ -38,25 +38,25 @@ trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] extends Serializable {
   type QType = Quantity[Q, P]
   type QPow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
   def unit: Unit[_, Q, P, _]
-  def to[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](u: Unit[U, Q, P, F]) = {
-    val v = unit.value * unit.prefix.factor * math.pow(unit.cf / u.cf, u.power) / u.prefix.factor
+  def to[U <: BaseUnit[U, Q], F <: Prefix[F]](u: Unit[U, Q, P, F]) = {
+    val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
     Unit[U, Q, P, F](u.name, u.cf, u.prefix, v, u.power)
   }
-  def +[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
-    val lhs = unit.to(rhs)
-    Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, lhs.value + rhs.value, rhs.power)
+  def +[U <: BaseUnit[U, Q], F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
+    val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), rhs.power)
+    Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, v + rhs.value, rhs.power)
   }
-  def -[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
-    val lhs = unit.to(rhs)
-    Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, lhs.value - rhs.value, rhs.power)
+  def -[U <: BaseUnit[U, Q], F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
+    val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), rhs.power)
+    Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, v - rhs.value, rhs.power)
   }
-  def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P2 <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P2, F]) = {
-    val t = unit.value * unit.prefix.factor * math.pow(unit.cf / rhs.cf, unit.power)
-    Unit[U, Q, P#Add[P2], F](rhs.name, rhs.cf, rhs.prefix, t * rhs.value, unit.power + rhs.power)
+  def *[U <: BaseUnit[U, Q], P2 <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P2, F]) = {
+    val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), unit.power)
+    Unit[U, Q, P#Add[P2], F](rhs.name, rhs.cf, rhs.prefix, v * rhs.value, unit.power + rhs.power)
   }
-  def /[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P2 <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P2, F]) = {
-    val t = unit.value * unit.prefix.factor * math.pow(unit.cf / rhs.cf, unit.power)
-    Unit[U, Q, P#Sub[P2], F](rhs.name, rhs.cf, rhs.prefix, t / rhs.value, unit.power - rhs.power)
+  def /[U <: BaseUnit[U, Q], P2 <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P2, F]) = {
+    val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), unit.power)
+    Unit[U, Q, P#Sub[P2], F](rhs.name, rhs.cf, rhs.prefix, v / rhs.value, unit.power - rhs.power)
   }
 }
 
