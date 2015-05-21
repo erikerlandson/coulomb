@@ -10,7 +10,7 @@ trait Prefix[F <: Prefix[F]] extends Serializable {
   self =>
   def factor: Double
   def name: String
-  final def *[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer](u: Unit[U, Q, RU, P, UnitPrefix])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = Unit[U, Q, RU, P, F](u.name, u.cf, self, u.value, u.power)
+  final def *[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer](u: Unit[U, Q, RU, P, UnitPrefix])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = Unit[U, Q, RU, P, F](u.value)
   final override def toString = s"Prefix($name, $factor)"
 }
 
@@ -30,23 +30,23 @@ trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer
   def unit: Unit[_, Q, RU, P, _]
   def to[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
-    Unit[U, Q, RU, P, F](u.name, u.cf, u.prefix, v, u.power)
+    Unit[U, Q, RU, P, F](v)
   }
   def +[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](rhs: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), rhs.power)
-    Unit[U, Q, RU, P, F](rhs.name, rhs.cf, rhs.prefix, v + rhs.value, rhs.power)
+    Unit[U, Q, RU, P, F](v + rhs.value)
   }
   def -[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](rhs: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), rhs.power)
-    Unit[U, Q, RU, P, F](rhs.name, rhs.cf, rhs.prefix, v - rhs.value, rhs.power)
+    Unit[U, Q, RU, P, F](v - rhs.value)
   }
   def *[U <: BaseUnit[U, Q, RU], P2 <: Integer, F <: Prefix[F]](rhs: Unit[U, Q, RU, P2, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P#Add[P2]], premeta: PrefixMeta[F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), unit.power)
-    Unit[U, Q, RU, P#Add[P2], F](rhs.name, rhs.cf, rhs.prefix, v * rhs.value, unit.power + rhs.power)
+    Unit[U, Q, RU, P#Add[P2], F](v * rhs.value)
   }
   def /[U <: BaseUnit[U, Q, RU], P2 <: Integer, F <: Prefix[F]](rhs: Unit[U, Q, RU, P2, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P#Sub[P2]], premeta: PrefixMeta[F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), unit.power)
-    Unit[U, Q, RU, P#Sub[P2], F](rhs.name, rhs.cf, rhs.prefix, v / rhs.value, unit.power - rhs.power)
+    Unit[U, Q, RU, P#Sub[P2], F](v / rhs.value)
   }
 }
 
@@ -62,7 +62,7 @@ abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: Bas
   def power: Int = ival.value
   def value: Double
   def prefix: Prefix[_] = premeta.prefix
-  def apply(v: Double) = Unit[U, Q, RU, P, F](self.name, self.cf, self.prefix, v, self.power)
+  def apply(v: Double) = Unit[U, Q, RU, P, F](v)
   override def toString = {
     val pre = if ((prefix.factor == UnitPrefix.factor) && (prefix.name == UnitPrefix.name)) "" else s"${prefix.name}-"
     val exp =
@@ -76,26 +76,15 @@ abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: Bas
 }
 
 object Unit {
-  def apply[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]](
-    name_ : String,
-    cf_ : Double,
-    prefix_ : Prefix[_],
-    value_ : Double,
-    power_ : Int)(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = new Unit[U, Q, RU, P, F] {
-//      def name = name_
-//      def cf = cf_
-//      def prefix = prefix_
+  def apply[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]](value_ : Double)(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = new Unit[U, Q, RU, P, F] {
       def value = value_
-//      def power = power_
       def unit = this.asInstanceOf[Unit[U, Q, RU, P, F]]
     }
 }
 
 abstract class BaseUnit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]](implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[Integer._1], premeta: PrefixMeta[UnitPrefix]) extends Unit[U, Q, RU, Integer._1, UnitPrefix] {
-//  def power = 1
   def value = 1.0
   def unit = this.asInstanceOf[Unit[U, Q, RU, Integer._1, UnitPrefix]]
-//  def prefix = UnitPrefix
 }
 
 case class BaseUnitMeta[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]](name: String, abbv: String, cf: Double)
