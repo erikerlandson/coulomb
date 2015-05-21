@@ -57,6 +57,7 @@ abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: Bas
   type Type = Unit[U, Q, RU, P, F]
   type Pow[K <: Integer] = Unit[U, Q, RU, P#Mul[K], F]
   def name: String = bumeta.name
+  def abbv: String = bumeta.abbv
   def cf: Double = bumeta.cf
   def power: Int = ival.value
   def value: Double
