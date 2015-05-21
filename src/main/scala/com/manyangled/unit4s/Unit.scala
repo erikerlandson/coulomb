@@ -50,8 +50,7 @@ trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer
   }
 }
 
-trait BaseQuantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]] extends Quantity[Q, RU, Integer._1] {
-}
+trait BaseQuantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]] extends Quantity[Q, RU, Integer._1]
 
 abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]](implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) extends Quantity[Q, RU, P] {
   self =>
@@ -99,11 +98,9 @@ object ISQ {
   object infra {
     import com.manyangled.unit4s.infra._
 
-    trait Length extends BaseQuantity[Length, Meter] {
-    }
+    trait Length extends BaseQuantity[Length, Meter]
 
-    trait Time extends BaseQuantity[Time, Second] {
-    }
+    trait Time extends BaseQuantity[Time, Second]
 
     class Meter(implicit bumeta: BaseUnitMeta[Meter, Length, Meter], ival: IntegerValue[Integer._1], premeta: PrefixMeta[UnitPrefix]) extends BaseUnit[Meter, Length, Meter]
     object Meter {
