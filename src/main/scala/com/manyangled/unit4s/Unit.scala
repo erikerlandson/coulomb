@@ -2,7 +2,7 @@ package com.manyangled
 
 object unit4s {
 
-import com.manyangled.church
+import com.manyangled.church.Integer
 
 import infra._
 
@@ -24,7 +24,7 @@ trait Prefix[F <: Prefix[F]] extends Serializable {
   self =>
   def factor: Double
   def name: String
-  final def *[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer](u: Unit[U, Q, P, UnitPrefix]) = Unit[U, Q, P, F](u.name, u.cf, self, u.value, u.power)
+  final def *[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer](u: Unit[U, Q, RU, P, UnitPrefix]) = Unit[U, Q, RU, P, F](u.name, u.cf, self, u.value, u.power)
   final override def toString = s"Prefix($name, $factor)"
 }
 
@@ -34,46 +34,45 @@ class UnitPrefix extends Prefix[UnitPrefix] {
 }
 object UnitPrefix extends UnitPrefix
 
-trait Quantity[Q <: BaseQuantity[Q], P <: church.Integer] extends Serializable {
-  type QType = Quantity[Q, P]
-  type QPow[K <: church.Integer] = Quantity[Q, P#Mul[K]]
-  def unit: Unit[_, Q, P, _]
-  def to[U <: BaseUnit[U, Q], F <: Prefix[F]](u: Unit[U, Q, P, F]) = {
+trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer] extends Serializable {
+  type QType = Quantity[Q, RU, P]
+  type QPow[K <: Integer] = Quantity[Q, RU, P#Mul[K]]
+  def unit: Unit[_, Q, RU, P, _]
+  def to[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
-    Unit[U, Q, P, F](u.name, u.cf, u.prefix, v, u.power)
+    Unit[U, Q, RU, P, F](u.name, u.cf, u.prefix, v, u.power)
   }
-  def +[U <: BaseUnit[U, Q], F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
+  def +[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](rhs: Unit[U, Q, RU, P, F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), rhs.power)
-    Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, v + rhs.value, rhs.power)
+    Unit[U, Q, RU, P, F](rhs.name, rhs.cf, rhs.prefix, v + rhs.value, rhs.power)
   }
-  def -[U <: BaseUnit[U, Q], F <: Prefix[F]](rhs: Unit[U, Q, P, F]) = {
+  def -[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](rhs: Unit[U, Q, RU, P, F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), rhs.power)
-    Unit[U, Q, P, F](rhs.name, rhs.cf, rhs.prefix, v - rhs.value, rhs.power)
+    Unit[U, Q, RU, P, F](rhs.name, rhs.cf, rhs.prefix, v - rhs.value, rhs.power)
   }
-  def *[U <: BaseUnit[U, Q], P2 <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P2, F]) = {
+  def *[U <: BaseUnit[U, Q, RU], P2 <: Integer, F <: Prefix[F]](rhs: Unit[U, Q, RU, P2, F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), unit.power)
-    Unit[U, Q, P#Add[P2], F](rhs.name, rhs.cf, rhs.prefix, v * rhs.value, unit.power + rhs.power)
+    Unit[U, Q, RU, P#Add[P2], F](rhs.name, rhs.cf, rhs.prefix, v * rhs.value, unit.power + rhs.power)
   }
-  def /[U <: BaseUnit[U, Q], P2 <: church.Integer, F <: Prefix[F]](rhs: Unit[U, Q, P2, F]) = {
+  def /[U <: BaseUnit[U, Q, RU], P2 <: Integer, F <: Prefix[F]](rhs: Unit[U, Q, RU, P2, F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (rhs.cf * rhs.prefix.factor), unit.power)
-    Unit[U, Q, P#Sub[P2], F](rhs.name, rhs.cf, rhs.prefix, v / rhs.value, unit.power - rhs.power)
+    Unit[U, Q, RU, P#Sub[P2], F](rhs.name, rhs.cf, rhs.prefix, v / rhs.value, unit.power - rhs.power)
   }
 }
 
-trait BaseQuantity[Q <: BaseQuantity[Q]] extends Quantity[Q, church.Integer._1] {
-  type RefUnit <: BaseUnit[RefUnit, Q]
+trait BaseQuantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]] extends Quantity[Q, RU, Integer._1] {
 }
 
-abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]] extends Quantity[Q, P] {
+abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]] extends Quantity[Q, RU, P] {
   self =>
-  type Type = Unit[U, Q, P, F]
-  type Pow[K <: church.Integer] = Unit[U, Q, P#Mul[K], F]
+  type Type = Unit[U, Q, RU, P, F]
+  type Pow[K <: Integer] = Unit[U, Q, RU, P#Mul[K], F]
   def name: String
   def cf: Double
   def power: Int
   def value: Double
   def prefix: Prefix[_]
-  def apply(v: Double) = Unit[U, Q, P, F](self.name, self.cf, self.prefix, v, self.power)
+  def apply(v: Double) = Unit[U, Q, RU, P, F](self.name, self.cf, self.prefix, v, self.power)
   override def toString = {
     val pre = if ((prefix.factor == UnitPrefix.factor) && (prefix.name == UnitPrefix.name)) "" else s"${prefix.name}-"
     val exp =
@@ -87,25 +86,25 @@ abstract class Unit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integ
 }
 
 object Unit {
-  def apply[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q], P <: church.Integer, F <: Prefix[F]](
+  def apply[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]](
     name_ : String,
     cf_ : Double,
     prefix_ : Prefix[_],
     value_ : Double,
-    power_ : Int) = new Unit[U, Q, P, F] {
+    power_ : Int) = new Unit[U, Q, RU, P, F] {
       def name = name_
       def cf = cf_
       def prefix = prefix_
       def value = value_
       def power = power_
-      def unit = this.asInstanceOf[Unit[U, Q, P, F]]
+      def unit = this.asInstanceOf[Unit[U, Q, RU, P, F]]
     }
 }
 
-abstract class BaseUnit[U <: BaseUnit[U, Q], Q <: BaseQuantity[Q]] extends Unit[U, Q, church.Integer._1, UnitPrefix] {
+abstract class BaseUnit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]] extends Unit[U, Q, RU, Integer._1, UnitPrefix] {
   def power = 1
   def value = 1.0
-  def unit = this.asInstanceOf[Unit[U, Q, church.Integer._1, UnitPrefix]]
+  def unit = this.asInstanceOf[Unit[U, Q, RU, Integer._1, UnitPrefix]]
   def prefix = UnitPrefix
 }
 
@@ -119,20 +118,18 @@ object ISQ {
   object infra {
     import com.manyangled.unit4s.infra._
 
-    trait Length extends BaseQuantity[Length] {
-      type RefUnit = Meter
+    trait Length extends BaseQuantity[Length, Meter] {
     }
 
-    trait Time extends BaseQuantity[Time] {
-      type RefUnit = Second
+    trait Time extends BaseQuantity[Time, Second] {
     }
 
-    class Meter extends BaseUnit[Meter, Length] {
+    class Meter extends BaseUnit[Meter, Length, Meter] {
       def name = "meter"
       def cf = 1.0
     }
 
-    class Second extends BaseUnit[Second, Time] {
+    class Second extends BaseUnit[Second, Time, Second] {
       def name = "second"
       def cf = 1.0
     }
@@ -159,12 +156,12 @@ object custom {
     import com.manyangled.unit4s.infra._
     import com.manyangled.ISQ.infra._
 
-    class Foot extends BaseUnit[Foot, Length] {
+    class Foot extends BaseUnit[Foot, Length, Meter] {
       def name = "foot"
       def cf = 0.3048
     }
 
-    class Minute extends BaseUnit[Minute, Time] {
+    class Minute extends BaseUnit[Minute, Time, Second] {
       def name = "minute"
       def cf = 60.0
     }
@@ -172,6 +169,7 @@ object custom {
 }
 
 object test {
+  import com.manyangled.church.Integer
   import com.manyangled.unit4s._
   import com.manyangled.ISQ._
   import com.manyangled.ISU._
@@ -187,7 +185,7 @@ object test {
   def f(v: Length) = v.to(Meter)
   def j(v: Meter) = v.value
 
-  def g(v: Time#QPow[church.Integer._1]) = v.to(Second)
+  def g(v: Time#QPow[Integer._1]) = v.to(Second)
 
   val KiloMeter = Kilo*Meter
   val v1 = KiloMeter(3.0)
@@ -199,12 +197,12 @@ object test {
 /*
   val sum1 = m1 + (f1)
 
-  def g(v: UnitValue with QuantityOf[Time#Pow[church.Integer._1]]) = v.to(Second)
+  def g(v: UnitValue with QuantityOf[Time#Pow[Integer._1]]) = v.to(Second)
 
-  type Area = Length#Pow[church.Integer._2]
-  type SquareMeter = Meter#Pow[church.Integer._2]
+  type Area = Length#Pow[Integer._2]
+  type SquareMeter = Meter#Pow[Integer._2]
   object SquareMeter extends SquareMeter
-  type SquareFoot = Foot#Pow[church.Integer._2]
+  type SquareFoot = Foot#Pow[Integer._2]
   object SquareFoot extends SquareFoot
 
   val sqm1 = SquareMeter(4.0)
