@@ -54,7 +54,7 @@ abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: Bas
   type Type = Unit[U, Q, RU, P, F]
   type Pow[K <: Integer] = Unit[U, Q, RU, P#Mul[K], F]
   def name: String = bumeta.name
-  def cf: Double
+  def cf: Double = bumeta.cf
   def power: Int
   def value: Double
   def prefix: Prefix[_]
@@ -79,7 +79,7 @@ object Unit {
     value_ : Double,
     power_ : Int)(implicit bumeta: BaseUnitMeta[U, Q, RU]) = new Unit[U, Q, RU, P, F] {
 //      def name = name_
-      def cf = cf_
+//      def cf = cf_
       def prefix = prefix_
       def value = value_
       def power = power_
@@ -94,7 +94,7 @@ abstract class BaseUnit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <:
   def prefix = UnitPrefix
 }
 
-case class BaseUnitMeta[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]](name: String, abbv: String)
+case class BaseUnitMeta[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]](name: String, abbv: String, cf: Double)
 
 } // infra
 } // unit4s
@@ -112,20 +112,14 @@ object ISQ {
     trait Time extends BaseQuantity[Time, Second] {
     }
 
-    class Meter(implicit bumeta: BaseUnitMeta[Meter, Length, Meter]) extends BaseUnit[Meter, Length, Meter] {
-//      def name = "meter"
-      def cf = 1.0
-    }
+    class Meter(implicit bumeta: BaseUnitMeta[Meter, Length, Meter]) extends BaseUnit[Meter, Length, Meter]
     object Meter {
-      implicit val meterMeta = BaseUnitMeta[Meter, Length, Meter]("meter", "m")
+      implicit val meterMeta = BaseUnitMeta[Meter, Length, Meter]("meter", "m", 1.0)
     }
 
-    class Second(implicit bumeta: BaseUnitMeta[Second, Time, Second]) extends BaseUnit[Second, Time, Second] {
-//      def name = "second"
-      def cf = 1.0
-    }
+    class Second(implicit bumeta: BaseUnitMeta[Second, Time, Second]) extends BaseUnit[Second, Time, Second]
     object Second {
-      implicit val secondMeta = BaseUnitMeta[Second, Time, Second]("second", "s")
+      implicit val secondMeta = BaseUnitMeta[Second, Time, Second]("second", "s", 1.0)
     }
   }
 
@@ -156,20 +150,14 @@ object customInfra {
   import com.manyangled.unit4s.infra._
   import com.manyangled.ISQ.infra._
 
-  class Foot(implicit bumeta: BaseUnitMeta[Foot, Length, Meter]) extends BaseUnit[Foot, Length, Meter] {
-    //def name = "foot"
-    def cf = 0.3048
-  }
+  class Foot(implicit bumeta: BaseUnitMeta[Foot, Length, Meter]) extends BaseUnit[Foot, Length, Meter]
   object Foot {
-    implicit val footMeta = BaseUnitMeta[Foot, Length, Meter]("foot", "ft")
+    implicit val footMeta = BaseUnitMeta[Foot, Length, Meter]("foot", "ft", 0.3048)
   }
 
-  class Minute(implicit bumeta: BaseUnitMeta[Minute, Time, Second]) extends BaseUnit[Minute, Time, Second] {
-    //def name = "minute"
-    def cf = 60.0
-  }
+  class Minute(implicit bumeta: BaseUnitMeta[Minute, Time, Second]) extends BaseUnit[Minute, Time, Second]
   object Minute {
-    implicit val minuteMeta = BaseUnitMeta[Minute, Time, Second]("minute", "min")
+    implicit val minuteMeta = BaseUnitMeta[Minute, Time, Second]("minute", "min", 60.0)
   }
 }
 
