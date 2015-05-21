@@ -56,13 +56,17 @@ abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: Bas
   self =>
   type Type = Unit[U, Q, RU, P, F]
   type Pow[K <: Integer] = Unit[U, Q, RU, P#Mul[K], F]
-  def name: String = bumeta.name
-  def abbv: String = bumeta.abbv
-  def cf: Double = bumeta.cf
-  def power: Int = ival.value
+
   def value: Double
+
+  def name = bumeta.name
+  def abbv = bumeta.abbv
+  def cf = bumeta.cf
+  def power = ival.value
   def prefix: Prefix[_] = premeta.prefix
+
   def apply(v: Double) = Unit[U, Q, RU, P, F](v)
+
   override def toString = {
     val pre = if ((prefix.factor == UnitPrefix.factor) && (prefix.name == UnitPrefix.name)) "" else s"${prefix.name}-"
     val exp =
