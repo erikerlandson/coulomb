@@ -54,6 +54,14 @@ trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer
     val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
     Unit[RU, Q, RU, P#Sub[P2], UnitPrefix](vL / vR)
   }
+  def inverse(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Neg], premeta: PrefixMeta[UnitPrefix]) = {
+    val v = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
+    Unit[RU, Q, RU, P#Neg, UnitPrefix](1.0 / v)
+  }
+  def pow[K <: Integer](implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Mul[K]], kval: IntegerValue[K], premeta: PrefixMeta[UnitPrefix]) = {
+    val v = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
+    Unit[RU, Q, RU, P#Mul[K], UnitPrefix](math.pow(v, kval.value))
+  }
 }
 
 trait BaseQuantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]] extends Quantity[Q, RU, Integer._1]
