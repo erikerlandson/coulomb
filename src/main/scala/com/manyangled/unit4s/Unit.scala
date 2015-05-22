@@ -91,6 +91,29 @@ abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: Bas
     val u = if (power == 0) "" else s"($pre$name$exp)"
     s"($value)$u"
   }
+
+  def uAdd[U2 <: BaseUnit[U2, Q, RU], F2 <: Prefix[F2]](rhs: Unit[U2, Q, RU, P, F2]) = {
+    val vR = rhs.value * rhs.prefix.factor * math.pow(rhs.cf / this.cf, rhs.power) / this.prefix.factor
+    Unit[U, Q, RU, P, F](this.value + vR)
+  }
+  def uSub[U2 <: BaseUnit[U2, Q, RU], F2 <: Prefix[F2]](rhs: Unit[U2, Q, RU, P, F2]) = {
+    val vR = rhs.value * rhs.prefix.factor * math.pow(rhs.cf / this.cf, rhs.power) / this.prefix.factor
+    Unit[U, Q, RU, P, F](this.value - vR)
+  }
+  def uMul[U2 <: BaseUnit[U2, Q, RU], P2 <: Integer, F2 <: Prefix[F2]](rhs: Unit[U2, Q, RU, P2, F2])(implicit ival: IntegerValue[P#Add[P2]]) = {
+    val vR = rhs.value * rhs.prefix.factor * math.pow(rhs.cf / this.cf, rhs.power) / this.prefix.factor
+    Unit[U, Q, RU, P#Add[P2], F](this.value * vR)
+  }
+  def uDiv[U2 <: BaseUnit[U2, Q, RU], P2 <: Integer, F2 <: Prefix[F2]](rhs: Unit[U2, Q, RU, P2, F2])(implicit ival: IntegerValue[P#Sub[P2]]) = {
+    val vR = rhs.value * rhs.prefix.factor * math.pow(rhs.cf / this.cf, rhs.power) / this.prefix.factor
+    Unit[U, Q, RU, P#Sub[P2], F](this.value / vR)
+  }
+  def uInv(implicit ival: IntegerValue[P#Neg]) = {
+    Unit[U, Q, RU, P#Neg, F](1.0 / this.value)
+  }
+  def uPow[K <: Integer](implicit ival: IntegerValue[P#Mul[K]]) = {
+    Unit[U, Q, RU, P#Mul[K], F](math.pow(this.value, ival.value))
+  }
 }
 
 object Unit {
