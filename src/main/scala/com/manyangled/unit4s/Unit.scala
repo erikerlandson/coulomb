@@ -114,8 +114,8 @@ abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: Bas
   def uInv(implicit ival: IntegerValue[P#Neg]) = {
     Unit[U, Q, RU, P#Neg, F](1.0 / this.value)
   }
-  def uPow[K <: Integer](implicit ival: IntegerValue[P#Mul[K]]) = {
-    Unit[U, Q, RU, P#Mul[K], F](math.pow(this.value, ival.value))
+  def uPow[K <: Integer](implicit ival: IntegerValue[P#Mul[K]], kval: IntegerValue[K]) = {
+    Unit[U, Q, RU, P#Mul[K], F](math.pow(this.value, kval.value))
   }
 }
 
