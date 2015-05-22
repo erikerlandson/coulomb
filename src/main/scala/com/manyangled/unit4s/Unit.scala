@@ -34,27 +34,27 @@ trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
     Unit[U, Q, RU, P, F](v)
   }
-  def +(rhs: Quantity[Q, RU, P])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[UnitPrefix]) = {
+  def add(rhs: Quantity[Q, RU, P])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[UnitPrefix]) = {
     val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
     val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
     Unit[RU, Q, RU, P, UnitPrefix](vL + vR)
   }
-  def -(rhs: Quantity[Q, RU, P])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[UnitPrefix]) = {
+  def sub(rhs: Quantity[Q, RU, P])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[UnitPrefix]) = {
     val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
     val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
     Unit[RU, Q, RU, P, UnitPrefix](vL - vR)
   }
-  def *[P2 <: Integer](rhs: Quantity[Q, RU, P2])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Add[P2]], premeta: PrefixMeta[UnitPrefix]) = {
+  def mul[P2 <: Integer](rhs: Quantity[Q, RU, P2])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Add[P2]], premeta: PrefixMeta[UnitPrefix]) = {
     val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
     val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
     Unit[RU, Q, RU, P#Add[P2], UnitPrefix](vL * vR)
   }
-  def /[P2 <: Integer](rhs: Quantity[Q, RU, P2])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Sub[P2]], premeta: PrefixMeta[UnitPrefix]) = {
+  def div[P2 <: Integer](rhs: Quantity[Q, RU, P2])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Sub[P2]], premeta: PrefixMeta[UnitPrefix]) = {
     val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
     val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
     Unit[RU, Q, RU, P#Sub[P2], UnitPrefix](vL / vR)
   }
-  def inverse(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Neg], premeta: PrefixMeta[UnitPrefix]) = {
+  def inv(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Neg], premeta: PrefixMeta[UnitPrefix]) = {
     val v = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
     Unit[RU, Q, RU, P#Neg, UnitPrefix](1.0 / v)
   }
