@@ -30,9 +30,12 @@ trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer
   type QType = Quantity[Q, RU, P]
   type QPow[K <: Integer] = Quantity[Q, RU, P#Mul[K]]
   def unit: Unit[_, Q, RU, P, _]
-  def to[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = {
+  def as[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = {
     val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
     Unit[U, Q, RU, P, F](v)
+  }
+  def valueAs[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F]) = {
+    unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
   }
   def add(rhs: Quantity[Q, RU, P])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[UnitPrefix]) = {
     val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
@@ -218,17 +221,17 @@ object test {
   val s1 = Second(4.5)
   val n1 = Minute(5.6)
 
-  val f2 = m1.to(Foot)
+  val f2 = m1.as(Foot)
 
-  def f(v: Length) = v.to(Meter)
+  def f(v: Length) = v.as(Meter)
   def j(v: Meter) = v.value
 
-  def g(v: Time#QPow[Integer._1]) = v.to(Second)
+  def g(v: Time#QPow[Integer._1]) = v.as(Second)
 
   val KiloMeter = Kilo*Meter
   val v1 = KiloMeter(3.0)
   val v2 = Kilo*Meter(2.0)
-  val v3 = Meter(4000).to(Kilo*Meter)
+  val v3 = Meter(4000).as(Kilo*Meter)
 
   val vec1: Vector[Length] = Vector(Meter(1.0), Foot(2.0), Milli*Meter(3.0))
 
