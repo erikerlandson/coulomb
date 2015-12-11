@@ -2,6 +2,8 @@ package com.manyangled
 
 import com.manyangled.church.{ Integer, IntegerValue }
 
+/*
+
 object unit4s {
 
 object infra {
@@ -255,3 +257,5 @@ object test {
 
 */
 } // test
+
+*/
