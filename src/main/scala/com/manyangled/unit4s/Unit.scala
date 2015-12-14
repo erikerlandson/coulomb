@@ -2,6 +2,141 @@ package com.manyangled
 
 import com.manyangled.church.{ Integer, IntegerValue }
 
+object unit4s {
+  import scala.language.implicitConversions
+
+  sealed class =!=[A,B]
+
+  trait LowerPriorityImplicits {
+    implicit def equal[A]: =!=[A, A] = sys.error("should not be called")
+  }
+  object =!= extends LowerPriorityImplicits {
+    implicit def nequal[A,B](implicit same: A =:= B = null): =!=[A,B] =
+      if (same != null) sys.error("should not be called explicitly with same type")
+      else new =!=[A,B]
+  }
+
+  trait Unit[U <: Unit[U]] {
+    type RU <: Unit[RU]
+    final def apply(value: Double)(implicit spec: UnitSpec[U]): UnitValue1[U, Integer._1] = UnitValue1[U, Integer._1](value)
+    final def *(value: Double)(implicit spec: UnitSpec[U]): UnitValue1[U, Integer._1] = UnitValue1[U, Integer._1](value)
+  }
+
+  object Unit {
+    def factor[U1 <: Unit[U1], U2 <: Unit[U2]](implicit spec1: UnitSpec[U1], spec2: UnitSpec[U2], eq: U1#RU =:= U2#RU) = spec1.cfr / spec2.cfr
+  }
+
+  trait UnitSpec[U <: Unit[U]] {
+    def cfr: Double
+    def name: String
+    def cf[Ua <: Unit[Ua]](implicit speca: UnitSpec[Ua], eq: U#RU =:= Ua#RU) = cfr / speca.cfr
+  }
+
+  trait Meter extends Unit[Meter] {
+    type RU = Meter
+  }
+  object Meter extends Meter {
+    implicit object spec extends UnitSpec[Meter] {
+      val cfr = 1.0
+      val name = "meter"
+    }
+  }
+
+  trait Foot extends Unit[Foot] {
+    type RU = Meter
+  }
+  object Foot extends Foot {
+    implicit object spec extends UnitSpec[Foot] {
+      val cfr = 0.3048
+      val name = "foot"
+    }
+  }
+
+  trait Yard extends Unit[Yard] {
+    type RU = Meter
+  }
+  object Yard extends Yard {
+    implicit object spec extends UnitSpec[Yard] {
+      val cfr = 0.9144
+      val name = "yard"
+    }
+  }
+
+  trait Second extends Unit[Second] {
+    type RU = Second
+  }
+  object Second extends Second {
+    implicit object spec extends UnitSpec[Second] {
+      val cfr = 1.0
+      val name = "second"
+    }
+  }
+
+  trait Minute extends Unit[Minute] {
+    type RU = Second
+  }
+  object Minute extends Minute {
+    implicit object spec extends UnitSpec[Minute] {
+      val cfr = 60.0
+      val name = "minute"
+    }
+  }
+
+  case class UnitValue1[U1 <: Unit[U1], P1 <: Integer](value: Double)(implicit spec1: UnitSpec[U1], p1: IntegerValue[P1]) {
+    def *(v: Double) = UnitValue1[U1, P1](v * value)
+  }
+
+  object UnitValue1 {
+    implicit def fromUnit[U1 <: Unit[U1]](unit: U1)(implicit spec: UnitSpec[U1]): UnitValue1[U1, Integer._1] = UnitValue1[U1, Integer._1](1.0)
+
+    implicit def commute1[U1 <: Unit[U1], P1 <: Integer, Ua <: Unit[Ua]](uv: UnitValue1[U1, P1])(implicit
+      spec1: UnitSpec[U1],
+      speca: UnitSpec[Ua],
+      eq: U1#RU =:= Ua#RU,
+      v1: IntegerValue[P1]): UnitValue1[Ua, P1] = {
+      val f = math.pow(Unit.factor[U1, Ua], Integer.value[P1])
+      UnitValue1[Ua, P1](uv.value * f)
+    }
+  }
+
+  case class UnitValue2[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer](value: Double)(implicit
+    spec1: UnitSpec[U1], p1: IntegerValue[P1],
+    spec2: UnitSpec[U2], p2: IntegerValue[P2],
+    ne12: U1#RU =!= U2#RU) {
+    def *(v: Double) = UnitValue2[U1, P1, U2, P2](v * value)
+  }
+
+  object UnitValue2 {
+    implicit def commute12[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue2[U1, P1, U2, P2])(implicit
+      spec1: UnitSpec[U1], spec2: UnitSpec[U2],
+      speca: UnitSpec[Ua], specb: UnitSpec[Ub],
+      eq1a: U1#RU =:= Ua#RU, eq2b: U2#RU =:= Ub#RU,
+      v1: IntegerValue[P1], v2: IntegerValue[P2]): UnitValue2[Ua, P1, Ub, P2] = {
+      val f =
+        math.pow(Unit.factor[U1, Ua], Integer.value[P1]) *
+        math.pow(Unit.factor[U2, Ub], Integer.value[P2])
+      UnitValue2[Ua, P1, Ub, P2](uv.value * f)
+    }
+    
+    implicit def commute21[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue2[U2, P2, U1, P1])(implicit
+      spec1: UnitSpec[U1], spec2: UnitSpec[U2],
+      speca: UnitSpec[Ua], specb: UnitSpec[Ub],
+      eq1a: U1#RU =:= Ua#RU, eq2b: U2#RU =:= Ub#RU,
+      v1: IntegerValue[P1], v2: IntegerValue[P2]): UnitValue2[Ua, P1, Ub, P2] = {
+      val f =
+        math.pow(Unit.factor[U1, Ua], Integer.value[P1]) *
+        math.pow(Unit.factor[U2, Ub], Integer.value[P2])
+      UnitValue2[Ua, P1, Ub, P2](uv.value * f)
+    }
+    
+  }
+
+  object test {
+    def f1(uv: UnitValue1[Foot, Integer._1]) = uv.value
+    def f2(uv: UnitValue2[Foot, Integer._1, Second, Integer._neg1]) = uv.value
+  }
+}
+
 /*
 
 object unit4s {
