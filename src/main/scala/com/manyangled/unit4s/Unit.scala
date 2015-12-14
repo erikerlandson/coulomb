@@ -17,19 +17,38 @@ object unit4s {
   }
 
   trait Unit[U <: Unit[U]] {
-    type RU <: Unit[RU]
+    type RU <: Unit[_]
     final def apply(value: Double)(implicit spec: UnitSpec[U]): UnitValue1[U, Integer._1] = UnitValue1[U, Integer._1](value)
     final def *(value: Double)(implicit spec: UnitSpec[U]): UnitValue1[U, Integer._1] = UnitValue1[U, Integer._1](value)
   }
 
   object Unit {
     def factor[U1 <: Unit[U1], U2 <: Unit[U2]](implicit spec1: UnitSpec[U1], spec2: UnitSpec[U2], eq: U1#RU =:= U2#RU) = spec1.cfr / spec2.cfr
+
+    def toString(value: Double, units: Seq[(String, Int)]) = {
+      val unitstr = units.map { case (name, exp) =>
+        if (exp == 1) s"$name" else s"($name)^($exp)"
+      }.mkString(" ")
+      s"UnitValue${units.length}($value $unitstr)"
+    }
   }
 
   trait UnitSpec[U <: Unit[U]] {
     def cfr: Double
     def name: String
-    def cf[Ua <: Unit[Ua]](implicit speca: UnitSpec[Ua], eq: U#RU =:= Ua#RU) = cfr / speca.cfr
+    def plural = name + "s"
+  }
+
+  trait Kilo[U <: Unit[U]] extends Unit[Kilo[U]] {
+    type RU = U#RU
+  }
+  object Kilo {
+    val (pfval, pfname) = (1000.0, "kilo")
+    implicit def factory[U <: Unit[U]](implicit spec: UnitSpec[U]): UnitSpec[Kilo[U]] = new UnitSpec[Kilo[U]] {
+      val cfr = pfval * spec.cfr
+      val name = pfname + spec.name
+      override val plural = pfname + spec.plural
+    }
   }
 
   trait Meter extends Unit[Meter] {
@@ -49,6 +68,7 @@ object unit4s {
     implicit object spec extends UnitSpec[Foot] {
       val cfr = 0.3048
       val name = "foot"
+      override val plural = "feet"
     }
   }
 
@@ -84,6 +104,7 @@ object unit4s {
 
   case class UnitValue1[U1 <: Unit[U1], P1 <: Integer](value: Double)(implicit spec1: UnitSpec[U1], p1: IntegerValue[P1]) {
     def *(v: Double) = UnitValue1[U1, P1](v * value)
+    override def toString = Unit.toString(value, Seq((spec1.name, Integer.value[P1])))
   }
 
   object UnitValue1 {
@@ -104,6 +125,7 @@ object unit4s {
     spec2: UnitSpec[U2], p2: IntegerValue[P2],
     ne12: U1#RU =!= U2#RU) {
     def *(v: Double) = UnitValue2[U1, P1, U2, P2](v * value)
+    override def toString = Unit.toString(value, Seq((spec1.name, Integer.value[P1]), (spec2.name, Integer.value[P2])))
   }
 
   object UnitValue2 {
@@ -117,7 +139,7 @@ object unit4s {
         math.pow(Unit.factor[U2, Ub], Integer.value[P2])
       UnitValue2[Ua, P1, Ub, P2](uv.value * f)
     }
-    
+
     implicit def commute21[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue2[U2, P2, U1, P1])(implicit
       spec1: UnitSpec[U1], spec2: UnitSpec[U2],
       speca: UnitSpec[Ua], specb: UnitSpec[Ub],
