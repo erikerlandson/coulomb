@@ -121,12 +121,36 @@ object unit4s {
     def +(uv: UnitValue2[U1, P1, U2, P2]) = UnitValue2[U1, P1, U2, P2](value + uv.value)
     def -(uv: UnitValue2[U1, P1, U2, P2]) = UnitValue2[U1, P1, U2, P2](value - uv.value)
 
-    def *(v: Double) = UnitValue2[U1, P1, U2, P2](v * value)
+    def *(v: Double): UnitValue2[U1, P1, U2, P2] = UnitValue2[U1, P1, U2, P2](value * v)
+
+    def *[Pa <: Integer, Pb <: Integer](uv: UnitValue2[U1, Pa, U2, Pb])(implicit
+      iva: IntegerValue[P1#Add[Pa]], ivb: IntegerValue[P2#Add[Pb]]): UnitValue2[U1, P1#Add[Pa], U2, P2#Add[Pb]] =
+      UnitValue2[U1, P1#Add[Pa], U2, P2#Add[Pb]](value * uv.value)
 
     override def toString = Unit.toString(value, Seq((udef1.name, Integer.value[P1]), (udef2.name, Integer.value[P2])))
   }
 
   object UnitValue2 {
+    implicit def fromUV1pa[U1 <: Unit[U1], P1 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue1[U1, P1])(implicit
+      udef1: UnitDef[U1],
+      udefa: UnitDef[Ua], udefb: UnitDef[Ub],
+      eq1a: U1#RU =:= Ua#RU,
+      iv1: IntegerValue[P1]): UnitValue2[Ua, P1, Ub, Integer._0] = {
+      val f =
+        math.pow(Unit.factor[U1, Ua], iv1.value)
+      UnitValue2[Ua, P1, Ub, Integer._0](uv.value * f)
+    }
+
+    implicit def fromUV1pb[U1 <: Unit[U1], P1 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue1[U1, P1])(implicit
+      udef1: UnitDef[U1],
+      udefa: UnitDef[Ua], udefb: UnitDef[Ub],
+      eq1a: U1#RU =:= Ub#RU,
+      iv1: IntegerValue[P1]): UnitValue2[Ua, Integer._0, Ub, P1] = {
+      val f =
+        math.pow(Unit.factor[U1, Ub], iv1.value)
+      UnitValue2[Ua, Integer._0, Ub, P1](uv.value * f)
+    }
+
     implicit def commute12[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue2[U1, P1, U2, P2])(implicit
       udef1: UnitDef[U1], udef2: UnitDef[U2],
       udefa: UnitDef[Ua], udefb: UnitDef[Ub],
@@ -147,8 +171,7 @@ object unit4s {
         math.pow(Unit.factor[U1, Ua], Integer.value[P1]) *
         math.pow(Unit.factor[U2, Ub], Integer.value[P2])
       UnitValue2[Ua, P1, Ub, P2](uv.value * f)
-    }
-    
+    }    
   }
 
   object test {
