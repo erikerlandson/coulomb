@@ -1,27 +1,31 @@
 package com.manyangled
 
 import com.manyangled.church.{ Integer, IntegerValue }
+import Integer.{ _0, _1 }
 
 object unit4s {
   import scala.language.implicitConversions
 
   sealed class =!=[A,B]
 
-  trait LowerPriorityImplicits {
-    implicit def equal[A]: =!=[A, A] = sys.error("should not be called")
+  trait NeqLowerPriorityImplicits {
+    implicit def equal[A]: =!=[A, A] = {
+      sys.error("should not be called")
+    }
   }
-  object =!= extends LowerPriorityImplicits {
-    implicit def nequal[A,B](implicit same: A =:= B = null): =!=[A,B] =
+  object =!= extends NeqLowerPriorityImplicits {
+    implicit def nequal[A,B](implicit same: A =:= B = null): =!=[A,B] = {
       if (same != null) sys.error("should not be called explicitly with same type")
       else new =!=[A,B]
+    }
   }
 
   trait Unit[U <: Unit[U]] {
     type RU <: Unit[_]
 
-    final def apply(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, Integer._1] = UnitValue1[U, Integer._1](value)
+    final def apply(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
 
-    final def *(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, Integer._1] = UnitValue1[U, Integer._1](value)
+    final def *(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
   }
 
   object Unit {
@@ -89,45 +93,122 @@ object unit4s {
     implicit val udef = UnitSpec[Minute]("minute", 60.0)
   }
 
+  trait U$ <: Unit[U$] {
+    type RU = U$
+  }
+  object U$ {
+    implicit val udef = UnitSpec[U$]("U$", 1.0)
+  } 
+
+  case class RHS[U1 <: Unit[U1], U2 <: Unit[U2], U3 <: Unit[U3], UA1 <: Unit[UA1], PA1 <: Integer, UA2 <: Unit[UA2], PA2 <: Integer, UA3 <: Unit[UA3], PA3 <: Integer](value: Double)(implicit
+    udef1: UnitDef[U1],
+    udef2: UnitDef[U2],
+    udef3: UnitDef[U3],
+    udef1a: UnitDef[UA1], iv1a: IntegerValue[PA1],
+    udef2a: UnitDef[UA2], iv2a: IntegerValue[PA2],
+    udef3a: UnitDef[UA3], iv3a: IntegerValue[PA3])
+
+  object RHS {
+    import Unit.factor
+
+    implicit def idf1[U1 <: Unit[U1], Ua <: Unit[Ua], Pa <: Integer](uv: UnitValue1[Ua, Pa])(implicit
+      udef1: UnitDef[U1],
+      udefa: UnitDef[Ua],
+      iva: IntegerValue[Pa],
+      eq1a: Ua#RU =:= U1#RU): RHS[U1, U$, U$,   U1, Pa, U$, _0, U$, _0] = {
+      val fp = Seq((factor[Ua, U1], iva.value))
+      RHS[U1, U$, U$,   U1, Pa, U$, _0, U$, _0](fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) })
+    }
+
+    implicit def idf2[U1 <: Unit[U1], Ua <: Unit[Ua], Pa <: Integer](uv: UnitValue1[Ua, Pa])(implicit
+      udef1: UnitDef[U1],
+      udefa: UnitDef[Ua],
+      iva: IntegerValue[Pa],
+      ne1a: Ua#RU =!= U1#RU): RHS[U1, U$, U$,   U$, _0, U$, _0, Ua, Pa] = {
+      val fp = Seq((1.0, 0))
+      RHS[U1, U$, U$,   U$, _0, U$, _0, Ua, Pa](fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) })
+    }
+  }
+
   case class UnitValue1[U1 <: Unit[U1], P1 <: Integer](value: Double)(implicit
-    udef1: UnitDef[U1], p1: IntegerValue[P1]) {
+    udef1: UnitDef[U1], iv1: IntegerValue[P1]) {
 
     def +(uv: UnitValue1[U1, P1]) = UnitValue1[U1, P1](value + uv.value)
     def -(uv: UnitValue1[U1, P1]) = UnitValue1[U1, P1](value - uv.value)
 
     def *(v: Double) = UnitValue1[U1, P1](v * value)
 
-    override def toString = Unit.toString(value, Seq((udef1.name, Integer.value[P1])))
-  }
+    def *[Pa <: Integer](rhs: RHS[U1, U$, U$,  U1, Pa, U$, _0, U$, _0])(implicit
+      iva: IntegerValue[P1#Add[Pa]]
+    ): UnitValue1[U1, P1#Add[Pa]] = UnitValue1[U1, P1#Add[Pa]](value * rhs.value)
 
-  object UnitValue1 {
-    implicit def fromUnit[U1 <: Unit[U1]](unit: U1)(implicit udef: UnitDef[U1]): UnitValue1[U1, Integer._1] = UnitValue1[U1, Integer._1](1.0)
-
-    implicit def commute1[U1 <: Unit[U1], P1 <: Integer, Ua <: Unit[Ua]](uv: UnitValue1[U1, P1])(implicit
-      udef1: UnitDef[U1],
+    def *[Ua <: Unit[Ua], Pa <: Integer](rhs: RHS[U1, U$, U$, U$, _0, U$, _0, Ua, Pa])(implicit
       udefa: UnitDef[Ua],
-      eq: U1#RU =:= Ua#RU,
-      v1: IntegerValue[P1]): UnitValue1[Ua, P1] = {
-      val f = math.pow(Unit.factor[U1, Ua], Integer.value[P1])
-      UnitValue1[Ua, P1](uv.value * f)
-    }
+      iva: IntegerValue[Pa]
+    ): UnitValue2[U1, P1, Ua, Pa] = UnitValue2[U1, P1, Ua, Pa](value * rhs.value)
+
+    override def toString = Unit.toString(value, Seq((udef1.name, iv1.value)))
   }
 
   case class UnitValue2[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer](value: Double)(implicit
-    udef1: UnitDef[U1], p1: IntegerValue[P1],
-    udef2: UnitDef[U2], p2: IntegerValue[P2],
-    ne12: U1#RU =!= U2#RU) {
+    udef1: UnitDef[U1], iv1: IntegerValue[P1],
+    udef2: UnitDef[U2], iv2: IntegerValue[P2] /*,
+    ne12: U1#RU =!= U2#RU */) {
 
     def +(uv: UnitValue2[U1, P1, U2, P2]) = UnitValue2[U1, P1, U2, P2](value + uv.value)
     def -(uv: UnitValue2[U1, P1, U2, P2]) = UnitValue2[U1, P1, U2, P2](value - uv.value)
 
     def *(v: Double): UnitValue2[U1, P1, U2, P2] = UnitValue2[U1, P1, U2, P2](value * v)
 
-    def *[Pa <: Integer, Pb <: Integer](uv: UnitValue2[U1, Pa, U2, Pb])(implicit
-      iva: IntegerValue[P1#Add[Pa]], ivb: IntegerValue[P2#Add[Pb]]): UnitValue2[U1, P1#Add[Pa], U2, P2#Add[Pb]] =
-      UnitValue2[U1, P1#Add[Pa], U2, P2#Add[Pb]](value * uv.value)
+    override def toString = Unit.toString(value, Seq((udef1.name, iv1.value), (udef2.name, iv2.value)))
+  }
 
-    override def toString = Unit.toString(value, Seq((udef1.name, Integer.value[P1]), (udef2.name, Integer.value[P2])))
+  case class UnitValue3[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer, U3 <: Unit[U3], P3 <: Integer](value: Double)(implicit
+    udef1: UnitDef[U1], iv1: IntegerValue[P1],
+    udef2: UnitDef[U2], iv2: IntegerValue[P2],
+    udef3: UnitDef[U3], iv3: IntegerValue[P3] /*,
+    ne12: U1#RU =!= U2#RU, ne23: U2#RU =!= U3#RU, ne13: U1#RU =!= U3#RU*/) {
+
+    def +(uv: UnitValue3[U1, P1, U2, P2, U3, P3]) = UnitValue3[U1, P1, U2, P2, U3, P3](value + uv.value)
+    def -(uv: UnitValue3[U1, P1, U2, P2, U3, P3]) = UnitValue3[U1, P1, U2, P2, U3, P3](value - uv.value)
+
+    def *(v: Double): UnitValue3[U1, P1, U2, P2, U3, P3] = UnitValue3[U1, P1, U2, P2, U3, P3](value * v)
+
+    override def toString = Unit.toString(value, Seq((udef1.name, iv1.value), (udef2.name, iv2.value), (udef3.name, iv3.value)))
+  }
+
+
+
+/*
+// V = maximum valence
+// w is a valence value
+(1 to V).foreach { w =>
+  // n is number 'unaligned' with existing unit in target
+  (0 to w).foreach { n =>
+    val a = w - n
+    (1 to V-n).combinations(a).foreach { aligned =>
+      val unaligned = ((1 to V-n).toSet -- aligned.toSet).toSeq
+      // generate implicit function that maps aligned (with conversion) and unaligned
+      // unaligned do not contribute to conversion factor
+      // unaligned occupy right-most places
+      // unaligned have no #RU constraints
+      // generate full permutations for all alligned units
+    }
+  }
+}
+*/
+
+  object UnitValue1 {
+    implicit def fromUnit[U1 <: Unit[U1]](unit: U1)(implicit udef: UnitDef[U1]): UnitValue1[U1, _1] = UnitValue1[U1, _1](1.0)
+
+    implicit def commute1[U1 <: Unit[U1], P1 <: Integer, Ua <: Unit[Ua]](uv: UnitValue1[U1, P1])(implicit
+      udef1: UnitDef[U1],
+      udefa: UnitDef[Ua],
+      eq: U1#RU =:= Ua#RU,
+      iv1: IntegerValue[P1]): UnitValue1[Ua, P1] = {
+      val f = math.pow(Unit.factor[U1, Ua], iv1.value)
+      UnitValue1[Ua, P1](uv.value * f)
+    }
   }
 
   object UnitValue2 {
@@ -135,7 +216,7 @@ object unit4s {
       udef1: UnitDef[U1],
       udefa: UnitDef[Ua], udefb: UnitDef[Ub],
       eq1a: U1#RU =:= Ua#RU,
-      iv1: IntegerValue[P1]): UnitValue2[Ua, P1, Ub, Integer._0] = {
+      iv1: IntegerValue[P1]): UnitValue2[Ua, P1, Ub, _0] = {
       val f =
         math.pow(Unit.factor[U1, Ua], iv1.value)
       UnitValue2[Ua, P1, Ub, Integer._0](uv.value * f)
@@ -179,261 +260,3 @@ object unit4s {
     def f2(uv: UnitValue2[Foot, Integer._1, Second, Integer._neg1]) = uv.value
   }
 }
-
-/*
-
-object unit4s {
-
-object infra {
-
-trait Prefix[F <: Prefix[F]] extends Serializable {
-  def factor: Double
-  def name: String
-  def abbv: String
-
-  final def *[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer](u: Unit[U, Q, RU, P, UnitPrefix])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = Unit[U, Q, RU, P, F](u.value)
-  final override def toString = s"Prefix($name, $factor)"
-}
-
-case class PrefixMeta[F <: Prefix[F]](prefix: F)
-
-class UnitPrefix extends Prefix[UnitPrefix] {
-  def factor = 1.0
-  def name = "[unit]"
-  def abbv = "[unit]"
-}
-object UnitPrefix extends UnitPrefix {
-  implicit val unitPrefixMeta = PrefixMeta(new UnitPrefix)
-}
-
-trait Quantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer] extends Serializable {
-  type QType = Quantity[Q, RU, P]
-  type QPow[K <: Integer] = Quantity[Q, RU, P#Mul[K]]
-  def unit: Unit[_, Q, RU, P, _]
-  def as[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F])(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = {
-    val v = unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
-    Unit[U, Q, RU, P, F](v)
-  }
-  def valueAs[U <: BaseUnit[U, Q, RU], F <: Prefix[F]](u: Unit[U, Q, RU, P, F]) = {
-    unit.value * math.pow((unit.cf * unit.prefix.factor) / (u.cf * u.prefix.factor), u.power)
-  }
-  def add(rhs: Quantity[Q, RU, P])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[UnitPrefix]) = {
-    val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
-    val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
-    Unit[RU, Q, RU, P, UnitPrefix](vL + vR)
-  }
-  def sub(rhs: Quantity[Q, RU, P])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[UnitPrefix]) = {
-    val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
-    val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
-    Unit[RU, Q, RU, P, UnitPrefix](vL - vR)
-  }
-  def mul[P2 <: Integer](rhs: Quantity[Q, RU, P2])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Add[P2]], premeta: PrefixMeta[UnitPrefix]) = {
-    val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
-    val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
-    Unit[RU, Q, RU, P#Add[P2], UnitPrefix](vL * vR)
-  }
-  def div[P2 <: Integer](rhs: Quantity[Q, RU, P2])(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Sub[P2]], premeta: PrefixMeta[UnitPrefix]) = {
-    val vL = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
-    val vR = rhs.unit.value * rhs.unit.prefix.factor * math.pow(rhs.unit.cf, rhs.unit.power)
-    Unit[RU, Q, RU, P#Sub[P2], UnitPrefix](vL / vR)
-  }
-  def inv(implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Neg], premeta: PrefixMeta[UnitPrefix]) = {
-    val v = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
-    Unit[RU, Q, RU, P#Neg, UnitPrefix](1.0 / v)
-  }
-  def pow[K <: Integer](implicit bumeta: BaseUnitMeta[RU, Q, RU], ival: IntegerValue[P#Mul[K]], kval: IntegerValue[K], premeta: PrefixMeta[UnitPrefix]) = {
-    val v = unit.value * unit.prefix.factor * math.pow(unit.cf, unit.power)
-    Unit[RU, Q, RU, P#Mul[K], UnitPrefix](math.pow(v, kval.value))
-  }
-}
-
-trait BaseQuantity[Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]] extends Quantity[Q, RU, Integer._1]
-
-abstract class Unit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]](implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) extends Quantity[Q, RU, P] {
-  self =>
-  type Type = Unit[U, Q, RU, P, F]
-  type Pow[K <: Integer] = Unit[U, Q, RU, P#Mul[K], F]
-
-  def value: Double
-
-  def name = bumeta.name
-  def abbv = bumeta.abbv
-  def cf = bumeta.cf
-  def power = ival.value
-  def prefix: Prefix[_] = premeta.prefix
-
-  def apply(v: Double) = Unit[U, Q, RU, P, F](v)
-
-  override def toString = {
-    val pre = if ((prefix.factor == UnitPrefix.factor) && (prefix.name == UnitPrefix.name)) "" else s"${prefix.name}-"
-    val exp =
-      if (power == 0) ""
-      else if (power == 1) ""
-      else if (power > 1) s"^$power"
-      else s"^($power)"
-    val u = if (power == 0) "" else s"($pre$name$exp)"
-    s"($value)$u"
-  }
-
-  def uAdd[U2 <: BaseUnit[U2, Q, RU], F2 <: Prefix[F2]](rhs: Unit[U2, Q, RU, P, F2]) = {
-    val vR = rhs.value * rhs.prefix.factor * math.pow(rhs.cf / this.cf, rhs.power) / this.prefix.factor
-    Unit[U, Q, RU, P, F](this.value + vR)
-  }
-  def uSub[U2 <: BaseUnit[U2, Q, RU], F2 <: Prefix[F2]](rhs: Unit[U2, Q, RU, P, F2]) = {
-    val vR = rhs.value * rhs.prefix.factor * math.pow(rhs.cf / this.cf, rhs.power) / this.prefix.factor
-    Unit[U, Q, RU, P, F](this.value - vR)
-  }
-  def uMul[U2 <: BaseUnit[U2, Q, RU], P2 <: Integer, F2 <: Prefix[F2]](rhs: Unit[U2, Q, RU, P2, F2])(implicit ival: IntegerValue[P#Add[P2]]) = {
-    val vR = rhs.value * rhs.prefix.factor * math.pow(rhs.cf / this.cf, rhs.power) / this.prefix.factor
-    Unit[U, Q, RU, P#Add[P2], F](this.value * vR)
-  }
-  def uDiv[U2 <: BaseUnit[U2, Q, RU], P2 <: Integer, F2 <: Prefix[F2]](rhs: Unit[U2, Q, RU, P2, F2])(implicit ival: IntegerValue[P#Sub[P2]]) = {
-    val vR = rhs.value * rhs.prefix.factor * math.pow(rhs.cf / this.cf, rhs.power) / this.prefix.factor
-    Unit[U, Q, RU, P#Sub[P2], F](this.value / vR)
-  }
-  def uInv(implicit ival: IntegerValue[P#Neg]) = {
-    Unit[U, Q, RU, P#Neg, F](1.0 / this.value)
-  }
-  def uPow[K <: Integer](implicit ival: IntegerValue[P#Mul[K]], kval: IntegerValue[K]) = {
-    Unit[U, Q, RU, P#Mul[K], F](math.pow(this.value, kval.value))
-  }
-}
-
-object Unit {
-  def apply[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU], P <: Integer, F <: Prefix[F]](value_ : Double)(implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[P], premeta: PrefixMeta[F]) = new Unit[U, Q, RU, P, F] {
-      def value = value_
-      def unit = this.asInstanceOf[Unit[U, Q, RU, P, F]]
-    }
-}
-
-abstract class BaseUnit[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]](implicit bumeta: BaseUnitMeta[U, Q, RU], ival: IntegerValue[Integer._1], premeta: PrefixMeta[UnitPrefix]) extends Unit[U, Q, RU, Integer._1, UnitPrefix] {
-  def value = 1.0
-  def unit = this.asInstanceOf[Unit[U, Q, RU, Integer._1, UnitPrefix]]
-}
-
-case class BaseUnitMeta[U <: BaseUnit[U, Q, RU], Q <: BaseQuantity[Q, RU], RU <: BaseUnit[RU, Q, RU]](name: String, abbv: String, cf: Double)
-
-} // infra
-} // unit4s
-
-object ISQ {
-  type Length = infra.Length#QType
-  type Time = infra.Time#QType
-
-  object infra {
-    import com.manyangled.unit4s.infra._
-
-    trait Length extends BaseQuantity[Length, Meter]
-
-    trait Time extends BaseQuantity[Time, Second]
-
-    class Meter(implicit bumeta: BaseUnitMeta[Meter, Length, Meter], ival: IntegerValue[Integer._1], premeta: PrefixMeta[UnitPrefix]) extends BaseUnit[Meter, Length, Meter]
-    object Meter {
-      implicit val meterMeta = BaseUnitMeta[Meter, Length, Meter]("meter", "m", 1.0)
-    }
-
-    class Second(implicit bumeta: BaseUnitMeta[Second, Time, Second], ival: IntegerValue[Integer._1], premeta: PrefixMeta[UnitPrefix]) extends BaseUnit[Second, Time, Second]
-    object Second {
-      implicit val secondMeta = BaseUnitMeta[Second, Time, Second]("second", "s", 1.0)
-    }
-  }
-
-  class Kilo extends com.manyangled.unit4s.infra.Prefix[Kilo] {
-    def factor = 1e3
-    def name = "kilo"
-    def abbv = "k"
-  }
-  object Kilo extends Kilo {
-    implicit val kiloMeta = com.manyangled.unit4s.infra.PrefixMeta[Kilo](new Kilo)
-  }
-
-  class Milli extends com.manyangled.unit4s.infra.Prefix[Milli] {
-    def factor = 1e-3
-    def name = "milli"
-    def abbv = "m"
-  }
-  object Milli extends Milli {
-    implicit val milliMeta = com.manyangled.unit4s.infra.PrefixMeta[Milli](new Milli)
-  }
-
-}
-
-object ISU {
-  type Meter = ISQ.infra.Meter#Type
-  object Meter extends ISQ.infra.Meter
-
-  type Second = ISQ.infra.Second#Type
-  object Second extends ISQ.infra.Second
-}
-
-// test definition of a new set of units
-object customInfra {
-  import com.manyangled.unit4s.infra._
-  import com.manyangled.ISQ.infra._
-
-  class Foot(implicit bumeta: BaseUnitMeta[Foot, Length, Meter], ival: IntegerValue[Integer._1], premeta: PrefixMeta[UnitPrefix]) extends BaseUnit[Foot, Length, Meter]
-  object Foot {
-    implicit val footMeta = BaseUnitMeta[Foot, Length, Meter]("foot", "ft", 0.3048)
-  }
-
-  class Minute(implicit bumeta: BaseUnitMeta[Minute, Time, Second], ival: IntegerValue[Integer._1], premeta: PrefixMeta[UnitPrefix]) extends BaseUnit[Minute, Time, Second]
-  object Minute {
-    implicit val minuteMeta = BaseUnitMeta[Minute, Time, Second]("minute", "min", 60.0)
-  }
-}
-
-object custom {
-  type Foot = customInfra.Foot#Type
-  object Foot extends customInfra.Foot
-
-  type Minute = customInfra.Minute#Type
-  object Minute extends customInfra.Minute
-}
-
-object test {
-  import com.manyangled.church.Integer
-  import com.manyangled.ISQ._
-  import com.manyangled.ISU._
-  import com.manyangled.custom._
-
-  val m1 = Meter(1.2)
-  val f1 = Foot(3.4)
-  val s1 = Second(4.5)
-  val n1 = Minute(5.6)
-
-  val f2 = m1.as(Foot)
-
-  def f(v: Length) = v.as(Meter)
-  def j(v: Meter) = v.value
-
-  def g(v: Time#QPow[Integer._1]) = v.as(Second)
-
-  val KiloMeter = Kilo*Meter
-  val v1 = KiloMeter(3.0)
-  val v2 = Kilo*Meter(2.0)
-  val v3 = Meter(4000).as(Kilo*Meter)
-
-  val vec1: Vector[Length] = Vector(Meter(1.0), Foot(2.0), Milli*Meter(3.0))
-
-/*
-  val sum1 = m1 + (f1)
-
-  def g(v: UnitValue with QuantityOf[Time#Pow[Integer._1]]) = v.to(Second)
-
-  type Area = Length#Pow[Integer._2]
-  type SquareMeter = Meter#Pow[Integer._2]
-  object SquareMeter extends SquareMeter
-  type SquareFoot = Foot#Pow[Integer._2]
-  object SquareFoot extends SquareFoot
-
-  val sqm1 = SquareMeter(4.0)
-  val sqf1 = sqm1.to(SquareFoot)
-
-  def h(v: UnitValue with QuantityOf[Area]) = v.to(SquareMeter)
-
-
-
-*/
-} // test
-
-*/
