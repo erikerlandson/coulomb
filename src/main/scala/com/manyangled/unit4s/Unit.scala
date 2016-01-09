@@ -3,7 +3,7 @@ package com.manyangled
 import com.manyangled.church.{ Integer, IntegerValue }
 import Integer.{ _0, _1 }
 
-object unit4s {
+package unit4s {
   import scala.language.implicitConversions
 
   sealed class =!=[A,B]
@@ -23,7 +23,7 @@ object unit4s {
   trait Unit[U <: Unit[U]] {
     type RU <: Unit[_]
 
-    final def apply(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
+    final def apply(value: Double = 1.0)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
 
     final def *(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
   }
@@ -100,34 +100,34 @@ object unit4s {
     implicit val udef = UnitSpec[U$]("U$", 1.0)
   } 
 
-  case class RHS[U1 <: Unit[U1], U2 <: Unit[U2], U3 <: Unit[U3], UA1 <: Unit[UA1], PA1 <: Integer, UA2 <: Unit[UA2], PA2 <: Integer, UA3 <: Unit[UA3], PA3 <: Integer](value: Double)(implicit
-    udef1: UnitDef[U1],
-    udef2: UnitDef[U2],
-    udef3: UnitDef[U3],
-    udef1a: UnitDef[UA1], iv1a: IntegerValue[PA1],
-    udef2a: UnitDef[UA2], iv2a: IntegerValue[PA2],
-    udef3a: UnitDef[UA3], iv3a: IntegerValue[PA3])
+  case class RHS[U1 <: Unit[U1], U2 <: Unit[U2], U3 <: Unit[U3], UA1 <: Unit[UA1], UA2 <: Unit[UA2], UA3 <: Unit[UA3], UN1 <: Unit[UN1], UN2 <: Unit[UN2], UN3 <: Unit[UN3], P1 <: Integer, P2 <: Integer, P3 <: Integer](value: Double)(implicit
+    udef1: UnitDef[U1], udef1a: UnitDef[UA1], udef1n: UnitDef[UN1], iv1: IntegerValue[P1],
+    udef2: UnitDef[U2], udef2a: UnitDef[UA2], udef2n: UnitDef[UN2], iv2: IntegerValue[P2],
+    udef3: UnitDef[U3], udef3a: UnitDef[UA3], udef3n: UnitDef[UN3], iv3: IntegerValue[P3])
+
 
   object RHS {
     import Unit.factor
 
-    implicit def idf1[U1 <: Unit[U1], Ua <: Unit[Ua], Pa <: Integer](uv: UnitValue1[Ua, Pa])(implicit
-      udef1: UnitDef[U1],
+    implicit def idf1[U1 <: Unit[U1], U2 <: Unit[U2], U3 <: Unit[U3], Ua <: Unit[Ua], Pa <: Integer](uv: UnitValue1[Ua, Pa])(implicit
+      udef1: UnitDef[U1], udef2: UnitDef[U2], udef3: UnitDef[U3],
       udefa: UnitDef[Ua],
       iva: IntegerValue[Pa],
-      eq1a: Ua#RU =:= U1#RU): RHS[U1, U$, U$,   U1, Pa, U$, _0, U$, _0] = {
+      eq1a: Ua#RU =:= U1#RU): RHS[U1, U2, U3,  U1, U$, U$,  U$, U$, U$,  Pa, _0, _0] = {
       val fp = Seq((factor[Ua, U1], iva.value))
-      RHS[U1, U$, U$,   U1, Pa, U$, _0, U$, _0](fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) })
+      RHS[U1, U2, U3,  U1, U$, U$,  U$, U$, U$,  Pa, _0, _0](fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) })
     }
 
-    implicit def idf2[U1 <: Unit[U1], Ua <: Unit[Ua], Pa <: Integer](uv: UnitValue1[Ua, Pa])(implicit
-      udef1: UnitDef[U1],
+    implicit def idf2[U1 <: Unit[U1], U2 <: Unit[U2], U3 <: Unit[U3], Ua <: Unit[Ua], Pa <: Integer](uv: UnitValue1[Ua, Pa])(implicit
+      udef1: UnitDef[U1], udef2: UnitDef[U2], udef3: UnitDef[U3],
       udefa: UnitDef[Ua],
       iva: IntegerValue[Pa],
-      ne1a: Ua#RU =!= U1#RU): RHS[U1, U$, U$,   U$, _0, U$, _0, Ua, Pa] = {
+      ne1a: Ua#RU =!= U1#RU, ne2a: Ua#RU =!= U2#RU, ne3a: Ua#RU =!= U3#RU): RHS[U1, U2, U3,  U$, U$, U$,  Ua, U$, U$,  Pa, _0, _0] = {
       val fp = Seq((1.0, 0))
-      RHS[U1, U$, U$,   U$, _0, U$, _0, Ua, Pa](fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) })
+      RHS[U1, U2, U3,  U$, U$, U$,  Ua, U$, U$,  Pa, _0, _0](fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) })
     }
+
+    
   }
 
   case class UnitValue1[U1 <: Unit[U1], P1 <: Integer](value: Double)(implicit
@@ -138,11 +138,11 @@ object unit4s {
 
     def *(v: Double) = UnitValue1[U1, P1](v * value)
 
-    def *[Pa <: Integer](rhs: RHS[U1, U$, U$,  U1, Pa, U$, _0, U$, _0])(implicit
+    def *[Pa <: Integer](rhs: RHS[U1, U$, U$,  U1, U$, U$,  U$, U$, U$,  Pa, _0, _0])(implicit
       iva: IntegerValue[P1#Add[Pa]]
     ): UnitValue1[U1, P1#Add[Pa]] = UnitValue1[U1, P1#Add[Pa]](value * rhs.value)
 
-    def *[Ua <: Unit[Ua], Pa <: Integer](rhs: RHS[U1, U$, U$, U$, _0, U$, _0, Ua, Pa])(implicit
+    def *[Ua <: Unit[Ua], Pa <: Integer](rhs: RHS[U1, U$, U$,  U$, U$, U$,  Ua, U$, U$,  Pa, _0, _0])(implicit
       udefa: UnitDef[Ua],
       iva: IntegerValue[Pa]
     ): UnitValue2[U1, P1, Ua, Pa] = UnitValue2[U1, P1, Ua, Pa](value * rhs.value)
@@ -176,27 +176,6 @@ object unit4s {
 
     override def toString = Unit.toString(value, Seq((udef1.name, iv1.value), (udef2.name, iv2.value), (udef3.name, iv3.value)))
   }
-
-
-
-/*
-// V = maximum valence
-// w is a valence value
-(1 to V).foreach { w =>
-  // n is number 'unaligned' with existing unit in target
-  (0 to w).foreach { n =>
-    val a = w - n
-    (1 to V-n).combinations(a).foreach { aligned =>
-      val unaligned = ((1 to V-n).toSet -- aligned.toSet).toSeq
-      // generate implicit function that maps aligned (with conversion) and unaligned
-      // unaligned do not contribute to conversion factor
-      // unaligned occupy right-most places
-      // unaligned have no #RU constraints
-      // generate full permutations for all alligned units
-    }
-  }
-}
-*/
 
   object UnitValue1 {
     implicit def fromUnit[U1 <: Unit[U1]](unit: U1)(implicit udef: UnitDef[U1]): UnitValue1[U1, _1] = UnitValue1[U1, _1](1.0)
@@ -258,5 +237,78 @@ object unit4s {
   object test {
     def f1(uv: UnitValue1[Foot, Integer._1]) = uv.value
     def f2(uv: UnitValue2[Foot, Integer._1, Second, Integer._neg1]) = uv.value
+  }
+
+  object codegen {
+    def writeString(str: String, path: String) {
+      import scalax.io._
+      Resource.fromFile(path).write(str)(Codec.UTF8)
+    }
+
+    val abase: Int = 'a'.toInt
+    def letter(j: Int) = (abase + j).toChar
+
+    def rhsFile(V: Int, fName: String) {
+      val defs = rhsImplicitDefSeq(V).mkString("\n")
+      val code = s"""|/* THIS FILE WAS MACHINE GENERATED, DO NOT EDIT */
+        |package com.manyangled
+        |
+        |import com.manyangled.church.{ Integer, IntegerValue }
+        |import Integer.{ _0, _1 }
+        |
+        |package unit4s {
+        |  import scala.language.implicitConversions
+        |
+        |  object RHS {
+        |$defs
+        |  }
+        |}""".stripMargin
+      scalax.file.Path.fromString(fName).deleteIfExists()
+      writeString(code, fName)
+    }
+
+    // V is maximum unit valence
+    def rhsImplicitDefSeq(V: Int): Seq[String] = {
+      val rU = (1 to V).map { j => s"U$j" }
+      val rudef = (1 to V).map { j => s"udef${j}: UnitDef[U${j}]" }.mkString(", ")
+      val defs = scala.collection.mutable.ArrayBuffer.empty[String]
+      (1 to V).foreach { v =>
+        // v is current valence of input: >= 1, <= V
+        val iU = (0 until v).map { j => "U" + letter(j) }
+        val iP = (0 until v).map { j => "P" + letter(j) }
+        val iUP = iU.zip(iP)
+        val fSig = ((rU ++ iU).map { tn => s"$tn <: Unit[$tn]" } ++ iP.map { tn => s"$tn <: Integer" }).mkString(", ")
+        val pP = iP ++ Seq.fill(V - v) { "_0" }
+        val iudef = (0 until v).map { j => s"udef${letter(j)}: UnitDef[U${letter(j)}]" }.mkString(", ")
+        val iiv = (0 until v).map { j => s"iv${letter(j)}: IntegerValue[P${letter(j)}]" }.mkString(", ")
+        (0 to v).foreach { u =>
+          // u is current number un-aligned: >= 0, <= v
+          // a is aligned, >= 0, <= v
+          val a = v - u
+          val uU = (a until v).map { j => s"U${letter(j)}" } ++ Seq.fill(V - u) { "U$" }
+          // (V) choose (a) ways to be aligned
+          (0 until V).combinations(a).foreach { aj =>
+            val aU = Seq.tabulate(V) { j => if (aj.contains(j)) s"U${j + 1}" else "U$" }
+            val rhsSig = (rU ++ aU ++ uU ++ pP).mkString(", ")
+            (0 until a).permutations.foreach { ajp =>
+              val jperm = ajp ++ (a until v)
+              val iSig = jperm.map { j => s"${iUP(j)._1}, ${iUP(j)._2}" }.mkString(", ")
+              val fCode = s"""
+                |    implicit def rhs$$v${v}a${a}c${aj.mkString("")}p${ajp.mkString("")}[$fSig](uv: UnitValue$v[$iSig])(implicit
+                |      $rudef,
+                |      $iudef,
+                |      $iiv,
+                |      xxx)[$rhsSig] = {
+                |      val fp = Seq(xxx)
+                |      RHS[$rhsSig](xxx)
+                |    }""".stripMargin
+              println(fCode)
+              defs += fCode
+            }
+          }
+        }
+      }
+      defs
+    }
   }
 }
