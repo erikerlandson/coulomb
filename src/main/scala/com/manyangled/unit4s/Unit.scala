@@ -249,7 +249,9 @@ package unit4s {
     def letter(j: Int) = (abase + j).toChar
 
     def rhsFile(V: Int, fName: String) {
-      val defs = rhsImplicitDefSeq(V).mkString("\n")
+      val defList = rhsImplicitDefSeq(V)
+      println(s"generated ${defList.length} implicit function definitions")
+      val defs = defList.mkString("\n")
       val code = s"""|/* THIS FILE WAS MACHINE GENERATED, DO NOT EDIT */
         |package com.manyangled
         |
@@ -277,33 +279,41 @@ package unit4s {
         val iU = (0 until v).map { j => "U" + letter(j) }
         val iP = (0 until v).map { j => "P" + letter(j) }
         val iUP = iU.zip(iP)
+        val iSig = iUP.map { case (u, p) => s"$u, $p" }.mkString(", ")
         val fSig = ((rU ++ iU).map { tn => s"$tn <: Unit[$tn]" } ++ iP.map { tn => s"$tn <: Integer" }).mkString(", ")
         val pP = iP ++ Seq.fill(V - v) { "_0" }
         val iudef = (0 until v).map { j => s"udef${letter(j)}: UnitDef[U${letter(j)}]" }.mkString(", ")
         val iiv = (0 until v).map { j => s"iv${letter(j)}: IntegerValue[P${letter(j)}]" }.mkString(", ")
-        (0 to v).foreach { u =>
+        (0 to v).foreach { a =>
+          // a is current number aligned, >= 0, <= v
           // u is current number un-aligned: >= 0, <= v
-          // a is aligned, >= 0, <= v
-          val a = v - u
+          val u = v - a
           val uU = (a until v).map { j => s"U${letter(j)}" } ++ Seq.fill(V - u) { "U$" }
           // (V) choose (a) ways to be aligned
           (0 until V).combinations(a).foreach { aj =>
             val aU = Seq.tabulate(V) { j => if (aj.contains(j)) s"U${j + 1}" else "U$" }
             val rhsSig = (rU ++ aU ++ uU ++ pP).mkString(", ")
-            (0 until a).permutations.foreach { ajp =>
-              val jperm = ajp ++ (a until v)
-              val iSig = jperm.map { j => s"${iUP(j)._1}, ${iUP(j)._2}" }.mkString(", ")
-              val fCode = s"""
-                |    implicit def rhs$$v${v}a${a}c${aj.mkString("")}p${ajp.mkString("")}[$fSig](uv: UnitValue$v[$iSig])(implicit
-                |      $rudef,
-                |      $iudef,
-                |      $iiv,
-                |      xxx)[$rhsSig] = {
-                |      val fp = Seq(xxx)
-                |      RHS[$rhsSig](xxx)
-                |    }""".stripMargin
-              println(fCode)
-              defs += fCode
+            (0 until v).combinations(a).foreach { aij =>
+              val uij = (0 until v).filter { j => !aij.contains(j) }
+              val rune = (for (ju <- uij; j <- (0 until V)) yield { s"U${letter(ju)}#RU =!= U${j + 1}#RU" }).mkString(", ")
+              aij.permutations.foreach { ajp =>
+                val rueq = ajp.zip(aj).map { case (ja, ju) => s"U${letter(ja)}#RU =:= U${ju + 1}#RU" }.mkString(", ")
+                val eqne = if (rune.isEmpty) rueq else if (rueq.isEmpty) rune else (rune + ",\n      " + rueq)
+                val fSeq = ajp.zip(aj).map { case (ja, ju) => s"(factor[U${letter(ja)}, U${ju + 1}], iv${letter(ja)}.value)" }
+                val vCode = if (fSeq.length == 0) "val v = uv.value" else s"""val fp = Seq(${fSeq.mkString(", ")})
+                  |      val v = fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) }""".stripMargin
+                val fCode = s"""
+                  |    implicit def rhs$$v${v}a${a}c${aj.mkString("")}p${ajp.mkString("")}[$fSig](uv: UnitValue$v[$iSig])(implicit
+                  |      $rudef,
+                  |      $iudef,
+                  |      $iiv,
+                  |      $eqne)[$rhsSig] = {
+                  |      $vCode
+                  |      RHS[$rhsSig](v)
+                  |    }""".stripMargin
+                //println(fCode)
+                defs += fCode
+              }
             }
           }
         }
