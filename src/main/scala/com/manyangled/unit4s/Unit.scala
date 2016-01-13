@@ -252,6 +252,7 @@ package unit4s {
       val defList = rhsImplicitDefSeq(V)
       println(s"generated ${defList.length} implicit function definitions")
       val defs = defList.mkString("\n")
+      val ccDef = rhsClassDef(V)
       val code = s"""|/* THIS FILE WAS MACHINE GENERATED, DO NOT EDIT */
         |package com.manyangled
         |
@@ -261,12 +262,33 @@ package unit4s {
         |package unit4s {
         |  import scala.language.implicitConversions
         |
+        |  $ccDef
+        |
         |  object RHS {
         |$defs
         |  }
         |}""".stripMargin
       scalax.file.Path.fromString(fName).deleteIfExists()
       writeString(code, fName)
+    }
+
+    def rhsClassDef(V: Int): String = {
+      val uS = (1 to V).map { j => s"U$j" }
+      val uaS = (1 to V).map { j => s"UA$j" }
+      val unS = (1 to V).map { j => s"UN$j" }
+      val pS = (1 to V).map { j => s"P$j" }
+      val uSig = (uS ++ uaS ++ unS).map { u => s"$u <: Unit[$u]" }
+      val pSig = pS.map { p => s"$p <: Integer" }
+      val ccSig = (uSig ++ pSig).mkString(", ")
+      val udef = (1 to V).map { j => s"udef${j}: UnitDef[U$j]" }.mkString(", ")
+      val udefa = (1 to V).map { j => s"udef${j}a: UnitDef[UA$j]" }.mkString(", ")
+      val udefn = (1 to V).map { j => s"udef${j}n: UnitDef[UN$j]" }.mkString(", ")
+      val ivdef = (1 to V).map { j => s"iv${j}: IntegerValue[P$j]" }.mkString(", ")
+      s"""case class RHS[$ccSig](value: Double)(implicit
+        |  $udef,
+        |  $udefa,
+        |  $udefn,
+        |  $ivdef)""".stripMargin
     }
 
     // V is maximum unit valence
