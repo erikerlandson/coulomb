@@ -10,6 +10,8 @@ object codegen {
   def letter(j: Int) = (abase + j).toChar
 
   def rhsFile(V: Int, fName: String) {
+    scalax.file.Path.fromString(fName).deleteIfExists()
+
     val defList = rhsImplicitDefSeq(V)
     println(s"generated ${defList.length} implicit function definitions")
     val defs = defList.mkString("\n")
@@ -28,7 +30,7 @@ object codegen {
       |object RHS {
       |$defs
       |}""".stripMargin
-    scalax.file.Path.fromString(fName).deleteIfExists()
+
     writeString(code, fName)
   }
 
@@ -99,6 +101,67 @@ object codegen {
           }
         }
       }
+    }
+    defs
+  }
+
+  def uvFile(V: Int, fName: String) {
+    scalax.file.Path.fromString(fName).deleteIfExists()
+
+    val head = s"""|/* THIS FILE WAS MACHINE GENERATED, DO NOT EDIT */
+      |package com.manyangled.unit4s
+      |
+      |import scala.language.implicitConversions
+      |
+      |import com.manyangled.church.{ Integer, IntegerValue }
+      |import Integer.{ _0, _1 }
+      |import Unit.factor
+      |""".stripMargin
+
+    writeString(head, fName)
+
+    (1 to V).foreach { v =>
+      val defs = uvImplicitDefSeq(v).mkString("\n")
+      val code = s"""
+        |object UnitValue$v {
+        |  $defs
+        |}""".stripMargin
+      writeString("\n", fName)
+      writeString(code, fName)
+    }
+  }
+
+  def uvClassDef(v: Int, V: Int): String = {
+    ""
+  }
+
+  def uvImplicitDefSeq(v: Int): Seq[String] = {
+    val defs = scala.collection.mutable.ArrayBuffer.empty[String]
+    val uS = (1 to v).map { j => s"U$j" }
+    val pS = (1 to v).map { j => s"P$j" }
+    val iS = (0 until v).map { j => s"U${letter(j)}" }
+    val fSig = ((iS ++ uS).map { u => s"$u <: Unit[$u]" } ++ pS.map { p => s"$p <: Integer" }).mkString(", ")
+    val oSig = uS.zip(pS).map { case (u, p) => s"$u, $p" }.mkString(", ")
+    val idef = (0 until v).map { j => s"udef${letter(j)}: UnitDef[U${letter(j)}]" }.mkString(", ")
+    val odef = (1 to v).map { j => s"udef$j: UnitDef[U$j]" }.mkString(", ")
+    val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }.mkString(", ")
+    val rueq = (0 until v).map { j => s"eq${letter(j)}${j + 1}: U${letter(j)}#RU =:= U${j + 1}#RU" }.mkString(", ")
+    val fSeq = (0 until v).map { j => s"(factor[U${letter(j)}, U${j + 1}], iv${j + 1}.value)" }
+    val vCode = s"""val fp = Seq(${fSeq.mkString(", ")})
+      |    val v = fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) }""".stripMargin
+
+    (0 until v).permutations.foreach { jp =>
+      val iSig = jp.map { j => s"U${letter(j)}, P${j + 1}" }.mkString(", ")
+      val fCode = s"""
+        |  implicit def uvc$$v${v}p${jp.mkString("")}[$fSig](uv: UnitValue$v[$iSig])(implicit
+        |    $idef,
+        |    $odef,
+        |    $iiv,
+        |    $rueq): UnitValue$v[$oSig] = {
+        |    $vCode
+        |    UnitValue$v[$oSig](v)
+        |  }""".stripMargin
+      defs += fCode
     }
     defs
   }
