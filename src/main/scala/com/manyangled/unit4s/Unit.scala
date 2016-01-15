@@ -1,63 +1,72 @@
-package com.manyangled
+package com.manyangled.unit4s
+
+import scala.language.implicitConversions
 
 import com.manyangled.church.{ Integer, IntegerValue }
 import Integer.{ _0, _1 }
 
-package unit4s {
-  import scala.language.implicitConversions
+sealed class =!=[A,B]
 
-  sealed class =!=[A,B]
-
-  trait NeqLowerPriorityImplicits {
-    implicit def equal[A]: =!=[A, A] = {
-      sys.error("should not be called")
-    }
+trait NeqLowerPriorityImplicits {
+  implicit def equal[A]: =!=[A, A] = {
+    sys.error("should not be called")
   }
-  object =!= extends NeqLowerPriorityImplicits {
-    implicit def nequal[A,B](implicit same: A =:= B = null): =!=[A,B] = {
-      if (same != null) sys.error("should not be called explicitly with same type")
-      else new =!=[A,B]
-    }
+}
+object =!= extends NeqLowerPriorityImplicits {
+  implicit def nequal[A,B](implicit same: A =:= B = null): =!=[A,B] = {
+    if (same != null) sys.error("should not be called explicitly with same type")
+    else new =!=[A,B]
   }
+}
 
-  trait Unit[U <: Unit[U]] {
-    type RU <: Unit[_]
+trait Unit[U <: Unit[U]] {
+  type RU <: Unit[_]
 
-    final def apply(value: Double = 1.0)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
+  final def apply(value: Double = 1.0)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
 
-    final def *(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
+  final def *(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
+}
+
+object Unit {
+  def factor[U1 <: Unit[U1], U2 <: Unit[U2]](implicit udef1: UnitDef[U1], udef2: UnitDef[U2], eq: U1#RU =:= U2#RU) = udef1.cfr / udef2.cfr
+
+  def toString(value: Double, units: Seq[(String, Int)]) = {
+    val unitstr = units.map { case (name, exp) =>
+      if (exp == 1) s"$name" else s"($name)^($exp)"
+    }.mkString(" ")
+    s"UnitValue${units.length}($value $unitstr)"
   }
+}
 
-  object Unit {
-    def factor[U1 <: Unit[U1], U2 <: Unit[U2]](implicit udef1: UnitDef[U1], udef2: UnitDef[U2], eq: U1#RU =:= U2#RU) = udef1.cfr / udef2.cfr
+trait UnitDef[U <: Unit[U]] {
+  def name: String
+  def cfr: Double
+}
 
-    def toString(value: Double, units: Seq[(String, Int)]) = {
-      val unitstr = units.map { case (name, exp) =>
-        if (exp == 1) s"$name" else s"($name)^($exp)"
-      }.mkString(" ")
-      s"UnitValue${units.length}($value $unitstr)"
-    }
-  }
+case class UnitSpec[U <: Unit[U]](val name: String, val cfr: Double) extends UnitDef[U]
 
-  trait UnitDef[U <: Unit[U]] {
-    def name: String
-    def cfr: Double
-  }
+case class PrefixUnit[P <: Unit[P], U <: Unit[U]](udef: UnitDef[U], val pfn: String, val pcf: Double) extends UnitDef[P] {
+  val name = pfn + udef.name
+  val cfr = pcf * udef.cfr
+}
 
-  case class UnitSpec[U <: Unit[U]](val name: String, val cfr: Double) extends UnitDef[U]
+trait U$ <: Unit[U$] {
+  type RU = U$
+}
+object U$ {
+  implicit val udef = UnitSpec[U$]("U$", 1.0)
+}
 
-  case class PrefixUnit[P <: Unit[P], U <: Unit[U]](udef: UnitDef[U], val pfn: String, val pcf: Double) extends UnitDef[P] {
-    val name = pfn + udef.name
-    val cfr = pcf * udef.cfr
-  }
-
+package prefix {
   trait Kilo[U <: Unit[U]] extends Unit[Kilo[U]] {
     type RU = U#RU
   }
   object Kilo {
     implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixUnit[Kilo[U], U](udef, "kilo", 1000.0)
   }
+}
 
+package testunits {
   trait Meter extends Unit[Meter] {
     type RU = Meter
   }
@@ -92,14 +101,17 @@ package unit4s {
   object Minute extends Minute {
     implicit val udef = UnitSpec[Minute]("minute", 60.0)
   }
+}
 
-  trait U$ <: Unit[U$] {
-    type RU = U$
-  }
-  object U$ {
-    implicit val udef = UnitSpec[U$]("U$", 1.0)
-  } 
+object test {
+  import testunits._
+  import prefix._
 
+  def f1(uv: UnitValue1[Foot, Integer._1]) = uv.value
+  def f2(uv: UnitValue2[Foot, Integer._1, Second, Integer._neg1]) = uv.value
+}
+
+/*
   case class UnitValue1[U1 <: Unit[U1], P1 <: Integer](value: Double)(implicit
     udef1: UnitDef[U1], iv1: IntegerValue[P1]) {
 
@@ -203,9 +215,4 @@ package unit4s {
       UnitValue2[Ua, P1, Ub, P2](uv.value * f)
     }    
   }
-
-  object test {
-    def f1(uv: UnitValue1[Foot, Integer._1]) = uv.value
-    def f2(uv: UnitValue2[Foot, Integer._1, Second, Integer._neg1]) = uv.value
-  }
-}
+*/
