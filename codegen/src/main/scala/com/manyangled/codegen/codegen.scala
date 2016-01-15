@@ -121,6 +121,9 @@ object codegen {
     writeString(head, fName)
 
     (1 to V).foreach { v =>
+      val cdef = uvClassDef(v, V)
+      writeString("\n", fName)
+      writeString(cdef, fName)
       val defs = uvImplicitDefSeq(v).mkString("\n")
       val code = s"""
         |object UnitValue$v {
@@ -132,7 +135,26 @@ object codegen {
   }
 
   def uvClassDef(v: Int, V: Int): String = {
-    ""
+    val uS = (1 to v).map { j => s"U$j" }
+    val pS = (1 to v).map { j => s"P$j" }
+    val ccSig = uS.zip(pS).map { case (u, p) => s"$u <: Unit[$u], $p <: Integer" }.mkString(", ")
+    val uvSig = uS.zip(pS).map { case (u, p) => s"$u, $p" }.mkString(", ")
+    val udef = (1 to v).map { j => s"udef$j: UnitDef[U$j]" }.mkString(", ")
+    val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }.mkString(", ")
+    val uvx = s"UnitValue$v[$uvSig]"
+    val tsSeq = (1 to v).map { j => s"(udef${j}.name, iv${j}.value)" }.mkString(", ")
+    s"""
+    |case class UnitValue$v[$ccSig](value: Double)(implicit
+    |  $udef,
+    |  $iiv) {
+    |
+    |  override def toString = Unit.toString(value, Seq($tsSeq))
+    |
+    |  def +(uv: $uvx): $uvx = $uvx(value + uv.value)
+    |  def -(uv: $uvx): $uvx = $uvx(value - uv.value)
+    |
+    |  def *(v: Double): $uvx = $uvx(value * v)
+    |}""".stripMargin
   }
 
   def uvImplicitDefSeq(v: Int): Seq[String] = {
