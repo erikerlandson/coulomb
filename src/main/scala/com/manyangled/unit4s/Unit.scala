@@ -22,9 +22,7 @@ object =!= extends NeqLowerPriorityImplicits {
 trait Unit[U <: Unit[U]] {
   type RU <: Unit[_]
 
-  final def apply(value: Double = 1.0)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
-
-  final def *(value: Double)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
+  def apply(value: Double = 1.0)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
 }
 
 object Unit {
@@ -45,7 +43,7 @@ trait UnitDef[U <: Unit[U]] {
 
 case class UnitSpec[U <: Unit[U]](val name: String, val cfr: Double) extends UnitDef[U]
 
-case class PrefixUnit[P <: Unit[P], U <: Unit[U]](udef: UnitDef[U], val pfn: String, val pcf: Double) extends UnitDef[P] {
+case class PrefixSpec[P <: Unit[P], U <: Unit[U]](udef: UnitDef[U], val pfn: String, val pcf: Double) extends UnitDef[P] {
   val name = pfn + udef.name
   val cfr = pcf * udef.cfr
 }
@@ -57,12 +55,47 @@ object U$ {
   implicit val udef = UnitSpec[U$]("U$", 1.0)
 }
 
+trait Unitless <: Unit[Unitless] {
+  type RU = Unitless
+}
+object Unitless {
+  implicit val udef = UnitSpec[Unitless]("unitless-ratio", 1.0)
+}
+
+/*
+import scala.language.higherKinds
+trait Factory[P[_] <: Unit[P[_]]] {
+  def apply[U <: Unit[U]](uv: UnitValue1[U, _1])(implicit pdef: PrefixSpec[P[U], U]): UnitValue1[P[U], _1] = UnitValue1[P[U], _1](uv.value)
+}
+*/
+
 package prefix {
+  trait Micro[U <: Unit[U]] extends Unit[Micro[U]] {
+    type RU = U#RU
+  }
+  object Micro {
+    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixSpec[Micro[U], U](udef, "micro", 1e-6)
+  }
+
+  trait Milli[U <: Unit[U]] extends Unit[Milli[U]] {
+    type RU = U#RU
+  }
+  object Milli {
+    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixSpec[Milli[U], U](udef, "milli", 1e-3)
+  }
+
   trait Kilo[U <: Unit[U]] extends Unit[Kilo[U]] {
     type RU = U#RU
   }
   object Kilo {
-    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixUnit[Kilo[U], U](udef, "kilo", 1000.0)
+    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixSpec[Kilo[U], U](udef, "kilo", 1e3)
+  }
+
+  trait Mega[U <: Unit[U]] extends Unit[Mega[U]] {
+    type RU = U#RU
+  }
+  object Mega {
+    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixSpec[Mega[U], U](udef, "mega", 1e6)
   }
 }
 
@@ -110,109 +143,3 @@ object test {
   def f1(uv: UnitValue1[Foot, Integer._1]) = uv.value
   def f2(uv: UnitValue2[Foot, Integer._1, Second, Integer._neg1]) = uv.value
 }
-
-/*
-  case class UnitValue1[U1 <: Unit[U1], P1 <: Integer](value: Double)(implicit
-    udef1: UnitDef[U1], iv1: IntegerValue[P1]) {
-
-    def +(uv: UnitValue1[U1, P1]) = UnitValue1[U1, P1](value + uv.value)
-    def -(uv: UnitValue1[U1, P1]) = UnitValue1[U1, P1](value - uv.value)
-
-    def *(v: Double) = UnitValue1[U1, P1](v * value)
-
-    def *[Pa <: Integer](rhs: RHS[U1, U$, U$,  U1, U$, U$,  U$, U$, U$,  Pa, _0, _0])(implicit
-      iva: IntegerValue[P1#Add[Pa]]
-    ): UnitValue1[U1, P1#Add[Pa]] = UnitValue1[U1, P1#Add[Pa]](value * rhs.value)
-
-    def *[Ua <: Unit[Ua], Pa <: Integer](rhs: RHS[U1, U$, U$,  U$, U$, U$,  Ua, U$, U$,  Pa, _0, _0])(implicit
-      udefa: UnitDef[Ua],
-      iva: IntegerValue[Pa]
-    ): UnitValue2[U1, P1, Ua, Pa] = UnitValue2[U1, P1, Ua, Pa](value * rhs.value)
-
-    override def toString = Unit.toString(value, Seq((udef1.name, iv1.value)))
-  }
-
-  case class UnitValue2[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer](value: Double)(implicit
-    udef1: UnitDef[U1], iv1: IntegerValue[P1],
-    udef2: UnitDef[U2], iv2: IntegerValue[P2] /*,
-    ne12: U1#RU =!= U2#RU */) {
-
-    def +(uv: UnitValue2[U1, P1, U2, P2]) = UnitValue2[U1, P1, U2, P2](value + uv.value)
-    def -(uv: UnitValue2[U1, P1, U2, P2]) = UnitValue2[U1, P1, U2, P2](value - uv.value)
-
-    def *(v: Double): UnitValue2[U1, P1, U2, P2] = UnitValue2[U1, P1, U2, P2](value * v)
-
-    override def toString = Unit.toString(value, Seq((udef1.name, iv1.value), (udef2.name, iv2.value)))
-  }
-
-  case class UnitValue3[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer, U3 <: Unit[U3], P3 <: Integer](value: Double)(implicit
-    udef1: UnitDef[U1], iv1: IntegerValue[P1],
-    udef2: UnitDef[U2], iv2: IntegerValue[P2],
-    udef3: UnitDef[U3], iv3: IntegerValue[P3] /*,
-    ne12: U1#RU =!= U2#RU, ne23: U2#RU =!= U3#RU, ne13: U1#RU =!= U3#RU*/) {
-
-    def +(uv: UnitValue3[U1, P1, U2, P2, U3, P3]) = UnitValue3[U1, P1, U2, P2, U3, P3](value + uv.value)
-    def -(uv: UnitValue3[U1, P1, U2, P2, U3, P3]) = UnitValue3[U1, P1, U2, P2, U3, P3](value - uv.value)
-
-    def *(v: Double): UnitValue3[U1, P1, U2, P2, U3, P3] = UnitValue3[U1, P1, U2, P2, U3, P3](value * v)
-
-    override def toString = Unit.toString(value, Seq((udef1.name, iv1.value), (udef2.name, iv2.value), (udef3.name, iv3.value)))
-  }
-
-  object UnitValue1 {
-    implicit def fromUnit[U1 <: Unit[U1]](unit: U1)(implicit udef: UnitDef[U1]): UnitValue1[U1, _1] = UnitValue1[U1, _1](1.0)
-
-    implicit def commute1[U1 <: Unit[U1], P1 <: Integer, Ua <: Unit[Ua]](uv: UnitValue1[U1, P1])(implicit
-      udef1: UnitDef[U1],
-      udefa: UnitDef[Ua],
-      eq: U1#RU =:= Ua#RU,
-      iv1: IntegerValue[P1]): UnitValue1[Ua, P1] = {
-      val f = math.pow(Unit.factor[U1, Ua], iv1.value)
-      UnitValue1[Ua, P1](uv.value * f)
-    }
-  }
-
-  object UnitValue2 {
-    implicit def fromUV1pa[U1 <: Unit[U1], P1 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue1[U1, P1])(implicit
-      udef1: UnitDef[U1],
-      udefa: UnitDef[Ua], udefb: UnitDef[Ub],
-      eq1a: U1#RU =:= Ua#RU,
-      iv1: IntegerValue[P1]): UnitValue2[Ua, P1, Ub, _0] = {
-      val f =
-        math.pow(Unit.factor[U1, Ua], iv1.value)
-      UnitValue2[Ua, P1, Ub, Integer._0](uv.value * f)
-    }
-
-    implicit def fromUV1pb[U1 <: Unit[U1], P1 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue1[U1, P1])(implicit
-      udef1: UnitDef[U1],
-      udefa: UnitDef[Ua], udefb: UnitDef[Ub],
-      eq1a: U1#RU =:= Ub#RU,
-      iv1: IntegerValue[P1]): UnitValue2[Ua, Integer._0, Ub, P1] = {
-      val f =
-        math.pow(Unit.factor[U1, Ub], iv1.value)
-      UnitValue2[Ua, Integer._0, Ub, P1](uv.value * f)
-    }
-
-    implicit def commute12[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue2[U1, P1, U2, P2])(implicit
-      udef1: UnitDef[U1], udef2: UnitDef[U2],
-      udefa: UnitDef[Ua], udefb: UnitDef[Ub],
-      eq1a: U1#RU =:= Ua#RU, eq2b: U2#RU =:= Ub#RU,
-      v1: IntegerValue[P1], v2: IntegerValue[P2]): UnitValue2[Ua, P1, Ub, P2] = {
-      val f =
-        math.pow(Unit.factor[U1, Ua], Integer.value[P1]) *
-        math.pow(Unit.factor[U2, Ub], Integer.value[P2])
-      UnitValue2[Ua, P1, Ub, P2](uv.value * f)
-    }
-
-    implicit def commute21[U1 <: Unit[U1], P1 <: Integer, U2 <: Unit[U2], P2 <: Integer, Ua <: Unit[Ua], Ub <: Unit[Ub]](uv: UnitValue2[U2, P2, U1, P1])(implicit
-      udef1: UnitDef[U1], udef2: UnitDef[U2],
-      udefa: UnitDef[Ua], udefb: UnitDef[Ub],
-      eq1a: U1#RU =:= Ua#RU, eq2b: U2#RU =:= Ub#RU,
-      v1: IntegerValue[P1], v2: IntegerValue[P2]): UnitValue2[Ua, P1, Ub, P2] = {
-      val f =
-        math.pow(Unit.factor[U1, Ua], Integer.value[P1]) *
-        math.pow(Unit.factor[U2, Ub], Integer.value[P2])
-      UnitValue2[Ua, P1, Ub, P2](uv.value * f)
-    }    
-  }
-*/
