@@ -1,6 +1,7 @@
 package com.manyangled.unit4s
 
 import scala.language.implicitConversions
+import scala.language.higherKinds
 
 import com.manyangled.church.{ Integer, IntegerValue }
 import Integer.{ _0, _1 }
@@ -19,14 +20,12 @@ object =!= extends NeqLowerPriorityImplicits {
   }
 }
 
-trait Unit[U <: Unit[U]] {
-  type RU <: Unit[_]
-
-  def apply(value: Double = 1.0)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
+trait Unit {
+  type RU <: Unit
 }
 
 object Unit {
-  def factor[U1 <: Unit[U1], U2 <: Unit[U2]](implicit udef1: UnitDef[U1], udef2: UnitDef[U2], eq: U1#RU =:= U2#RU) = udef1.cfr / udef2.cfr
+  def factor[U1 <: Unit, U2 <: Unit](implicit udef1: UnitDef[U1], udef2: UnitDef[U2], eq: U1#RU =:= U2#RU) = udef1.cfr / udef2.cfr
 
   def toString(value: Double, units: Seq[(String, Int)]) = {
     val unitstr = units.map { case (name, exp) =>
@@ -36,99 +35,88 @@ object Unit {
   }
 }
 
-trait UnitDef[U <: Unit[U]] {
+trait UnitDef[U <: Unit] {
   def name: String
   def cfr: Double
 }
 
-case class UnitSpec[U <: Unit[U]](val name: String, val cfr: Double) extends UnitDef[U]
+case class UnitSpec[U <: Unit](name: String, cfr: Double) extends UnitDef[U]
 
-case class PrefixSpec[P <: Unit[P], U <: Unit[U]](udef: UnitDef[U], val pfn: String, val pcf: Double) extends UnitDef[P] {
-  val name = pfn + udef.name
-  val cfr = pcf * udef.cfr
-}
+case class PrefixSpec[P[_ <: Unit] <: Unit](pfn: String, pcf: Double)
 
-trait U$ <: Unit[U$] {
+trait U$ <: Unit {
   type RU = U$
 }
 object U$ {
   implicit val udef = UnitSpec[U$]("U$", 1.0)
 }
 
-trait Unitless <: Unit[Unitless] {
+trait Unitless <: Unit {
   type RU = Unitless
 }
 object Unitless {
   implicit val udef = UnitSpec[Unitless]("unitless-ratio", 1.0)
 }
 
-/*
-import scala.language.higherKinds
-trait Factory[P[_] <: Unit[P[_]]] {
-  def apply[U <: Unit[U]](uv: UnitValue1[U, _1])(implicit pdef: PrefixSpec[P[U], U]): UnitValue1[P[U], _1] = UnitValue1[P[U], _1](uv.value)
+trait UnitFactory[U <: Unit] {
+  def apply(value: Double = 1.0)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
+  implicit def fromObject[T <: U](t: T)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](1.0)
 }
-*/
+
+trait PrefixFactory[P[_ <: Unit] <: Unit] {
+  def apply[U <: Unit](uv: UnitValue1[U, _1])(implicit pudef: UnitDef[P[U]]): UnitValue1[P[U], _1] = UnitValue1[P[U], _1](uv.value)
+  implicit def pudef[U <: Unit](implicit pdef: PrefixSpec[P], udef: UnitDef[U]): UnitDef[P[U]] = new UnitDef[P[U]] {
+    def name = pdef.pfn + udef.name
+    def cfr = pdef.pcf * udef.cfr
+  }
+}
 
 package prefix {
-  trait Micro[U <: Unit[U]] extends Unit[Micro[U]] {
+  trait Milli[U <: Unit] extends Unit {
     type RU = U#RU
   }
-  object Micro {
-    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixSpec[Micro[U], U](udef, "micro", 1e-6)
+  object Milli extends PrefixFactory[Milli] {
+    implicit val pdef = PrefixSpec[Milli]("milli", 1e-3)
   }
 
-  trait Milli[U <: Unit[U]] extends Unit[Milli[U]] {
+  trait Kilo[U <: Unit] extends Unit {
     type RU = U#RU
   }
-  object Milli {
-    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixSpec[Milli[U], U](udef, "milli", 1e-3)
-  }
-
-  trait Kilo[U <: Unit[U]] extends Unit[Kilo[U]] {
-    type RU = U#RU
-  }
-  object Kilo {
-    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixSpec[Kilo[U], U](udef, "kilo", 1e3)
-  }
-
-  trait Mega[U <: Unit[U]] extends Unit[Mega[U]] {
-    type RU = U#RU
-  }
-  object Mega {
-    implicit def factory[U <: Unit[U]](implicit udef: UnitDef[U]) = PrefixSpec[Mega[U], U](udef, "mega", 1e6)
+  object Kilo extends PrefixFactory[Kilo] {
+    implicit val pdef = PrefixSpec[Kilo]("kilo", 1e+3)
   }
 }
 
 package testunits {
-  trait Meter extends Unit[Meter] {
+  trait Meter extends Unit {
     type RU = Meter
   }
-  object Meter extends Meter {
+  object Meter extends Meter with UnitFactory[Meter] {
     implicit val udef = UnitSpec[Meter]("meter", 1.0)
   }
 
-  trait Foot extends Unit[Foot] {
+  trait Foot extends Unit {
     type RU = Meter
   }
   object Foot extends Foot {
     implicit val udef = UnitSpec[Foot]("foot", 0.3048)
   }
 
-  trait Yard extends Unit[Yard] {
+  trait Yard extends Unit {
     type RU = Meter
   }
   object Yard extends Yard {
     implicit val udef = UnitSpec[Yard]("yard", 0.9144)
   }
 
-  trait Second extends Unit[Second] {
+  trait Second extends Unit {
     type RU = Second
   }
   object Second extends Second {
     implicit val udef = UnitSpec[Second]("second", 1.0)
   }
 
-  trait Minute extends Unit[Minute] {
+  trait Minute extends Unit {
     type RU = Second
   }
   object Minute extends Minute {

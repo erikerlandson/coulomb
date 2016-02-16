@@ -39,7 +39,7 @@ object codegen {
     val uaS = (1 to V).map { j => s"UA$j" }
     val unS = (1 to V).map { j => s"UN$j" }
     val pS = (1 to V).map { j => s"P$j" }
-    val uSig = (uS ++ uaS ++ unS).map { u => s"$u <: Unit[$u]" }
+    val uSig = (uS ++ uaS ++ unS).map { u => s"$u <: Unit" }
     val pSig = pS.map { p => s"$p <: Integer" }
     val ccSig = (uSig ++ pSig).mkString(", ")
     val udef = (1 to V).map { j => s"udef${j}: UnitDef[U$j]" }.mkString(", ")
@@ -64,7 +64,7 @@ object codegen {
       val iP = (0 until v).map { j => "P" + letter(j) }
       val iUP = iU.zip(iP)
       val iSig = iUP.map { case (u, p) => s"$u, $p" }.mkString(", ")
-      val fSig = ((rU ++ iU).map { tn => s"$tn <: Unit[$tn]" } ++ iP.map { tn => s"$tn <: Integer" }).mkString(", ")
+      val fSig = ((rU ++ iU).map { tn => s"$tn <: Unit" } ++ iP.map { tn => s"$tn <: Integer" }).mkString(", ")
       val pP = iP ++ Seq.fill(V - v) { "_0" }
       val iudef = (0 until v).map { j => s"udef${letter(j)}: UnitDef[U${letter(j)}]" }.mkString(", ")
       val iiv = (0 until v).map { j => s"iv${letter(j)}: IntegerValue[P${letter(j)}]" }.mkString(", ")
@@ -137,7 +137,7 @@ object codegen {
   def uvClassDef(v: Int, V: Int): String = {
     val uS = (1 to v).map { j => s"U$j" }
     val pS = (1 to v).map { j => s"P$j" }
-    val ccSig = uS.zip(pS).map { case (u, p) => s"$u <: Unit[$u], $p <: Integer" }.mkString(", ")
+    val ccSig = uS.zip(pS).map { case (u, p) => s"$u <: Unit, $p <: Integer" }.mkString(", ")
     val uvSig = uS.zip(pS).map { case (u, p) => s"$u, $p" }.mkString(", ")
     val udef = (1 to v).map { j => s"udef$j: UnitDef[U$j]" }.mkString(", ")
     val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }.mkString(", ")
@@ -162,7 +162,7 @@ object codegen {
     val uS = (1 to v).map { j => s"U$j" }
     val pS = (1 to v).map { j => s"P$j" }
     val iS = (0 until v).map { j => s"U${letter(j)}" }
-    val fSig = ((iS ++ uS).map { u => s"$u <: Unit[$u]" } ++ pS.map { p => s"$p <: Integer" }).mkString(", ")
+    val fSig = ((iS ++ uS).map { u => s"$u <: Unit" } ++ pS.map { p => s"$p <: Integer" }).mkString(", ")
     val oSig = uS.zip(pS).map { case (u, p) => s"$u, $p" }.mkString(", ")
     val idef = (0 until v).map { j => s"udef${letter(j)}: UnitDef[U${letter(j)}]" }.mkString(", ")
     val odef = (1 to v).map { j => s"udef$j: UnitDef[U$j]" }.mkString(", ")
