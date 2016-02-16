@@ -25,7 +25,7 @@ trait Unit {
 }
 
 object Unit {
-  def factor[U1 <: Unit, U2 <: Unit](implicit udef1: UnitDef[U1], udef2: UnitDef[U2], eq: U1#RU =:= U2#RU) = udef1.cfr / udef2.cfr
+  def factor[U1 <: Unit, U2 <: Unit](implicit urec1: UnitRec[U1], urec2: UnitRec[U2], eq: U1#RU =:= U2#RU) = urec1.cfr / urec2.cfr
 
   def toString(value: Double, units: Seq[(String, Int)]) = {
     val unitstr = units.map { case (name, exp) =>
@@ -35,94 +35,78 @@ object Unit {
   }
 }
 
-trait UnitDef[U <: Unit] {
+trait UnitLike[U <: Unit] extends Unit {
+  type RU = U
+}
+
+trait PrefixLike[U <: Unit] extends Unit {
+  type RU = U#RU
+}
+
+// contravariance allows companion objects to use UnitRec for parent unit trait
+// unsure if this is evil, but I'll leave it for now.  Not a dealbreaker if it
+// had to be backed off
+trait UnitRec[-U <: Unit] {
   def name: String
   def cfr: Double
 }
 
-case class UnitSpec[U <: Unit](name: String, cfr: Double) extends UnitDef[U]
-
-case class PrefixSpec[P[_ <: Unit] <: Unit](pfn: String, pcf: Double)
-
-trait U$ <: Unit {
-  type RU = U$
-}
-object U$ {
-  implicit val udef = UnitSpec[U$]("U$", 1.0)
+trait PrefixRec[P[_ <: Unit] <: Unit] {
+  def pfn: String
+  def pcf: Double
 }
 
-trait Unitless <: Unit {
-  type RU = Unitless
-}
-object Unitless {
-  implicit val udef = UnitSpec[Unitless]("unitless-ratio", 1.0)
-}
-
-trait UnitFactory[U <: Unit] {
-  def apply(value: Double = 1.0)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
-  implicit def fromObject[T <: U](t: T)(implicit udef: UnitDef[U]): UnitValue1[U, _1] = UnitValue1[U, _1](1.0)
+class UnitCompanion[U <: Unit](uname: String, ucfr: Double) {
+  def apply(value: Double = 1.0)(implicit urec: UnitRec[U]): UnitValue1[U, _1] = UnitValue1[U, _1](value)
+  implicit val urec: UnitRec[U] = new UnitRec[U] {
+    def name = uname
+    def cfr = ucfr
+  }
+  implicit def fromObject[T <: U](t: T)(implicit urec: UnitRec[U]): UnitValue1[U, _1] = UnitValue1[U, _1](1.0)
 }
 
-trait PrefixFactory[P[_ <: Unit] <: Unit] {
-  def apply[U <: Unit](uv: UnitValue1[U, _1])(implicit pudef: UnitDef[P[U]]): UnitValue1[P[U], _1] = UnitValue1[P[U], _1](uv.value)
-  implicit def pudef[U <: Unit](implicit pdef: PrefixSpec[P], udef: UnitDef[U]): UnitDef[P[U]] = new UnitDef[P[U]] {
-    def name = pdef.pfn + udef.name
-    def cfr = pdef.pcf * udef.cfr
+class PrefixCompanion[P[_ <: Unit] <: Unit](upfn: String, upcf: Double) {
+  def apply[U <: Unit](uv: UnitValue1[U, _1])(implicit purec: UnitRec[P[U]]): UnitValue1[P[U], _1] = UnitValue1[P[U], _1](uv.value)
+  implicit val prec: PrefixRec[P] = new PrefixRec[P] {
+    def pfn = upfn
+    def pcf = upcf
+  }
+  implicit def purec[U <: Unit](implicit pdef: PrefixRec[P], urec: UnitRec[U]): UnitRec[P[U]] = new UnitRec[P[U]] {
+    def name = pdef.pfn + urec.name
+    def cfr = pdef.pcf * urec.cfr
   }
 }
 
 package prefix {
-  trait Milli[U <: Unit] extends Unit {
-    type RU = U#RU
-  }
-  object Milli extends PrefixFactory[Milli] {
-    implicit val pdef = PrefixSpec[Milli]("milli", 1e-3)
-  }
+  trait Milli[U <: Unit] extends PrefixLike[U]
+  object Milli extends PrefixCompanion[Milli]("milli", 1e-3)
 
-  trait Kilo[U <: Unit] extends Unit {
-    type RU = U#RU
-  }
-  object Kilo extends PrefixFactory[Kilo] {
-    implicit val pdef = PrefixSpec[Kilo]("kilo", 1e+3)
-  }
+  trait Kilo[U <: Unit] extends PrefixLike[U]
+  object Kilo extends PrefixCompanion[Kilo]("kilo", 1e+3)
 }
 
 package testunits {
-  trait Meter extends Unit {
-    type RU = Meter
-  }
-  object Meter extends Meter with UnitFactory[Meter] {
-    implicit val udef = UnitSpec[Meter]("meter", 1.0)
-  }
+  trait Meter extends UnitLike[Meter]
+  object Meter extends UnitCompanion[Meter]("meter", 1.0) with Meter
 
-  trait Foot extends Unit {
-    type RU = Meter
-  }
-  object Foot extends Foot {
-    implicit val udef = UnitSpec[Foot]("foot", 0.3048)
-  }
+  trait Foot extends UnitLike[Meter]
+  object Foot extends UnitCompanion[Foot]("foot", 0.3048) with Foot
 
-  trait Yard extends Unit {
-    type RU = Meter
-  }
-  object Yard extends Yard {
-    implicit val udef = UnitSpec[Yard]("yard", 0.9144)
-  }
+  trait Yard extends UnitLike[Meter]
+  object Yard extends UnitCompanion[Yard]("yard", 0.9144) with Yard
 
-  trait Second extends Unit {
-    type RU = Second
-  }
-  object Second extends Second {
-    implicit val udef = UnitSpec[Second]("second", 1.0)
-  }
+  trait Second extends UnitLike[Second]
+  object Second extends UnitCompanion[Second]("second", 1.0) with Second
 
-  trait Minute extends Unit {
-    type RU = Second
-  }
-  object Minute extends Minute {
-    implicit val udef = UnitSpec[Minute]("minute", 60.0)
-  }
+  trait Minute extends UnitLike[Second]
+  object Minute extends UnitCompanion[Minute]("minute", 60.0) with Minute
 }
+
+trait U$ extends UnitLike[U$]
+object U$ extends UnitCompanion[U$]("U$", 1.0) with U$
+
+trait Unitless extends UnitLike[Unitless]
+object Unitless extends UnitCompanion[Unitless]("unitless", 1.0)
 
 object test {
   import testunits._
