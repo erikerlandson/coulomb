@@ -143,6 +143,7 @@ object codegen {
     val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }.mkString(", ")
     val uvx = s"UnitValue$v[$uvSig]"
     val tsSeq = (1 to v).map { j => s"(urec${j}.name, iv${j}.value)" }.mkString(", ")
+    val timesDefs = uvTimes(v, V).mkString("\n")
     s"""
     |case class UnitValue$v[$ccSig](value: Double)(implicit
     |  $urec,
@@ -154,17 +155,51 @@ object codegen {
     |  def -(uv: $uvx): $uvx = $uvx(value - uv.value)
     |
     |  def *(v: Double): $uvx = $uvx(value * v)
+    |
+    |$timesDefs
     |}""".stripMargin
   }
 
-  def uvRHS(v: Int, V: Int): Seq[String] = {
+  def cross[A, B](sa: TraversableOnce[A], sb: TraversableOnce[B]): Iterator[(A, B)] =
+    for(
+      a <- sa.toIterator;
+      b <- sb.toIterator
+    ) yield (a, b)
+
+  def uvTimes(v: Int, V: Int): Seq[String] = {
     val defs = scala.collection.mutable.ArrayBuffer.empty[String]
-    val uref = (1 to v).map { j => s"U$j" }
-    val uf1 = uref ++ Vector.fill(V - v)("U$")
+    val rUSig = (1 to v).map { j => s"U$j" }
+    val rU = rUSig ++ Seq.fill(V - v)("U$")
     (1 to V).foreach { uvj =>
+      val amax = math.min(v, uvj)
       val umax = math.min(V - v, uvj)
-      (0 until umax).foreach { u =>
-        val a = uvj - u
+      cross(0 to amax, 0 to umax)
+        .filter { case (a, u) => (a + u == uvj) && (v + u <= V) }
+        .foreach { case (a, u) =>
+        val uUSig = (0 until u).map { j => s"U${letter(j)}" }
+        val uU = uUSig ++ Seq.fill(V - u)("U$")
+        val vo = v + u
+        (0 until v).combinations(a).foreach { aj =>
+          val aU = Seq.tabulate(V) { j => if (aj.contains(j)) s"U${j + 1}" else "U$" }
+          val Q = aj.map { j => s"Q${j + 1}" } ++ (0 until u).map { j => s"Q${letter(j)}" }
+          val vQ = Q ++ Seq.fill(V - uvj)("_0")
+          val aQ = Q.take(a)
+          val uQ = Q.drop(a)
+          val fSig = (uUSig.map(_ + " <: Unit") ++ Q.map(_ + " <: Integer")).mkString(", ")
+          val rhsSig = (rU ++ aU ++ uU ++ vQ).mkString(", ")
+          val pq = aj.map { j => s"P${j + 1}" }.zip(aQ).map { case (p, q) => s"$p#Add[$q]" }
+          val aP = Seq.tabulate(v) { j => if (aj.contains(j)) s"${pq(aj.indexOf(j))}" else s"P${j + 1}" }
+          val oSig = (rUSig ++ uUSig).zip(aP ++ uQ).map { case (u, p) => s"$u, $p" }.mkString(", ")
+          val urecs = uUSig.map { u => s"urec$u: UnitRec[$u]" }.mkString(", ")
+          //val urecComma = if (urecs.length > 0) "," else ""
+          val ivs = Q.map { q => s"iv$q: IntegerValue[$q]" }.mkString(", ")
+          val ivs2 = (0 until a).map { j => s"ivpq$j: IntegerValue[${pq(j)}]" }.mkString(", ")
+          val imps = Seq(urecs, ivs, ivs2).filter(_.length > 0).mkString(",\n    ")
+          defs += s"""
+            |  def *[$fSig](rhs: RHS[$rhsSig])(implicit
+            |    $imps): UnitValue$vo[$oSig] =
+            |    UnitValue$vo[$oSig](value * rhs.value)""".stripMargin
+        }
       }
     }
     defs
