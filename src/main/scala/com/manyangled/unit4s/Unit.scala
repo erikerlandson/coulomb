@@ -102,8 +102,8 @@ package testunits {
   object Minute extends UnitCompanion[Minute]("minute", 60.0) with Minute
 }
 
-trait U$ extends UnitLike[U$]
-object U$ extends UnitCompanion[U$]("U$", 1.0) with U$
+trait UZ extends UnitLike[UZ]
+object UZ extends UnitCompanion[UZ]("UZ", 1.0) with UZ
 
 trait Unitless extends UnitLike[Unitless]
 object Unitless extends UnitCompanion[Unitless]("unitless", 1.0)
