@@ -15,6 +15,19 @@ object codegen {
   val abase: Int = 'a'.toInt
   def letter(j: Int) = (abase + j).toChar
 
+  def padstr(n: Int, c: Char = ' ') = Seq.fill(n)(c).mkString("")
+
+  def params(pseq: Seq[Seq[String]], imp: Boolean = false, indent: Int = 2, sep: String = " "): String = {
+    require(sep == " " || sep == "\n")
+    val lines = pseq.filter(_.length > 0).map(_.mkString(", "))
+    if (lines.isEmpty) "" else {
+      val pad = if (indent > 0 && sep == "\n") padstr(indent) else ""
+      val ipre = if (imp) s"implicit$sep$pad" else ""
+      val pcode = ipre + lines.mkString(s",$sep$pad")
+      s"($pcode)"
+    }
+  }
+
   def rhsFile(V: Int, fName: String) {
     scalax.file.Path.fromString(fName).deleteIfExists()
 
