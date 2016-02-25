@@ -17,16 +17,26 @@ object codegen {
 
   def padstr(n: Int, c: Char = ' ') = Seq.fill(n)(c).mkString("")
 
-  def params(pseq: Seq[Seq[String]], imp: Boolean = false, indent: Int = 2, sep: String = " "): String = {
-    require(sep == " " || sep == "\n")
+  def pCode(pseq: Seq[Seq[String]], imp: Boolean, ind: Int, sep: Char, enc: Char): String = {
+    require(Seq('(', '[').contains(enc))
+    require(Seq(' ', '\n').contains(sep))
     val lines = pseq.filter(_.length > 0).map(_.mkString(", "))
     if (lines.isEmpty) "" else {
-      val pad = if (indent > 0 && sep == "\n") padstr(indent) else ""
+      val (lp, rp) = if (enc == '(') ('(', ')') else ('[', ']')
+      val pad = if (ind > 0 && sep == '\n') padstr(ind) else ""
       val ipre = if (imp) s"implicit$sep$pad" else ""
       val pcode = ipre + lines.mkString(s",$sep$pad")
-      s"($pcode)"
+      s"$lp$pcode$rp"
     }
   }
+
+  def mlparams(pseq: Seq[Seq[String]], imp: Boolean = false, ind: Int = 2): String =
+    pCode(pseq, imp, ind, '\n', '(')
+
+  def params(pseq: Seq[String], imp: Boolean = false): String =
+    pCode(Seq(pseq), imp, 0, ' ', '(')
+
+  def typesig(tseq: Seq[String]) = pCode(Seq(tseq), false, 0, ' ', '[')
 
   def rhsFile(V: Int, fName: String) {
     scalax.file.Path.fromString(fName).deleteIfExists()
