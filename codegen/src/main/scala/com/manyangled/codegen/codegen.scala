@@ -15,7 +15,7 @@ object codegen {
   val abase: Int = 'a'.toInt
   def letter(j: Int) = (abase + j).toChar
 
-  def padstr(n: Int, c: Char = ' ') = Seq.fill(n)(c).mkString("")
+  def padstr(n: Int, c: Char = ' ') = Seq.fill(n)(c).mkString
 
   def pCode(pseq: Seq[Seq[String]], imp: Boolean, ind: Int, sep: Char, enc: Char): String = {
     require(Seq('(', '[').contains(enc))
@@ -72,14 +72,13 @@ object codegen {
         (0 until V).combinations(a).foreach { aj =>
           val aP = aj.map { j => s"P${j + 1}" }
           val aPiv = aP.map { t => s"iv$t: IntegerValue[$t]" }
-          val rhsName = s"""RHSv${v}a${a}s${aj.mkString("")}"""
+          val rhsName = s"""RHSv${v}a${a}s${aj.mkString}"""
           val rhsSig = Seq(rU.map { t => s"$t <: Unit" }, aP.map { t => s"$t <: Integer" }, uU.map { t => s"$t <: Unit" }, uP.map { t => s"$t <: Integer" })
-            .fold(Seq.empty[String])(_ ++ _).mkString(", ")
-          val imps = Seq(rUrec, aPiv, uUrec, uPiv).filter(_.length > 0).map(_.mkString(", ")).mkString(",\n  ")
+            .fold(Seq.empty[String])(_ ++ _)
+          val imps = Seq(rUrec, aPiv, uUrec, uPiv)
           val impDef = rhsImplicitDefs(V, v, aj).mkString("\n\n")
           val code = s"""
-            |class $rhsName[$rhsSig](val value: Double)(implicit
-            |  $imps)
+            |class $rhsName${typesig(rhsSig)}(val value: Double)${mlparams(imps,imp=true)}
             |
             |object $rhsName {
             |$impDef
@@ -100,31 +99,31 @@ object codegen {
     val rUrec = rU.map { t => s"urec$t: UnitRec[$t]" }
     val uvU = (0 until v).map { j => "U" + letter(j) }
     val uvP = (0 until v).map { j => "P" + letter(j) }
-    val uvSig = uvU.zip(uvP).map { case (u, p) => s"$u, $p" }.mkString(", ")
-    val rhsName = s"""RHSv${v}a${a}s${aj.mkString("")}"""
+    val uvSig = uvU.zip(uvP).map { case (u, p) => s"$u, $p" }
+    val uvType = s"UnitValue$v${typesig(uvSig)}"
+    val rhsName = s"""RHSv${v}a${a}s${aj.mkString}"""
     val uvUrec = uvU.map { t => s"urec$t: UnitRec[$t]" }
     val uvPiv = uvP.map { p => s"iv$p: IntegerValue[$p]" }
-    val fSig = ((rU ++ uvU).map { t => s"$t <: Unit" } ++ uvP.map { t => s"$t <: Integer" }).mkString(", ")
+    val fSig = (rU ++ uvU).map { t => s"$t <: Unit" } ++ uvP.map { t => s"$t <: Integer" }
     (0 until v).combinations(a).foreach { aij =>
       val uij = (0 until v).filter { j => !aij.contains(j) }
       val (uvUa, uvPa) = (aij.map { j => uvU(j) }, aij.map { j => uvP(j) })
       val (uvUu, uvPu) = (uij.map { j => uvU(j) }, uij.map { j => uvP(j) })
       val rune = for (uu <- uvUu; ru <- rU) yield s"ne$uu$ru: ${uu}#RU =!= ${ru}#RU"
-      val rhsSig = (rU ++ uvPa ++ uvUu ++ uvPu).mkString(", ")
+      val rhsSig = (rU ++ uvPa ++ uvUu ++ uvPu)
+      val rhsType = s"$rhsName${typesig(rhsSig)}"
       aij.permutations.foreach { ajp =>
         val uvUp = ajp.map { j => uvU(j) }
         val uvPp = ajp.map { j => uvP(j) }
         val rueq = uvUp.zip(rUa).map { case (iu, ru) => s"eq$iu$ru: ${iu}#RU =:= ${ru}#RU" }
         val fSeq = uvUp.zip(rUa).zip(uvPp).map { case ((iu, ru), ip) => s"(factor[$iu, $ru], iv${ip}.value)" }
-        val imps = Seq(rUrec, uvUrec, uvPiv, rueq, rune).filter(_.length > 0).map(_.mkString(", ")).mkString(",\n    ")
-        val fName = s"""rhs$$v${v}a${a}s${aj.mkString("")}c${aij.mkString("")}p${ajp.mkString("")}"""
-        val vCode = if (fSeq.length == 0) "val v = uv.value" else s"""val fp = Seq(${fSeq.mkString(", ")})
+        val imps = Seq(rUrec, uvUrec, uvPiv, rueq, rune)
+        val fName = s"""rhs$$v${v}a${a}s${aj.mkString}c${aij.mkString}p${ajp.mkString}"""
+        val vCode = if (fSeq.length == 0) "val v = uv.value" else s"""val fp = Seq${params(fSeq)}
            |    val v = fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) }""".stripMargin
-        val fCode = s"""|  implicit def $fName[$fSig](uv: UnitValue$v[$uvSig])(implicit
-          |    $imps
-          |  ): $rhsName[$rhsSig] = {
+        val fCode = s"""|  implicit def $fName${typesig(fSig)}(uv: $uvType)${mlparams(imps,imp=true,ind=4)}: $rhsType = {
           |    $vCode
-          |    new $rhsName[$rhsSig](v)
+          |    new $rhsType(v)
           |  }""".stripMargin
         defs += fCode
       }
@@ -164,18 +163,15 @@ object codegen {
   def uvClassDef(v: Int, V: Int): String = {
     val uS = (1 to v).map { j => s"U$j" }
     val pS = (1 to v).map { j => s"P$j" }
-    val ccSig = uS.zip(pS).map { case (u, p) => s"$u <: Unit, $p <: Integer" }.mkString(", ")
-    val uvSig = uS.zip(pS).map { case (u, p) => s"$u, $p" }.mkString(", ")
-    val urec = (1 to v).map { j => s"urec$j: UnitRec[U$j]" }.mkString(", ")
-    val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }.mkString(", ")
-    val uvx = s"UnitValue$v[$uvSig]"
+    val ccSig = uS.zip(pS).map { case (u, p) => s"$u <: Unit, $p <: Integer" }
+    val uvSig = uS.zip(pS).map { case (u, p) => s"$u, $p" }
+    val urec = (1 to v).map { j => s"urec$j: UnitRec[U$j]" }
+    val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }
+    val uvx = s"UnitValue$v${typesig(uvSig)}"
     val tsSeq = (1 to v).map { j => s"(urec${j}.name, iv${j}.value)" }.mkString(", ")
     val timesDefs = uvTimes(v, V).mkString("\n")
     s"""
-    |case class UnitValue$v[$ccSig](value: Double)(implicit
-    |  $urec,
-    |  $iiv) {
-    |
+    |case class UnitValue$v${typesig(ccSig)}(value: Double)${mlparams(Seq(urec,iiv),imp=true)} {
     |  override def toString = Unit.toString(value, Seq($tsSeq))
     |
     |  def +(uv: $uvx): $uvx = $uvx(value + uv.value)
@@ -202,20 +198,20 @@ object codegen {
         val uQ = (0 until u).map { j => s"Q${letter(j)}" }
         (0 until v).combinations(a).foreach { aj =>
           val aQ = aj.map { j => s"Q${j + 1}" }
-          val fSig = (aQ.map(_ + " <: Integer") ++ uU.map(_ + " <: Unit") ++ uQ.map(_ + " <: Integer")).mkString(", ")
-          val rhsName = s"""RHSv${vi}a${a}s${aj.mkString("")}"""
-          val rhsSig = (rU ++ aQ ++ uU ++ uQ).mkString(", ")
+          val fSig = (aQ.map(_ + " <: Integer") ++ uU.map(_ + " <: Unit") ++ uQ.map(_ + " <: Integer"))
+          val rhsName = s"""RHSv${vi}a${a}s${aj.mkString}"""
+          val rhsSig = (rU ++ aQ ++ uU ++ uQ)
           val pq = aj.map { j => s"P${j + 1}" }.zip(aQ).map { case (p, q) => s"$p#Add[$q]" }
           val aP = Seq.tabulate(v) { j => if (aj.contains(j)) s"${pq(aj.indexOf(j))}" else s"P${j + 1}" }
-          val oSig = (rUSig ++ uU).zip(aP ++ uQ).map { case (u, p) => s"$u, $p" }.mkString(", ")
-          val urecs = uU.map { u => s"urec$u: UnitRec[$u]" }.mkString(", ")
-          val ivs = uQ.map { q => s"iv$q: IntegerValue[$q]" }.mkString(", ")
-          val ivs2 = (0 until a).map { j => s"ivpq$j: IntegerValue[${pq(j)}]" }.mkString(", ")
-          val imps = Seq(urecs, ivs, ivs2).filter(_.length > 0).mkString(",\n    ")
+          val oSig = (rUSig ++ uU).zip(aP ++ uQ).map { case (u, p) => s"$u, $p" }
+          val urecs = uU.map { u => s"urec$u: UnitRec[$u]" }
+          val ivs = uQ.map { q => s"iv$q: IntegerValue[$q]" }
+          val ivs2 = (0 until a).map { j => s"ivpq$j: IntegerValue[${pq(j)}]" }
+          val imps = Seq(urecs, ivs, ivs2)
+          val uvvo = s"UnitValue$vo${typesig(oSig)}"
           defs += s"""
-            |  def *[$fSig](rhs: $rhsName[$rhsSig])(implicit
-            |    $imps): UnitValue$vo[$oSig] =
-            |    UnitValue$vo[$oSig](value * rhs.value)""".stripMargin
+            |  def *${typesig(fSig)}(rhs: $rhsName${typesig(rhsSig)})${mlparams(imps,imp=true,ind=4)}: $uvvo =
+            |    $uvvo(value * rhs.value)""".stripMargin
         }
       }
     }
@@ -227,26 +223,24 @@ object codegen {
     val uS = (1 to v).map { j => s"U$j" }
     val pS = (1 to v).map { j => s"P$j" }
     val iS = (0 until v).map { j => s"U${letter(j)}" }
-    val fSig = ((iS ++ uS).map { u => s"$u <: Unit" } ++ pS.map { p => s"$p <: Integer" }).mkString(", ")
-    val oSig = uS.zip(pS).map { case (u, p) => s"$u, $p" }.mkString(", ")
-    val idef = (0 until v).map { j => s"urec${letter(j)}: UnitRec[U${letter(j)}]" }.mkString(", ")
-    val odef = (1 to v).map { j => s"urec$j: UnitRec[U$j]" }.mkString(", ")
-    val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }.mkString(", ")
-    val rueq = (0 until v).map { j => s"eq${letter(j)}${j + 1}: U${letter(j)}#RU =:= U${j + 1}#RU" }.mkString(", ")
+    val fSig = ((iS ++ uS).map { u => s"$u <: Unit" } ++ pS.map { p => s"$p <: Integer" })
+    val oSig = uS.zip(pS).map { case (u, p) => s"$u, $p" }
+    val idef = (0 until v).map { j => s"urec${letter(j)}: UnitRec[U${letter(j)}]" }
+    val odef = (1 to v).map { j => s"urec$j: UnitRec[U$j]" }
+    val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }
+    val rueq = (0 until v).map { j => s"eq${letter(j)}${j + 1}: U${letter(j)}#RU =:= U${j + 1}#RU" }
+    val imps = Seq(idef, odef, iiv, rueq)
     val fSeq = (0 until v).map { j => s"(factor[U${letter(j)}, U${j + 1}], iv${j + 1}.value)" }
+    val uvov = s"UnitValue$v${typesig(oSig)}"
     val vCode = s"""val fp = Seq(${fSeq.mkString(", ")})
       |    val v = fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) }""".stripMargin
-
     (0 until v).permutations.foreach { jp =>
-      val iSig = jp.map { j => s"U${letter(j)}, P${j + 1}" }.mkString(", ")
+      val fName = s"uvc$$v${v}p${jp.mkString}"
+      val iSig = jp.map { j => s"U${letter(j)}, P${j + 1}" }
       val fCode = s"""
-        |  implicit def uvc$$v${v}p${jp.mkString("")}[$fSig](uv: UnitValue$v[$iSig])(implicit
-        |    $idef,
-        |    $odef,
-        |    $iiv,
-        |    $rueq): UnitValue$v[$oSig] = {
+        |  implicit def $fName${typesig(fSig)}(uv: UnitValue$v${typesig(iSig)})${mlparams(imps,imp=true,ind=4)}: $uvov = {
         |    $vCode
-        |    UnitValue$v[$oSig](v)
+        |    $uvov(v)
         |  }""".stripMargin
       defs += fCode
     }
