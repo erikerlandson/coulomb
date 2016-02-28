@@ -84,19 +84,19 @@ package prefix {
 
 package testunits {
   trait Meter extends UnitLike[Meter]
-  object Meter extends UnitCompanion[Meter]("meter", 1.0) with Meter
+  object Meter extends UnitCompanion[Meter]("meter", 1.0)
 
   trait Foot extends UnitLike[Meter]
-  object Foot extends UnitCompanion[Foot]("foot", 0.3048) with Foot
+  object Foot extends UnitCompanion[Foot]("foot", 0.3048)
 
   trait Yard extends UnitLike[Meter]
-  object Yard extends UnitCompanion[Yard]("yard", 0.9144) with Yard
+  object Yard extends UnitCompanion[Yard]("yard", 0.9144)
 
   trait Second extends UnitLike[Second]
-  object Second extends UnitCompanion[Second]("second", 1.0) with Second
+  object Second extends UnitCompanion[Second]("second", 1.0)
 
   trait Minute extends UnitLike[Second]
-  object Minute extends UnitCompanion[Minute]("minute", 60.0) with Minute
+  object Minute extends UnitCompanion[Minute]("minute", 60.0)
 }
 
 trait UZ extends UnitLike[UZ]
