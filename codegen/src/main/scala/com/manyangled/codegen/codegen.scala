@@ -62,7 +62,7 @@ object codegen {
     val defs = scala.collection.mutable.ArrayBuffer.empty[String]
     val rU = (1 to V).map { j => s"U$j" }
     val rUrec = rU.map { t => s"urec$t: UnitRec[$t]" }
-    (1 to V).foreach { v =>
+    (0 to V).foreach { v =>
       (0 to v).foreach { a =>
         val u = v - a
         val uU = (0 until u).map { j => s"U${letter(j)}" }
@@ -146,7 +146,7 @@ object codegen {
 
     writeString(head, fName)
 
-    (1 to V).foreach { v =>
+    (0 to V).foreach { v =>
       val cdef = uvClassDef(v, V)
       writeString("\n", fName)
       writeString(cdef, fName)
@@ -187,7 +187,7 @@ object codegen {
     val defs = scala.collection.mutable.ArrayBuffer.empty[String]
     val rUSig = (1 to v).map { j => s"U$j" }
     val rU = rUSig ++ Seq.fill(V - v)("UZ")
-    (1 to V).foreach { vi =>
+    (0 to V).foreach { vi =>
       val amax = math.min(v, vi)
       val umax = math.min(V - v, vi)
       cross(0 to amax, 0 to umax)
@@ -234,7 +234,7 @@ object codegen {
     val uvov = s"UnitValue$v${typesig(oSig)}"
     val vCode = s"""val fp = Seq(${fSeq.mkString(", ")})
       |    val v = fp.foldLeft(uv.value) { case (v, (f, p)) => v * math.pow(f, p) }""".stripMargin
-    (0 until v).permutations.foreach { jp =>
+    (0 until v).permutations.filter(!_.isEmpty).foreach { jp =>
       val fName = s"uvc$$v${v}p${jp.mkString}"
       val iSig = jp.map { j => s"U${letter(j)}, P${j + 1}" }
       val fCode = s"""
