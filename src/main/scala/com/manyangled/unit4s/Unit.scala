@@ -102,9 +102,6 @@ package testunits {
 trait UZ extends UnitLike[UZ]
 object UZ extends UnitCompanion[UZ]("UZ", 1.0) with UZ
 
-trait Unitless extends UnitLike[Unitless]
-object Unitless extends UnitCompanion[Unitless]("unitless", 1.0)
-
 object test {
   import testunits._
   import prefix._
