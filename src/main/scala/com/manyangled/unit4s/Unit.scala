@@ -97,6 +97,12 @@ package testunits {
 
   trait Minute extends UnitLike[Second]
   object Minute extends UnitCompanion[Minute]("minute", 60.0)
+
+  trait Kilogram extends UnitLike[Kilogram]
+  object Kilogram extends UnitCompanion[Kilogram]("kilogram", 1.0)
+
+  trait Pound extends UnitLike[Kilogram]
+  object Pound extends UnitCompanion[Pound]("pound", 0.453592)
 }
 
 trait UZ extends UnitLike[UZ]
