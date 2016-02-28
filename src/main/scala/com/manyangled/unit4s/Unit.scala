@@ -43,10 +43,7 @@ trait PrefixLike[U <: Unit] extends Unit {
   type RU = U#RU
 }
 
-// contravariance allows companion objects to use UnitRec for parent unit trait
-// unsure if this is evil, but I'll leave it for now.  Not a dealbreaker if it
-// had to be backed off
-trait UnitRec[-U <: Unit] {
+trait UnitRec[U <: Unit] {
   def name: String
   def cfr: Double
 }

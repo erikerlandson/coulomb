@@ -244,17 +244,6 @@ object codegen {
         |  }""".stripMargin
       defs += fCode
     }
-    if (v == 1) {
-      // I can only get this to work right when UnitRec is contravariant so that
-      // unit companion classes can access their parent UnitRec implicits
-      val fCode = s"""
-        |  implicit def fromObj[Ua <: Unit, U1 <: Unit](u: Ua)(implicit
-        |    ureca: UnitRec[Ua],
-        |    urec1: UnitRec[U1],
-        |    eqa1: Ua#RU =:= U1#RU): UnitValue1[U1, _1] =
-        |    UnitValue1[U1, _1](factor[Ua, U1])"""
-      defs += fCode
-    }
     defs
   }
 }
