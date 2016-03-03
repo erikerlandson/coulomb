@@ -28,10 +28,10 @@ object Unit {
   def factor[U1 <: Unit, U2 <: Unit](implicit urec1: UnitRec[U1], urec2: UnitRec[U2], eq: U1#RU =:= U2#RU) = urec1.cfr / urec2.cfr
 
   def toString(value: Double, units: Seq[(String, Int)]) = {
-    val unitstr = units.map { case (name, exp) =>
+    val terms = s"$value" +: units.map { case (name, exp) =>
       if (exp == 1) s"$name" else s"($name)^($exp)"
-    }.mkString(" ")
-    s"UnitValue${units.length}($value $unitstr)"
+    }
+    s"""UnitValue${units.length}(${terms.mkString(" ")})"""
   }
 }
 
