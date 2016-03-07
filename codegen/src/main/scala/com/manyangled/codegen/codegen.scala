@@ -163,8 +163,8 @@ object codegen {
       |
       |import scala.language.implicitConversions
       |
-      |import com.manyangled.church.{ Integer, IntegerValue }
-      |import Integer.{ _0, _1 }
+      |import com.manyangled.church.{ Integer, IntegerValue, NonZero }
+      |import Integer.{ _0, _1, _neg1, _2 }
       |import Unit.factor
       |""".stripMargin
 
@@ -193,6 +193,12 @@ object codegen {
     val iiv = (1 to v).map { j => s"iv$j: IntegerValue[P$j]" }
     val uvx = s"UnitValue$v${typesig(uvSig)}"
     val tsSeq = (1 to v).map { j => s"(urec${j}.name, iv${j}.value)" }.mkString(", ")
+    val powSig = uS.zip(pS).map { case (u, p) => s"$u, $p#Mul[Q]" }
+    val powImps = Seq(Seq("ivQ: IntegerValue[Q]"), pS.map { t => s"pow$t: IntegerValue[${t}#Mul[Q]]" })
+    val invSig = uS.zip(pS).map { case (u, p) => s"$u, $p#Neg" }
+    val invImps = Seq(pS.map { t => s"inv$t: IntegerValue[${t}#Neg]" })
+    val sqSig = uS.zip(pS).map { case (u, p) => s"$u, $p#Mul[_2]" }
+    val sqImps = Seq(pS.map { t => s"sq$t: IntegerValue[${t}#Mul[_2]]" })
     val mulDefs = uvOpDefs(v, V, 'M').mkString("\n")
     val divDefs = uvOpDefs(v, V, 'D').mkString("\n")
     s"""
@@ -201,6 +207,17 @@ object codegen {
     |
     |  def +(uv: $uvx): $uvx = $uvx(value + uv.value)
     |  def -(uv: $uvx): $uvx = $uvx(value - uv.value)
+    |
+    |  def pow[Q <: Integer with NonZero]${mlparams(powImps,imp=true,ind=4)}: UnitValue$v${typesig(powSig)} =
+    |    UnitValue$v${typesig(powSig)}(math.pow(value, ivQ.value))
+    |
+    |  def pow[Q <: _0]: UnitValue0 = UnitValue0(1.0)
+    |
+    |  def inv${mlparams(invImps,imp=true,ind=4)}: UnitValue$v${typesig(invSig)} =
+    |    UnitValue$v${typesig(invSig)}(1.0 / value)
+    |
+    |  def sq${mlparams(sqImps,imp=true,ind=4)}: UnitValue$v${typesig(sqSig)} =
+    |    UnitValue$v${typesig(sqSig)}(value * value)
     |
     |  def *(v: Double): $uvx = $uvx(value * v)
     |

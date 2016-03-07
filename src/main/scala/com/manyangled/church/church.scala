@@ -13,6 +13,8 @@ sealed trait Integer {
 
 case class IntegerValue[N <: Integer](value: Int)
 
+trait NonZero
+
 object Integer {
   import infra._
 
@@ -67,7 +69,7 @@ object Integer {
 }
 
 object infra {
-  class IncInteger[N <: Integer] extends Integer {
+  class IncInteger[N <: Integer] extends Integer with NonZero {
     type Inc = IncInteger[IncInteger[N]]
     type Dec = N
     type Add[K <: Integer] = N#Add[K]#Inc
@@ -76,7 +78,7 @@ object infra {
     type Neg = N#Neg#Dec
   }
 
-  class DecInteger[N <: Integer] extends Integer {
+  class DecInteger[N <: Integer] extends Integer with NonZero {
     type Inc = N
     type Dec = DecInteger[DecInteger[N]]
     type Add[K <: Integer] = N#Add[K]#Dec
