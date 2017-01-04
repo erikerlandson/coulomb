@@ -3,7 +3,7 @@ name := "unit4s"
 lazy val commonSettings = Seq(
   organization := "com.manyangled",
   version := "0.0.1",
-  scalaVersion := "2.11.6",
+  scalaVersion := "2.11.8",
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
@@ -22,7 +22,7 @@ lazy val commonSettings = Seq(
 seq(commonSettings: _*)
 
 libraryDependencies ++= Seq(
-  "com.chuusai" %% "shapeless" % "2.1.0"
+  "com.chuusai" %% "shapeless" % "2.3.2"
 )
 
 lazy val unit4s = project in file(".")
