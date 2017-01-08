@@ -25,7 +25,7 @@ sealed trait <^> [UE <: UnitExpr, P <: Integer] extends UnitExpr
 sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 
 // unitless values (any units have canceled)
-sealed trait Unity extends UnitExpr
+sealed trait Unitless extends UnitExpr
 
 case class UnitRec[UE <: UnitExpr](name: String, coef: Double)
 
@@ -52,12 +52,25 @@ object UnitExprString {
     macro infra.UnitMacros.unitExprString[U]
 }
 
+trait UnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr] {
+  type U <: UnitExpr
+  def coef: Double
+}
+
+object UnitExprMul {
+  implicit def witnessUnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprMul[U1, U2] =
+    macro infra.UnitMacros.unitExprMul[U1, U2]
+}
+
 class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
   def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Unit[U2] =
     new Unit[U2](this.value * cu.coef)
 
   def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
     new Unit[U](this.value + cu.coef * that.value)
+
+  def *[U2 <: UnitExpr, MU <: UnitExpr](that: Unit[U2])(implicit uem: UnitExprMul[U, U2] { type U = MU }, uesMU: UnitExprString[MU]) =
+    new Unit[MU](this.value * that.value * uem.coef)
 
   override def toString = s"$value ${uesU.str}"
 }
@@ -189,8 +202,39 @@ object infra {
       }
     }
 
+    object IsUnitless {
+      def unapply(tpe: Type): Boolean = tpe =:= typeOf[Unitless]
+    }
+
+    def mapMul(lmap: Map[Type, Int], rmap: Map[Type, Int]): Map[Type, Int] = {
+      rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
+        if (m.contains(t)) {
+          val ne = m(t) + e
+          if (ne == 0) (m - t) else m + ((t, ne))
+        } else {
+          m + ((t, e))
+        }
+      }
+    }
+
+    def mapDiv(lmap: Map[Type, Int], rmap: Map[Type, Int]): Map[Type, Int] = {
+      rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
+        if (m.contains(t)) {
+          val ne = m(t) - e
+          if (ne == 0) (m - t) else m + ((t, ne))
+        } else {
+          m + ((t, -e))
+        }
+      }
+    }
+
+    def mapPow(bmap: Map[Type, Int], exp: Int): Map[Type, Int] = {    
+      if (exp == 0) Map.empty[Type, Int] else bmap.mapValues(_ * exp)
+    }
+
     def canonical(typeU: Type): (Double, Map[Type, Int]) = {
       typeU.dealias match {
+        case IsUnitless() => (1.0, Map.empty[Type, Int])
         case FUnit(_) => {
           (1.0, Map(typeU -> 1))
         }
@@ -201,35 +245,16 @@ object infra {
         case MulOp(lsub, rsub) => {
           val (lcoef, lmap) = canonical(lsub)
           val (rcoef, rmap) = canonical(rsub)
-          val mmap = rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
-            if (m.contains(t)) {
-              val ne = m(t) + e
-              if (ne == 0) m else m + ((t, ne))
-            } else {
-              m + ((t, e))
-            }
-          }
-          (lcoef * rcoef, mmap)
+          (lcoef * rcoef, mapMul(lmap, rmap))
         }
         case DivOp(lsub, rsub) => {
           val (lcoef, lmap) = canonical(lsub)
           val (rcoef, rmap) = canonical(rsub)
-          val dmap = rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
-            if (m.contains(t)) {
-              val ne = m(t) - e
-              if (ne == 0) m else m + ((t, ne))
-            } else {
-              m + ((t, -e))
-            }
-          }
-          (lcoef / rcoef, dmap)
+          (lcoef / rcoef, mapDiv(lmap, rmap))
         }
         case PowOp(bsub, exp) => {
           val (bcoef, bmap) = canonical(bsub)
-          if (exp == 0)
-            (1.0, Map.empty[Type, Int])
-          else
-            (math.pow(bcoef, exp), bmap.mapValues(_ * exp))
+          (math.pow(bcoef, exp), mapPow(bmap, exp))
         }
         case PreOp(_, coef, sub) => {
           val (scoef, smap) = canonical(sub)
@@ -273,6 +298,7 @@ object infra {
 
     def ueString(typeU: Type): String = {
       typeU.dealias match {
+        case IsUnitless() => "unitless"
         case FUnit(name) => name
         case DUnit(name, _, _) => name
         case MulOp(lsub, rsub) => {
@@ -313,6 +339,67 @@ object infra {
       val sq = q"$str"
       q"""
         _root_.com.manyangled.unit4s.UnitExprString[$tpeU]($sq)
+      """
+    }
+
+    def intType(i: Int): Type = {
+      i match {
+        case 0 => weakTypeOf[Integer._0]
+        case 1 => weakTypeOf[Integer._1]
+        case 2 => weakTypeOf[Integer._2]
+        case 3 => weakTypeOf[Integer._3]
+        case 4 => weakTypeOf[Integer._4]
+        case 5 => weakTypeOf[Integer._5]
+        case 6 => weakTypeOf[Integer._6]
+        case 7 => weakTypeOf[Integer._7]
+        case 8 => weakTypeOf[Integer._8]
+        case 9 => weakTypeOf[Integer._9]
+        case -1 => weakTypeOf[Integer._neg1]
+        case -2 => weakTypeOf[Integer._neg2]
+        case -3 => weakTypeOf[Integer._neg3]
+        case -4 => weakTypeOf[Integer._neg4]
+        case -5 => weakTypeOf[Integer._neg5]
+        case -6 => weakTypeOf[Integer._neg6]
+        case -7 => weakTypeOf[Integer._neg7]
+        case -8 => weakTypeOf[Integer._neg8]
+        case -9 => weakTypeOf[Integer._neg9]
+        case _ => {
+          abort(s"No type mapping defined for integer $i")
+          weakTypeOf[Integer._0]
+        }
+      }
+    }
+
+    def mapToType(map: Map[Type, Int]): Type = {
+      if (map.isEmpty) typeOf[Unitless] else {
+        val mlist = map.toList
+        val (u0, e0) = mlist.head
+        val et0 = intType(e0)
+        val t0 = appliedType(powType, List(u0, et0))
+        mlist.tail.foldLeft(t0) { case (tc, (u, e)) =>
+          val et = intType(e)
+          val t = appliedType(powType, List(u, et))
+          appliedType(mulType, List(tc, t))
+        }
+      }
+    }
+
+    def unitExprMul[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+      val tpeU1 = weakTypeOf[U1]
+      val tpeU2 = weakTypeOf[U2]
+
+      val (coef1, map1) = canonical(tpeU1)
+      val (coef2, map2) = canonical(tpeU2)
+
+      val mt = mapToType(mapMul(map1, map2))
+
+      val cq = q"${coef1 * coef2}"
+
+      q"""
+        new _root_.com.manyangled.unit4s.UnitExprMul[$tpeU1, $tpeU2] {
+          type U = $mt
+          def coef = $cq
+        }
       """
     }
   }
