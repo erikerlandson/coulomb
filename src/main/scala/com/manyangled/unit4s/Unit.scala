@@ -79,6 +79,9 @@ class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
   def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
     new Unit[U](this.value + cu.coef * that.value)
 
+  def -[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
+    new Unit[U](this.value - cu.coef * that.value)
+
   def *[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
     new Unit[RU](uer.coef * this.value * that.value)
 
