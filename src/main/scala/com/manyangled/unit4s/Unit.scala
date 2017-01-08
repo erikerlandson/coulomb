@@ -8,106 +8,31 @@ import scala.language.higherKinds
 import com.manyangled.church.{ Integer, IntegerValue }
 import Integer.{ _0, _1 }
 
-sealed class =!=[A,B]
-
-trait NeqLowerPriorityImplicits {
-  implicit def equal[A]: =!=[A, A] = {
-    sys.error("should not be called")
-  }
-}
-object =!= extends NeqLowerPriorityImplicits {
-  implicit def nequal[A,B](implicit same: A =:= B = null): =!=[A,B] = {
-    if (same != null) sys.error("should not be called explicitly with same type")
-    else new =!=[A,B]
-  }
-}
-
 trait UnitExpr
 
-trait FULike extends UnitExpr {
-  type RU <: FULike
-}
+trait FundamentalUnit extends UnitExpr
 
-trait FundamentalUnit[U <: FULike] extends FULike {
-  type RU = U
-}
-
-object FundamentalUnit {
-  def factor[U1 <: FULike, U2 <: FULike](implicit cfu: CompatFU[U1, U2]) = cfu.cf
-}
-
-trait PULike extends UnitExpr {
-  type RU <: PULike
-}
-
-trait PrefixUnit[PU <: PULike] extends PULike {
-  type RU = PU
-}
+trait PrefixUnit extends UnitExpr
 
 trait DerivedUnit[U <: UnitExpr] extends UnitExpr
 
-// compound unit expressions
-sealed trait CULike extends UnitExpr {
-  type RU <: CULike
-}
+sealed trait <*> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
-trait <*> [LUE <: UnitExpr, RUE <: UnitExpr] extends CULike {
-  type RU = <*> [LUE, RUE]
-}
+sealed trait </> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
-trait </> [LUE <: UnitExpr, RUE <: UnitExpr] extends CULike {
-  type RU = </> [LUE, RUE]
-}
+sealed trait <^> [UE <: UnitExpr, P <: Integer] extends UnitExpr
 
-trait <^> [UE <: UnitExpr, P <: Integer] extends CULike {
-  type RU = <^> [UE, P]
-}
-
-trait <-> [PU <: PULike, UE <: UnitExpr] extends CULike {
-  type RU = <-> [PU, UE]
-}
+sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 
 // unitless values (any units have canceled)
 sealed trait Unity extends UnitExpr
 
-
-trait UnitRec[UE <: UnitExpr] {
-  def name: String
-  def coef: Double
-}
+case class UnitRec[UE <: UnitExpr](name: String, coef: Double)
 
 class UCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
-  implicit val furec: UnitRec[U] = new UnitRec[U] {
-    def name = uname
-    def coef = ucoef
-  }
-}
+  def this(n: String) = this(n, 1.0)
 
-@implicitNotFound("Implicit not found: CompatFU[${U1}, ${U2}].\nIncompatible Fundamental Units: ${U1} and ${U2}")
-case class CompatFU[U1 <: FULike, U2 <: FULike](
-  // conversion factor from U1 to U2
-  cf: Double
-)
-
-object CompatFU {
-  implicit def witnessCompatFU[U1 <: FULike, U2 <: FULike](implicit
-      urec1: UnitRec[U1],
-      urec2: UnitRec[U2],
-      eq: U1#RU =:= U2#RU): CompatFU[U1, U2] =
-    CompatFU[U1, U2](urec1.coef / urec2.coef)
-}
-
-case class Unit[U <: UnitExpr](value: Double) {
-  def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] = {
-    println(s"cu= $cu")
-    Unit[U](this.value + cu.coef * that.value)
-  }
-}
-
-object Unit {
-  implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
-    def withUnit[U <: UnitExpr]: Unit[U] = Unit[U](num.toDouble(v))
-  }
+  implicit val furec: UnitRec[U] = UnitRec[U](uname, ucoef)
 }
 
 @implicitNotFound("Implicit not found: CompatUnits[${U1}, ${U2}].\nIncompatible Unit Expressions: ${U1} and ${U2}")
@@ -120,57 +45,26 @@ object CompatUnits {
     CompatUnits[U1, U2] = macro infra.UnitMacros.compatUnits[U1, U2]
 }
 
+case class Unit[U <: UnitExpr](value: Double) {
+  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Unit[U2] = Unit[U2](this.value * cu.coef)
 
-package fundamental {
-  trait Meter extends FundamentalUnit[Meter]
-  object Meter extends UCompanion[Meter]("meter", 1.0)
-
-  trait Foot extends FundamentalUnit[Meter]
-  object Foot extends UCompanion[Foot]("foot", 0.3048)
-
-  trait Yard extends FundamentalUnit[Meter]
-  object Yard extends UCompanion[Yard]("yard", 0.9144)
-
-  trait Second extends FundamentalUnit[Second]
-  object Second extends UCompanion[Second]("second", 1.0)
-
-  trait Minute extends FundamentalUnit[Second]
-  object Minute extends UCompanion[Minute]("minute", 60.0)
-
-  trait Kilogram extends FundamentalUnit[Kilogram]
-  object Kilogram extends UCompanion[Kilogram]("kilogram", 1.0)
-
-  trait Pound extends FundamentalUnit[Kilogram]
-  object Pound extends UCompanion[Pound]("pound", 0.453592)
+  def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] = {
+    Unit[U](this.value + cu.coef * that.value)
+  }
 }
 
-package derived {
-  import Integer._
-  import fundamental._
-
-  trait Liter extends DerivedUnit[Meter <^> _3]
-  object Liter extends UCompanion[Liter]("liter", 0.001)
-
-  trait EarthGravity extends DerivedUnit[Meter </> (Second <^> _2)]
-  object EarthGravity extends UCompanion[EarthGravity]("g", 9.807)
-}
-
-package prefix {
-  trait Milli extends PrefixUnit[Milli]
-  object Milli extends UCompanion[Milli]("milli", 1e-3)
-
-  trait Kilo extends PrefixUnit[Kilo]
-  object Kilo extends UCompanion[Kilo]("kilo", 1e+3)
+object Unit {
+  implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
+    def withUnit[U <: UnitExpr]: Unit[U] = Unit[U](num.toDouble(v))
+  }
 }
 
 object infra {
   import scala.language.experimental.macros
   import scala.reflect.macros.whitebox
 
-  trait DummyU extends FundamentalUnit[DummyU]
-  object DummyU extends UCompanion[DummyU]("dummy", 1.0)
-  trait DummyP extends PrefixUnit[DummyP]
-  object DummyP extends UCompanion[DummyP]("dummy", 1.0)
+  trait DummyU extends FundamentalUnit
+  trait DummyP extends PrefixUnit
 
   class UnitMacros(val c: whitebox.Context) {
     import scala.reflect.runtime.currentMirror 
@@ -193,9 +87,15 @@ object infra {
 
     val ivalType = typeOf[IntegerValue[Integer._0]].typeConstructor
     val urecType = typeOf[UnitRec[DummyU]].typeConstructor
-    val fuType = typeOf[FundamentalUnit[DummyU]].typeConstructor
+
+    val fuType = typeOf[FundamentalUnit]
+    val puType = typeOf[PrefixUnit]
     val duType = typeOf[DerivedUnit[DummyU]].typeConstructor
-    val puType = typeOf[PrefixUnit[DummyP]].typeConstructor
+
+    val mulType = typeOf[<*>[DummyU, DummyU]].typeConstructor
+    val divType = typeOf[</>[DummyU, DummyU]].typeConstructor
+    val powType = typeOf[<^>[DummyU, Integer._0]].typeConstructor
+    val preType = typeOf[<->[DummyP, DummyU]].typeConstructor
 
     def intVal(intT: Type): Int = {
       val ivt = appliedType(ivalType, List(intT))
@@ -209,10 +109,11 @@ object infra {
       evalTree[Double](q"${ur}.coef")
     }
 
-    val mulType = typeOf[<*>[DummyU, DummyU]].typeConstructor
-    val divType = typeOf[</>[DummyU, DummyU]].typeConstructor
-    val powType = typeOf[<^>[DummyU, Integer._0]].typeConstructor
-    val preType = typeOf[<->[DummyP, DummyU]].typeConstructor
+    def nameVal(unitT: Type): String = {
+      val urt = appliedType(urecType, List(unitT))
+      val ur = c.inferImplicitValue(urt, silent = false)
+      evalTree[String](q"${ur}.name")
+    }
 
     object MulOp {
       def unapply(tpe: Type): Option[(Type, Type)] = {
@@ -245,16 +146,14 @@ object infra {
       def unapply(tpe: Type): Option[(Double, Type)] = {
         if (tpe.typeConstructor =:= preType) {
           val (pre :: uexp :: Nil) = tpe.typeArgs
-          Option(coefVal(pre), uexp)
+          val pu = superClass(pre, puType)
+          if (pu.isEmpty) None else Option(coefVal(pre), uexp)
         } else None
       }
     }
 
     object FUnit {
-      def unapply(tpe: Type): Option[(Double, Type)] = {
-        val fu = superClass(tpe, fuType)
-        if (fu.isEmpty) None else Option(coefVal(tpe), fu.get.typeArgs(0))
-      }
+      def unapply(tpe: Type): Boolean = !superClass(tpe, fuType).isEmpty
     }
 
     object DUnit {
@@ -265,19 +164,15 @@ object infra {
     }
 
     def canonical(typeU: Type): (Double, Map[Type, Int]) = {
-      println(s"canonical: ${typeName(typeU)}")
-      typeU match {
-        case FUnit(coef, refU) => {
-          println(s"FUNDAMENTAL: coef= $coef  refU= ${typeName(refU)}")
-          (coef, Map(refU -> 1))
+      typeU.dealias match {
+        case FUnit() => {
+          (1.0, Map(typeU -> 1))
         }
         case DUnit(coef, dsub) => {
-          println(s"DERIVED: coef= $coef  dsub= ${typeName(dsub)}")
           val (dcoef, dmap) = canonical(dsub)
           (coef * dcoef, dmap)
         }
         case MulOp(lsub, rsub) => {
-          println(s"MUL: ${typeName(lsub)} ${typeName(rsub)}")
           val (lcoef, lmap) = canonical(lsub)
           val (rcoef, rmap) = canonical(rsub)
           val mmap = rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
@@ -291,7 +186,6 @@ object infra {
           (lcoef * rcoef, mmap)
         }
         case DivOp(lsub, rsub) => {
-          println(s"MUL: ${typeName(lsub)} ${typeName(rsub)}")
           val (lcoef, lmap) = canonical(lsub)
           val (rcoef, rmap) = canonical(rsub)
           val dmap = rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
@@ -305,7 +199,6 @@ object infra {
           (lcoef / rcoef, dmap)
         }
         case PowOp(bsub, exp) => {
-          println(s"POW: ${typeName(bsub)} $exp")
           val (bcoef, bmap) = canonical(bsub)
           if (exp == 0)
             (1.0, Map.empty[Type, Int])
@@ -313,7 +206,6 @@ object infra {
             (math.pow(bcoef, exp), bmap.mapValues(_ * exp))
         }
         case PreOp(coef, sub) => {
-          println(s"PRE: $coef ${typeName(sub)}")
           val (scoef, smap) = canonical(sub)
           (coef * scoef, smap)
         }
@@ -326,19 +218,18 @@ object infra {
     }
 
     def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-      val tpeU1 = weakTypeOf[U1].dealias
-      val tpeU2 = weakTypeOf[U2].dealias
+      val tpeU1 = weakTypeOf[U1]
+      val tpeU2 = weakTypeOf[U2]
 
       val (coef1, map1) = canonical(tpeU1)
       val (coef2, map2) = canonical(tpeU2)
 
-      println(s"coef1= $coef1  map1=\n$map1")
-      println(s"coef2= $coef2  map2=\n$map2")
-
+      // units are compatible if their canonical representations are equal
       val compat = (map1 == map2)
 
-      if (!compat) q"" // implicit resolution will fail
+      if (!compat) q"" // fail implicit resolution if they aren't compatible
       else {
+        // if they are compatible, then create the corresponding witness
         val cq = q"${coef1 / coef2}"
         q"""
           _root_.com.manyangled.unit4s.CompatUnits[$tpeU1, $tpeU2]($cq)
@@ -348,15 +239,49 @@ object infra {
   }
 }
 
+package fundamental {
+  trait Meter extends FundamentalUnit
+  object Meter extends UCompanion[Meter]("meter")
 
+  trait Second extends FundamentalUnit
+  object Second extends UCompanion[Second]("second")
+
+  trait Kilogram extends FundamentalUnit
+  object Kilogram extends UCompanion[Kilogram]("kilogram")
+}
+
+package derived {
+  import Integer._
+  import fundamental._
+
+  trait Foot extends DerivedUnit[Meter]
+  object Foot extends UCompanion[Foot]("foot", 0.3048)
+
+  trait Yard extends DerivedUnit[Meter]
+  object Yard extends UCompanion[Yard]("yard", 0.9144)
+
+  trait Minute extends DerivedUnit[Second]
+  object Minute extends UCompanion[Minute]("minute", 60.0)
+
+  trait Pound extends DerivedUnit[Kilogram]
+  object Pound extends UCompanion[Pound]("pound", 0.453592)
+
+  trait Liter extends DerivedUnit[Meter <^> _3]
+  object Liter extends UCompanion[Liter]("liter", 0.001)
+
+  trait EarthGravity extends DerivedUnit[Meter </> (Second <^> _2)]
+  object EarthGravity extends UCompanion[EarthGravity]("g", 9.807)
+}
+
+package prefix {
+  trait Milli extends PrefixUnit
+  object Milli extends UCompanion[Milli]("milli", 1e-3)
+
+  trait Kilo extends PrefixUnit
+  object Kilo extends UCompanion[Kilo]("kilo", 1e+3)
+}
 
 object test {
   import shapeless._
   import prefix._
-
-/*
-  def f1(uv: UnitValue1[Foot, Integer._1]) = uv.value
-  def f2(uv: UnitValue2[Foot, Integer._1, Second, Integer._neg1]) = uv.value
-*/
-
 }
