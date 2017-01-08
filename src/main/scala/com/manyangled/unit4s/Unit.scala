@@ -76,6 +76,8 @@ class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
   def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Unit[U2] =
     new Unit[U2](this.value * cu.coef)
 
+  def unary_- : Unit[U] = new Unit[U](-this.value)
+
   def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
     new Unit[U](this.value + cu.coef * that.value)
 
