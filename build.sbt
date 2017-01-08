@@ -9,6 +9,8 @@ lazy val commonSettings = Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies ++= Seq(
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "org.scalatest" %% "scalatest" % "2.2.4" % Test,
     "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
     "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3"
@@ -19,7 +21,7 @@ lazy val commonSettings = Seq(
   fork := true
 )
 
-seq(commonSettings: _*)
+commonSettings
 
 libraryDependencies ++= Seq(
   "com.chuusai" %% "shapeless" % "2.3.2"
