@@ -85,6 +85,9 @@ class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
   def /[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
     new Unit[RU](uer.coef * this.value / that.value)
 
+  def pow[E <: Integer](implicit exp: IntegerValue[E], uesRU: UnitExprString[U <^> E]) =
+    new Unit[U <^> E](math.pow(this.value, exp.value))
+
   override def toString = s"$value ${uesU.str}"
 }
 
@@ -317,9 +320,11 @@ object infra {
           s"$ls / $rs"
         }
         case PowOp(bsub, exp) => {
-          val bstr = ueString(bsub)
-          val bs = if (ueAtomicString(bsub)) bstr else s"($bstr)"
-          s"$bs ^ $exp"
+          if (exp == 0) "unitless" else {
+            val bstr = ueString(bsub)
+            val bs = if (ueAtomicString(bsub)) bstr else s"($bstr)"
+            s"$bs ^ $exp"
+          }
         }
         case PreOp(name, _, sub) => {
           val str = ueString(sub)
