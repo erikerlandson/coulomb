@@ -125,18 +125,6 @@ object infra {
       evalTree[Int](q"${ival}.value")
     }
     
-    def coefVal(unitT: Type): Double = {
-      val urt = appliedType(urecType, List(unitT))
-      val ur = c.inferImplicitValue(urt, silent = false)
-      evalTree[Double](q"${ur}.coef")
-    }
-
-    def nameVal(unitT: Type): String = {
-      val urt = appliedType(urecType, List(unitT))
-      val ur = c.inferImplicitValue(urt, silent = false)
-      evalTree[String](q"${ur}.name")
-    }
-
     def urecVal(unitT: Type): (String, Double) = {
       val urt = appliedType(urecType, List(unitT))
       val ur = c.inferImplicitValue(urt, silent = false)
