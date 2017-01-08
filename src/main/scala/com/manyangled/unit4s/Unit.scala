@@ -57,6 +57,16 @@ trait UnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr] {
   def coef: Double
 }
 
+object UnitExprDiv {
+  implicit def witnessUnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprDiv[U1, U2] =
+    macro infra.UnitMacros.unitExprDiv[U1, U2]
+}
+
+trait UnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr] {
+  type U <: UnitExpr
+  def coef: Double
+}
+
 object UnitExprMul {
   implicit def witnessUnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprMul[U1, U2] =
     macro infra.UnitMacros.unitExprMul[U1, U2]
@@ -69,8 +79,11 @@ class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
   def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
     new Unit[U](this.value + cu.coef * that.value)
 
-  def *[U2 <: UnitExpr, MU <: UnitExpr](that: Unit[U2])(implicit uem: UnitExprMul[U, U2] { type U = MU }, uesMU: UnitExprString[MU]) =
-    new Unit[MU](this.value * that.value * uem.coef)
+  def *[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
+    new Unit[RU](uer.coef * this.value * that.value)
+
+  def /[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
+    new Unit[RU](uer.coef * this.value / that.value)
 
   override def toString = s"$value ${uesU.str}"
 }
@@ -385,6 +398,25 @@ object infra {
 
       q"""
         new _root_.com.manyangled.unit4s.UnitExprMul[$tpeU1, $tpeU2] {
+          type U = $mt
+          def coef = $cq
+        }
+      """
+    }
+
+    def unitExprDiv[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+      val tpeU1 = weakTypeOf[U1]
+      val tpeU2 = weakTypeOf[U2]
+
+      val (coef1, map1) = canonical(tpeU1)
+      val (coef2, map2) = canonical(tpeU2)
+
+      val mt = mapToType(mapDiv(map1, map2))
+
+      val cq = q"${coef1 / coef2}"
+
+      q"""
+        new _root_.com.manyangled.unit4s.UnitExprDiv[$tpeU1, $tpeU2] {
           type U = $mt
           def coef = $cq
         }
