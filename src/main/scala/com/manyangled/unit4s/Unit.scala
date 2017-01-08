@@ -41,21 +41,30 @@ case class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](
 )
 
 object CompatUnits {
-  implicit def witnessCompatUnits[U1 <: UnitExpr, U2 <: UnitExpr]:
-    CompatUnits[U1, U2] = macro infra.UnitMacros.compatUnits[U1, U2]
+  implicit def witnessCompatUnits[U1 <: UnitExpr, U2 <: UnitExpr]: CompatUnits[U1, U2] =
+    macro infra.UnitMacros.compatUnits[U1, U2]
 }
 
-case class Unit[U <: UnitExpr](value: Double) {
-  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Unit[U2] = Unit[U2](this.value * cu.coef)
+case class UnitExprString[U <: UnitExpr](str: String)
 
-  def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] = {
-    Unit[U](this.value + cu.coef * that.value)
-  }
+object UnitExprString {
+  implicit def witnessUnitExprString[U <: UnitExpr]: UnitExprString[U] =
+    macro infra.UnitMacros.unitExprString[U]
+}
+
+class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
+  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Unit[U2] =
+    new Unit[U2](this.value * cu.coef)
+
+  def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
+    new Unit[U](this.value + cu.coef * that.value)
+
+  override def toString = s"$value ${uesU.str}"
 }
 
 object Unit {
   implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
-    def withUnit[U <: UnitExpr]: Unit[U] = Unit[U](num.toDouble(v))
+    def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Unit[U] = new Unit[U](num.toDouble(v))
   }
 }
 
@@ -115,6 +124,12 @@ object infra {
       evalTree[String](q"${ur}.name")
     }
 
+    def urecVal(unitT: Type): (String, Double) = {
+      val urt = appliedType(urecType, List(unitT))
+      val ur = c.inferImplicitValue(urt, silent = false)
+      evalTree[(String, Double)](q"(${ur}.name, ${ur}.coef)")
+    }
+
     object MulOp {
       def unapply(tpe: Type): Option[(Type, Type)] = {
         if (tpe.typeConstructor =:= mulType) {
@@ -142,33 +157,44 @@ object infra {
       }
     }
 
+    object FUnit {
+      def unapply(tpe: Type): Option[String] = {
+        if (superClass(tpe, fuType).isEmpty) None else {
+          val (name, _) = urecVal(tpe)
+          Option(name)
+        }
+      }
+    }
+
     object PreOp {
-      def unapply(tpe: Type): Option[(Double, Type)] = {
+      def unapply(tpe: Type): Option[(String, Double, Type)] = {
         if (tpe.typeConstructor =:= preType) {
           val (pre :: uexp :: Nil) = tpe.typeArgs
           val pu = superClass(pre, puType)
-          if (pu.isEmpty) None else Option(coefVal(pre), uexp)
+          if (pu.isEmpty) None else {
+            val (name, coef) = urecVal(pre)
+            Option(name, coef, uexp)
+          }
         } else None
       }
     }
 
-    object FUnit {
-      def unapply(tpe: Type): Boolean = !superClass(tpe, fuType).isEmpty
-    }
-
     object DUnit {
-      def unapply(tpe: Type): Option[(Double, Type)] = {
+      def unapply(tpe: Type): Option[(String, Double, Type)] = {
         val du = superClass(tpe, duType)
-        if (du.isEmpty) None else Option(coefVal(tpe), du.get.typeArgs(0))
+        if (du.isEmpty) None else {
+          val (name, coef) = urecVal(tpe)
+          Option(name, coef, du.get.typeArgs(0))
+        }
       }
     }
 
     def canonical(typeU: Type): (Double, Map[Type, Int]) = {
       typeU.dealias match {
-        case FUnit() => {
+        case FUnit(_) => {
           (1.0, Map(typeU -> 1))
         }
-        case DUnit(coef, dsub) => {
+        case DUnit(_, coef, dsub) => {
           val (dcoef, dmap) = canonical(dsub)
           (coef * dcoef, dmap)
         }
@@ -205,7 +231,7 @@ object infra {
           else
             (math.pow(bcoef, exp), bmap.mapValues(_ * exp))
         }
-        case PreOp(coef, sub) => {
+        case PreOp(_, coef, sub) => {
           val (scoef, smap) = canonical(sub)
           (coef * scoef, smap)
         }
@@ -235,6 +261,59 @@ object infra {
           _root_.com.manyangled.unit4s.CompatUnits[$tpeU1, $tpeU2]($cq)
         """
       }
+    }
+
+    def ueAtomicString(typeU: Type): Boolean = {
+      typeU.dealias match {
+        case FUnit(_) => true
+        case DUnit(_, _, _) => true
+        case _ => false
+      }
+    }
+
+    def ueString(typeU: Type): String = {
+      typeU.dealias match {
+        case FUnit(name) => name
+        case DUnit(name, _, _) => name
+        case MulOp(lsub, rsub) => {
+          val lstr = ueString(lsub)
+          val rstr = ueString(rsub)
+          val ls = if (ueAtomicString(lsub)) lstr else s"($lstr)"
+          val rs = if (ueAtomicString(rsub)) rstr else s"($rstr)"
+          s"$ls * $rs"
+        }
+        case DivOp(lsub, rsub) => {
+          val lstr = ueString(lsub)
+          val rstr = ueString(rsub)
+          val ls = if (ueAtomicString(lsub)) lstr else s"($lstr)"
+          val rs = if (ueAtomicString(rsub)) rstr else s"($rstr)"
+          s"$ls / $rs"
+        }
+        case PowOp(bsub, exp) => {
+          val bstr = ueString(bsub)
+          val bs = if (ueAtomicString(bsub)) bstr else s"($bstr)"
+          s"$bs ^ $exp"
+        }
+        case PreOp(name, _, sub) => {
+          val str = ueString(sub)
+          val s = if (ueAtomicString(sub)) str else s"($str)"
+          s"${name}-$s"
+        }        
+        case _ => {
+          // This should never execute
+          abort(s"Undefined Unit Type: ${typeName(typeU)}")
+          ""
+        }
+      }
+    }
+
+    def unitExprString[U: WeakTypeTag]: Tree = {
+      val tpeU = weakTypeOf[U]
+      val str = ueString(tpeU)
+      val sq = q"$str"
+      q"""
+        _root_.com.manyangled.unit4s.UnitExprString[$tpeU]($sq)
+      """
     }
   }
 }
