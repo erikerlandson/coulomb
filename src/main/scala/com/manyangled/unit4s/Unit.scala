@@ -35,10 +35,16 @@ class UCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
   implicit val furec: UnitRec[U] = UnitRec[U](uname, ucoef)
 }
 
+case class TempUnitRec[UE <: UnitExpr](offset: Double)
+
+class TempUnitCompanion[U <: UnitExpr](uname: String, ucoef: Double, uoffset: Double) extends UCompanion[U](uname, ucoef) {
+  implicit val turec: TempUnitRec[U] = TempUnitRec[U](uoffset)
+}
+
 @implicitNotFound("Implicit not found: CompatUnits[${U1}, ${U2}].\nIncompatible Unit Expressions: ${U1} and ${U2}")
-case class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](
-  coef: Double // conversion factor from U1 to U2
-)
+class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
+  def convert(u: Unit[U1])(implicit uesU2: UnitExprString[U2]): Unit[U2] = new Unit[U2](coef * u.value)
+}
 
 object CompatUnits {
   implicit def witnessCompatUnits[U1 <: UnitExpr, U2 <: UnitExpr]: CompatUnits[U1, U2] =
@@ -74,7 +80,7 @@ object UnitExprMul {
 
 class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
   def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Unit[U2] =
-    new Unit[U2](this.value * cu.coef)
+    cu.convert(this)
 
   def unary_- : Unit[U] = new Unit[U](-this.value)
 
@@ -130,6 +136,7 @@ object infra {
 
     val ivalType = typeOf[IntegerValue[Integer._0]].typeConstructor
     val urecType = typeOf[UnitRec[DummyU]].typeConstructor
+    val turecType = typeOf[TempUnitRec[DummyU]].typeConstructor
 
     val fuType = typeOf[FundamentalUnit]
     val puType = typeOf[PrefixUnit]
@@ -150,6 +157,12 @@ object infra {
       val urt = appliedType(urecType, List(unitT))
       val ur = c.inferImplicitValue(urt, silent = false)
       evalTree[(String, Double)](q"(${ur}.name, ${ur}.coef)")
+    }
+
+    def turecVal(unitT: Type): Double = {
+      val urt = appliedType(turecType, List(unitT))
+      val ur = c.inferImplicitValue(urt, silent = false)
+      evalTree[Double](q"${ur}.offset")
     }
 
     object MulOp {
@@ -277,9 +290,13 @@ object infra {
       }
     }
 
+    def directTempCompat(map1: Map[Type, Int], map2: Map[Type, Int]): Boolean = {
+      map1 == Map(typeOf[fundamental.Kelvin] -> 1) && map2 == Map(typeOf[fundamental.Kelvin] -> 1)
+    }
+
     def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-      val tpeU1 = weakTypeOf[U1]
-      val tpeU2 = weakTypeOf[U2]
+      val tpeU1 = weakTypeOf[U1].dealias
+      val tpeU2 = weakTypeOf[U2].dealias
 
       val (coef1, map1) = canonical(tpeU1)
       val (coef2, map2) = canonical(tpeU2)
@@ -291,9 +308,27 @@ object infra {
       else {
         // if they are compatible, then create the corresponding witness
         val cq = q"${coef1 / coef2}"
-        q"""
-          _root_.com.manyangled.unit4s.CompatUnits[$tpeU1, $tpeU2]($cq)
-        """
+        if (directTempCompat(map1, map2)) {
+          // todo: add handling of rudimentary type simplifications to identify
+          // nontrivial cases of direct temperature unit exprs?
+          val (_, coef1) = urecVal(tpeU1)
+          val (_, coef2) = urecVal(tpeU2)
+          val (coef1q, coef2q) = (q"$coef1", q"$coef2")
+          val (off1q, off2q) = (q"${turecVal(tpeU1)}", q"${turecVal(tpeU2)}")
+          q"""
+            new _root_.com.manyangled.unit4s.CompatUnits[$tpeU1, $tpeU2]($cq) {
+              override def convert(u: _root_.com.manyangled.unit4s.Unit[$tpeU1])(implicit uesU2: _root_.com.manyangled.unit4s.UnitExprString[$tpeU2]): _root_.com.manyangled.unit4s.Unit[$tpeU2] = {
+                val k = (u.value + $off1q) * $coef1q
+                val r = (k / $coef2q) - $off2q
+                new _root_.com.manyangled.unit4s.Unit[$tpeU2](r)
+              }
+            }
+          """
+        } else {
+          q"""
+            new _root_.com.manyangled.unit4s.CompatUnits[$tpeU1, $tpeU2]($cq)
+          """
+        }
       }
     }
 
@@ -444,6 +479,9 @@ package fundamental {
 
   trait Kilogram extends FundamentalUnit
   object Kilogram extends UCompanion[Kilogram]("kilogram")
+
+  trait Kelvin extends FundamentalUnit
+  object Kelvin extends TempUnitCompanion[Kelvin]("kelvin", 1.0, 0.0)
 }
 
 package derived {
@@ -467,6 +505,12 @@ package derived {
 
   trait EarthGravity extends DerivedUnit[Meter </> (Second <^> _2)]
   object EarthGravity extends UCompanion[EarthGravity]("g", 9.807)
+
+  trait Celsius extends DerivedUnit[Kelvin]
+  object Celsius extends TempUnitCompanion[Celsius]("celsius", 1.0, 273.15)
+
+  trait Fahrenheit extends DerivedUnit[Kelvin]
+  object Fahrenheit extends TempUnitCompanion[Fahrenheit]("fahrenheit", 5.0 / 9.0, 459.67)
 }
 
 package prefix {
