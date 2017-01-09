@@ -2,8 +2,6 @@ package com.manyangled.church
 
 import scala.language.higherKinds
 
-import church$detail._
-
 sealed trait Integer {
   type Inc <: Integer
   type Dec <: Integer
@@ -11,25 +9,16 @@ sealed trait Integer {
   type Sub[K <: Integer] <: Integer
   type Mul[K <: Integer] <: Integer
   type Neg <: Integer
-
-  private[church] def value: Int
 }
 
+case class IntegerValue[N <: Integer](value: Int)
+
+trait NonZero
+
 object Integer {
-  trait Constructable[+T] {
-    def construct(): T
-  }
+  import infra._
 
-  object Constructable {
-    def apply[T](blk: => T): Constructable[T] = new Constructable[T] {
-      def construct(): T = blk
-    }
-  }
-
-  private[church] def construct[N <: Integer :Constructable] =
-    implicitly[Constructable[N]].construct()
-
-  def value[N <: Integer :Constructable] = construct[N].value
+  def value[N <: Integer](implicit iv: IntegerValue[N]) = iv.value
 
   type _0 = Zero
 
@@ -55,35 +44,47 @@ object Integer {
 
   type _min = _neg9
   type _max = _9
+
+  implicit val integerValue_0 = IntegerValue[_0](0)
+
+  implicit val integerValue_1 = IntegerValue[_1](1)
+  implicit val integerValue_2 = IntegerValue[_2](2)
+  implicit val integerValue_3 = IntegerValue[_3](3)
+  implicit val integerValue_4 = IntegerValue[_4](4)
+  implicit val integerValue_5 = IntegerValue[_5](5)
+  implicit val integerValue_6 = IntegerValue[_6](6)
+  implicit val integerValue_7 = IntegerValue[_7](7)
+  implicit val integerValue_8 = IntegerValue[_8](8)
+  implicit val integerValue_9 = IntegerValue[_9](9)
+
+  implicit val integerValue_neg1 = IntegerValue[_neg1](-1)
+  implicit val integerValue_neg2 = IntegerValue[_neg2](-2)
+  implicit val integerValue_neg3 = IntegerValue[_neg3](-3)
+  implicit val integerValue_neg4 = IntegerValue[_neg4](-4)
+  implicit val integerValue_neg5 = IntegerValue[_neg5](-5)
+  implicit val integerValue_neg6 = IntegerValue[_neg6](-6)
+  implicit val integerValue_neg7 = IntegerValue[_neg7](-7)
+  implicit val integerValue_neg8 = IntegerValue[_neg8](-8)
+  implicit val integerValue_neg9 = IntegerValue[_neg9](-9)
 }
 
-object church$detail {
-  import Integer._
-
-  class IncInteger[N <: Integer :Constructable] extends Integer {
+object infra {
+  class IncInteger[N <: Integer] extends Integer with NonZero {
     type Inc = IncInteger[IncInteger[N]]
     type Dec = N
     type Add[K <: Integer] = N#Add[K]#Inc
     type Sub[K <: Integer] = N#Sub[K]#Inc
     type Mul[K <: Integer] = K#Add[N#Mul[K]]
     type Neg = N#Neg#Dec
-
-    private[church] def value = {
-      implicitly[Constructable[N]].construct().value + 1
-    }
   }
 
-  class DecInteger[N <: Integer :Constructable] extends Integer {
+  class DecInteger[N <: Integer] extends Integer with NonZero {
     type Inc = N
     type Dec = DecInteger[DecInteger[N]]
     type Add[K <: Integer] = N#Add[K]#Dec
     type Sub[K <: Integer] = N#Sub[K]#Dec
     type Mul[K <: Integer] = Neg#Mul[K]#Neg
     type Neg = N#Neg#Inc
-
-    private[church] def value = {
-      implicitly[Constructable[N]].construct().value - 1
-    }
   }
 
   class Zero extends Integer {
@@ -93,28 +94,5 @@ object church$detail {
     type Sub[K <: Integer] = K#Neg
     type Mul[K <: Integer] = Zero
     type Neg = Zero
-
-    private[church] def value = 0
   }
-
-  implicit val constructable0: Constructable[_0] = Constructable { new _0 }
-  implicit val constructable1: Constructable[_1] = Constructable { new _1 }
-  implicit val constructable2: Constructable[_2] = Constructable { new _2 }
-  implicit val constructable3: Constructable[_3] = Constructable { new _3 }
-  implicit val constructable4: Constructable[_4] = Constructable { new _4 }
-  implicit val constructable5: Constructable[_5] = Constructable { new _5 }
-  implicit val constructable6: Constructable[_6] = Constructable { new _6 }
-  implicit val constructable7: Constructable[_7] = Constructable { new _7 }
-  implicit val constructable8: Constructable[_8] = Constructable { new _8 }
-  implicit val constructable9: Constructable[_9] = Constructable { new _9 }
-
-  implicit val constructable1n: Constructable[_neg1] = Constructable { new _neg1 }
-  implicit val constructable2n: Constructable[_neg2] = Constructable { new _neg2 }
-  implicit val constructable3n: Constructable[_neg3] = Constructable { new _neg3 }
-  implicit val constructable4n: Constructable[_neg4] = Constructable { new _neg4 }
-  implicit val constructable5n: Constructable[_neg5] = Constructable { new _neg5 }
-  implicit val constructable6n: Constructable[_neg6] = Constructable { new _neg6 }
-  implicit val constructable7n: Constructable[_neg7] = Constructable { new _neg7 }
-  implicit val constructable8n: Constructable[_neg8] = Constructable { new _neg8 }
-  implicit val constructable9n: Constructable[_neg9] = Constructable { new _neg9 }
 }

@@ -1,26 +1,38 @@
 name := "unit4s"
 
-organization := "com.manyangled"
-
-version := "0.0.1"
-
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("releases"),
-  Resolver.sonatypeRepo("snapshots")
+lazy val commonSettings = Seq(
+  organization := "com.manyangled",
+  version := "0.0.1",
+  scalaVersion := "2.11.8",
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("releases"),
+    Resolver.sonatypeRepo("snapshots")
+  ),
+  libraryDependencies ++= Seq(
+    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+    "org.scalatest" %% "scalatest" % "2.2.4" % Test,
+    "com.github.scala-incubator.io" %% "scala-io-core" % "0.4.3",
+    "com.github.scala-incubator.io" %% "scala-io-file" % "0.4.3"
+  ),
+  licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
+  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
+  scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"),
+  fork := true
 )
 
-scalaVersion := "2.11.6"
+commonSettings
 
 libraryDependencies ++= Seq(
-  "com.chuusai" %% "shapeless" % "2.1.0"
+  "com.chuusai" %% "shapeless" % "2.3.2"
 )
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % Test
+lazy val unit4s = project in file(".")
 
-licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0"))
-
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
-
-scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt")
-
-fork := true
+lazy val codegen = project
+  .settings(commonSettings :_*)
+  .settings(
+    initialCommands in console := """
+      |import com.manyangled.codegen._
+    """.stripMargin
+  )
