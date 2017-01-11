@@ -1,4 +1,4 @@
-name := "unit4s"
+name := "coulomb"
 
 lazy val commonSettings = Seq(
   organization := "com.manyangled",
@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
   "com.chuusai" %% "shapeless" % "2.3.2"
 )
 
-lazy val unit4s = project in file(".")
+lazy val coulomb = project in file(".")
 
 lazy val codegen = project
   .settings(commonSettings :_*)

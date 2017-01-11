@@ -1,4 +1,4 @@
-package com.manyangled.unit4s
+package com.manyangled.coulomb
 
 import scala.language.experimental.macros
 import scala.language.implicitConversions
@@ -316,17 +316,17 @@ object infra {
           val (coef1q, coef2q) = (q"$coef1", q"$coef2")
           val (off1q, off2q) = (q"${turecVal(tpeU1)}", q"${turecVal(tpeU2)}")
           q"""
-            new _root_.com.manyangled.unit4s.CompatUnits[$tpeU1, $tpeU2]($cq) {
-              override def convert(u: _root_.com.manyangled.unit4s.Unit[$tpeU1])(implicit uesU2: _root_.com.manyangled.unit4s.UnitExprString[$tpeU2]): _root_.com.manyangled.unit4s.Unit[$tpeU2] = {
+            new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq) {
+              override def convert(u: _root_.com.manyangled.coulomb.Unit[$tpeU1])(implicit uesU2: _root_.com.manyangled.coulomb.UnitExprString[$tpeU2]): _root_.com.manyangled.coulomb.Unit[$tpeU2] = {
                 val k = (u.value + $off1q) * $coef1q
                 val r = (k / $coef2q) - $off2q
-                new _root_.com.manyangled.unit4s.Unit[$tpeU2](r)
+                new _root_.com.manyangled.coulomb.Unit[$tpeU2](r)
               }
             }
           """
         } else {
           q"""
-            new _root_.com.manyangled.unit4s.CompatUnits[$tpeU1, $tpeU2]($cq)
+            new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq)
           """
         }
       }
@@ -384,7 +384,7 @@ object infra {
       val str = ueString(tpeU)
       val sq = q"$str"
       q"""
-        _root_.com.manyangled.unit4s.UnitExprString[$tpeU]($sq)
+        _root_.com.manyangled.coulomb.UnitExprString[$tpeU]($sq)
       """
     }
 
@@ -442,7 +442,7 @@ object infra {
       val cq = q"${coef1 * coef2}"
 
       q"""
-        new _root_.com.manyangled.unit4s.UnitExprMul[$tpeU1, $tpeU2] {
+        new _root_.com.manyangled.coulomb.UnitExprMul[$tpeU1, $tpeU2] {
           type U = $mt
           def coef = $cq
         }
@@ -461,7 +461,7 @@ object infra {
       val cq = q"${coef1 / coef2}"
 
       q"""
-        new _root_.com.manyangled.unit4s.UnitExprDiv[$tpeU1, $tpeU2] {
+        new _root_.com.manyangled.coulomb.UnitExprDiv[$tpeU1, $tpeU2] {
           type U = $mt
           def coef = $cq
         }
