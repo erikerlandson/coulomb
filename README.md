@@ -4,6 +4,8 @@ A statically typed unit analysis library for Scala
 #### Why name it `coulomb` ?
 `coulomb` is a library for "static units", and 'coulomb' is the "unit of static" (aka charge).
 
+### examples
+
 ```scala
 scala> import com.manyangled.coulomb._; import com.manyangled.church.Integer._; import fundamental._; import prefix._; import derived._; import Unit._
 import com.manyangled.coulomb._
