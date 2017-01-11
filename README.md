@@ -1,5 +1,8 @@
 ### coulomb
-Experiment with unit library with a type system
+A statically typed unit analysis library for Scala
+
+#### Why name it `coulomb` ?
+`coulomb` is a library for "static units", and 'coulomb' is the "unit of static" (aka charge).
 
 ```scala
 scala> import com.manyangled.coulomb._; import com.manyangled.church.Integer._; import fundamental._; import prefix._; import derived._; import Unit._
