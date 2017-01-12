@@ -4,9 +4,6 @@ import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 import scala.language.implicitConversions
 import scala.annotation.implicitNotFound
-import scala.language.higherKinds
-
-import ChurchInt.{ _0, _1 }
 
 trait UnitExpr
 
