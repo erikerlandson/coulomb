@@ -1,15 +1,17 @@
 ### coulomb
 A statically typed unit analysis library for Scala
 
+`coulomb` is still under construction, but I hope to have a consumable release soon.  Feel free to play with it in the mean time! I'll keep the head of `develop` branch unbroken.
+
 #### Why name it `coulomb` ?
 `coulomb` is a library for "static units", and 'coulomb' is the "unit of static" (aka charge).
 
 ### examples
 
 ```scala
-scala> import com.manyangled.coulomb._; import com.manyangled.coulomb.ChurchInt._; import fundamental._; import prefix._; import derived._; import Unit._
+scala> import com.manyangled.coulomb._; import ChurchInt._; import fundamental._; import prefix._; import derived._; import Unit._
 import com.manyangled.coulomb._
-import com.manyangled.coulomb.ChurchInt._
+import ChurchInt._
 import fundamental._
 import prefix._
 import derived._
