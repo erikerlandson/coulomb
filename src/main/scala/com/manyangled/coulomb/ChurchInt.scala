@@ -22,7 +22,7 @@ object ChurchIntValue {
 object ChurchInt {
   import infra._
 
-  def value[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
+  def churchToInt[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
 
   type _0 = Zero
 

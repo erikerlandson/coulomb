@@ -9,34 +9,43 @@ class ChurchIntSpec extends FlatSpec with Matchers {
   it should "have expected min and max defined constants" in {
     import ChurchInt._
 
-    ChurchInt.value[_min] should be (-9)
-    ChurchInt.value[_max] should be (9)
+    churchToInt[_min] should be (-9)
+    churchToInt[_max] should be (9)
   }
 
-  it should "implement value[N] method on defined subset of integers" in {
+  it should "implement churchToInt[N] method on ChurchInt" in {
     import ChurchInt._
 
-    ChurchInt.value[_0] should be (0)
+    churchToInt[_0] should be (0)
 
-    ChurchInt.value[_1] should be (1)
-    ChurchInt.value[_2] should be (2)
-    ChurchInt.value[_3] should be (3)
-    ChurchInt.value[_4] should be (4)
-    ChurchInt.value[_5] should be (5)
-    ChurchInt.value[_6] should be (6)
-    ChurchInt.value[_7] should be (7)
-    ChurchInt.value[_8] should be (8)
-    ChurchInt.value[_9] should be (9)
+    churchToInt[_1] should be (1)
+    churchToInt[_2] should be (2)
+    churchToInt[_3] should be (3)
+    churchToInt[_4] should be (4)
+    churchToInt[_5] should be (5)
+    churchToInt[_6] should be (6)
+    churchToInt[_7] should be (7)
+    churchToInt[_8] should be (8)
+    churchToInt[_9] should be (9)
 
-    ChurchInt.value[_neg1] should be (-1)
-    ChurchInt.value[_neg2] should be (-2)
-    ChurchInt.value[_neg3] should be (-3)
-    ChurchInt.value[_neg4] should be (-4)
-    ChurchInt.value[_neg5] should be (-5)
-    ChurchInt.value[_neg6] should be (-6)
-    ChurchInt.value[_neg7] should be (-7)
-    ChurchInt.value[_neg8] should be (-8)
-    ChurchInt.value[_neg9] should be (-9)
+    churchToInt[_neg1] should be (-1)
+    churchToInt[_neg2] should be (-2)
+    churchToInt[_neg3] should be (-3)
+    churchToInt[_neg4] should be (-4)
+    churchToInt[_neg5] should be (-5)
+    churchToInt[_neg6] should be (-6)
+    churchToInt[_neg7] should be (-7)
+    churchToInt[_neg8] should be (-8)
+    churchToInt[_neg9] should be (-9)
+  }
+
+  it should "support churchToInt[N] on arbitrarily large N" in {
+    import ChurchInt._
+
+    // Sufficiently large ChurchInt will cause a compiler stack-overflow, which
+    // is not too surprising since they operate via recursion
+    churchToInt[_9#Mul[_9]] should be (81)
+    churchToInt[_9#Mul[_neg9]] should be (-81)
   }
 
   it should "demonstrate strong typing" in {
