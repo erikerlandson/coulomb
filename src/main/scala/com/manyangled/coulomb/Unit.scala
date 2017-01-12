@@ -114,24 +114,8 @@ object infra {
   trait DummyU extends FundamentalUnit
   trait DummyP extends PrefixUnit
 
-  class UnitMacros(val c: whitebox.Context) {
-    import scala.reflect.runtime.currentMirror 
-    import scala.tools.reflect.ToolBox 
-    val toolbox = currentMirror.mkToolBox()
-
+  class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
     import c.universe._
-
-    def abort(msg: String) = c.abort(c.enclosingPosition, msg)
-
-    def typeName(tpe: Type): String = tpe.typeSymbol.fullName
-
-    def evalTree[T](tree: Tree) = c.eval(c.Expr[T](c.untypecheck(tree.duplicate)))
-
-    def superClass(tpe: Type, sup: Type): Option[Type] = {
-      val supSym = sup.typeSymbol
-      val bc = tpe.baseClasses.drop(1)
-      if (bc.count { bSym => bSym == supSym } < 1) None else Some(tpe.baseType(supSym))
-    }
 
     val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
     val urecType = typeOf[UnitRec[DummyU]].typeConstructor
