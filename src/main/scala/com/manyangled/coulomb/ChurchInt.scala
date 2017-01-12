@@ -1,24 +1,22 @@
-package com.manyangled.church
+package com.manyangled.coulomb
 
 import scala.language.higherKinds
 
-sealed trait Integer {
-  type Inc <: Integer
-  type Dec <: Integer
-  type Add[K <: Integer] <: Integer
-  type Sub[K <: Integer] <: Integer
-  type Mul[K <: Integer] <: Integer
-  type Neg <: Integer
+sealed trait ChurchInt {
+  type Inc <: ChurchInt
+  type Dec <: ChurchInt
+  type Add[K <: ChurchInt] <: ChurchInt
+  type Sub[K <: ChurchInt] <: ChurchInt
+  type Mul[K <: ChurchInt] <: ChurchInt
+  type Neg <: ChurchInt
 }
 
-case class IntegerValue[N <: Integer](value: Int)
+case class ChurchIntValue[N <: ChurchInt](value: Int)
 
-trait NonZero
-
-object Integer {
+object ChurchInt {
   import infra._
 
-  def value[N <: Integer](implicit iv: IntegerValue[N]) = iv.value
+  def value[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
 
   type _0 = Zero
 
@@ -45,54 +43,55 @@ object Integer {
   type _min = _neg9
   type _max = _9
 
-  implicit val integerValue_0 = IntegerValue[_0](0)
+  implicit val integerValue_0 = ChurchIntValue[_0](0)
 
-  implicit val integerValue_1 = IntegerValue[_1](1)
-  implicit val integerValue_2 = IntegerValue[_2](2)
-  implicit val integerValue_3 = IntegerValue[_3](3)
-  implicit val integerValue_4 = IntegerValue[_4](4)
-  implicit val integerValue_5 = IntegerValue[_5](5)
-  implicit val integerValue_6 = IntegerValue[_6](6)
-  implicit val integerValue_7 = IntegerValue[_7](7)
-  implicit val integerValue_8 = IntegerValue[_8](8)
-  implicit val integerValue_9 = IntegerValue[_9](9)
+  implicit val integerValue_1 = ChurchIntValue[_1](1)
+  implicit val integerValue_2 = ChurchIntValue[_2](2)
+  implicit val integerValue_3 = ChurchIntValue[_3](3)
+  implicit val integerValue_4 = ChurchIntValue[_4](4)
+  implicit val integerValue_5 = ChurchIntValue[_5](5)
+  implicit val integerValue_6 = ChurchIntValue[_6](6)
+  implicit val integerValue_7 = ChurchIntValue[_7](7)
+  implicit val integerValue_8 = ChurchIntValue[_8](8)
+  implicit val integerValue_9 = ChurchIntValue[_9](9)
 
-  implicit val integerValue_neg1 = IntegerValue[_neg1](-1)
-  implicit val integerValue_neg2 = IntegerValue[_neg2](-2)
-  implicit val integerValue_neg3 = IntegerValue[_neg3](-3)
-  implicit val integerValue_neg4 = IntegerValue[_neg4](-4)
-  implicit val integerValue_neg5 = IntegerValue[_neg5](-5)
-  implicit val integerValue_neg6 = IntegerValue[_neg6](-6)
-  implicit val integerValue_neg7 = IntegerValue[_neg7](-7)
-  implicit val integerValue_neg8 = IntegerValue[_neg8](-8)
-  implicit val integerValue_neg9 = IntegerValue[_neg9](-9)
+  implicit val integerValue_neg1 = ChurchIntValue[_neg1](-1)
+  implicit val integerValue_neg2 = ChurchIntValue[_neg2](-2)
+  implicit val integerValue_neg3 = ChurchIntValue[_neg3](-3)
+  implicit val integerValue_neg4 = ChurchIntValue[_neg4](-4)
+  implicit val integerValue_neg5 = ChurchIntValue[_neg5](-5)
+  implicit val integerValue_neg6 = ChurchIntValue[_neg6](-6)
+  implicit val integerValue_neg7 = ChurchIntValue[_neg7](-7)
+  implicit val integerValue_neg8 = ChurchIntValue[_neg8](-8)
+  implicit val integerValue_neg9 = ChurchIntValue[_neg9](-9)
+
+  object infra {
+    class IncChurchInt[N <: ChurchInt] extends ChurchInt {
+      type Inc = IncChurchInt[IncChurchInt[N]]
+      type Dec = N
+      type Add[K <: ChurchInt] = N#Add[K]#Inc
+      type Sub[K <: ChurchInt] = N#Sub[K]#Inc
+      type Mul[K <: ChurchInt] = K#Add[N#Mul[K]]
+      type Neg = N#Neg#Dec
+    }
+
+    class DecChurchInt[N <: ChurchInt] extends ChurchInt {
+      type Inc = N
+      type Dec = DecChurchInt[DecChurchInt[N]]
+      type Add[K <: ChurchInt] = N#Add[K]#Dec
+      type Sub[K <: ChurchInt] = N#Sub[K]#Dec
+      type Mul[K <: ChurchInt] = Neg#Mul[K]#Neg
+      type Neg = N#Neg#Inc
+    }
+
+    class Zero extends ChurchInt {
+      type Inc = IncChurchInt[Zero]
+      type Dec = DecChurchInt[Zero]
+      type Add[K <: ChurchInt] = K
+      type Sub[K <: ChurchInt] = K#Neg
+      type Mul[K <: ChurchInt] = Zero
+      type Neg = Zero
+    }
+  }
 }
 
-object infra {
-  class IncInteger[N <: Integer] extends Integer with NonZero {
-    type Inc = IncInteger[IncInteger[N]]
-    type Dec = N
-    type Add[K <: Integer] = N#Add[K]#Inc
-    type Sub[K <: Integer] = N#Sub[K]#Inc
-    type Mul[K <: Integer] = K#Add[N#Mul[K]]
-    type Neg = N#Neg#Dec
-  }
-
-  class DecInteger[N <: Integer] extends Integer with NonZero {
-    type Inc = N
-    type Dec = DecInteger[DecInteger[N]]
-    type Add[K <: Integer] = N#Add[K]#Dec
-    type Sub[K <: Integer] = N#Sub[K]#Dec
-    type Mul[K <: Integer] = Neg#Mul[K]#Neg
-    type Neg = N#Neg#Inc
-  }
-
-  class Zero extends Integer {
-    type Inc = IncInteger[Zero]
-    type Dec = DecInteger[Zero]
-    type Add[K <: Integer] = K
-    type Sub[K <: Integer] = K#Neg
-    type Mul[K <: Integer] = Zero
-    type Neg = Zero
-  }
-}

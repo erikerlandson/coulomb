@@ -5,8 +5,7 @@ import scala.language.implicitConversions
 import scala.annotation.implicitNotFound
 import scala.language.higherKinds
 
-import com.manyangled.church.{ Integer, IntegerValue }
-import Integer.{ _0, _1 }
+import ChurchInt.{ _0, _1 }
 
 trait UnitExpr
 
@@ -20,7 +19,7 @@ sealed trait <*> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
 sealed trait </> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
-sealed trait <^> [UE <: UnitExpr, P <: Integer] extends UnitExpr
+sealed trait <^> [UE <: UnitExpr, P <: ChurchInt] extends UnitExpr
 
 sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 
@@ -96,7 +95,7 @@ class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
   def /[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
     new Unit[RU](uer.coef * this.value / that.value)
 
-  def pow[E <: Integer](implicit exp: IntegerValue[E], uesRU: UnitExprString[U <^> E]) =
+  def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E], uesRU: UnitExprString[U <^> E]) =
     new Unit[U <^> E](math.pow(this.value, exp.value))
 
   override def toString = s"$value ${uesU.str}"
@@ -134,7 +133,7 @@ object infra {
       if (bc.count { bSym => bSym == supSym } < 1) None else Some(tpe.baseType(supSym))
     }
 
-    val ivalType = typeOf[IntegerValue[Integer._0]].typeConstructor
+    val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
     val urecType = typeOf[UnitRec[DummyU]].typeConstructor
     val turecType = typeOf[TempUnitRec[DummyU]].typeConstructor
 
@@ -144,7 +143,7 @@ object infra {
 
     val mulType = typeOf[<*>[DummyU, DummyU]].typeConstructor
     val divType = typeOf[</>[DummyU, DummyU]].typeConstructor
-    val powType = typeOf[<^>[DummyU, Integer._0]].typeConstructor
+    val powType = typeOf[<^>[DummyU, ChurchInt._0]].typeConstructor
     val preType = typeOf[<->[DummyP, DummyU]].typeConstructor
 
     def intVal(intT: Type): Int = {
@@ -390,28 +389,28 @@ object infra {
 
     def intType(i: Int): Type = {
       i match {
-        case 0 => weakTypeOf[Integer._0]
-        case 1 => weakTypeOf[Integer._1]
-        case 2 => weakTypeOf[Integer._2]
-        case 3 => weakTypeOf[Integer._3]
-        case 4 => weakTypeOf[Integer._4]
-        case 5 => weakTypeOf[Integer._5]
-        case 6 => weakTypeOf[Integer._6]
-        case 7 => weakTypeOf[Integer._7]
-        case 8 => weakTypeOf[Integer._8]
-        case 9 => weakTypeOf[Integer._9]
-        case -1 => weakTypeOf[Integer._neg1]
-        case -2 => weakTypeOf[Integer._neg2]
-        case -3 => weakTypeOf[Integer._neg3]
-        case -4 => weakTypeOf[Integer._neg4]
-        case -5 => weakTypeOf[Integer._neg5]
-        case -6 => weakTypeOf[Integer._neg6]
-        case -7 => weakTypeOf[Integer._neg7]
-        case -8 => weakTypeOf[Integer._neg8]
-        case -9 => weakTypeOf[Integer._neg9]
+        case 0 => weakTypeOf[ChurchInt._0]
+        case 1 => weakTypeOf[ChurchInt._1]
+        case 2 => weakTypeOf[ChurchInt._2]
+        case 3 => weakTypeOf[ChurchInt._3]
+        case 4 => weakTypeOf[ChurchInt._4]
+        case 5 => weakTypeOf[ChurchInt._5]
+        case 6 => weakTypeOf[ChurchInt._6]
+        case 7 => weakTypeOf[ChurchInt._7]
+        case 8 => weakTypeOf[ChurchInt._8]
+        case 9 => weakTypeOf[ChurchInt._9]
+        case -1 => weakTypeOf[ChurchInt._neg1]
+        case -2 => weakTypeOf[ChurchInt._neg2]
+        case -3 => weakTypeOf[ChurchInt._neg3]
+        case -4 => weakTypeOf[ChurchInt._neg4]
+        case -5 => weakTypeOf[ChurchInt._neg5]
+        case -6 => weakTypeOf[ChurchInt._neg6]
+        case -7 => weakTypeOf[ChurchInt._neg7]
+        case -8 => weakTypeOf[ChurchInt._neg8]
+        case -9 => weakTypeOf[ChurchInt._neg9]
         case _ => {
           abort(s"No type mapping defined for integer $i")
-          weakTypeOf[Integer._0]
+          weakTypeOf[ChurchInt._0]
         }
       }
     }
@@ -485,7 +484,7 @@ package fundamental {
 }
 
 package derived {
-  import Integer._
+  import ChurchInt._
   import fundamental._
 
   trait Foot extends DerivedUnit[Meter]
@@ -519,9 +518,4 @@ package prefix {
 
   trait Kilo extends PrefixUnit
   object Kilo extends UCompanion[Kilo]("kilo", 1e+3)
-}
-
-object test {
-  import shapeless._
-  import prefix._
 }

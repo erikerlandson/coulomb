@@ -1,46 +1,46 @@
-package com.manyangled.church
+package com.manyangled.coulomb
 
 import org.scalatest._
 
-class IntegerSpec extends FlatSpec with Matchers {
+class ChurchIntSpec extends FlatSpec with Matchers {
 
   case class Equal[A >: B <: B, B]()
 
   it should "have expected min and max defined constants" in {
-    import Integer._
+    import ChurchInt._
 
-    Integer.value[_min] should be (-9)
-    Integer.value[_max] should be (9)
+    ChurchInt.value[_min] should be (-9)
+    ChurchInt.value[_max] should be (9)
   }
 
   it should "implement value[N] method on defined subset of integers" in {
-    import Integer._
+    import ChurchInt._
 
-    Integer.value[_0] should be (0)
+    ChurchInt.value[_0] should be (0)
 
-    Integer.value[_1] should be (1)
-    Integer.value[_2] should be (2)
-    Integer.value[_3] should be (3)
-    Integer.value[_4] should be (4)
-    Integer.value[_5] should be (5)
-    Integer.value[_6] should be (6)
-    Integer.value[_7] should be (7)
-    Integer.value[_8] should be (8)
-    Integer.value[_9] should be (9)
+    ChurchInt.value[_1] should be (1)
+    ChurchInt.value[_2] should be (2)
+    ChurchInt.value[_3] should be (3)
+    ChurchInt.value[_4] should be (4)
+    ChurchInt.value[_5] should be (5)
+    ChurchInt.value[_6] should be (6)
+    ChurchInt.value[_7] should be (7)
+    ChurchInt.value[_8] should be (8)
+    ChurchInt.value[_9] should be (9)
 
-    Integer.value[_neg1] should be (-1)
-    Integer.value[_neg2] should be (-2)
-    Integer.value[_neg3] should be (-3)
-    Integer.value[_neg4] should be (-4)
-    Integer.value[_neg5] should be (-5)
-    Integer.value[_neg6] should be (-6)
-    Integer.value[_neg7] should be (-7)
-    Integer.value[_neg8] should be (-8)
-    Integer.value[_neg9] should be (-9)
+    ChurchInt.value[_neg1] should be (-1)
+    ChurchInt.value[_neg2] should be (-2)
+    ChurchInt.value[_neg3] should be (-3)
+    ChurchInt.value[_neg4] should be (-4)
+    ChurchInt.value[_neg5] should be (-5)
+    ChurchInt.value[_neg6] should be (-6)
+    ChurchInt.value[_neg7] should be (-7)
+    ChurchInt.value[_neg8] should be (-8)
+    ChurchInt.value[_neg9] should be (-9)
   }
 
   it should "demonstrate strong typing" in {
-    import Integer._
+    import ChurchInt._
 
     "Equal[_0, _0]" should compile
     "Equal[_1, _1]" should compile
@@ -54,7 +54,7 @@ class IntegerSpec extends FlatSpec with Matchers {
   }
 
   it should "support Inc type operator" in {
-    import Integer._
+    import ChurchInt._
 
     "Equal[_0#Inc, _1]" should compile
     "Equal[_1#Inc, _2]" should compile
@@ -65,7 +65,7 @@ class IntegerSpec extends FlatSpec with Matchers {
   }
 
   it should "support Dec type operator" in {
-    import Integer._
+    import ChurchInt._
 
     "Equal[_0#Dec, _neg1]" should compile
     "Equal[_1#Dec, _0]" should compile
@@ -76,7 +76,7 @@ class IntegerSpec extends FlatSpec with Matchers {
   }
 
   it should "support Neg type operator" in {
-    import Integer._
+    import ChurchInt._
 
     "Equal[_0#Neg, _0]" should compile
     "Equal[_1#Neg, _neg1]" should compile
@@ -88,7 +88,7 @@ class IntegerSpec extends FlatSpec with Matchers {
   }
 
   it should "support Add type operator" in {
-    import Integer._
+    import ChurchInt._
 
     "Equal[_0#Add[_1], _1]" should compile
     "Equal[_0#Add[_1]#Add[_1], _2]" should compile
@@ -101,7 +101,7 @@ class IntegerSpec extends FlatSpec with Matchers {
   }
 
   it should "support Sub type operator" in {
-    import Integer._
+    import ChurchInt._
 
     "Equal[_0#Sub[_1], _neg1]" should compile
     "Equal[_0#Sub[_1]#Sub[_1], _neg2]" should compile
@@ -112,7 +112,7 @@ class IntegerSpec extends FlatSpec with Matchers {
   }
 
   it should "support Mul type operator" in {
-    import Integer._
+    import ChurchInt._
     "Equal[_0#Mul[_1], _0]" should compile
     "Equal[_0#Mul[_2], _0]" should compile
     "Equal[_2#Mul[_0], _0]" should compile
@@ -123,7 +123,7 @@ class IntegerSpec extends FlatSpec with Matchers {
   }
 
   it should "support composed type operators" in {
-    import Integer._
+    import ChurchInt._
 
     "Equal[_0#Inc#Dec, _0#Dec#Inc]" should compile
     "Equal[_0#Inc#Neg, _neg2#Add[_3]#Sub[_2]]" should compile
@@ -132,7 +132,7 @@ class IntegerSpec extends FlatSpec with Matchers {
   }
 
   it should "support type system outside of value range" in {
-    import Integer._
+    import ChurchInt._
 
     "Equal[_max#Inc, _max#Add[_1]]" should compile
     "Equal[_min#Dec, _min#Sub[_1]]" should compile
