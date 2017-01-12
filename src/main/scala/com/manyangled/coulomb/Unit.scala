@@ -24,6 +24,36 @@ sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 // unitless values (any units have canceled)
 sealed trait Unitless extends UnitExpr
 
+class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
+  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Unit[U2] =
+    cu.convert(this)
+
+  def unary_- : Unit[U] = new Unit[U](-this.value)
+
+  def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
+    new Unit[U](this.value + cu.coef * that.value)
+
+  def -[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
+    new Unit[U](this.value - cu.coef * that.value)
+
+  def *[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
+    new Unit[RU](uer.coef * this.value * that.value)
+
+  def /[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
+    new Unit[RU](uer.coef * this.value / that.value)
+
+  def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E], uesRU: UnitExprString[U <^> E]) =
+    new Unit[U <^> E](math.pow(this.value, exp.value))
+
+  override def toString = s"$value ${uesU.str}"
+}
+
+object Unit {
+  implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
+    def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Unit[U] = new Unit[U](num.toDouble(v))
+  }
+}
+
 case class UnitRec[UE <: UnitExpr](name: String, coef: Double)
 
 class UCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
@@ -73,36 +103,6 @@ trait UnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr] {
 object UnitExprMul {
   implicit def witnessUnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprMul[U1, U2] =
     macro UnitMacros.unitExprMul[U1, U2]
-}
-
-class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
-  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Unit[U2] =
-    cu.convert(this)
-
-  def unary_- : Unit[U] = new Unit[U](-this.value)
-
-  def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
-    new Unit[U](this.value + cu.coef * that.value)
-
-  def -[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
-    new Unit[U](this.value - cu.coef * that.value)
-
-  def *[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
-    new Unit[RU](uer.coef * this.value * that.value)
-
-  def /[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
-    new Unit[RU](uer.coef * this.value / that.value)
-
-  def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E], uesRU: UnitExprString[U <^> E]) =
-    new Unit[U <^> E](math.pow(this.value, exp.value))
-
-  override def toString = s"$value ${uesU.str}"
-}
-
-object Unit {
-  implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
-    def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Unit[U] = new Unit[U](num.toDouble(v))
-  }
 }
 
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
