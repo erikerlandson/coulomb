@@ -1,6 +1,7 @@
 package com.manyangled.coulomb
 
 import scala.language.higherKinds
+import scala.language.experimental.macros
 
 sealed trait ChurchInt {
   type Inc <: ChurchInt
@@ -12,6 +13,11 @@ sealed trait ChurchInt {
 }
 
 case class ChurchIntValue[N <: ChurchInt](value: Int)
+
+object ChurchIntValue {
+  implicit def witnessChurchIntValue[N <: ChurchInt]: ChurchIntValue[N] =
+    macro ChurchIntMacros.churchIntValue[N]
+}
 
 object ChurchInt {
   import infra._
@@ -42,28 +48,6 @@ object ChurchInt {
 
   type _min = _neg9
   type _max = _9
-
-  implicit val integerValue_0 = ChurchIntValue[_0](0)
-
-  implicit val integerValue_1 = ChurchIntValue[_1](1)
-  implicit val integerValue_2 = ChurchIntValue[_2](2)
-  implicit val integerValue_3 = ChurchIntValue[_3](3)
-  implicit val integerValue_4 = ChurchIntValue[_4](4)
-  implicit val integerValue_5 = ChurchIntValue[_5](5)
-  implicit val integerValue_6 = ChurchIntValue[_6](6)
-  implicit val integerValue_7 = ChurchIntValue[_7](7)
-  implicit val integerValue_8 = ChurchIntValue[_8](8)
-  implicit val integerValue_9 = ChurchIntValue[_9](9)
-
-  implicit val integerValue_neg1 = ChurchIntValue[_neg1](-1)
-  implicit val integerValue_neg2 = ChurchIntValue[_neg2](-2)
-  implicit val integerValue_neg3 = ChurchIntValue[_neg3](-3)
-  implicit val integerValue_neg4 = ChurchIntValue[_neg4](-4)
-  implicit val integerValue_neg5 = ChurchIntValue[_neg5](-5)
-  implicit val integerValue_neg6 = ChurchIntValue[_neg6](-6)
-  implicit val integerValue_neg7 = ChurchIntValue[_neg7](-7)
-  implicit val integerValue_neg8 = ChurchIntValue[_neg8](-8)
-  implicit val integerValue_neg9 = ChurchIntValue[_neg9](-9)
 
   object infra {
     class IncChurchInt[N <: ChurchInt] extends ChurchInt {
@@ -114,5 +98,45 @@ class MacroCommon(val c: scala.reflect.macros.whitebox.Context) {
 class ChurchIntMacros(c0: scala.reflect.macros.whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
 
-  
+  import ChurchInt.infra._
+
+  val zeroType = typeOf[Zero]
+  val incType = typeOf[IncChurchInt[Zero]].typeConstructor
+  val decType = typeOf[DecChurchInt[Zero]].typeConstructor
+
+  object IsZero {
+    def unapply(tpe: Type): Boolean = (tpe =:= zeroType)
+  }
+
+  object IsInc {
+    def unapply(tpe: Type): Option[Type] =
+      if (tpe.typeConstructor =:= incType) Option(tpe.typeArgs(0)) else None
+  }
+
+  object IsDec {
+    def unapply(tpe: Type): Option[Type] =
+      if (tpe.typeConstructor =:= decType) Option(tpe.typeArgs(0)) else None
+  }
+
+  def computeValue(typeN: Type): Int = {
+    typeN.dealias match {
+      case IsZero() => 0
+      case IsInc(ta) => computeValue(ta) + 1
+      case IsDec(ta) => computeValue(ta) - 1
+      case _ => {
+        abort(s"UNIMPLEMENTED: type ${typeName(typeN)}")
+        0
+      }
+    }
+  }
+
+  def churchIntValue[N: WeakTypeTag]: Tree = {
+    val tpeN = weakTypeOf[N].dealias
+
+    val n = computeValue(tpeN)
+    val nq = q"$n"
+    q"""
+      _root_.com.manyangled.coulomb.ChurchIntValue[$tpeN]($nq)
+    """
+  }
 }
