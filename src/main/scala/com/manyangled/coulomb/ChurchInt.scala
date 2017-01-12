@@ -79,6 +79,12 @@ object ChurchInt {
 class MacroCommon(val c: scala.reflect.macros.whitebox.Context) {
   import c.universe._
 
+  import ChurchInt.infra._
+
+  val zeroType = typeOf[Zero]
+  val incType = typeOf[IncChurchInt[Zero]].typeConstructor
+  val decType = typeOf[DecChurchInt[Zero]].typeConstructor
+
   def abort(msg: String) = c.abort(c.enclosingPosition, msg)
 
   def typeName(tpe: Type): String = tpe.typeSymbol.fullName
@@ -94,12 +100,6 @@ class MacroCommon(val c: scala.reflect.macros.whitebox.Context) {
 
 class ChurchIntMacros(c0: scala.reflect.macros.whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
-
-  import ChurchInt.infra._
-
-  val zeroType = typeOf[Zero]
-  val incType = typeOf[IncChurchInt[Zero]].typeConstructor
-  val decType = typeOf[DecChurchInt[Zero]].typeConstructor
 
   object IsZero {
     def unapply(tpe: Type): Boolean = (tpe =:= zeroType)

@@ -371,31 +371,11 @@ object infra {
       """
     }
 
-    def intType(i: Int): Type = {
+    def churchType(i: Int): Type = {
       i match {
-        case 0 => weakTypeOf[ChurchInt._0]
-        case 1 => weakTypeOf[ChurchInt._1]
-        case 2 => weakTypeOf[ChurchInt._2]
-        case 3 => weakTypeOf[ChurchInt._3]
-        case 4 => weakTypeOf[ChurchInt._4]
-        case 5 => weakTypeOf[ChurchInt._5]
-        case 6 => weakTypeOf[ChurchInt._6]
-        case 7 => weakTypeOf[ChurchInt._7]
-        case 8 => weakTypeOf[ChurchInt._8]
-        case 9 => weakTypeOf[ChurchInt._9]
-        case -1 => weakTypeOf[ChurchInt._neg1]
-        case -2 => weakTypeOf[ChurchInt._neg2]
-        case -3 => weakTypeOf[ChurchInt._neg3]
-        case -4 => weakTypeOf[ChurchInt._neg4]
-        case -5 => weakTypeOf[ChurchInt._neg5]
-        case -6 => weakTypeOf[ChurchInt._neg6]
-        case -7 => weakTypeOf[ChurchInt._neg7]
-        case -8 => weakTypeOf[ChurchInt._neg8]
-        case -9 => weakTypeOf[ChurchInt._neg9]
-        case _ => {
-          abort(s"No type mapping defined for integer $i")
-          weakTypeOf[ChurchInt._0]
-        }
+        case v if (v > 0) => appliedType(incType, List(churchType(v - 1)))
+        case v if (v < 0) => appliedType(decType, List(churchType(v + 1)))
+        case _ => zeroType
       }
     }
 
@@ -403,10 +383,10 @@ object infra {
       if (map.isEmpty) typeOf[Unitless] else {
         val mlist = map.toList
         val (u0, e0) = mlist.head
-        val et0 = intType(e0)
+        val et0 = churchType(e0)
         val t0 = appliedType(powType, List(u0, et0))
         mlist.tail.foldLeft(t0) { case (tc, (u, e)) =>
-          val et = intType(e)
+          val et = churchType(e)
           val t = appliedType(powType, List(u, et))
           appliedType(mulType, List(tc, t))
         }
