@@ -10,7 +10,7 @@ import ChurchInt.{ _0, _1 }
 
 trait UnitExpr
 
-trait FundamentalUnit extends UnitExpr
+trait BaseUnit extends UnitExpr
 
 trait PrefixUnit extends UnitExpr
 
@@ -111,14 +111,14 @@ object Unit {
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
 
-  trait DummyU extends FundamentalUnit
+  trait DummyU extends BaseUnit
   trait DummyP extends PrefixUnit
 
   val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
   val urecType = typeOf[UnitRec[DummyU]].typeConstructor
   val turecType = typeOf[TempUnitRec[DummyU]].typeConstructor
 
-  val fuType = typeOf[FundamentalUnit]
+  val fuType = typeOf[BaseUnit]
   val puType = typeOf[PrefixUnit]
   val duType = typeOf[DerivedUnit[DummyU]].typeConstructor
 
@@ -271,7 +271,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def directTempCompat(map1: Map[Type, Int], map2: Map[Type, Int]): Boolean = {
-    map1 == Map(typeOf[fundamental.Kelvin] -> 1) && map2 == Map(typeOf[fundamental.Kelvin] -> 1)
+    map1 == Map(typeOf[base.Kelvin] -> 1) && map2 == Map(typeOf[base.Kelvin] -> 1)
   }
 
   def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
@@ -429,23 +429,23 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 }
 
-package fundamental {
-  trait Meter extends FundamentalUnit
+package base {
+  trait Meter extends BaseUnit
   object Meter extends UCompanion[Meter]("meter")
 
-  trait Second extends FundamentalUnit
+  trait Second extends BaseUnit
   object Second extends UCompanion[Second]("second")
 
-  trait Kilogram extends FundamentalUnit
+  trait Kilogram extends BaseUnit
   object Kilogram extends UCompanion[Kilogram]("kilogram")
 
-  trait Kelvin extends FundamentalUnit
+  trait Kelvin extends BaseUnit
   object Kelvin extends TempUnitCompanion[Kelvin]("kelvin", 1.0, 0.0)
 }
 
 package derived {
   import ChurchInt._
-  import fundamental._
+  import base._
 
   trait Foot extends DerivedUnit[Meter]
   object Foot extends UCompanion[Foot]("foot", 0.3048)
