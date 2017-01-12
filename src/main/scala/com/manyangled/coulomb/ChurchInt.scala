@@ -13,19 +13,12 @@ sealed trait ChurchInt {
   type Neg <: ChurchInt
 }
 
-case class ChurchIntValue[N <: ChurchInt](value: Int)
-
-object ChurchIntValue {
-  implicit def witnessChurchIntValue[N <: ChurchInt]: ChurchIntValue[N] =
-    macro ChurchIntMacros.churchIntValue[N]
-}
-
 object ChurchInt {
-  import infra._
+  import infraChurchInt._
 
   def churchToInt[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
 
-  type _0 = Zero
+  type _0 = ZeroChurchInt
 
   type _1 = _0#Inc
   type _2 = _1#Inc
@@ -46,45 +39,52 @@ object ChurchInt {
   type _neg7 = _neg6#Dec
   type _neg8 = _neg7#Dec
   type _neg9 = _neg8#Dec
+}
 
-  object infra {
-    class IncChurchInt[N <: ChurchInt] extends ChurchInt {
-      type Inc = IncChurchInt[IncChurchInt[N]]
-      type Dec = N
-      type Add[K <: ChurchInt] = N#Add[K]#Inc
-      type Sub[K <: ChurchInt] = N#Sub[K]#Inc
-      type Mul[K <: ChurchInt] = K#Add[N#Mul[K]]
-      type Neg = N#Neg#Dec
-    }
-
-    class DecChurchInt[N <: ChurchInt] extends ChurchInt {
-      type Inc = N
-      type Dec = DecChurchInt[DecChurchInt[N]]
-      type Add[K <: ChurchInt] = N#Add[K]#Dec
-      type Sub[K <: ChurchInt] = N#Sub[K]#Dec
-      type Mul[K <: ChurchInt] = Neg#Mul[K]#Neg
-      type Neg = N#Neg#Inc
-    }
-
-    class Zero extends ChurchInt {
-      type Inc = IncChurchInt[Zero]
-      type Dec = DecChurchInt[Zero]
-      type Add[K <: ChurchInt] = K
-      type Sub[K <: ChurchInt] = K#Neg
-      type Mul[K <: ChurchInt] = Zero
-      type Neg = Zero
-    }
+object infraChurchInt {
+  class IncChurchInt[N <: ChurchInt] extends ChurchInt {
+    type Inc = IncChurchInt[IncChurchInt[N]]
+    type Dec = N
+    type Add[K <: ChurchInt] = N#Add[K]#Inc
+    type Sub[K <: ChurchInt] = N#Sub[K]#Inc
+    type Mul[K <: ChurchInt] = K#Add[N#Mul[K]]
+    type Neg = N#Neg#Dec
   }
+
+  class DecChurchInt[N <: ChurchInt] extends ChurchInt {
+    type Inc = N
+    type Dec = DecChurchInt[DecChurchInt[N]]
+    type Add[K <: ChurchInt] = N#Add[K]#Dec
+    type Sub[K <: ChurchInt] = N#Sub[K]#Dec
+    type Mul[K <: ChurchInt] = Neg#Mul[K]#Neg
+    type Neg = N#Neg#Inc
+  }
+
+  class ZeroChurchInt extends ChurchInt {
+    type Inc = IncChurchInt[ZeroChurchInt]
+    type Dec = DecChurchInt[ZeroChurchInt]
+    type Add[K <: ChurchInt] = K
+    type Sub[K <: ChurchInt] = K#Neg
+    type Mul[K <: ChurchInt] = ZeroChurchInt
+    type Neg = ZeroChurchInt
+  }
+}
+
+case class ChurchIntValue[N <: ChurchInt](value: Int)
+
+object ChurchIntValue {
+  implicit def witnessChurchIntValue[N <: ChurchInt]: ChurchIntValue[N] =
+    macro ChurchIntMacros.churchIntValue[N]
 }
 
 private [coulomb] class MacroCommon(val c: whitebox.Context) {
   import c.universe._
 
-  import ChurchInt.infra._
+  import infraChurchInt._
 
-  val zeroType = typeOf[Zero]
-  val incType = typeOf[IncChurchInt[Zero]].typeConstructor
-  val decType = typeOf[DecChurchInt[Zero]].typeConstructor
+  val zeroType = typeOf[ZeroChurchInt]
+  val incType = typeOf[IncChurchInt[ZeroChurchInt]].typeConstructor
+  val decType = typeOf[DecChurchInt[ZeroChurchInt]].typeConstructor
 
   def abort(msg: String) = c.abort(c.enclosingPosition, msg)
 
