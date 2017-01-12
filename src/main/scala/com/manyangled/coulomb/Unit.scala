@@ -365,14 +365,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     """
   }
 
-  def churchType(i: Int): Type = {
-    i match {
-      case v if (v > 0) => appliedType(incType, List(churchType(v - 1)))
-      case v if (v < 0) => appliedType(decType, List(churchType(v + 1)))
-      case _ => zeroType
-    }
-  }
-
   def mapToType(map: Map[Type, Int]): Type = {
     if (map.isEmpty) typeOf[Unitless] else {
       val mlist = map.toList

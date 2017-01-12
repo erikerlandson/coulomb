@@ -97,6 +97,14 @@ private [coulomb] class MacroCommon(val c: whitebox.Context) {
     val bc = tpe.baseClasses.drop(1)
     if (bc.count { bSym => bSym == supSym } < 1) None else Some(tpe.baseType(supSym))
   }
+
+  def churchType(i: Int): Type = {
+    i match {
+      case v if (v > 0) => appliedType(incType, List(churchType(v - 1)))
+      case v if (v < 0) => appliedType(decType, List(churchType(v + 1)))
+      case _ => zeroType
+    }
+  }
 }  
 
 private [coulomb] class ChurchIntMacros(c0: whitebox.Context) extends MacroCommon(c0) {
