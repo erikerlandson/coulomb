@@ -9,33 +9,47 @@ A statically typed unit analysis library for Scala
 ### examples
 
 ```scala
-scala> import com.manyangled.coulomb._; import ChurchInt._; import fundamental._; import prefix._; import derived._; import Unit._
+scala> import com.manyangled.coulomb._; import ChurchInt._; import base._; import prefix._; import derived._; import Unit._
 import com.manyangled.coulomb._
 import ChurchInt._
-import fundamental._
+import base._
 import prefix._
 import derived._
 import Unit._
 
-scala> 1.withUnit[EarthGravity].as[Foot </> (Second <^> _2)]
-res0: com.manyangled.coulomb.Unit[com.manyangled.coulomb.</>[com.manyangled.coulomb.derived.Foot,com.manyangled.coulomb.<^>[com.manyangled.coulomb.fundamental.Second,com.manyangled.coulomb.ChurchInt._2]]] = 32.175196850393704 foot / (second ^ 2)
+scala> 1.withUnit[Liter].as[Meter <^> _3].toString
+res1: String = 0.001 meter ^ 3
 
-scala> 1.withUnit[Liter].as[Meter <^> _3]
-res1: com.manyangled.coulomb.Unit[com.manyangled.coulomb.<^>[com.manyangled.coulomb.fundamental.Meter,com.manyangled.coulomb.ChurchInt._3]] = 0.001 meter ^ 3
+scala> (1.withUnit[Foot] + 1.withUnit[Yard]).toString
+res2: String = 4.0 foot
 
-scala> 1.withUnit[Foot] + 1.withUnit[Yard]
-res2: com.manyangled.coulomb.Unit[com.manyangled.coulomb.derived.Foot] = 4.0 foot
+scala> (1.withUnit[Foot] + 1.withUnit[Meter]).toString
+res3: String = 4.2808398950131235 foot
 
-scala> 1.withUnit[Foot] + 1.withUnit[Meter]
-res3: com.manyangled.coulomb.Unit[com.manyangled.coulomb.derived.Foot] = 4.2808398950131235 foot
+scala> (1000.withUnit[Meter] + 1.withUnit[Kilo <-> Meter]).toString
+res4: String = 2000.0 meter
 
-scala> 1.withUnit[Foot <^> _2] + 1.withUnit[Liter </> Meter]
-res4: com.manyangled.coulomb.Unit[com.manyangled.coulomb.<^>[com.manyangled.coulomb.derived.Foot,com.manyangled.coulomb.ChurchInt._2]] = 1.0107639104167097 foot ^ 2
+scala> 5280.withUnit[Foot].as[Kilo <-> Meter].toString
+res5: String = 1.609344 kilo-meter
 
-scala> 1.withUnit[Foot <^> _2] * 1.withUnit[Liter </> Meter]
-res5: com.manyangled.coulomb.Unit[this.U] = 9.290304E-5 meter ^ 4
+scala> (2.withUnit[Meter] * 2.withUnit[Meter <^> _2]).toString
+res6: String = 4.0 meter ^ 3
 
-scala> 1.withUnit[Foot <^> _2] / 1.withUnit[Liter </> Meter]
-res6: com.manyangled.coulomb.Unit[this.U] = 92.90304 unitless
+scala> (2.withUnit[Meter] * 2.withUnit[Meter <^> _2]).as[Liter].toString
+res8: String = 4000.0 liter
 
+scala> (2.withUnit[Meter] * 2.withUnit[Meter <^> _2]).as[Kilo <-> Liter].toString
+res9: String = 4.0 kilo-liter
+
+scala> (100.withUnit[Meter] / 9.withUnit[Second]).toString
+res10: String = 11.11111111111111 (meter ^ 1) * (second ^ -1)
+
+scala> (11.withUnit[Meter </> Second] * 1.withUnit[Minute]).as[Yard].toString
+res11: String = 721.7847769028872 yard
+
+scala> 1.withUnit[EarthGravity].as[Foot </> (Second <^> _2)].toString
+res12: String = 32.175196850393704 foot / (second ^ 2)
+
+scala> (1.withUnit[Yard] / 1.withUnit[Foot]).toString
+res13: String = 3.0 unitless
 ```
