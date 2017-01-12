@@ -46,9 +46,6 @@ object ChurchInt {
   type _neg8 = _neg7#Dec
   type _neg9 = _neg8#Dec
 
-  type _min = _neg9
-  type _max = _9
-
   object infra {
     class IncChurchInt[N <: ChurchInt] extends ChurchInt {
       type Inc = IncChurchInt[IncChurchInt[N]]

@@ -6,13 +6,6 @@ class ChurchIntSpec extends FlatSpec with Matchers {
 
   case class Equal[A >: B <: B, B]()
 
-  it should "have expected min and max defined constants" in {
-    import ChurchInt._
-
-    churchToInt[_min] should be (-9)
-    churchToInt[_max] should be (9)
-  }
-
   it should "implement churchToInt[N] method on ChurchInt" in {
     import ChurchInt._
 
@@ -54,8 +47,6 @@ class ChurchIntSpec extends FlatSpec with Matchers {
     "Equal[_0, _0]" should compile
     "Equal[_1, _1]" should compile
     "Equal[_neg1, _neg1]" should compile
-    "Equal[_min, _min]" should compile
-    "Equal[_max, _max]" should compile
 
     "Equal[_0, _1]" shouldNot typeCheck
     "Equal[_1, _neg1]" shouldNot typeCheck
@@ -138,12 +129,5 @@ class ChurchIntSpec extends FlatSpec with Matchers {
     "Equal[_0#Inc#Neg, _neg2#Add[_3]#Sub[_2]]" should compile
     "Equal[_4#Neg#Inc, _5#Sub[_3]#Neg#Dec]" should compile
     "Equal[_9#Sub[_8]#Inc, _neg9#Neg#Sub[_6]#Dec]" should compile 
-  }
-
-  it should "support type system outside of value range" in {
-    import ChurchInt._
-
-    "Equal[_max#Inc, _max#Add[_1]]" should compile
-    "Equal[_min#Dec, _min#Sub[_1]]" should compile
   }
 }
