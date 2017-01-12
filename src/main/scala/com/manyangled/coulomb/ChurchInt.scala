@@ -2,6 +2,7 @@ package com.manyangled.coulomb
 
 import scala.language.higherKinds
 import scala.language.experimental.macros
+import scala.reflect.macros.whitebox
 
 sealed trait ChurchInt {
   type Inc <: ChurchInt
@@ -76,7 +77,7 @@ object ChurchInt {
   }
 }
 
-class MacroCommon(val c: scala.reflect.macros.whitebox.Context) {
+private [coulomb] class MacroCommon(val c: whitebox.Context) {
   import c.universe._
 
   import ChurchInt.infra._
@@ -98,7 +99,7 @@ class MacroCommon(val c: scala.reflect.macros.whitebox.Context) {
   }
 }  
 
-class ChurchIntMacros(c0: scala.reflect.macros.whitebox.Context) extends MacroCommon(c0) {
+private [coulomb] class ChurchIntMacros(c0: whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
 
   object IsZero {

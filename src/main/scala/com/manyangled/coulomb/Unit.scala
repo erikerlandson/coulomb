@@ -1,6 +1,7 @@
 package com.manyangled.coulomb
 
 import scala.language.experimental.macros
+import scala.reflect.macros.whitebox
 import scala.language.implicitConversions
 import scala.annotation.implicitNotFound
 import scala.language.higherKinds
@@ -47,14 +48,14 @@ class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
 
 object CompatUnits {
   implicit def witnessCompatUnits[U1 <: UnitExpr, U2 <: UnitExpr]: CompatUnits[U1, U2] =
-    macro infra.UnitMacros.compatUnits[U1, U2]
+    macro UnitMacros.compatUnits[U1, U2]
 }
 
 case class UnitExprString[U <: UnitExpr](str: String)
 
 object UnitExprString {
   implicit def witnessUnitExprString[U <: UnitExpr]: UnitExprString[U] =
-    macro infra.UnitMacros.unitExprString[U]
+    macro UnitMacros.unitExprString[U]
 }
 
 trait UnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr] {
@@ -64,7 +65,7 @@ trait UnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr] {
 
 object UnitExprDiv {
   implicit def witnessUnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprDiv[U1, U2] =
-    macro infra.UnitMacros.unitExprDiv[U1, U2]
+    macro UnitMacros.unitExprDiv[U1, U2]
 }
 
 trait UnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr] {
@@ -74,7 +75,7 @@ trait UnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr] {
 
 object UnitExprMul {
   implicit def witnessUnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprMul[U1, U2] =
-    macro infra.UnitMacros.unitExprMul[U1, U2]
+    macro UnitMacros.unitExprMul[U1, U2]
 }
 
 class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
@@ -107,329 +108,324 @@ object Unit {
   }
 }
 
-object infra {
-  import scala.language.experimental.macros
-  import scala.reflect.macros.whitebox
+private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
+  import c.universe._
 
   trait DummyU extends FundamentalUnit
   trait DummyP extends PrefixUnit
 
-  class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
-    import c.universe._
+  val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
+  val urecType = typeOf[UnitRec[DummyU]].typeConstructor
+  val turecType = typeOf[TempUnitRec[DummyU]].typeConstructor
 
-    val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
-    val urecType = typeOf[UnitRec[DummyU]].typeConstructor
-    val turecType = typeOf[TempUnitRec[DummyU]].typeConstructor
+  val fuType = typeOf[FundamentalUnit]
+  val puType = typeOf[PrefixUnit]
+  val duType = typeOf[DerivedUnit[DummyU]].typeConstructor
 
-    val fuType = typeOf[FundamentalUnit]
-    val puType = typeOf[PrefixUnit]
-    val duType = typeOf[DerivedUnit[DummyU]].typeConstructor
+  val mulType = typeOf[<*>[DummyU, DummyU]].typeConstructor
+  val divType = typeOf[</>[DummyU, DummyU]].typeConstructor
+  val powType = typeOf[<^>[DummyU, ChurchInt._0]].typeConstructor
+  val preType = typeOf[<->[DummyP, DummyU]].typeConstructor
 
-    val mulType = typeOf[<*>[DummyU, DummyU]].typeConstructor
-    val divType = typeOf[</>[DummyU, DummyU]].typeConstructor
-    val powType = typeOf[<^>[DummyU, ChurchInt._0]].typeConstructor
-    val preType = typeOf[<->[DummyP, DummyU]].typeConstructor
+  def intVal(intT: Type): Int = {
+    val ivt = appliedType(ivalType, List(intT))
+    val ival = c.inferImplicitValue(ivt, silent = false)
+    evalTree[Int](q"${ival}.value")
+  }
+  
+  def urecVal(unitT: Type): (String, Double) = {
+    val urt = appliedType(urecType, List(unitT))
+    val ur = c.inferImplicitValue(urt, silent = false)
+    evalTree[(String, Double)](q"(${ur}.name, ${ur}.coef)")
+  }
 
-    def intVal(intT: Type): Int = {
-      val ivt = appliedType(ivalType, List(intT))
-      val ival = c.inferImplicitValue(ivt, silent = false)
-      evalTree[Int](q"${ival}.value")
+  def turecVal(unitT: Type): Double = {
+    val urt = appliedType(turecType, List(unitT))
+    val ur = c.inferImplicitValue(urt, silent = false)
+    evalTree[Double](q"${ur}.offset")
+  }
+
+  object MulOp {
+    def unapply(tpe: Type): Option[(Type, Type)] = {
+      if (tpe.typeConstructor =:= mulType) {
+        val (lht :: rht :: Nil) = tpe.typeArgs
+        Option(lht, rht)
+      } else None
     }
-    
-    def urecVal(unitT: Type): (String, Double) = {
-      val urt = appliedType(urecType, List(unitT))
-      val ur = c.inferImplicitValue(urt, silent = false)
-      evalTree[(String, Double)](q"(${ur}.name, ${ur}.coef)")
-    }
+  }
 
-    def turecVal(unitT: Type): Double = {
-      val urt = appliedType(turecType, List(unitT))
-      val ur = c.inferImplicitValue(urt, silent = false)
-      evalTree[Double](q"${ur}.offset")
+  object DivOp {
+    def unapply(tpe: Type): Option[(Type, Type)] = {
+      if (tpe.typeConstructor =:= divType) {
+        val (lht :: rht :: Nil) = tpe.typeArgs
+        Option(lht, rht)
+      } else None
     }
+  }
 
-    object MulOp {
-      def unapply(tpe: Type): Option[(Type, Type)] = {
-        if (tpe.typeConstructor =:= mulType) {
-          val (lht :: rht :: Nil) = tpe.typeArgs
-          Option(lht, rht)
-        } else None
+  object PowOp {
+    def unapply(tpe: Type): Option[(Type, Int)] = {
+      if (tpe.typeConstructor =:= powType) {
+        val (bT :: expT :: Nil) = tpe.typeArgs
+        Option(bT, intVal(expT))
+      } else None
+    }
+  }
+
+  object FUnit {
+    def unapply(tpe: Type): Option[String] = {
+      if (superClass(tpe, fuType).isEmpty) None else {
+        val (name, _) = urecVal(tpe)
+        Option(name)
       }
     }
+  }
 
-    object DivOp {
-      def unapply(tpe: Type): Option[(Type, Type)] = {
-        if (tpe.typeConstructor =:= divType) {
-          val (lht :: rht :: Nil) = tpe.typeArgs
-          Option(lht, rht)
-        } else None
+  object PreOp {
+    def unapply(tpe: Type): Option[(String, Double, Type)] = {
+      if (tpe.typeConstructor =:= preType) {
+        val (pre :: uexp :: Nil) = tpe.typeArgs
+        val pu = superClass(pre, puType)
+        if (pu.isEmpty) None else {
+          val (name, coef) = urecVal(pre)
+          Option(name, coef, uexp)
+        }
+      } else None
+    }
+  }
+
+  object DUnit {
+    def unapply(tpe: Type): Option[(String, Double, Type)] = {
+      val du = superClass(tpe, duType)
+      if (du.isEmpty) None else {
+        val (name, coef) = urecVal(tpe)
+        Option(name, coef, du.get.typeArgs(0))
       }
     }
+  }
 
-    object PowOp {
-      def unapply(tpe: Type): Option[(Type, Int)] = {
-        if (tpe.typeConstructor =:= powType) {
-          val (bT :: expT :: Nil) = tpe.typeArgs
-          Option(bT, intVal(expT))
-        } else None
+  object IsUnitless {
+    def unapply(tpe: Type): Boolean = tpe =:= typeOf[Unitless]
+  }
+
+  def mapMul(lmap: Map[Type, Int], rmap: Map[Type, Int]): Map[Type, Int] = {
+    rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
+      if (m.contains(t)) {
+        val ne = m(t) + e
+        if (ne == 0) (m - t) else m + ((t, ne))
+      } else {
+        m + ((t, e))
       }
     }
+  }
 
-    object FUnit {
-      def unapply(tpe: Type): Option[String] = {
-        if (superClass(tpe, fuType).isEmpty) None else {
-          val (name, _) = urecVal(tpe)
-          Option(name)
-        }
+  def mapDiv(lmap: Map[Type, Int], rmap: Map[Type, Int]): Map[Type, Int] = {
+    rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
+      if (m.contains(t)) {
+        val ne = m(t) - e
+        if (ne == 0) (m - t) else m + ((t, ne))
+      } else {
+        m + ((t, -e))
       }
     }
+  }
 
-    object PreOp {
-      def unapply(tpe: Type): Option[(String, Double, Type)] = {
-        if (tpe.typeConstructor =:= preType) {
-          val (pre :: uexp :: Nil) = tpe.typeArgs
-          val pu = superClass(pre, puType)
-          if (pu.isEmpty) None else {
-            val (name, coef) = urecVal(pre)
-            Option(name, coef, uexp)
-          }
-        } else None
+  def mapPow(bmap: Map[Type, Int], exp: Int): Map[Type, Int] = {    
+    if (exp == 0) Map.empty[Type, Int] else bmap.mapValues(_ * exp)
+  }
+
+  def canonical(typeU: Type): (Double, Map[Type, Int]) = {
+    typeU.dealias match {
+      case IsUnitless() => (1.0, Map.empty[Type, Int])
+      case FUnit(_) => {
+        (1.0, Map(typeU -> 1))
+      }
+      case DUnit(_, coef, dsub) => {
+        val (dcoef, dmap) = canonical(dsub)
+        (coef * dcoef, dmap)
+      }
+      case MulOp(lsub, rsub) => {
+        val (lcoef, lmap) = canonical(lsub)
+        val (rcoef, rmap) = canonical(rsub)
+        (lcoef * rcoef, mapMul(lmap, rmap))
+      }
+      case DivOp(lsub, rsub) => {
+        val (lcoef, lmap) = canonical(lsub)
+        val (rcoef, rmap) = canonical(rsub)
+        (lcoef / rcoef, mapDiv(lmap, rmap))
+      }
+      case PowOp(bsub, exp) => {
+        val (bcoef, bmap) = canonical(bsub)
+        (math.pow(bcoef, exp), mapPow(bmap, exp))
+      }
+      case PreOp(_, coef, sub) => {
+        val (scoef, smap) = canonical(sub)
+        (coef * scoef, smap)
+      }
+      case _ => {
+        // This should never execute
+        abort(s"Undefined Unit Type: ${typeName(typeU)}")
+        (0.0, Map.empty[Type, Int])
       }
     }
+  }
 
-    object DUnit {
-      def unapply(tpe: Type): Option[(String, Double, Type)] = {
-        val du = superClass(tpe, duType)
-        if (du.isEmpty) None else {
-          val (name, coef) = urecVal(tpe)
-          Option(name, coef, du.get.typeArgs(0))
-        }
-      }
-    }
+  def directTempCompat(map1: Map[Type, Int], map2: Map[Type, Int]): Boolean = {
+    map1 == Map(typeOf[fundamental.Kelvin] -> 1) && map2 == Map(typeOf[fundamental.Kelvin] -> 1)
+  }
 
-    object IsUnitless {
-      def unapply(tpe: Type): Boolean = tpe =:= typeOf[Unitless]
-    }
+  def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+    val tpeU1 = weakTypeOf[U1].dealias
+    val tpeU2 = weakTypeOf[U2].dealias
 
-    def mapMul(lmap: Map[Type, Int], rmap: Map[Type, Int]): Map[Type, Int] = {
-      rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
-        if (m.contains(t)) {
-          val ne = m(t) + e
-          if (ne == 0) (m - t) else m + ((t, ne))
-        } else {
-          m + ((t, e))
-        }
-      }
-    }
+    val (coef1, map1) = canonical(tpeU1)
+    val (coef2, map2) = canonical(tpeU2)
 
-    def mapDiv(lmap: Map[Type, Int], rmap: Map[Type, Int]): Map[Type, Int] = {
-      rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
-        if (m.contains(t)) {
-          val ne = m(t) - e
-          if (ne == 0) (m - t) else m + ((t, ne))
-        } else {
-          m + ((t, -e))
-        }
-      }
-    }
+    // units are compatible if their canonical representations are equal
+    val compat = (map1 == map2)
 
-    def mapPow(bmap: Map[Type, Int], exp: Int): Map[Type, Int] = {    
-      if (exp == 0) Map.empty[Type, Int] else bmap.mapValues(_ * exp)
-    }
-
-    def canonical(typeU: Type): (Double, Map[Type, Int]) = {
-      typeU.dealias match {
-        case IsUnitless() => (1.0, Map.empty[Type, Int])
-        case FUnit(_) => {
-          (1.0, Map(typeU -> 1))
-        }
-        case DUnit(_, coef, dsub) => {
-          val (dcoef, dmap) = canonical(dsub)
-          (coef * dcoef, dmap)
-        }
-        case MulOp(lsub, rsub) => {
-          val (lcoef, lmap) = canonical(lsub)
-          val (rcoef, rmap) = canonical(rsub)
-          (lcoef * rcoef, mapMul(lmap, rmap))
-        }
-        case DivOp(lsub, rsub) => {
-          val (lcoef, lmap) = canonical(lsub)
-          val (rcoef, rmap) = canonical(rsub)
-          (lcoef / rcoef, mapDiv(lmap, rmap))
-        }
-        case PowOp(bsub, exp) => {
-          val (bcoef, bmap) = canonical(bsub)
-          (math.pow(bcoef, exp), mapPow(bmap, exp))
-        }
-        case PreOp(_, coef, sub) => {
-          val (scoef, smap) = canonical(sub)
-          (coef * scoef, smap)
-        }
-        case _ => {
-          // This should never execute
-          abort(s"Undefined Unit Type: ${typeName(typeU)}")
-          (0.0, Map.empty[Type, Int])
-        }
-      }
-    }
-
-    def directTempCompat(map1: Map[Type, Int], map2: Map[Type, Int]): Boolean = {
-      map1 == Map(typeOf[fundamental.Kelvin] -> 1) && map2 == Map(typeOf[fundamental.Kelvin] -> 1)
-    }
-
-    def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-      val tpeU1 = weakTypeOf[U1].dealias
-      val tpeU2 = weakTypeOf[U2].dealias
-
-      val (coef1, map1) = canonical(tpeU1)
-      val (coef2, map2) = canonical(tpeU2)
-
-      // units are compatible if their canonical representations are equal
-      val compat = (map1 == map2)
-
-      if (!compat) q"" // fail implicit resolution if they aren't compatible
-      else {
-        // if they are compatible, then create the corresponding witness
-        val cq = q"${coef1 / coef2}"
-        if (directTempCompat(map1, map2)) {
-          // todo: add handling of rudimentary type simplifications to identify
-          // nontrivial cases of direct temperature unit exprs?
-          val (_, coef1) = urecVal(tpeU1)
-          val (_, coef2) = urecVal(tpeU2)
-          val (coef1q, coef2q) = (q"$coef1", q"$coef2")
-          val (off1q, off2q) = (q"${turecVal(tpeU1)}", q"${turecVal(tpeU2)}")
-          q"""
-            new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq) {
-              override def convert(u: _root_.com.manyangled.coulomb.Unit[$tpeU1])(implicit uesU2: _root_.com.manyangled.coulomb.UnitExprString[$tpeU2]): _root_.com.manyangled.coulomb.Unit[$tpeU2] = {
-                val k = (u.value + $off1q) * $coef1q
-                val r = (k / $coef2q) - $off2q
-                new _root_.com.manyangled.coulomb.Unit[$tpeU2](r)
-              }
-            }
-          """
-        } else {
-          q"""
-            new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq)
-          """
-        }
-      }
-    }
-
-    def ueAtomicString(typeU: Type): Boolean = {
-      typeU.dealias match {
-        case FUnit(_) => true
-        case DUnit(_, _, _) => true
-        case _ => false
-      }
-    }
-
-    def ueString(typeU: Type): String = {
-      typeU.dealias match {
-        case IsUnitless() => "unitless"
-        case FUnit(name) => name
-        case DUnit(name, _, _) => name
-        case MulOp(lsub, rsub) => {
-          val lstr = ueString(lsub)
-          val rstr = ueString(rsub)
-          val ls = if (ueAtomicString(lsub)) lstr else s"($lstr)"
-          val rs = if (ueAtomicString(rsub)) rstr else s"($rstr)"
-          s"$ls * $rs"
-        }
-        case DivOp(lsub, rsub) => {
-          val lstr = ueString(lsub)
-          val rstr = ueString(rsub)
-          val ls = if (ueAtomicString(lsub)) lstr else s"($lstr)"
-          val rs = if (ueAtomicString(rsub)) rstr else s"($rstr)"
-          s"$ls / $rs"
-        }
-        case PowOp(bsub, exp) => {
-          if (exp == 0) "unitless" else {
-            val bstr = ueString(bsub)
-            val bs = if (ueAtomicString(bsub)) bstr else s"($bstr)"
-            s"$bs ^ $exp"
-          }
-        }
-        case PreOp(name, _, sub) => {
-          val str = ueString(sub)
-          val s = if (ueAtomicString(sub)) str else s"($str)"
-          s"${name}-$s"
-        }        
-        case _ => {
-          // This should never execute
-          abort(s"Undefined Unit Type: ${typeName(typeU)}")
-          ""
-        }
-      }
-    }
-
-    def unitExprString[U: WeakTypeTag]: Tree = {
-      val tpeU = weakTypeOf[U]
-      val str = ueString(tpeU)
-      val sq = q"$str"
-      q"""
-        _root_.com.manyangled.coulomb.UnitExprString[$tpeU]($sq)
-      """
-    }
-
-    def churchType(i: Int): Type = {
-      i match {
-        case v if (v > 0) => appliedType(incType, List(churchType(v - 1)))
-        case v if (v < 0) => appliedType(decType, List(churchType(v + 1)))
-        case _ => zeroType
-      }
-    }
-
-    def mapToType(map: Map[Type, Int]): Type = {
-      if (map.isEmpty) typeOf[Unitless] else {
-        val mlist = map.toList
-        val (u0, e0) = mlist.head
-        val et0 = churchType(e0)
-        val t0 = appliedType(powType, List(u0, et0))
-        mlist.tail.foldLeft(t0) { case (tc, (u, e)) =>
-          val et = churchType(e)
-          val t = appliedType(powType, List(u, et))
-          appliedType(mulType, List(tc, t))
-        }
-      }
-    }
-
-    def unitExprMul[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-      val tpeU1 = weakTypeOf[U1]
-      val tpeU2 = weakTypeOf[U2]
-
-      val (coef1, map1) = canonical(tpeU1)
-      val (coef2, map2) = canonical(tpeU2)
-
-      val mt = mapToType(mapMul(map1, map2))
-
-      val cq = q"${coef1 * coef2}"
-
-      q"""
-        new _root_.com.manyangled.coulomb.UnitExprMul[$tpeU1, $tpeU2] {
-          type U = $mt
-          def coef = $cq
-        }
-      """
-    }
-
-    def unitExprDiv[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-      val tpeU1 = weakTypeOf[U1]
-      val tpeU2 = weakTypeOf[U2]
-
-      val (coef1, map1) = canonical(tpeU1)
-      val (coef2, map2) = canonical(tpeU2)
-
-      val mt = mapToType(mapDiv(map1, map2))
-
+    if (!compat) q"" // fail implicit resolution if they aren't compatible
+    else {
+      // if they are compatible, then create the corresponding witness
       val cq = q"${coef1 / coef2}"
-
-      q"""
-        new _root_.com.manyangled.coulomb.UnitExprDiv[$tpeU1, $tpeU2] {
-          type U = $mt
-          def coef = $cq
-        }
-      """
+      if (directTempCompat(map1, map2)) {
+        // todo: add handling of rudimentary type simplifications to identify
+        // nontrivial cases of direct temperature unit exprs?
+        val (_, coef1) = urecVal(tpeU1)
+        val (_, coef2) = urecVal(tpeU2)
+        val (coef1q, coef2q) = (q"$coef1", q"$coef2")
+        val (off1q, off2q) = (q"${turecVal(tpeU1)}", q"${turecVal(tpeU2)}")
+        q"""
+          new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq) {
+            override def convert(u: _root_.com.manyangled.coulomb.Unit[$tpeU1])(implicit uesU2: _root_.com.manyangled.coulomb.UnitExprString[$tpeU2]): _root_.com.manyangled.coulomb.Unit[$tpeU2] = {
+              val k = (u.value + $off1q) * $coef1q
+              val r = (k / $coef2q) - $off2q
+              new _root_.com.manyangled.coulomb.Unit[$tpeU2](r)
+            }
+          }
+        """
+      } else {
+        q"""
+          new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq)
+        """
+      }
     }
+  }
+
+  def ueAtomicString(typeU: Type): Boolean = {
+    typeU.dealias match {
+      case FUnit(_) => true
+      case DUnit(_, _, _) => true
+      case _ => false
+    }
+  }
+
+  def ueString(typeU: Type): String = {
+    typeU.dealias match {
+      case IsUnitless() => "unitless"
+      case FUnit(name) => name
+      case DUnit(name, _, _) => name
+      case MulOp(lsub, rsub) => {
+        val lstr = ueString(lsub)
+        val rstr = ueString(rsub)
+        val ls = if (ueAtomicString(lsub)) lstr else s"($lstr)"
+        val rs = if (ueAtomicString(rsub)) rstr else s"($rstr)"
+        s"$ls * $rs"
+      }
+      case DivOp(lsub, rsub) => {
+        val lstr = ueString(lsub)
+        val rstr = ueString(rsub)
+        val ls = if (ueAtomicString(lsub)) lstr else s"($lstr)"
+        val rs = if (ueAtomicString(rsub)) rstr else s"($rstr)"
+        s"$ls / $rs"
+      }
+      case PowOp(bsub, exp) => {
+        if (exp == 0) "unitless" else {
+          val bstr = ueString(bsub)
+          val bs = if (ueAtomicString(bsub)) bstr else s"($bstr)"
+          s"$bs ^ $exp"
+        }
+      }
+      case PreOp(name, _, sub) => {
+        val str = ueString(sub)
+        val s = if (ueAtomicString(sub)) str else s"($str)"
+        s"${name}-$s"
+      }        
+      case _ => {
+        // This should never execute
+        abort(s"Undefined Unit Type: ${typeName(typeU)}")
+        ""
+      }
+    }
+  }
+
+  def unitExprString[U: WeakTypeTag]: Tree = {
+    val tpeU = weakTypeOf[U]
+    val str = ueString(tpeU)
+    val sq = q"$str"
+    q"""
+      _root_.com.manyangled.coulomb.UnitExprString[$tpeU]($sq)
+    """
+  }
+
+  def churchType(i: Int): Type = {
+    i match {
+      case v if (v > 0) => appliedType(incType, List(churchType(v - 1)))
+      case v if (v < 0) => appliedType(decType, List(churchType(v + 1)))
+      case _ => zeroType
+    }
+  }
+
+  def mapToType(map: Map[Type, Int]): Type = {
+    if (map.isEmpty) typeOf[Unitless] else {
+      val mlist = map.toList
+      val (u0, e0) = mlist.head
+      val et0 = churchType(e0)
+      val t0 = appliedType(powType, List(u0, et0))
+      mlist.tail.foldLeft(t0) { case (tc, (u, e)) =>
+        val et = churchType(e)
+        val t = appliedType(powType, List(u, et))
+        appliedType(mulType, List(tc, t))
+      }
+    }
+  }
+
+  def unitExprMul[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+    val tpeU1 = weakTypeOf[U1]
+    val tpeU2 = weakTypeOf[U2]
+
+    val (coef1, map1) = canonical(tpeU1)
+    val (coef2, map2) = canonical(tpeU2)
+
+    val mt = mapToType(mapMul(map1, map2))
+
+    val cq = q"${coef1 * coef2}"
+
+    q"""
+      new _root_.com.manyangled.coulomb.UnitExprMul[$tpeU1, $tpeU2] {
+        type U = $mt
+        def coef = $cq
+      }
+    """
+  }
+
+  def unitExprDiv[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+    val tpeU1 = weakTypeOf[U1]
+    val tpeU2 = weakTypeOf[U2]
+
+    val (coef1, map1) = canonical(tpeU1)
+    val (coef2, map2) = canonical(tpeU2)
+
+    val mt = mapToType(mapDiv(map1, map2))
+
+    val cq = q"${coef1 / coef2}"
+
+    q"""
+      new _root_.com.manyangled.coulomb.UnitExprDiv[$tpeU1, $tpeU2] {
+        type U = $mt
+        def coef = $cq
+      }
+    """
   }
 }
 
