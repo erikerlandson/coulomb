@@ -49,6 +49,10 @@ class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
 }
 
 object Unit {
+  implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](u: Unit[U])(implicit
+    cu: CompatUnits[U, U2],
+    uesU2: UnitExprString[U2]): Unit[U2] = cu.convert(u)
+
   implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
     def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Unit[U] = new Unit[U](num.toDouble(v))
   }
