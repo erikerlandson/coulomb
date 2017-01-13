@@ -151,6 +151,25 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
+  object FlatMulOp {
+    def unapply(tpe: Type): Option[Seq[Type]] = {
+      tpe match {
+        case MulOp(lsub, rsub) => {
+          val lseq = lsub match {
+            case FlatMulOp(ls) => ls
+            case _ => Vector(lsub)
+          }
+          val rseq = rsub match {
+            case FlatMulOp(rs) => rs
+            case _ => Vector(rsub)
+          }
+          Option(lseq ++ rseq)
+        }
+        case _ => None
+      }
+    }
+  }
+
   object DivOp {
     def unapply(tpe: Type): Option[(Type, Type)] = {
       if (tpe.typeConstructor =:= divType) {
@@ -325,12 +344,11 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case IsUnitless() => "unitless"
       case FUnit(name) => name
       case DUnit(name, _, _) => name
-      case MulOp(lsub, rsub) => {
-        val lstr = ueString(lsub)
-        val rstr = ueString(rsub)
-        val ls = if (ueAtomicString(lsub)) lstr else s"($lstr)"
-        val rs = if (ueAtomicString(rsub)) rstr else s"($rstr)"
-        s"$ls * $rs"
+      case FlatMulOp(ssub) => {
+        ssub.map { sub =>
+          val str = ueString(sub)
+          if (ueAtomicString(sub)) str else s"($str)"
+        }.mkString(" * ")
       }
       case DivOp(lsub, rsub) => {
         val lstr = ueString(lsub)
