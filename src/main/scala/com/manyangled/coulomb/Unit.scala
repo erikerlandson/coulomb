@@ -370,18 +370,26 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     """
   }
 
-  def mapToType(map: Map[Type, Int]): Type = {
-    if (map.isEmpty) typeOf[Unitless] else {
-      val mlist = map.toList
-      val (u0, e0) = mlist.head
-      val et0 = churchType(e0)
-      val t0 = appliedType(powType, List(u0, et0))
-      mlist.tail.foldLeft(t0) { case (tc, (u, e)) =>
-        val et = churchType(e)
-        val t = appliedType(powType, List(u, et))
-        appliedType(mulType, List(tc, t))
+  def ueToType(u: Type, e: Int): Type =
+    if (e == 1) u else appliedType(powType, List(u, churchType(e)))
+
+  def seqToType(seq: Seq[(Type, Int)]): Type = {
+    if (seq.isEmpty) typeOf[Unitless] else {
+      val (u0, e0) = seq.head
+      seq.tail.foldLeft(ueToType(u0, e0)) { case (tc, (u, e)) =>
+        appliedType(mulType, List(tc, ueToType(u, e)))
       }
     }
+  }
+
+  def mapToType(map: Map[Type, Int]): Type = {
+    val vec = map.toVector
+    val ePos = vec.filter { case(_, e) => e > 0 }.sortBy { case (_, e) => e }
+    val eNeg = vec.filter { case(_, e) => e < 0 }
+      .map { case (u, e) => (u -> -e) }.sortBy { case (_, e) => e }
+    val tPos = seqToType(ePos)
+    val tNeg = seqToType(eNeg)
+    if (eNeg.isEmpty) tPos else appliedType(divType, List(tPos, tNeg))
   }
 
   def unitExprMul[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
