@@ -311,8 +311,11 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def ueAtomicString(typeU: Type): Boolean = {
     typeU.dealias match {
+      case IsUnitless() => true
       case FUnit(_) => true
       case DUnit(_, _, _) => true
+      case PowOp(_, exp) if (exp == 0) => true
+      case PowOp(bsub, exp) if (exp == 1 && ueAtomicString(bsub)) => true
       case _ => false
     }
   }
@@ -337,7 +340,9 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         s"$ls / $rs"
       }
       case PowOp(bsub, exp) => {
-        if (exp == 0) "unitless" else {
+        if (exp == 0) "unitless"
+        else if (exp == 1) ueString(bsub)
+        else {
           val bstr = ueString(bsub)
           val bs = if (ueAtomicString(bsub)) bstr else s"($bstr)"
           s"$bs ^ $exp"
