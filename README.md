@@ -9,12 +9,12 @@ A statically typed unit analysis library for Scala
 ### examples
 
 ```scala
-scala> import com.manyangled.coulomb._; import ChurchInt._; import base._; import prefix._; import derived._; import Unit._
+scala> import com.manyangled.coulomb._; import ChurchInt._; import SIBaseUnits._; import SIPrefixes._; import DemoUnits._; import Unit._
 import com.manyangled.coulomb._
 import ChurchInt._
-import base._
-import prefix._
-import derived._
+import SIBaseUnits._
+import SIPrefixes._
+import DemoUnits._
 import Unit._
 
 scala> 1.withUnit[Liter].as[Meter <^> _3].toString

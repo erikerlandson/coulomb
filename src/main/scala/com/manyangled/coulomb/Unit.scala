@@ -60,7 +60,7 @@ object Unit {
 
 case class UnitRec[UE <: UnitExpr](name: String, coef: Double)
 
-class UCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
+class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
   def this(n: String) = this(n, 1.0)
 
   implicit val furec: UnitRec[U] = UnitRec[U](uname, ucoef)
@@ -68,7 +68,7 @@ class UCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
 
 case class TempUnitRec[UE <: UnitExpr](offset: Double)
 
-class TempUnitCompanion[U <: UnitExpr](uname: String, ucoef: Double, uoffset: Double) extends UCompanion[U](uname, ucoef) {
+class TempUnitCompanion[U <: UnitExpr](uname: String, ucoef: Double, uoffset: Double) extends UnitCompanion[U](uname, ucoef) {
   implicit val turec: TempUnitRec[U] = TempUnitRec[U](uoffset)
 }
 
@@ -291,7 +291,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def directTempCompat(map1: Map[Type, Int], map2: Map[Type, Int]): Boolean = {
-    map1 == Map(typeOf[base.Kelvin] -> 1) && map2 == Map(typeOf[base.Kelvin] -> 1)
+    map1 == Map(typeOf[SIBaseUnits.Kelvin] -> 1) && map2 == map1
   }
 
   def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
@@ -451,55 +451,4 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       }
     """
   }
-}
-
-package base {
-  trait Meter extends BaseUnit
-  object Meter extends UCompanion[Meter]("meter")
-
-  trait Second extends BaseUnit
-  object Second extends UCompanion[Second]("second")
-
-  trait Kilogram extends BaseUnit
-  object Kilogram extends UCompanion[Kilogram]("kilogram")
-
-  trait Kelvin extends BaseUnit
-  object Kelvin extends TempUnitCompanion[Kelvin]("kelvin", 1.0, 0.0)
-}
-
-package derived {
-  import ChurchInt._
-  import base._
-
-  trait Foot extends DerivedUnit[Meter]
-  object Foot extends UCompanion[Foot]("foot", 0.3048)
-
-  trait Yard extends DerivedUnit[Meter]
-  object Yard extends UCompanion[Yard]("yard", 0.9144)
-
-  trait Minute extends DerivedUnit[Second]
-  object Minute extends UCompanion[Minute]("minute", 60.0)
-
-  trait Pound extends DerivedUnit[Kilogram]
-  object Pound extends UCompanion[Pound]("pound", 0.453592)
-
-  trait Liter extends DerivedUnit[Meter <^> _3]
-  object Liter extends UCompanion[Liter]("liter", 0.001)
-
-  trait EarthGravity extends DerivedUnit[Meter </> (Second <^> _2)]
-  object EarthGravity extends UCompanion[EarthGravity]("g", 9.807)
-
-  trait Celsius extends DerivedUnit[Kelvin]
-  object Celsius extends TempUnitCompanion[Celsius]("celsius", 1.0, 273.15)
-
-  trait Fahrenheit extends DerivedUnit[Kelvin]
-  object Fahrenheit extends TempUnitCompanion[Fahrenheit]("fahrenheit", 5.0 / 9.0, 459.67)
-}
-
-package prefix {
-  trait Milli extends PrefixUnit
-  object Milli extends UCompanion[Milli]("milli", 1e-3)
-
-  trait Kilo extends PrefixUnit
-  object Kilo extends UCompanion[Kilo]("kilo", 1e+3)
 }
