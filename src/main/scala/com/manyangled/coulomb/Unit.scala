@@ -58,16 +58,6 @@ object Quantity {
   implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](q: Quantity[U])(implicit
     cu: CompatUnits[U, U2],
     uesU2: UnitExprString[U2]): Quantity[U2] = cu.convert(q)
-
-  implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
-    def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Quantity[U] =
-      new Quantity[U](num.toDouble(v))
-
-    def withTemperature[U <: UnitExpr](implicit
-        turecU: TempUnitRec[U],
-        uesU: UnitExprString[U]): Temperature[U] =
-      new Temperature[U](num.toDouble(v))
-  }
 }
 
 class Temperature[U <: UnitExpr](val value: Double)(implicit
@@ -93,6 +83,18 @@ class Temperature[U <: UnitExpr](val value: Double)(implicit
     new Quantity[U](this.value - ct.convert(that).value)
 
   override def toString = s"$value ${uesU.str}"  
+}
+
+object extensions {
+  implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
+    def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Quantity[U] =
+      new Quantity[U](num.toDouble(v))
+
+    def withTemperature[U <: UnitExpr](implicit
+        turecU: TempUnitRec[U],
+        uesU: UnitExprString[U]): Temperature[U] =
+      new Temperature[U](num.toDouble(v))
+  }
 }
 
 case class UnitRec[UE <: UnitExpr](name: String, coef: Double)
