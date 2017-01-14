@@ -64,6 +64,11 @@ case class UnitRec[UE <: UnitExpr](name: String, coef: Double)
 class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
   def this(n: String) = this(n, 1.0)
 
+  def apply[N](v: N)(implicit
+      num: Numeric[N],
+      ues: UnitExprString[U]): Quantity[U] =
+    new Quantity[U](num.toDouble(v))
+
   implicit val furec: UnitRec[U] = UnitRec[U](uname, ucoef)
 }
 
