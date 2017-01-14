@@ -9,7 +9,7 @@ A statically typed unit analysis library for Scala
 ### examples
 
 ```scala
-scala> import com.manyangled.coulomb._; import ChurchInt._; import SIBaseUnits._; import SIPrefixes._; import DemoUnits._; import Unit._
+scala> import com.manyangled.coulomb._; import ChurchInt._; import SIBaseUnits._; import SIPrefixes._; import DemoUnits._; import extensions._
 import com.manyangled.coulomb._
 import ChurchInt._
 import SIBaseUnits._
