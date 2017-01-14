@@ -9,9 +9,9 @@ trait UnitExpr
 
 trait BaseUnit extends UnitExpr
 
-trait PrefixUnit extends UnitExpr
-
 trait DerivedUnit[U <: UnitExpr] extends UnitExpr
+
+trait PrefixUnit extends DerivedUnit[Unitless]
 
 sealed trait <*> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
