@@ -15,7 +15,7 @@ import ChurchInt._
 import SIBaseUnits._
 import SIPrefixes._
 import DemoUnits._
-import Unit._
+import extensions._
 
 scala> 1.withUnit[Liter].as[Meter <^> _3].toString
 res1: String = 0.001 meter ^ 3
