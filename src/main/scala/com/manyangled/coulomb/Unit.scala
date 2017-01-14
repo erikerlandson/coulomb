@@ -21,17 +21,17 @@ sealed trait <^> [UE <: UnitExpr, P <: ChurchInt] extends UnitExpr
 
 sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 
+sealed trait Unitless extends UnitExpr
+
 trait TemperatureExpr extends UnitExpr
 
 trait BaseTemperature extends BaseUnit with TemperatureExpr
 
 trait DerivedTemperature extends DerivedUnit[SIBaseUnits.Kelvin] with TemperatureExpr
 
+class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
+    extends AnyVal with Serializable {
 
-// unitless values (any units have canceled)
-sealed trait Unitless extends UnitExpr
-
-class Quantity[U <: UnitExpr](private [coulomb] val value: Double) extends AnyVal with Serializable {
   def as[U2 <: UnitExpr](implicit
       cu: CompatUnits[U, U2]): Quantity[U2] =
     cu.convert(this)
@@ -66,7 +66,8 @@ object Quantity {
     cu: CompatUnits[U, U2]): Quantity[U2] = cu.convert(q)
 }
 
-class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double) extends AnyVal with Serializable {
+class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double)
+    extends AnyVal with Serializable {
 
   def as[U2 <: TemperatureExpr](implicit
       ct: CompatTemps[U, U2]): Temperature[U2] =
