@@ -54,6 +54,11 @@ class Quantity[U <: UnitExpr](val value: Double) extends AnyVal with Serializabl
     new Quantity[U <^> E](math.pow(this.value, exp.value))
 
   def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
+
+  def toInt: Int = value.round.toInt
+  def toLong: Long = value.round
+  def toFloat: Float = value.toFloat
+  def toDouble: Double = value
 }
 
 object Quantity {
@@ -78,6 +83,11 @@ class Temperature[U <: TemperatureExpr](val value: Double) extends AnyVal with S
     new Quantity[U](this.value - ct.convert(that).value)
 
   def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
+
+  def toInt: Int = value.round.toInt
+  def toLong: Long = value.round
+  def toFloat: Float = value.toFloat
+  def toDouble: Double = value
 }
 
 object extensions {
