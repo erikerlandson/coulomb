@@ -24,10 +24,9 @@ sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 // unitless values (any units have canceled)
 sealed trait Unitless extends UnitExpr
 
-class Quantity[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
+class Quantity[U <: UnitExpr](val value: Double) {
   def as[U2 <: UnitExpr](implicit
-      cu: CompatUnits[U, U2],
-      uesU2: UnitExprString[U2]): Quantity[U2] =
+      cu: CompatUnits[U, U2]): Quantity[U2] =
     cu.convert(this)
 
   def asTemperature(implicit
@@ -42,32 +41,29 @@ class Quantity[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U
   def -[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Quantity[U] =
     new Quantity[U](this.value - cu.coef * that.value)
 
-  def *[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }, uesRU: UnitExprString[RU]): Quantity[RU] =
+  def *[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }): Quantity[RU] =
     new Quantity[RU](uer.coef * this.value * that.value)
 
-  def /[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }, uesRU: UnitExprString[RU]): Quantity[RU] =
+  def /[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }): Quantity[RU] =
     new Quantity[RU](uer.coef * this.value / that.value)
 
-  def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E], uesRU: UnitExprString[U <^> E]): Quantity[U <^> E] =
+  def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E]): Quantity[U <^> E] =
     new Quantity[U <^> E](math.pow(this.value, exp.value))
 
-  override def toString = s"$value ${uesU.str}"
+  def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
 }
 
 object Quantity {
   implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](q: Quantity[U])(implicit
-    cu: CompatUnits[U, U2],
-    uesU2: UnitExprString[U2]): Quantity[U2] = cu.convert(q)
+    cu: CompatUnits[U, U2]): Quantity[U2] = cu.convert(q)
 }
 
 class Temperature[U <: UnitExpr](val value: Double)(implicit
-    trecU: TempUnitRec[U],
-    uesU: UnitExprString[U]) {
+    trecU: TempUnitRec[U]) {
 
   def as[U2 <: UnitExpr](implicit
       ct: CompatTemps[U, U2],
-      trecU2: TempUnitRec[U2],
-      uesU2: UnitExprString[U2]): Temperature[U2] =
+      trecU2: TempUnitRec[U2]): Temperature[U2] =
     ct.convert(this)
 
   def asQuantity: Quantity[U] = new Quantity[U](this.value)
@@ -82,17 +78,16 @@ class Temperature[U <: UnitExpr](val value: Double)(implicit
       ct: CompatTemps[U2, U]): Quantity[U] =
     new Quantity[U](this.value - ct.convert(that).value)
 
-  override def toString = s"$value ${uesU.str}"  
+  def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
 }
 
 object extensions {
   implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
-    def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Quantity[U] =
+    def withUnit[U <: UnitExpr]: Quantity[U] =
       new Quantity[U](num.toDouble(v))
 
     def withTemperature[U <: UnitExpr](implicit
-        turecU: TempUnitRec[U],
-        uesU: UnitExprString[U]): Temperature[U] =
+        turecU: TempUnitRec[U]): Temperature[U] =
       new Temperature[U](num.toDouble(v))
   }
 }
@@ -103,8 +98,7 @@ class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
   def this(n: String) = this(n, 1.0)
 
   def apply[N](v: N)(implicit
-      num: Numeric[N],
-      ues: UnitExprString[U]): Quantity[U] =
+      num: Numeric[N]): Quantity[U] =
     new Quantity[U](num.toDouble(v))
 
   implicit val furec: UnitRec[U] = UnitRec[U](uname, ucoef)
@@ -118,7 +112,7 @@ class TempUnitCompanion[U <: UnitExpr](uname: String, ucoef: Double, uoffset: Do
 
 @implicitNotFound("Implicit not found: CompatUnits[${U1}, ${U2}].\nIncompatible Unit Expressions: ${U1} and ${U2}")
 class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
-  def convert(q1: Quantity[U1])(implicit uesU2: UnitExprString[U2]): Quantity[U2] =
+  def convert(q1: Quantity[U1]): Quantity[U2] =
     new Quantity[U2](coef * q1.value)
 }
 
@@ -131,7 +125,6 @@ class CompatTemps[U1 <: UnitExpr, U2 <: UnitExpr](
     val coef1: Double, val off1: Double, val coef2: Double, val off2: Double) {
 
   def convert(t1: Temperature[U1])(implicit
-      uesU2: UnitExprString[U2],
       turecU2: TempUnitRec[U2]): Temperature[U2] = {
     val k = (t1.value + off1) * coef1
     val v2 = (k / coef2) - off2
