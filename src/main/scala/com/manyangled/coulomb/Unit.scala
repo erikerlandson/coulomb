@@ -24,37 +24,38 @@ sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 // unitless values (any units have canceled)
 sealed trait Unitless extends UnitExpr
 
-class Unit[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
-  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Unit[U2] =
+class Quantity[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
+  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Quantity[U2] =
     cu.convert(this)
 
-  def unary_- : Unit[U] = new Unit[U](-this.value)
+  def unary_- : Quantity[U] = new Quantity[U](-this.value)
 
-  def +[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
-    new Unit[U](this.value + cu.coef * that.value)
+  def +[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Quantity[U] =
+    new Quantity[U](this.value + cu.coef * that.value)
 
-  def -[U2 <: UnitExpr](that: Unit[U2])(implicit cu: CompatUnits[U2, U]): Unit[U] =
-    new Unit[U](this.value - cu.coef * that.value)
+  def -[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Quantity[U] =
+    new Quantity[U](this.value - cu.coef * that.value)
 
-  def *[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
-    new Unit[RU](uer.coef * this.value * that.value)
+  def *[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }, uesRU: UnitExprString[RU]): Quantity[RU] =
+    new Quantity[RU](uer.coef * this.value * that.value)
 
-  def /[U2 <: UnitExpr, RU <: UnitExpr](that: Unit[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }, uesRU: UnitExprString[RU]) =
-    new Unit[RU](uer.coef * this.value / that.value)
+  def /[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }, uesRU: UnitExprString[RU]): Quantity[RU] =
+    new Quantity[RU](uer.coef * this.value / that.value)
 
-  def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E], uesRU: UnitExprString[U <^> E]) =
-    new Unit[U <^> E](math.pow(this.value, exp.value))
+  def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E], uesRU: UnitExprString[U <^> E]): Quantity[U <^> E] =
+    new Quantity[U <^> E](math.pow(this.value, exp.value))
 
   override def toString = s"$value ${uesU.str}"
 }
 
-object Unit {
-  implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](u: Unit[U])(implicit
+object Quantity {
+  implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](q: Quantity[U])(implicit
     cu: CompatUnits[U, U2],
-    uesU2: UnitExprString[U2]): Unit[U2] = cu.convert(u)
+    uesU2: UnitExprString[U2]): Quantity[U2] = cu.convert(q)
 
   implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
-    def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Unit[U] = new Unit[U](num.toDouble(v))
+    def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Quantity[U] =
+      new Quantity[U](num.toDouble(v))
   }
 }
 
@@ -74,7 +75,8 @@ class TempUnitCompanion[U <: UnitExpr](uname: String, ucoef: Double, uoffset: Do
 
 @implicitNotFound("Implicit not found: CompatUnits[${U1}, ${U2}].\nIncompatible Unit Expressions: ${U1} and ${U2}")
 class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
-  def convert(u: Unit[U1])(implicit uesU2: UnitExprString[U2]): Unit[U2] = new Unit[U2](coef * u.value)
+  def convert(q1: Quantity[U1])(implicit uesU2: UnitExprString[U2]): Quantity[U2] =
+    new Quantity[U2](coef * q1.value)
 }
 
 object CompatUnits {
