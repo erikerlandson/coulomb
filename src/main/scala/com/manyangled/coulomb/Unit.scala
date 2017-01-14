@@ -24,7 +24,7 @@ sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 // unitless values (any units have canceled)
 sealed trait Unitless extends UnitExpr
 
-class Quantity[U <: UnitExpr](val value: Double) {
+class Quantity[U <: UnitExpr](val value: Double) extends AnyVal with Serializable {
   def as[U2 <: UnitExpr](implicit
       cu: CompatUnits[U, U2]): Quantity[U2] =
     cu.convert(this)
@@ -59,7 +59,7 @@ object Quantity {
 }
 
 class Temperature[U <: UnitExpr](val value: Double)(implicit
-    trecU: TempUnitRec[U]) {
+    trecU: TempUnitRec[U]) extends Serializable {
 
   def as[U2 <: UnitExpr](implicit
       ct: CompatTemps[U, U2],
