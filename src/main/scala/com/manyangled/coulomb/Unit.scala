@@ -25,8 +25,14 @@ sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 sealed trait Unitless extends UnitExpr
 
 class Quantity[U <: UnitExpr](val value: Double)(implicit uesU: UnitExprString[U]) {
-  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2], uesU2: UnitExprString[U2]): Quantity[U2] =
+  def as[U2 <: UnitExpr](implicit
+      cu: CompatUnits[U, U2],
+      uesU2: UnitExprString[U2]): Quantity[U2] =
     cu.convert(this)
+
+  def asTemperature(implicit
+      turecU: TempUnitRec[U]): Temperature[U] =
+    new Temperature[U](this.value)
 
   def unary_- : Quantity[U] = new Quantity[U](-this.value)
 
@@ -56,7 +62,37 @@ object Quantity {
   implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
     def withUnit[U <: UnitExpr](implicit uesU: UnitExprString[U]): Quantity[U] =
       new Quantity[U](num.toDouble(v))
+
+    def withTemperature[U <: UnitExpr](implicit
+        turecU: TempUnitRec[U],
+        uesU: UnitExprString[U]): Temperature[U] =
+      new Temperature[U](num.toDouble(v))
   }
+}
+
+class Temperature[U <: UnitExpr](val value: Double)(implicit
+    trecU: TempUnitRec[U],
+    uesU: UnitExprString[U]) {
+
+  def as[U2 <: UnitExpr](implicit
+      ct: CompatTemps[U, U2],
+      trecU2: TempUnitRec[U2],
+      uesU2: UnitExprString[U2]): Temperature[U2] =
+    ct.convert(this)
+
+  def asQuantity: Quantity[U] = new Quantity[U](this.value)
+
+  def +[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Temperature[U] =
+    new Temperature[U](this.value + cu.coef * that.value)
+
+  def -[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Temperature[U] =
+    new Temperature[U](this.value - cu.coef * that.value)
+
+  def -[U2 <: UnitExpr](that: Temperature[U2])(implicit
+      ct: CompatTemps[U2, U]): Quantity[U] =
+    new Quantity[U](this.value - ct.convert(that).value)
+
+  override def toString = s"$value ${uesU.str}"  
 }
 
 case class UnitRec[UE <: UnitExpr](name: String, coef: Double)
@@ -87,6 +123,25 @@ class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
 object CompatUnits {
   implicit def witnessCompatUnits[U1 <: UnitExpr, U2 <: UnitExpr]: CompatUnits[U1, U2] =
     macro UnitMacros.compatUnits[U1, U2]
+}
+
+class CompatTemps[U1 <: UnitExpr, U2 <: UnitExpr](
+    val coef1: Double, val off1: Double, val coef2: Double, val off2: Double) {
+
+  def convert(t1: Temperature[U1])(implicit
+      uesU2: UnitExprString[U2],
+      turecU2: TempUnitRec[U2]): Temperature[U2] = {
+    val k = (t1.value + off1) * coef1
+    val v2 = (k / coef2) - off2
+    new Temperature[U2](v2)
+  }
+}
+
+object CompatTemps {
+  implicit def witnessCompatTemps[U1 <: UnitExpr, U2 <: UnitExpr](implicit
+      turecU1: TempUnitRec[U1], urecU1: UnitRec[U1],
+      turecU2: TempUnitRec[U2], urecU2: UnitRec[U2]): CompatTemps[U1, U2] =
+    new CompatTemps[U1, U2](urecU1.coef, turecU1.offset, urecU2.coef, turecU2.offset)
 }
 
 case class UnitExprString[U <: UnitExpr](str: String)
@@ -297,10 +352,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def directTempCompat(map1: Map[Type, Int], map2: Map[Type, Int]): Boolean = {
-    map1 == Map(typeOf[SIBaseUnits.Kelvin] -> 1) && map2 == map1
-  }
-
   def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
     val tpeU1 = weakTypeOf[U1].dealias
     val tpeU2 = weakTypeOf[U2].dealias
@@ -315,27 +366,9 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     else {
       // if they are compatible, then create the corresponding witness
       val cq = q"${coef1 / coef2}"
-      if (directTempCompat(map1, map2)) {
-        // todo: add handling of rudimentary type simplifications to identify
-        // nontrivial cases of direct temperature unit exprs?
-        val (_, coef1) = urecVal(tpeU1)
-        val (_, coef2) = urecVal(tpeU2)
-        val (coef1q, coef2q) = (q"$coef1", q"$coef2")
-        val (off1q, off2q) = (q"${turecVal(tpeU1)}", q"${turecVal(tpeU2)}")
-        q"""
-          new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq) {
-            override def convert(u: _root_.com.manyangled.coulomb.Unit[$tpeU1])(implicit uesU2: _root_.com.manyangled.coulomb.UnitExprString[$tpeU2]): _root_.com.manyangled.coulomb.Unit[$tpeU2] = {
-              val k = (u.value + $off1q) * $coef1q
-              val r = (k / $coef2q) - $off2q
-              new _root_.com.manyangled.coulomb.Unit[$tpeU2](r)
-            }
-          }
-        """
-      } else {
-        q"""
-          new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq)
-        """
-      }
+      q"""
+        new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq)
+      """
     }
   }
 
