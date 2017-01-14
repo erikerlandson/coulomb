@@ -21,6 +21,13 @@ sealed trait <^> [UE <: UnitExpr, P <: ChurchInt] extends UnitExpr
 
 sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 
+trait TemperatureExpr extends UnitExpr
+
+trait BaseTemperature extends BaseUnit with TemperatureExpr
+
+trait DerivedTemperature extends DerivedUnit[SIBaseUnits.Kelvin] with TemperatureExpr
+
+
 // unitless values (any units have canceled)
 sealed trait Unitless extends UnitExpr
 
@@ -28,10 +35,6 @@ class Quantity[U <: UnitExpr](val value: Double) extends AnyVal with Serializabl
   def as[U2 <: UnitExpr](implicit
       cu: CompatUnits[U, U2]): Quantity[U2] =
     cu.convert(this)
-
-  def asTemperature(implicit
-      turecU: TempUnitRec[U]): Temperature[U] =
-    new Temperature[U](this.value)
 
   def unary_- : Quantity[U] = new Quantity[U](-this.value)
 
@@ -58,15 +61,11 @@ object Quantity {
     cu: CompatUnits[U, U2]): Quantity[U2] = cu.convert(q)
 }
 
-class Temperature[U <: UnitExpr](val value: Double)(implicit
-    trecU: TempUnitRec[U]) extends Serializable {
+class Temperature[U <: TemperatureExpr](val value: Double) extends AnyVal with Serializable {
 
-  def as[U2 <: UnitExpr](implicit
-      ct: CompatTemps[U, U2],
-      trecU2: TempUnitRec[U2]): Temperature[U2] =
+  def as[U2 <: TemperatureExpr](implicit
+      ct: CompatTemps[U, U2]): Temperature[U2] =
     ct.convert(this)
-
-  def asQuantity: Quantity[U] = new Quantity[U](this.value)
 
   def +[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Temperature[U] =
     new Temperature[U](this.value + cu.coef * that.value)
@@ -74,7 +73,7 @@ class Temperature[U <: UnitExpr](val value: Double)(implicit
   def -[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Temperature[U] =
     new Temperature[U](this.value - cu.coef * that.value)
 
-  def -[U2 <: UnitExpr](that: Temperature[U2])(implicit
+  def -[U2 <: TemperatureExpr](that: Temperature[U2])(implicit
       ct: CompatTemps[U2, U]): Quantity[U] =
     new Quantity[U](this.value - ct.convert(that).value)
 
@@ -86,8 +85,7 @@ object extensions {
     def withUnit[U <: UnitExpr]: Quantity[U] =
       new Quantity[U](num.toDouble(v))
 
-    def withTemperature[U <: UnitExpr](implicit
-        turecU: TempUnitRec[U]): Temperature[U] =
+    def withTemperature[U <: TemperatureExpr]: Temperature[U] =
       new Temperature[U](num.toDouble(v))
   }
 }
@@ -104,9 +102,9 @@ class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
   implicit val furec: UnitRec[U] = UnitRec[U](uname, ucoef)
 }
 
-case class TempUnitRec[UE <: UnitExpr](offset: Double)
+case class TempUnitRec[UE <: TemperatureExpr](offset: Double)
 
-class TempUnitCompanion[U <: UnitExpr](uname: String, ucoef: Double, uoffset: Double) extends UnitCompanion[U](uname, ucoef) {
+class TempUnitCompanion[U <: TemperatureExpr](uname: String, ucoef: Double, uoffset: Double) extends UnitCompanion[U](uname, ucoef) {
   implicit val turec: TempUnitRec[U] = TempUnitRec[U](uoffset)
 }
 
@@ -121,11 +119,10 @@ object CompatUnits {
     macro UnitMacros.compatUnits[U1, U2]
 }
 
-class CompatTemps[U1 <: UnitExpr, U2 <: UnitExpr](
+class CompatTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](
     val coef1: Double, val off1: Double, val coef2: Double, val off2: Double) {
 
-  def convert(t1: Temperature[U1])(implicit
-      turecU2: TempUnitRec[U2]): Temperature[U2] = {
+  def convert(t1: Temperature[U1]): Temperature[U2] = {
     val k = (t1.value + off1) * coef1
     val v2 = (k / coef2) - off2
     new Temperature[U2](v2)
@@ -133,7 +130,7 @@ class CompatTemps[U1 <: UnitExpr, U2 <: UnitExpr](
 }
 
 object CompatTemps {
-  implicit def witnessCompatTemps[U1 <: UnitExpr, U2 <: UnitExpr](implicit
+  implicit def witnessCompatTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](implicit
       turecU1: TempUnitRec[U1], urecU1: UnitRec[U1],
       turecU2: TempUnitRec[U2], urecU2: UnitRec[U2]): CompatTemps[U1, U2] =
     new CompatTemps[U1, U2](urecU1.coef, turecU1.offset, urecU2.coef, turecU2.offset)
@@ -170,11 +167,12 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   import c.universe._
 
   trait DummyU extends BaseUnit
+  trait DummyT extends BaseTemperature
   trait DummyP extends PrefixUnit
 
   val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
   val urecType = typeOf[UnitRec[DummyU]].typeConstructor
-  val turecType = typeOf[TempUnitRec[DummyU]].typeConstructor
+  val turecType = typeOf[TempUnitRec[DummyT]].typeConstructor
 
   val fuType = typeOf[BaseUnit]
   val puType = typeOf[PrefixUnit]

@@ -19,7 +19,7 @@ object SIBaseUnits {
   trait Candela extends BaseUnit
   object Candela extends UnitCompanion[Candela]("candela")
 
-  trait Kelvin extends BaseUnit
+  trait Kelvin extends BaseTemperature
   object Kelvin extends TempUnitCompanion[Kelvin]("kelvin", 1.0, 0.0)
 }
 
@@ -46,9 +46,9 @@ object DemoUnits {
   trait EarthGravity extends DerivedUnit[Meter </> (Second <^> _2)]
   object EarthGravity extends UnitCompanion[EarthGravity]("g", 9.807)
 
-  trait Celsius extends DerivedUnit[Kelvin]
+  trait Celsius extends DerivedTemperature
   object Celsius extends TempUnitCompanion[Celsius]("celsius", 1.0, 273.15)
 
-  trait Fahrenheit extends DerivedUnit[Kelvin]
+  trait Fahrenheit extends DerivedTemperature
   object Fahrenheit extends TempUnitCompanion[Fahrenheit]("fahrenheit", 5.0 / 9.0, 459.67)
 }
