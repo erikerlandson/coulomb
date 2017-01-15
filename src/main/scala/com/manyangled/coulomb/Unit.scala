@@ -399,13 +399,13 @@ object Temperature {
 
 /** type extensions and implicits for working with units */
 object extensions {
-  /** enhances numeric types with utility methods for `coulomb`
+  /** enhances numeric types with utility methods for `coulomb` */
   implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
-    /** create a new unit Quantity of type U with numeric value of `this`
+    /** create a new unit Quantity of type U with numeric value of `this` */
     def withUnit[U <: UnitExpr]: Quantity[U] =
       new Quantity[U](num.toDouble(v))
 
-    /** create a new unit Temperature of type U with numeric value of `this`
+    /** create a new unit Temperature of type U with numeric value of `this` */
     def withTemperature[U <: TemperatureExpr]: Temperature[U] =
       new Temperature[U](num.toDouble(v))
   }
