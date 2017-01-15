@@ -3,6 +3,9 @@ A statically typed unit analysis library for Scala
 
 `coulomb` is still under construction, but I hope to have a consumable release soon.  Feel free to play with it in the mean time! I'll keep the head of `develop` branch unbroken.
 
+### Documentation
+API documentation for `coulomb` is available at: https://erikerlandson.github.io/coulomb/latest/api/
+
 #### Why name it `coulomb` ?
 `coulomb` is a library for "static units", and 'coulomb' is the "unit of static" (aka charge).
 
