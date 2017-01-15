@@ -69,6 +69,13 @@ object Quantity {
   def coefficient[U <: UnitExpr, U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Double =
     cu.coef
 
+  def apply[U <: UnitExpr](v: Int) = new Quantity[U](v.toDouble)
+  def apply[U <: UnitExpr](v: Long) = new Quantity[U](v.toDouble)
+  def apply[U <: UnitExpr](v: Float) = new Quantity[U](v.toDouble)
+  def apply[U <: UnitExpr](v: Double) = new Quantity[U](v)
+
+  def fromTemperature[U <: TemperatureExpr](t: Temperature[U]) = new Quantity[U](t.value)
+
   implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](q: Quantity[U])(implicit
     cu: CompatUnits[U, U2]): Quantity[U2] = cu.convert(q)
 }
@@ -102,6 +109,13 @@ object Temperature {
   def converter[U <: TemperatureExpr, U2 <: TemperatureExpr](implicit
       ct: CompatTemps[U, U2]): Temperature[U] => Temperature[U2] =
     ct.converter
+
+  def apply[U <: TemperatureExpr](v: Int) = new Temperature[U](v.toDouble)
+  def apply[U <: TemperatureExpr](v: Long) = new Temperature[U](v.toDouble)
+  def apply[U <: TemperatureExpr](v: Float) = new Temperature[U](v.toDouble)
+  def apply[U <: TemperatureExpr](v: Double) = new Temperature[U](v)
+
+  def fromQuantity[U <: TemperatureExpr](q: Quantity[U]) = new Temperature[U](q.value)
 
   implicit def implicitTempConvert[U <: TemperatureExpr, U2 <: TemperatureExpr](t: Temperature[U])(
       implicit ct: CompatTemps[U, U2]): Temperature[U2] =
