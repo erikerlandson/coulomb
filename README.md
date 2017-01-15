@@ -67,8 +67,11 @@ res13: String = 3.0 unitless
 The motivation for `coulomb` is to support the following features:
 
 1. allow a programmer to assocate unit analysis with values, in the form of static types
+  1. `val length = Quantity[Meter](1)`
 1. express those types with arbitrary and natural expressions
-1. let the compiler automatically determine which unit expressions are equivalent (aka _compatible)
+  1. `val speed = Quantity[(Kilo <-> Meter) </> Hour](100.0)`
+  1. `val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)`
+1. let the compiler automatically determine which unit expressions are equivalent (aka _compatible_)
 1. cause compile-time error when operations are attempted with _incompatible_ unit types
 1. automatically convert unit quantities into equivalent compatible units
 1. automatically generate the output unit types for operations on unit quantities
