@@ -62,6 +62,13 @@ class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
 }
 
 object Quantity {
+  def converter[U <: UnitExpr, U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]):
+      Quantity[U] => Quantity[U2] =
+    cu.converter
+
+  def coefficient[U <: UnitExpr, U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Double =
+    cu.coef
+
   implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](q: Quantity[U])(implicit
     cu: CompatUnits[U, U2]): Quantity[U2] = cu.convert(q)
 }
@@ -92,6 +99,10 @@ class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double)
 }
 
 object Temperature {
+  def converter[U <: TemperatureExpr, U2 <: TemperatureExpr](implicit
+      ct: CompatTemps[U, U2]): Temperature[U] => Temperature[U2] =
+    ct.converter
+
   implicit def implicitTempConvert[U <: TemperatureExpr, U2 <: TemperatureExpr](t: Temperature[U])(
       implicit ct: CompatTemps[U, U2]): Temperature[U2] =
     ct.convert(t)
@@ -128,26 +139,33 @@ class TempUnitCompanion[U <: TemperatureExpr](uname: String, ucoef: Double, uoff
 
 @implicitNotFound("Implicit not found: CompatUnits[${U1}, ${U2}].\nIncompatible Unit Expressions: ${U1} and ${U2}")
 class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
-  def convert(q1: Quantity[U1]): Quantity[U2] =
-    new Quantity[U2](coef * q1.value)
+  val converter = CompatUnits.converter[U1, U2](coef)
+  def convert(q1: Quantity[U1]): Quantity[U2] = converter(q1)
 }
 
 object CompatUnits {
+  def converter[U1 <: UnitExpr, U2 <: UnitExpr](coef: Double): Quantity[U1] => Quantity[U2] =
+    (q1: Quantity[U1]) => new Quantity[U2](coef * q1.value)
+
   implicit def witnessCompatUnits[U1 <: UnitExpr, U2 <: UnitExpr]: CompatUnits[U1, U2] =
     macro UnitMacros.compatUnits[U1, U2]
 }
 
 class CompatTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](
     val coef1: Double, val off1: Double, val coef2: Double, val off2: Double) {
-
-  def convert(t1: Temperature[U1]): Temperature[U2] = {
-    val k = (t1.value + off1) * coef1
-    val v2 = (k / coef2) - off2
-    new Temperature[U2](v2)
-  }
+  val converter = CompatTemps.converter[U1, U2](coef1, off1, coef2, off2)
+  def convert(t1: Temperature[U1]): Temperature[U2] = converter(t1)
 }
 
 object CompatTemps {
+  def converter[U1 <: TemperatureExpr, U2 <: TemperatureExpr](
+    coef1: Double, off1: Double, coef2: Double, off2: Double): Temperature[U1] => Temperature[U2] =
+    (t1: Temperature[U1]) => {
+      val k = (t1.value + off1) * coef1
+      val v2 = (k / coef2) - off2
+      new Temperature[U2](v2)
+    }
+
   implicit def witnessCompatTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](implicit
       turecU1: TempUnitRec[U1], urecU1: UnitRec[U1],
       turecU2: TempUnitRec[U2], urecU2: UnitRec[U2]): CompatTemps[U1, U2] =
