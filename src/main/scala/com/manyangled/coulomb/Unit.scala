@@ -5,122 +5,391 @@ import scala.reflect.macros.whitebox
 import scala.language.implicitConversions
 import scala.annotation.implicitNotFound
 
+/**
+ * In `coulomb` all units are static types of a form given by the `UnitExpr` trait hierarchy
+ */
 trait UnitExpr
 
+/**
+ * Base units are axiomatic units. The
+ * [[https://en.wikipedia.org/wiki/International_System_of_Units Standard International]]
+ * (SI) unit system defines seven Base units, which `coulomb` defines in [[SIBaseUnits]].
+ * Exactly one `BaseUnit` is defined for each category of quantity (e.g. length, mass, time, etc).
+ */
 trait BaseUnit extends UnitExpr
 
+/**
+ * Derived units are defined in terms of another [[UnitExpr]]
+ * @tparam U The [[UnitExpr]] used to define the new unit
+ * {{{
+ * // define a new unit Furlong in terms of Meter
+ * import SIBaseUnits._
+ * trait Furlong extends DerivedUnit[Meter]
+ * object Furlong extends UnitCompanion[Furlong]("furlong", 201.168)
+ * }}}
+ */
 trait DerivedUnit[U <: UnitExpr] extends UnitExpr
 
+/**
+ * Prefix units represent standard unitless multipliers applied to units, e.g. [[SIPrefixes]]
+ * defines units `Kilo` (10^3), `Mega` (10^6), etc.
+ * {{{
+ * // define a new prefix Dozen, representing multiplier of 12
+ * trait Dozen extends PrefixUnit
+ * object Dozen extends UnitCompanion[Dozen]("dozen", 12.0)
+ * }}}
+ */
 trait PrefixUnit extends DerivedUnit[Unitless]
 
+/**
+ * The unit product of two other unit expressions
+ * @tparam LUE the left-hand unit expression
+ * @tparam RUE the right-hand unit expression
+ * {{{
+ * import USCustomaryUnits._
+ * // a quantity of acre-feet (a unit of volume, usually for water)
+ * val afq = Quantity[Acre <*> Foot](10)
+ * }}}
+ */
 sealed trait <*> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
+/**
+ * The unit quotient of two unit expressions
+ * @tparam LUE the left-hand unit expression
+ * @tparam RUE the right-hand unit expression
+ * {{{
+ * import SIBaseUnits._
+ * // a velocity in meters per second
+ * val v = Quantity[Meter </> Second](10)
+ * }}}
+ */
 sealed trait </> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
+/**
+ * A power (exponent) of a unit expression
+ * @tparam UE the unit expression being raised to a power
+ * @tparam P the exponent (power)
+ * {{{
+ * import SIBaseUnits._
+ * // an area in square meters
+ * val area = Quantity[Meter <^> _2](10)
+ * }}}
+ */
 sealed trait <^> [UE <: UnitExpr, P <: ChurchInt] extends UnitExpr
 
+/**
+ * Applying a prefix to some unit expression
+ * @tparam PU the prefix being applied
+ * @tparam UE the unit expression
+ * {{{
+ * import SIPrefixes._
+ * import SIBaseUnits._
+ * // a length in millionths of a meter
+ * val length = Quantity[Micro <-> Meter](10)
+ * }}}
+ */
 sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
 
+/**
+ * A unitless value.  Each [[PrefixUnit]] is derived from Unitless.  Unit Expressions where all
+ * units cancel out will also be of type Unitless
+ * {{{
+ * import USCustomaryUnits._
+ * // ratio will have type Unitless, since length units cancel
+ * val ratio = Quantity[Yard](1) / Quantity[Foot](1)
+ * }}}
+ */
 sealed trait Unitless extends UnitExpr
 
+/**
+ * An expression representing a temperature given in some defined temperature unit.
+ */
 trait TemperatureExpr extends UnitExpr
 
+/**
+ * Define a base unit of temperature.  There should be exactly one such base unit, which is
+ * [[SIBaseUnits.Kelvin]].  Any other unit of temperature should be a [[DerivedTemperature]].
+ */
 trait BaseTemperature extends BaseUnit with TemperatureExpr
 
+/**
+ * Define a derived unit of temperature. By definition, all derived temperatures are defined in
+ * terms of [[SIBaseUnits.Kelvin]].
+ * The three common temperatures Kelvin, Celsius and Fahrenheit are already defined in `coulomb`
+ * and so use cases for new derived temperatures are expected to be rare.
+ * {{{
+ * // example defining Fahrenheit temperature unit (already defined by coulomb)
+ * trait Fahrenheit extends DerivedTemperature
+ * object Fahrenheit extends TempUnitCompanion[Fahrenheit]("fahrenheit", 5.0 / 9.0, 459.67)
+ * }}}
+ */
 trait DerivedTemperature extends DerivedUnit[SIBaseUnits.Kelvin] with TemperatureExpr
 
+/**
+ * A value (quantity) having an associated static unit type
+ * @tparam U The unit expression representing the associated unit
+ * {{{
+ * import MKSUnits._
+ * // a length of 5 meters
+ * val length = Quantity[Meter](5)
+ * // a velocity in meters per second
+ * val speed = Quantity[Meter </> Second](10)
+ * // an acceleration in meters per second-squared
+ * val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)
+ * }}}
+ */
 class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
     extends AnyVal with Serializable {
 
-  def as[U2 <: UnitExpr](implicit
-      cu: CompatUnits[U, U2]): Quantity[U2] =
+  /**
+   * Convert a quantity into new units.
+   * @tparam U2 the new unit expression to convert to. If U2 is not a compatible unit
+   * then a compile-time error will occur
+   * @return a new value of type Quantity[U2], equivalent to `this` quantity
+   */
+  def as[U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Quantity[U2] =
     cu.convert(this)
 
+  /**
+   * Obtain a new quantity with same units, but negated value
+   * @return negated unit quantity
+   */
   def unary_- : Quantity[U] = new Quantity[U](-this.value)
 
+  /**
+   * The sum of two unit quantities
+   * @tparam U2 the unit type of the right-hand quantity.  U2 must be compatible with U, or
+   * a compile-time error will occur
+   * @param that the right-hand side of the quantity sum
+   * @return `this` + `that`, with units of left-hand side `this`
+   */
   def +[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Quantity[U] =
     new Quantity[U](this.value + cu.coef * that.value)
 
+  /**
+   * The difference of two unit quantities
+   * @tparam U2 the unit type of the right-hand quantity.  U2 must be compatible with U, or
+   * a compile-time error will occur
+   * @param that the right-hand side of the difference
+   * @return `this` - `that`, with units of left-hand side `this`
+   */
   def -[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Quantity[U] =
     new Quantity[U](this.value - cu.coef * that.value)
 
+  /**
+   * The product of two unit quantities
+   * @tparam U2 the unit type of the right-hand quantity
+   * @tparam RU the unit type of the result quantity, is compatible with `U <*> U2`
+   * @param that the right-hand side of the product
+   * @return `this` * `that`, with units of RU
+   */
   def *[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }): Quantity[RU] =
     new Quantity[RU](uer.coef * this.value * that.value)
 
+  /**
+   * The quotient, or ratio, of two unit quantities
+   * @tparam U2 the unit type of the right-hand quantity
+   * @tparam RU the unit type of the result quantity, is compatible with `U </> U2`
+   * @param that the right-hand side of the ratio
+   * @return `this` / `that`, with units of RU
+   */
   def /[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }): Quantity[RU] =
     new Quantity[RU](uer.coef * this.value / that.value)
 
+  /**
+   * Raise a unit quantity to a power
+   * @tparam E the church integer type representing the exponent
+   * @return `this` ^ E, in units compatible with `U <^> E`
+   */
   def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E]): Quantity[U <^> E] =
     new Quantity[U <^> E](math.pow(this.value, exp.value))
 
+  /** The raw value of the unit quantity, rounded to nearest integer and returned as an Int */
   def toInt: Int = value.round.toInt
+
+  /** The raw value of the unit quantity, rounded to nearest integer and return as a Long */
   def toLong: Long = value.round
+
+  /** The raw value of the unit quantity returned as a Float */
   def toFloat: Float = value.toFloat
+
+  /** The raw value of the unit quantity returned as a Double */
   def toDouble: Double = value
 
+  /** A human-readable string representing the unit quantity with its associated type */
   def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
+
+  /** A human-readable string representing the unit type of this quantity */
   def unitStr(implicit uesU: UnitExprString[U]) = uesU.str
 }
 
+/** Factory functions and implicit definitions associated with Quantity objects */
 object Quantity {
+  /**
+   * Obtain a function that converts objects of Quantity[U] into compatible Quantity[U2]
+   * @tparam U the unit type of input quantity.
+   * @tparam U2 the unit type of the output. If U2 is not compatible with U,
+   * then a compile-time error will occur.
+   * @return a function for converting Quantity[U] into Quantity[U2]
+   */
   def converter[U <: UnitExpr, U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]):
       Quantity[U] => Quantity[U2] =
     cu.converter
 
+  /**
+   * Obtain the numeric coefficient that represents the conversion factor from
+   * a quantity with units U to a quantity of unit type U2
+   * @tparam U the unit type of input quantity.
+   * @tparam U2 the unit type of the output. If U2 is not compatible with U,
+   * then a compile-time error will occur.
+   * @return numeric coefficient, aka the conversion factor from Quantity[U] into Quantity[U2]
+   */
   def coefficient[U <: UnitExpr, U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Double =
     cu.coef
 
+  /**
+   * Obtain a human-readable string representing a unit type U
+   * @tparam U a unit type
+   * @return human readable string representing U
+   */
   def unitStr[U <: UnitExpr](implicit uesU: UnitExprString[U]) = uesU.str
 
+  /** Obtain a unit quantity of unit type U from an Int */
   def apply[U <: UnitExpr](v: Int) = new Quantity[U](v.toDouble)
+
+  /** Obtain a unit quantity of unit type U from a Long */
   def apply[U <: UnitExpr](v: Long) = new Quantity[U](v.toDouble)
+
+  /** Obtain a unit quantity of unit type U from a Float */
   def apply[U <: UnitExpr](v: Float) = new Quantity[U](v.toDouble)
+
+  /** Obtain a unit quantity of unit type U from a Double */
   def apply[U <: UnitExpr](v: Double) = new Quantity[U](v)
 
+  /**
+   * Obtain a unit quantity from a Temperature with the same raw value and temperature unit
+   * @tparam U a unit of temperature, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
+   * or USCustomaryUnits.Fahrenheit
+   * @param t the temperature value of unit type U
+   * @return a unit quantity of the same unit type U and raw numeric value of t
+   */
   def fromTemperature[U <: TemperatureExpr](t: Temperature[U]) = new Quantity[U](t.value)
 
   implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](q: Quantity[U])(implicit
     cu: CompatUnits[U, U2]): Quantity[U2] = cu.convert(q)
 }
 
+/**
+ * A temperature value.
+ * @tparam U a temperature unit, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
+ * or USCustomaryUnits.Fahrenheit
+ * {{{
+ * // a Temperature takes temperature baseline offsets into account during conversion
+ * val c = Temperature[Celsius](1)
+ * val f = c.as[Fahrenheit]        // == Temperature[Fahrenheit](33.8)
+ * // a Quantity of temperature only considers amounts of unit
+ * val cq = Quantity[Celsius](1)
+ * val fq = cq.as[Fahrenheit]      // == Quantity[Fahrenheit](1.8)
+ * }}}
+ */
 class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double)
     extends AnyVal with Serializable {
 
-  def as[U2 <: TemperatureExpr](implicit
-      ct: CompatTemps[U, U2]): Temperature[U2] =
+  /**
+   * Convert a temperature into a new unit of temperature.
+   * @tparam U2 the new temperature unit expression to convert to.
+   * @return a new value of type Temperature[U2], equivalent to `this`
+   */
+  def as[U2 <: TemperatureExpr](implicit ct: CompatTemps[U, U2]): Temperature[U2] =
     ct.convert(this)
 
+  /**
+   * Add a Quantity of temperature units to a temperature to get a new temperature
+   * @tparam U2 the temperature unit of right side.  If U2 is not a compatible unit (temperature)
+   * a compile-time error will ocurr.
+   * @param that the right hand side of sum
+   * @return a new temperature that is sum of left-hand temp plus right-hand temp quantity
+   */
   def +[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Temperature[U] =
     new Temperature[U](this.value + cu.coef * that.value)
 
+  /**
+   * Subtract a Quantity of temperature units from a temperature to get a new temperature
+   * @tparam U2 the temperature unit of right side.  If U2 is not a compatible unit (temperature)
+   * a compile-time error will ocurr.
+   * @param that the right hand side of difference
+   * @return a new temperature that is the left-hand temp minus right-hand temp quantity
+   */
   def -[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Temperature[U] =
     new Temperature[U](this.value - cu.coef * that.value)
 
+  /**
+   * Subtract two temperatures to get a Quantity of temperature units
+   * @tparam U2 the temperature unit of right side.
+   * @param that the right hand side of difference
+   * @return a new unit Quantity equal to `this` - `that`
+   */
   def -[U2 <: TemperatureExpr](that: Temperature[U2])(implicit
       ct: CompatTemps[U2, U]): Quantity[U] =
     new Quantity[U](this.value - ct.convert(that).value)
 
+  /** The raw value of the temperature, rounded to nearest integer and returned as an Int */
   def toInt: Int = value.round.toInt
+
+  /** The raw value of the temperature, rounded to nearest integer and returned as a Long */
   def toLong: Long = value.round
+
+  /** The raw value of the temperature, rounded to nearest integer and returned as a Float */
   def toFloat: Float = value.toFloat
+
+  /** The raw value of the temperature, rounded to nearest integer and returned as a Double */
   def toDouble: Double = value
 
+  /** A human-readable string representing the temperature with its associated unit type */  
   def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
+
+  /** A human-readable string representing the unit type of this temperature */
   def unitStr(implicit uesU: UnitExprString[U]) = uesU.str
 }
 
+/** Factory functions and implicit definitions associated with Temperature objects */
 object Temperature {
+  /**
+   * Obtain a function that converts objects of Temperature[U] into compatible Temperature[U2]
+   * @tparam U the unit type of input temp.
+   * @tparam U2 the unit type of the output.
+   * @return a function for converting Temperature[U] into Temperature[U2]
+   */
   def converter[U <: TemperatureExpr, U2 <: TemperatureExpr](implicit
       ct: CompatTemps[U, U2]): Temperature[U] => Temperature[U2] =
     ct.converter
 
+  /**
+   * Obtain a human-readable string representing a unit type U
+   * @tparam U a unit type representing a temperature
+   * @return human readable string representing U
+   */
   def unitStr[U <: TemperatureExpr](implicit uesU: UnitExprString[U]) = uesU.str
 
+  /** Obtain a temperature of type U from an Int */
   def apply[U <: TemperatureExpr](v: Int) = new Temperature[U](v.toDouble)
+
+  /** Obtain a temperature of type U from a Long */
   def apply[U <: TemperatureExpr](v: Long) = new Temperature[U](v.toDouble)
+
+  /** Obtain a temperature of type U from a Float */
   def apply[U <: TemperatureExpr](v: Float) = new Temperature[U](v.toDouble)
+
+  /** Obtain a temperature of type U from a Doiuble */
   def apply[U <: TemperatureExpr](v: Double) = new Temperature[U](v)
 
+  /**
+   * Obtain a temperature from a unit Quantity with same raw value and temperature unit
+   * @tparam U a unit of temperature, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
+   * or USCustomaryUnits.Fahrenheit
+   * @param q the quantity of temperature-unit type U
+   * @return a temperature of same unit type U and raw numeric value of q
+   */
   def fromQuantity[U <: TemperatureExpr](q: Quantity[U]) = new Temperature[U](q.value)
 
   implicit def implicitTempConvert[U <: TemperatureExpr, U2 <: TemperatureExpr](t: Temperature[U])(
@@ -128,11 +397,15 @@ object Temperature {
     ct.convert(t)
 }
 
+/** type extensions and implicits for working with units */
 object extensions {
+  /** enhances numeric types with utility methods for `coulomb`
   implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
+    /** create a new unit Quantity of type U with numeric value of `this`
     def withUnit[U <: UnitExpr]: Quantity[U] =
       new Quantity[U](num.toDouble(v))
 
+    /** create a new unit Temperature of type U with numeric value of `this`
     def withTemperature[U <: TemperatureExpr]: Temperature[U] =
       new Temperature[U](num.toDouble(v))
   }
