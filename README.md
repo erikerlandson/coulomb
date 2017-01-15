@@ -11,7 +11,32 @@ The key user-facing type, `Quantity`, is [documented here](https://erikerlandson
 ##### Why name it `coulomb` ?
 `coulomb` is a library for "static units", and 'coulomb' is the "unit of static" (aka charge).
 
-### examples
+### Tutorial
+
+#### Motivation
+
+The motivation for `coulomb` is to support the following features:
+
+1. allow a programmer to assocate unit analysis with values, in the form of static types
+  1. `val length = Quantity[Meter](1)`
+1. express those types with arbitrary and natural static type expressions
+  1. `val speed = Quantity[(Kilo <-> Meter) </> Hour](100.0)`
+  1. `val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)`
+1. let the compiler determine which unit expressions are equivalent (aka _compatible_) and transparently convert beween them
+  1. `val mps: Quantity[Meter </> Second] = Quantity[Mile </> Hour](60.0)`
+1. cause compile-time error when operations are attempted with _incompatible_ unit types
+  1. `val mps: Quantity[Meter </> Second] = Quantity[Mile](60.0) // compile-time type error!`
+1. automatically determine correct output unit types for operations on unit quantities
+  1. `val mps: Quantity[Meter </> Second] = Mile(60) / Hour()`
+1. allow a programmer to easily declare new units that will work seamlessly with existing units
+  1. `// a new length:`
+  1. `trait Smoot extends DerivedType[Inch]`
+  1. `object Smoot extends UnitCompanion[Smoot]("smoot", 67.0)`
+  1. `// a unit of acceleration:`
+  1. `trait EarthGravity extends DerivedType[Meter </> (Second <^> 2)]`
+  1. `object EarthGravity extends UnitCompanion[EarthGravity]("g", 9.8)`
+
+#### examples
 
 ```scala
 scala> import com.manyangled.coulomb._; import ChurchInt._; import SIBaseUnits._; import SIPrefixes._; import SIAcceptedUnits._; import USCustomaryUnits._; import extensions._
@@ -60,19 +85,3 @@ scala> (1.withUnit[Yard] / 1.withUnit[Foot]).str
 res13: String = 3.0 unitless
 ```
 
-### Tutorial
-
-#### Motivation
-
-The motivation for `coulomb` is to support the following features:
-
-1. allow a programmer to assocate unit analysis with values, in the form of static types
-  1. `val length = Quantity[Meter](1)`
-1. express those types with arbitrary and natural expressions
-  1. `val speed = Quantity[(Kilo <-> Meter) </> Hour](100.0)`
-  1. `val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)`
-1. let the compiler automatically determine which unit expressions are equivalent (aka _compatible_)
-1. cause compile-time error when operations are attempted with _incompatible_ unit types
-1. automatically convert unit quantities into equivalent compatible units
-1. automatically generate the output unit types for operations on unit quantities
-1. allow a programmer to easily declare new units that will work seamlessly with existing units
