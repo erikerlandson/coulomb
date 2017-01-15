@@ -198,9 +198,9 @@ trait UnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr] {
   def coef: Double
 }
 
-object UnitExprDiv {
-  implicit def witnessUnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprDiv[U1, U2] =
-    macro UnitMacros.unitExprDiv[U1, U2]
+object UnitExprMul {
+  implicit def witnessUnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprMul[U1, U2] =
+    macro UnitMacros.unitExprMul[U1, U2]
 }
 
 trait UnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr] {
@@ -208,9 +208,9 @@ trait UnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr] {
   def coef: Double
 }
 
-object UnitExprMul {
-  implicit def witnessUnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprMul[U1, U2] =
-    macro UnitMacros.unitExprMul[U1, U2]
+object UnitExprDiv {
+  implicit def witnessUnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprDiv[U1, U2] =
+    macro UnitMacros.unitExprDiv[U1, U2]
 }
 
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
