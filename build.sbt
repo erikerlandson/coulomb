@@ -6,7 +6,7 @@ version := "0.0.1"
 
 scalaVersion := "2.11.8"
 
-crossScalaVersions := Seq("2.11.8", "2.12.2")
+crossScalaVersions := Seq("2.11.8", "2.12.1")
 
 resolvers ++= Seq(
   Resolver.sonatypeRepo("releases"),
@@ -16,7 +16,7 @@ resolvers ++= Seq(
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % scalaVersion.value,
   "org.scala-lang" % "scala-compiler" % scalaVersion.value,
-  "org.scalatest" %% "scalatest" % "2.2.4" % Test
+  "org.scalatest" %% "scalatest" % "3.0.1" % Test
 )
 
 licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0"))

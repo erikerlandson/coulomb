@@ -11,10 +11,14 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.5.4")
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.6.0")
+
+// I'm disabling these for now, since I'm not using them yet and they aren't all synced
+// up with scala 2.12
+
+//addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.6.0")
 
 // scoverage and coveralls deps are at old versions to avoid a bug in the current versions
 // update these when this fix is released:  https://github.com/scoverage/sbt-coveralls/issues/73
-addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.0.4")
+//addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.0.4")
 
-addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.0.0")
+//addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.0.0")
