@@ -49,7 +49,10 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Derived units are defined in terms of another <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>The <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a> used to define the new unit</p><pre><span class="cmt">// define a new unit Furlong in terms of Meter</span>
+<span class="kw">import</span> SIBaseUnits._
+<span class="kw">trait</span> Furlong <span class="kw">extends</span> DerivedUnit[Meter]
+<span class="kw">object</span> Furlong <span class="kw">extends</span> UnitCompanion[Furlong](<span class="lit">"furlong"</span>, <span class="num">201.168</span>)</pre></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">

@@ -51,7 +51,13 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A value (quantity) having an associated static unit type</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>The unit expression representing the associated unit</p><pre><span class="kw">import</span> MKSUnits._
+<span class="cmt">// a length of 5 meters</span>
+<span class="kw">val</span> length = Quantity[Meter](<span class="num">5</span>)
+<span class="cmt">// a velocity in meters per second</span>
+<span class="kw">val</span> speed = Quantity[Meter &lt;/&gt; Second](<span class="num">10</span>)
+<span class="cmt">// an acceleration in meters per second-squared</span>
+<span class="kw">val</span> acceleration = Quantity[Meter &lt;/&gt; (Second &lt;^&gt; _2)](<span class="num">9.8</span>)</pre></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyVal">AnyVal</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -106,7 +112,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt"></p>
     </li></ol>
             </div>
 
@@ -150,7 +156,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#*" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.manyangled.coulomb.Quantity#*" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="*[U2&lt;:com.manyangled.coulomb.UnitExpr,RU&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicituer:com.manyangled.coulomb.UnitExprMul[U,U2]{typeU=RU}):com.manyangled.coulomb.Quantity[RU]"></a>
       <a id="*[U2&lt;:UnitExpr,RU&lt;:UnitExpr](Quantity[U2])(UnitExprMul[U,U2]{typeU=RU}):Quantity[RU]"></a>
       <h4 class="signature">
@@ -166,8 +172,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.manyangled.coulomb.Quantity#+" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">The product of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The product of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity</p></dd><dt class="tparam">RU</dt><dd class="cmt"><p>the unit type of the result quantity, is compatible with <code>U &lt;*&gt; U2</code></p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the product</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> * <code>that</code>, with units of RU</p></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.Quantity#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Quantity[U]"></a>
       <a id="+[U2&lt;:UnitExpr](Quantity[U2])(CompatUnits[U2,U]):Quantity[U]"></a>
       <h4 class="signature">
@@ -183,8 +189,9 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.manyangled.coulomb.Quantity#-" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">The sum of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The sum of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity.  U2 must be compatible with U, or
+a compile-time error will occur</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the quantity sum</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> + <code>that</code>, with units of left-hand side <code>this</code></p></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.Quantity#-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Quantity[U]"></a>
       <a id="-[U2&lt;:UnitExpr](Quantity[U2])(CompatUnits[U2,U]):Quantity[U]"></a>
       <h4 class="signature">
@@ -200,8 +207,9 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.manyangled.coulomb.Quantity#/" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">The difference of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The difference of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity.  U2 must be compatible with U, or
+a compile-time error will occur</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the difference</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> - <code>that</code>, with units of left-hand side <code>this</code></p></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.Quantity#/" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="/[U2&lt;:com.manyangled.coulomb.UnitExpr,RU&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicituer:com.manyangled.coulomb.UnitExprDiv[U,U2]{typeU=RU}):com.manyangled.coulomb.Quantity[RU]"></a>
       <a id="/[U2&lt;:UnitExpr,RU&lt;:UnitExpr](Quantity[U2])(UnitExprDiv[U,U2]{typeU=RU}):Quantity[RU]"></a>
       <h4 class="signature">
@@ -217,7 +225,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">The quotient, or ratio, of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The quotient, or ratio, of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity</p></dd><dt class="tparam">RU</dt><dd class="cmt"><p>the unit type of the result quantity, is compatible with <code>U &lt;/&gt; U2</code></p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the ratio</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> / <code>that</code>, with units of RU</p></dd></dl></div>
     </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a>
       <a id="==(Any):Boolean"></a>
@@ -235,7 +243,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#as" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.manyangled.coulomb.Quantity#as" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="as[U2&lt;:com.manyangled.coulomb.UnitExpr](implicitcu:com.manyangled.coulomb.CompatUnits[U,U2]):com.manyangled.coulomb.Quantity[U2]"></a>
       <a id="as[U2&lt;:UnitExpr](CompatUnits[U,U2]):Quantity[U2]"></a>
       <h4 class="signature">
@@ -251,7 +259,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Convert a quantity into new units.</p><div class="fullcomment"><div class="comment cmt"><p>Convert a quantity into new units.</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the new unit expression to convert to. If U2 is not a compatible unit
+then a compile-time error will occur</p></dd><dt>returns</dt><dd class="cmt"><p>a new value of type Quantity[U2], equivalent to <code>this</code> quantity</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -303,7 +312,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#pow" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.manyangled.coulomb.Quantity#pow" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="pow[E&lt;:com.manyangled.coulomb.ChurchInt](implicitexp:com.manyangled.coulomb.ChurchIntValue[E]):com.manyangled.coulomb.Quantity[com.manyangled.coulomb.&lt;^&gt;[U,E]]"></a>
       <a id="pow[E&lt;:ChurchInt](ChurchIntValue[E]):Quantity[&lt;^&gt;[U,E]]"></a>
       <h4 class="signature">
@@ -319,7 +328,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Raise a unit quantity to a power</p><div class="fullcomment"><div class="comment cmt"><p>Raise a unit quantity to a power</p></div><dl class="paramcmts block"><dt class="tparam">E</dt><dd class="cmt"><p>the church integer type representing the exponent</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> ^ E, in units compatible with <code>U &lt;^&gt; E<code></code></code></p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#str" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="str(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String"></a>
       <a id="str(UnitExprString[U]):String"></a>
@@ -336,7 +345,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">A human-readable string representing the unit quantity with its associated type</p>
     </li><li name="com.manyangled.coulomb.Quantity#toDouble" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="toDouble:Double"></a>
       <a id="toDouble:Double"></a>
@@ -353,7 +362,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">The raw value of the unit quantity returned as a Double</p>
     </li><li name="com.manyangled.coulomb.Quantity#toFloat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="toFloat:Float"></a>
       <a id="toFloat:Float"></a>
@@ -370,7 +379,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">The raw value of the unit quantity returned as a Float</p>
     </li><li name="com.manyangled.coulomb.Quantity#toInt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="toInt:Int"></a>
       <a id="toInt:Int"></a>
@@ -387,7 +396,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">The raw value of the unit quantity, rounded to nearest integer and returned as an Int</p>
     </li><li name="com.manyangled.coulomb.Quantity#toLong" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="toLong:Long"></a>
       <a id="toLong:Long"></a>
@@ -404,7 +413,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">The raw value of the unit quantity, rounded to nearest integer and return as a Long</p>
     </li><li name="scala.Any#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <a id="toString():String"></a>
@@ -422,7 +431,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#unary_-" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.manyangled.coulomb.Quantity#unary_-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="unary_-:com.manyangled.coulomb.Quantity[U]"></a>
       <a id="unary_-:Quantity[U]"></a>
       <h4 class="signature">
@@ -438,7 +447,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Obtain a new quantity with same units, but negated value</p><div class="fullcomment"><div class="comment cmt"><p>Obtain a new quantity with same units, but negated value</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>negated unit quantity</p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#unitStr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="unitStr(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String"></a>
       <a id="unitStr(UnitExprString[U]):String"></a>
@@ -455,7 +464,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">A human-readable string representing the unit type of this quantity</p>
     </li></ol>
             </div>
 

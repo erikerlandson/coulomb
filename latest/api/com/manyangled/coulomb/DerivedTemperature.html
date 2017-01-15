@@ -49,7 +49,12 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Define a derived unit of temperature. By definition, all derived temperatures are defined in
+terms of <a href="SIBaseUnits$$Kelvin.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Kelvin">SIBaseUnits.Kelvin</a>.
+The three common temperatures Kelvin, Celsius and Fahrenheit are already defined in <code>coulomb</code>
+and so use cases for new derived temperatures are expected to be rare.</p><pre><span class="cmt">// example defining Fahrenheit temperature unit (already defined by coulomb)</span>
+<span class="kw">trait</span> Fahrenheit <span class="kw">extends</span> DerivedTemperature
+<span class="kw">object</span> Fahrenheit <span class="kw">extends</span> TempUnitCompanion[Fahrenheit](<span class="lit">"fahrenheit"</span>, <span class="num">5.0</span> / <span class="num">9.0</span>, <span class="num">459.67</span>)</pre></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a>, <a href="DerivedUnit.html" class="extype" name="com.manyangled.coulomb.DerivedUnit">DerivedUnit</a>[<a href="SIBaseUnits$$Kelvin.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Kelvin">Kelvin</a>], <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">

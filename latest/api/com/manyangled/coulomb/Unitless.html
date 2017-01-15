@@ -49,7 +49,10 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A unitless value.  Each <a href="PrefixUnit.html" class="extype" name="com.manyangled.coulomb.PrefixUnit">PrefixUnit</a> is derived from Unitless.  Unit Expressions where all
+units cancel out will also be of type Unitless</p><pre><span class="kw">import</span> USCustomaryUnits._
+<span class="cmt">// ratio will have type Unitless, since length units cancel</span>
+<span class="kw">val</span> ratio = Quantity[Yard](<span class="num">1</span>) / Quantity[Foot](<span class="num">1</span>)</pre></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>

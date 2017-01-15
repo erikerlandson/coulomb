@@ -51,7 +51,7 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Factory functions and implicit definitions associated with Quantity objects</p></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -163,7 +163,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Obtain a unit quantity of unit type U from a Double</p>
     </li><li name="com.manyangled.coulomb.Quantity#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="apply[U&lt;:com.manyangled.coulomb.UnitExpr](v:Float):com.manyangled.coulomb.Quantity[U]"></a>
       <a id="apply[U&lt;:UnitExpr](Float):Quantity[U]"></a>
@@ -180,7 +180,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Obtain a unit quantity of unit type U from a Float</p>
     </li><li name="com.manyangled.coulomb.Quantity#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="apply[U&lt;:com.manyangled.coulomb.UnitExpr](v:Long):com.manyangled.coulomb.Quantity[U]"></a>
       <a id="apply[U&lt;:UnitExpr](Long):Quantity[U]"></a>
@@ -197,7 +197,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Obtain a unit quantity of unit type U from a Long</p>
     </li><li name="com.manyangled.coulomb.Quantity#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="apply[U&lt;:com.manyangled.coulomb.UnitExpr](v:Int):com.manyangled.coulomb.Quantity[U]"></a>
       <a id="apply[U&lt;:UnitExpr](Int):Quantity[U]"></a>
@@ -214,7 +214,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Obtain a unit quantity of unit type U from an Int</p>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -255,7 +255,7 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#coefficient" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.manyangled.coulomb.Quantity#coefficient" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="coefficient[U&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr](implicitcu:com.manyangled.coulomb.CompatUnits[U,U2]):Double"></a>
       <a id="coefficient[U&lt;:UnitExpr,U2&lt;:UnitExpr](CompatUnits[U,U2]):Double"></a>
       <h4 class="signature">
@@ -271,8 +271,11 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.manyangled.coulomb.Quantity#converter" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <p class="shortcomment cmt">Obtain the numeric coefficient that represents the conversion factor from
+a quantity with units U to a quantity of unit type U2</p><div class="fullcomment"><div class="comment cmt"><p>Obtain the numeric coefficient that represents the conversion factor from
+a quantity with units U to a quantity of unit type U2</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>the unit type of input quantity.</p></dd><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the output. If U2 is not compatible with U,
+then a compile-time error will occur.</p></dd><dt>returns</dt><dd class="cmt"><p>numeric coefficient, aka the conversion factor from Quantity[U] into Quantity[U2]</p></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.Quantity#converter" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="converter[U&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr](implicitcu:com.manyangled.coulomb.CompatUnits[U,U2]):com.manyangled.coulomb.Quantity[U]=&gt;com.manyangled.coulomb.Quantity[U2]"></a>
       <a id="converter[U&lt;:UnitExpr,U2&lt;:UnitExpr](CompatUnits[U,U2]):(Quantity[U])⇒Quantity[U2]"></a>
       <h4 class="signature">
@@ -288,7 +291,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Obtain a function that converts objects of Quantity[U] into compatible Quantity[U2]</p><div class="fullcomment"><div class="comment cmt"><p>Obtain a function that converts objects of Quantity[U] into compatible Quantity[U2]</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>the unit type of input quantity.</p></dd><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the output. If U2 is not compatible with U,
+then a compile-time error will occur.</p></dd><dt>returns</dt><dd class="cmt"><p>a function for converting Quantity[U] into Quantity[U2]</p></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -346,7 +350,7 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#fromTemperature" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.manyangled.coulomb.Quantity#fromTemperature" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="fromTemperature[U&lt;:com.manyangled.coulomb.TemperatureExpr](t:com.manyangled.coulomb.Temperature[U]):com.manyangled.coulomb.Quantity[U]"></a>
       <a id="fromTemperature[U&lt;:TemperatureExpr](Temperature[U]):Quantity[U]"></a>
       <h4 class="signature">
@@ -362,7 +366,8 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Obtain a unit quantity from a Temperature with the same raw value and temperature unit</p><div class="fullcomment"><div class="comment cmt"><p>Obtain a unit quantity from a Temperature with the same raw value and temperature unit</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>a unit of temperature, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
+or USCustomaryUnits.Fahrenheit</p></dd><dt class="param">t</dt><dd class="cmt"><p>the temperature value of unit type U</p></dd><dt>returns</dt><dd class="cmt"><p>a unit quantity of the same unit type U and raw numeric value of t</p></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -516,7 +521,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#unitStr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.manyangled.coulomb.Quantity#unitStr" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="unitStr[U&lt;:com.manyangled.coulomb.UnitExpr](implicituesU:com.manyangled.coulomb.UnitExprString[U]):String"></a>
       <a id="unitStr[U&lt;:UnitExpr](UnitExprString[U]):String"></a>
       <h4 class="signature">
@@ -532,7 +537,7 @@
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
+      <p class="shortcomment cmt">Obtain a human-readable string representing a unit type U</p><div class="fullcomment"><div class="comment cmt"><p>Obtain a human-readable string representing a unit type U</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>a unit type</p></dd><dt>returns</dt><dd class="cmt"><p>human readable string representing U</p></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
