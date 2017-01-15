@@ -91,6 +91,12 @@ class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double)
   def toDouble: Double = value
 }
 
+object Temperature {
+  implicit def implicitTempConvert[U <: TemperatureExpr, U2 <: TemperatureExpr](t: Temperature[U])(
+      implicit ct: CompatTemps[U, U2]): Temperature[U2] =
+    ct.convert(t)
+}
+
 object extensions {
   implicit class ExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
     def withUnit[U <: UnitExpr]: Quantity[U] =
