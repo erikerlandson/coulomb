@@ -9,12 +9,13 @@ A statically typed unit analysis library for Scala
 ### examples
 
 ```scala
-scala> import com.manyangled.coulomb._; import ChurchInt._; import SIBaseUnits._; import SIPrefixes._; import DemoUnits._; import extensions._
+scala> import com.manyangled.coulomb._; import ChurchInt._; import SIBaseUnits._; import SIPrefixes._; import SIAcceptedUnits._; import USCustomaryUnits._; import extensions._
 import com.manyangled.coulomb._
 import ChurchInt._
 import SIBaseUnits._
 import SIPrefixes._
-import DemoUnits._
+import SIAcceptedUnits._
+import USCustomaryUnits._
 import extensions._
 
 scala> 1.withUnit[Liter].as[Meter <^> _3].str
@@ -47,8 +48,8 @@ res10: String = 11.11111111111111 (meter ^ 1) * (second ^ -1)
 scala> (11.withUnit[Meter </> Second] * 1.withUnit[Minute]).as[Yard].str
 res11: String = 721.7847769028872 yard
 
-scala> 1.withUnit[EarthGravity].as[Foot </> (Second <^> _2)].str
-res12: String = 32.175196850393704 foot / (second ^ 2)
+scala> (9.8).withUnit[Meter </> (Second <^> _2)].as[Foot </> (Second <^> _2)].str
+res12: String = 32.15223097112861 foot / (second ^ 2)
 
 scala> (1.withUnit[Yard] / 1.withUnit[Foot]).str
 res13: String = 3.0 unitless
