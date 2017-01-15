@@ -5,6 +5,9 @@ object SIAcceptedUnits {
   import SIBaseUnits._
   import MKSUnits.{ Radian, Pascal }
 
+  trait Celsius extends DerivedTemperature
+  object Celsius extends TempUnitCompanion[Celsius]("celsius", 1.0, 273.15)
+
   trait Minute extends DerivedUnit[Second]
   object Minute extends UnitCompanion[Minute]("minute", 60.0)
 
