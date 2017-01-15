@@ -53,12 +53,13 @@ class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
   def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E]): Quantity[U <^> E] =
     new Quantity[U <^> E](math.pow(this.value, exp.value))
 
-  def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
-
   def toInt: Int = value.round.toInt
   def toLong: Long = value.round
   def toFloat: Float = value.toFloat
   def toDouble: Double = value
+
+  def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
+  def unitStr(implicit uesU: UnitExprString[U]) = uesU.str
 }
 
 object Quantity {
@@ -68,6 +69,8 @@ object Quantity {
 
   def coefficient[U <: UnitExpr, U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Double =
     cu.coef
+
+  def unitStr[U <: UnitExpr](implicit uesU: UnitExprString[U]) = uesU.str
 
   def apply[U <: UnitExpr](v: Int) = new Quantity[U](v.toDouble)
   def apply[U <: UnitExpr](v: Long) = new Quantity[U](v.toDouble)
@@ -97,18 +100,21 @@ class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double)
       ct: CompatTemps[U2, U]): Quantity[U] =
     new Quantity[U](this.value - ct.convert(that).value)
 
-  def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
-
   def toInt: Int = value.round.toInt
   def toLong: Long = value.round
   def toFloat: Float = value.toFloat
   def toDouble: Double = value
+
+  def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
+  def unitStr(implicit uesU: UnitExprString[U]) = uesU.str
 }
 
 object Temperature {
   def converter[U <: TemperatureExpr, U2 <: TemperatureExpr](implicit
       ct: CompatTemps[U, U2]): Temperature[U] => Temperature[U2] =
     ct.converter
+
+  def unitStr[U <: TemperatureExpr](implicit uesU: UnitExprString[U]) = uesU.str
 
   def apply[U <: TemperatureExpr](v: Int) = new Temperature[U](v.toDouble)
   def apply[U <: TemperatureExpr](v: Long) = new Temperature[U](v.toDouble)
