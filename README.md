@@ -59,3 +59,17 @@ res12: String = 32.15223097112861 foot / (second ^ 2)
 scala> (1.withUnit[Yard] / 1.withUnit[Foot]).str
 res13: String = 3.0 unitless
 ```
+
+### Tutorial
+
+#### Motivation
+
+The motivation for `coulomb` is to support the following features:
+
+1. allow a programmer to assocate unit analysis with values, in the form of static types
+1. express those types with arbitrary and natural expressions
+1. let the compiler automatically determine which unit expressions are equivalent (aka _compatible)
+1. cause compile-time error when operations are attempted with _incompatible_ unit types
+1. automatically convert unit quantities into equivalent compatible units
+1. automatically generate the output unit types for operations on unit quantities
+1. allow a programmer to easily declare new units that will work seamlessly with existing units
