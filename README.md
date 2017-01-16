@@ -33,7 +33,7 @@ The motivation for `coulomb` is to support the following features:
   1. `trait Smoot extends DerivedType[Inch]`
   1. `object Smoot extends UnitCompanion[Smoot]("smoot", 67.0)`
   1. `// a unit of acceleration:`
-  1. `trait EarthGravity extends DerivedType[Meter </> (Second <^> 2)]`
+  1. `trait EarthGravity extends DerivedType[Meter </> (Second <^> _2)]`
   1. `object EarthGravity extends UnitCompanion[EarthGravity]("g", 9.8)`
 
 #### examples
