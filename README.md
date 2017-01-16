@@ -36,6 +36,41 @@ The motivation for `coulomb` is to support the following features:
   1. `trait EarthGravity extends DerivedType[Meter </> (Second <^> _2)]`
   1. `object EarthGravity extends UnitCompanion[EarthGravity]("g", 9.8)`
 
+#### `Quantity` and `UnitExpr`
+
+`coulomb` defines the class `Quantity` for representing values with associated units.
+These units are represented by a type parameter of `Quantity`, which is some sub-trait of `UnitExpr`.
+Here are some simple declarations of `Quantity` objects:
+
+```scala
+import com.manyangled.coulomb._
+import extensions._
+import SIBaseUnits._
+
+val length = Quantity[Meter](10)
+val duration = Second(30.0)
+val mass = 100.withUnit[Kilogram]
+```
+
+The `UnitExpr` trait hierarchy provides four operator types for building more complex unit types: `<*>`, `</>`, `<^>` and `<->`:
+
+```scala
+import ChurchInt._    // exponents are represented as Church integers _1, _2, ...
+import SIPrefixes._
+
+val area = Quantity[Meter <*> Meter](100)      // unit product
+val speed = Quantity[Meter </> Second](10)     // unit ratio
+val volume = Quantity[Meter <^> _3](50)        // unit power
+val distance = Quantity[Kilo <-> Meter](1000)  // unit prefix
+```
+
+Using these operators, a `UnitExpr` can be composed into unit type expressions of arbitrary complexity.
+
+```scala
+val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)
+val ohms = Quantity[(Kilogram <*> (Meter <^> _2)) </> ((Second <^> _3) <*> (Ampere <^> _2))](0.01)
+```
+
 #### examples
 
 ```scala
