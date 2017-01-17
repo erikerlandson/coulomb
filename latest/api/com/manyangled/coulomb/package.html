@@ -85,26 +85,6 @@
       <p class="shortcomment cmt">The unit product of two other unit expressions</p><div class="fullcomment"><div class="comment cmt"><p>The unit product of two other unit expressions</p></div><dl class="paramcmts block"><dt class="tparam">LUE</dt><dd class="cmt"><p>the left-hand unit expression</p></dd><dt class="tparam">RUE</dt><dd class="cmt"><p>the right-hand unit expression</p><pre><span class="kw">import</span> USCustomaryUnits._
 <span class="cmt">// a quantity of acre-feet (a unit of volume, usually for water)</span>
 <span class="kw">val</span> afq = Quantity[Acre &lt;*&gt; Foot](<span class="num">10</span>)</pre></dd></dl></div>
-    </li><li name="com.manyangled.coulomb.&lt;-&gt;" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="&lt;-&gt;[PU&lt;:com.manyangled.coulomb.PrefixUnit,UE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr"></a>
-      <a id="&lt;-&gt;[PU&lt;:PrefixUnit,UE&lt;:UnitExpr]:&lt;-&gt;[PU,UE]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">sealed </span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a href="$less$minus$greater.html"><span title="gt4s: $less$minus$greater" class="name">&lt;-&gt;</span></a><span class="tparams">[<span name="PU">PU &lt;: <a href="PrefixUnit.html" class="extype" name="com.manyangled.coulomb.PrefixUnit">PrefixUnit</a></span>, <span name="UE">UE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@&lt;-&gt;[PU&lt;:com.manyangled.coulomb.PrefixUnit,UE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Applying a prefix to some unit expression</p><div class="fullcomment"><div class="comment cmt"><p>Applying a prefix to some unit expression</p></div><dl class="paramcmts block"><dt class="tparam">PU</dt><dd class="cmt"><p>the prefix being applied</p></dd><dt class="tparam">UE</dt><dd class="cmt"><p>the unit expression</p><pre><span class="kw">import</span> SIPrefixes._
-<span class="kw">import</span> SIBaseUnits._
-<span class="cmt">// a length in millionths of a meter</span>
-<span class="kw">val</span> length = Quantity[Micro <span class="kw">&lt;-</span>&gt; Meter](<span class="num">10</span>)</pre></dd></dl></div>
     </li><li name="com.manyangled.coulomb.&lt;/&gt;" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="&lt;/&gt;[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr"></a>
       <a id="&lt;/&gt;[LUE&lt;:UnitExpr,RUE&lt;:UnitExpr]:&lt;/&gt;[LUE,RUE]"></a>
@@ -814,6 +794,23 @@ units cancel out will also be of type Unitless</p><pre><span class="kw">import</
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#com.manyangled.coulomb.package@UnitExprString" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
+    </li><li name="com.manyangled.coulomb.Unitless" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Unitless"></a>
+      <a id="Unitless:Unitless"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Unitless$.html"><span class="name">Unitless</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@Unitless" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
