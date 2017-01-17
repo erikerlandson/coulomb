@@ -20,7 +20,7 @@ The motivation for `coulomb` is to support the following features:
 1. allow a programmer to assocate unit analysis with values, in the form of static types
   1. `val length = Quantity[Meter](1)`
 1. express those types with arbitrary and natural static type expressions
-  1. `val speed = Quantity[(Kilo <-> Meter) </> Hour](100.0)`
+  1. `val speed = Quantity[(Kilo <*> Meter) </> Hour](100.0)`
   1. `val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)`
 1. let the compiler determine which unit expressions are equivalent (aka _compatible_) and transparently convert beween them
   1. `val mps: Quantity[Meter </> Second] = Quantity[Mile </> Hour](60.0)`
@@ -52,7 +52,7 @@ val duration = Second(30.0)
 val mass = 100.withUnit[Kilogram]
 ```
 
-The `UnitExpr` trait hierarchy provides four operator types for building more complex unit types: `<*>`, `</>`, `<^>` and `<->`:
+The `UnitExpr` trait hierarchy provides three operator types for building more complex unit types: `<*>`, `</>`, and `<^>`:
 
 ```scala
 import ChurchInt._    // exponents are represented as Church integers _1, _2, ...
@@ -61,7 +61,6 @@ import SIPrefixes._
 val area = Quantity[Meter <*> Meter](100)      // unit product
 val speed = Quantity[Meter </> Second](10)     // unit ratio
 val volume = Quantity[Meter <^> _3](50)        // unit power
-val distance = Quantity[Kilo <-> Meter](1000)  // unit prefix
 ```
 
 Using these operators, a `UnitExpr` can be composed into unit type expressions of arbitrary complexity.
@@ -92,10 +91,10 @@ res2: String = 4.0 foot
 scala> (1.withUnit[Foot] + 1.withUnit[Meter]).str
 res3: String = 4.2808398950131235 foot
 
-scala> (1000.withUnit[Meter] + 1.withUnit[Kilo <-> Meter]).str
+scala> (1000.withUnit[Meter] + 1.withUnit[Kilo <*> Meter]).str
 res4: String = 2000.0 meter
 
-scala> 5280.withUnit[Foot].as[Kilo <-> Meter].str
+scala> 5280.withUnit[Foot].as[Kilo <*> Meter].str
 res5: String = 1.609344 kilo-meter
 
 scala> (2.withUnit[Meter] * 2.withUnit[Meter <^> _2]).str
@@ -104,7 +103,7 @@ res6: String = 4.0 meter ^ 3
 scala> (2.withUnit[Meter] * 2.withUnit[Meter <^> _2]).as[Liter].str
 res8: String = 4000.0 liter
 
-scala> (2.withUnit[Meter] * 2.withUnit[Meter <^> _2]).as[Kilo <-> Liter].str
+scala> (2.withUnit[Meter] * 2.withUnit[Meter <^> _2]).as[Kilo <*> Liter].str
 res9: String = 4.0 kilo-liter
 
 scala> (100.withUnit[Meter] / 9.withUnit[Second]).str

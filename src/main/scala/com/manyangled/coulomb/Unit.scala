@@ -78,19 +78,6 @@ sealed trait </> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 sealed trait <^> [UE <: UnitExpr, P <: ChurchInt] extends UnitExpr
 
 /**
- * Applying a prefix to some unit expression
- * @tparam PU the prefix being applied
- * @tparam UE the unit expression
- * {{{
- * import SIPrefixes._
- * import SIBaseUnits._
- * // a length in millionths of a meter
- * val length = Quantity[Micro <-> Meter](10)
- * }}}
- */
-sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
-
-/**
  * A unitless value.  Each [[PrefixUnit]] is derived from Unitless.  Unit Expressions where all
  * units cancel out will also be of type Unitless
  * {{{
@@ -504,7 +491,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   trait DummyU extends BaseUnit
   trait DummyT extends BaseTemperature
-  trait DummyP extends PrefixUnit
 
   val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
   val urecType = typeOf[UnitRec[DummyU]].typeConstructor
@@ -517,7 +503,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   val mulType = typeOf[<*>[DummyU, DummyU]].typeConstructor
   val divType = typeOf[</>[DummyU, DummyU]].typeConstructor
   val powType = typeOf[<^>[DummyU, ChurchInt._0]].typeConstructor
-  val preType = typeOf[<->[DummyP, DummyU]].typeConstructor
 
   def intVal(intT: Type): Int = {
     val ivt = appliedType(ivalType, List(intT))
@@ -592,19 +577,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  object PreOp {
-    def unapply(tpe: Type): Option[(String, Double, Type)] = {
-      if (tpe.typeConstructor =:= preType) {
-        val (pre :: uexp :: Nil) = tpe.typeArgs
-        val pu = superClass(pre, puType)
-        if (pu.isEmpty) None else {
-          val (name, coef) = urecVal(pre)
-          Option(name, coef, uexp)
-        }
-      } else None
-    }
-  }
-
   object DUnit {
     def unapply(tpe: Type): Option[(String, Double, Type)] = {
       val du = superClass(tpe, duType)
@@ -612,6 +584,22 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         val (name, coef) = urecVal(tpe)
         Option(name, coef, du.get.typeArgs(0))
       }
+    }
+  }
+
+  object Prefix {
+    def unapply(tpe: Type): Option[(String, Double, Type)] = {
+      if (tpe.typeConstructor =:= mulType) {
+        val (pre :: uexp :: Nil) = tpe.typeArgs
+        val pu = superClass(pre, puType)
+        if (pu.isEmpty) None else uexp match {
+          case FUnit(_) | DUnit(_, _, _) => {
+            val (name, coef) = urecVal(pre)
+            Option(name, coef, uexp)
+          }
+          case _ => None
+        }
+      } else None
     }
   }
 
@@ -669,10 +657,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         val (bcoef, bmap) = canonical(bsub)
         (math.pow(bcoef, exp), mapPow(bmap, exp))
       }
-      case PreOp(_, coef, sub) => {
-        val (scoef, smap) = canonical(sub)
-        (coef * scoef, smap)
-      }
       case _ => {
         // This should never execute
         abort(s"Undefined Unit Type: ${typeName(typeU)}")
@@ -717,6 +701,11 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case IsUnitless() => "unitless"
       case FUnit(name) => name
       case DUnit(name, _, _) => name
+      case Prefix(name, _, sub) => {
+        val str = ueString(sub)
+        val s = if (ueAtomicString(sub)) str else s"($str)"
+        s"${name}-$s"
+      }
       case FlatMulOp(ssub) => {
         ssub.map { sub =>
           val str = ueString(sub)
@@ -739,11 +728,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
           s"$bs ^ $exp"
         }
       }
-      case PreOp(name, _, sub) => {
-        val str = ueString(sub)
-        val s = if (ueAtomicString(sub)) str else s"($str)"
-        s"${name}-$s"
-      }        
       case _ => {
         // This should never execute
         abort(s"Undefined Unit Type: ${typeName(typeU)}")
