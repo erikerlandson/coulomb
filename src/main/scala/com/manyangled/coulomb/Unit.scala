@@ -101,6 +101,13 @@ sealed trait <-> [PU <: PrefixUnit, UE <: UnitExpr] extends UnitExpr
  */
 sealed trait Unitless extends UnitExpr
 
+object Unitless {
+  def apply[N](v: N)(implicit num: Numeric[N]): Quantity[Unitless] =
+    new Quantity[Unitless](num.toDouble(v))
+
+  def apply(): Quantity[Unitless] = new Quantity[Unitless](1.0)
+}
+
 /**
  * An expression representing a temperature given in some defined temperature unit.
  */
@@ -675,8 +682,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeU1 = weakTypeOf[U1].dealias
-    val tpeU2 = weakTypeOf[U2].dealias
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
 
     val (coef1, map1) = canonical(tpeU1)
     val (coef2, map2) = canonical(tpeU2)
@@ -746,7 +753,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitExprString[U: WeakTypeTag]: Tree = {
-    val tpeU = weakTypeOf[U]
+    val tpeU = fixType(weakTypeOf[U])
     val str = ueString(tpeU)
     val sq = q"$str"
     q"""
@@ -777,8 +784,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitExprMul[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeU1 = weakTypeOf[U1]
-    val tpeU2 = weakTypeOf[U2]
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
 
     val (coef1, map1) = canonical(tpeU1)
     val (coef2, map2) = canonical(tpeU2)
@@ -796,8 +803,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitExprDiv[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeU1 = weakTypeOf[U1]
-    val tpeU2 = weakTypeOf[U2]
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
 
     val (coef1, map1) = canonical(tpeU1)
     val (coef2, map2) = canonical(tpeU2)

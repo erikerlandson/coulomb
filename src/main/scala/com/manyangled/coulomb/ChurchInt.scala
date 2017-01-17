@@ -98,6 +98,9 @@ private [coulomb] class MacroCommon(val c: whitebox.Context) {
     if (bc.count { bSym => bSym == supSym } < 1) None else Some(tpe.baseType(supSym))
   }
 
+  // translates types like 'this.U' into the "actual" type
+  def fixType(tpe: Type) = tpe.baseType(tpe.baseClasses.head)
+
   def churchType(i: Int): Type = {
     i match {
       case v if (v > 0) => appliedType(incType, List(churchType(v - 1)))
