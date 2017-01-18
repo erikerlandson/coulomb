@@ -27,10 +27,9 @@ class QuantityParser(
 
   def apply[U <: UnitExpr :TypeTag](quantityExpr: String): Try[Quantity[U]] = {
     val tpeU = typeOf[U]
-    val qU = toolbox.untypecheck(q"$tpeU")
     for (
       qeTree <- Try { toolbox.parse(s"$importStr ($quantityExpr)") };
-      qeEval <- Try { toolbox.eval(q"${qeTree}.as[$qU]") };
+      qeEval <- Try { toolbox.eval(q"${qeTree}.as[$tpeU]") };
       qret <- Try { qeEval.asInstanceOf[Quantity[U]] }
     ) yield {
       qret
