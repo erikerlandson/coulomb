@@ -322,6 +322,30 @@ defines units <code>Kilo</code> (10<sup>3), <code>Mega</code> (10</sup>6), etc.<
 <span class="kw">val</span> speed = Quantity[Meter &lt;/&gt; Second](<span class="num">10</span>)
 <span class="cmt">// an acceleration in meters per second-squared</span>
 <span class="kw">val</span> acceleration = Quantity[Meter &lt;/&gt; (Second &lt;^&gt; _2)](<span class="num">9.8</span>)</pre></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.QuantityParser" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="QuantityParserextendsAnyRef"></a>
+      <a id="QuantityParser:QuantityParser"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantityParser.html"><span class="name">QuantityParser</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@QuantityParserextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A run-time parser for string expressions that evaluate to <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a> objects.</p><div class="fullcomment"><div class="comment cmt"><p>A run-time parser for string expressions that evaluate to <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a> objects.
+Parsing returns a compatible unit Quantity type, or failure.</p></div><dl class="attributes block"> <dt>Note</dt><dd><span class="cmt"><p><code>QuantityParser</code> always imports <code>com.manyangled.coulomb._</code>, <code>extensions._</code> and <code>ChurchInt._</code></p><pre><span class="kw">import</span> SIBaseUnits._
+<span class="cmt">// create a parser that knows about all SIBaseUnit units, Mile and Hour</span>
+<span class="kw">val</span> qp = QuantityParser(
+  unitDeclarationObjects = <span class="std">Seq</span>(SIBaseUnits),
+  unitCompanionObjects = <span class="std">Seq</span>(USCustomaryUnits.Mile, SIAcceptedUnits.Hour))
+<span class="cmt">// parse an expression in miles per hour, return as meters per second</span>
+<span class="kw">val</span> mps = qp[Meter &lt;/&gt; Second](<span class="lit">"60.withUnit[Mile &lt;/&gt; Hour]"</span>)</pre></span></dd></dl></div>
     </li><li name="com.manyangled.coulomb.TempUnitCompanion" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="TempUnitCompanion[U&lt;:com.manyangled.coulomb.TemperatureExpr]extendsUnitCompanion[U]"></a>
       <a id="TempUnitCompanion[U&lt;:TemperatureExpr]:TempUnitCompanion[U]"></a>
@@ -662,6 +686,24 @@ units cancel out will also be of type Unitless</p><pre><span class="kw">import</
       </a>
     </span>
       <p class="shortcomment cmt">Factory functions and implicit definitions associated with Quantity objects</p>
+    </li><li name="com.manyangled.coulomb.QuantityParser" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="QuantityParser"></a>
+      <a id="QuantityParser:QuantityParser"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="QuantityParser$.html"><span class="name">QuantityParser</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@QuantityParser" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Factory methods for instantiating <code>QuantityParser</code> objects
+</p>
     </li><li name="com.manyangled.coulomb.SIAcceptedUnits" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="SIAcceptedUnits"></a>
       <a id="SIAcceptedUnits:SIAcceptedUnits"></a>

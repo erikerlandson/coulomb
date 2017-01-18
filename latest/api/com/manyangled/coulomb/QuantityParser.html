@@ -1,9 +1,9 @@
 <!DOCTYPE html >
 <html>
         <head>
-          <title>UnitCompanion - com.manyangled.coulomb.UnitCompanion</title>
-          <meta name="description" content="UnitCompanion - com.manyangled.coulomb.UnitCompanion" />
-          <meta name="keywords" content="UnitCompanion com.manyangled.coulomb.UnitCompanion" />
+          <title>QuantityParser - com.manyangled.coulomb.QuantityParser</title>
+          <meta name="description" content="QuantityParser - com.manyangled.coulomb.QuantityParser" />
+          <meta name="keywords" content="QuantityParser com.manyangled.coulomb.QuantityParser" />
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
           
       <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
@@ -16,7 +16,7 @@
       <script type="text/javascript">
          if(top === self) {
             var url = '../../../index.html';
-            var hash = 'com.manyangled.coulomb.UnitCompanion';
+            var hash = 'com.manyangled.coulomb.QuantityParser';
             var anchor = window.location.hash;
             var anchor_opt = '';
             if (anchor.length >= 1)
@@ -28,12 +28,14 @@
         </head>
         <body class="type">
       <div id="definition">
-        <img alt="Class" src="../../../lib/class_big.png" />
+        <a href="QuantityParser$.html" title="See companion object"><img alt="Class/Object" src="../../../lib/class_to_object_big.png" /></a>
         <p id="owner"><a href="../../package.html" class="extype" name="com">com</a>.<a href="../package.html" class="extype" name="com.manyangled">manyangled</a>.<a href="package.html" class="extype" name="com.manyangled.coulomb">coulomb</a></p>
-        <h1>UnitCompanion</h1><h3><span class="morelinks"><div>Related Doc:
-            <a href="package.html" class="extype" name="com.manyangled.coulomb">package coulomb</a>
+        <h1><a href="QuantityParser$.html" title="See companion object">QuantityParser</a></h1><h3><span class="morelinks"><div>
+            Related Docs:
+            <a href="QuantityParser$.html" title="See companion object">object QuantityParser</a>
+            | <a href="package.html" class="extype" name="com.manyangled.coulomb">package coulomb</a>
           </div></span></h3><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -45,17 +47,21 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">UnitCompanion</span><span class="tparams">[<span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <span class="name">QuantityParser</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A run-time parser for string expressions that evaluate to <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a> objects.
+Parsing returns a compatible unit Quantity type, or failure.</p></div><dl class="attributes block"> <dt>Note</dt><dd><span class="cmt"><p><code>QuantityParser</code> always imports <code>com.manyangled.coulomb._</code>, <code>extensions._</code> and <code>ChurchInt._</code></p><pre><span class="kw">import</span> SIBaseUnits._
+<span class="cmt">// create a parser that knows about all SIBaseUnit units, Mile and Hour</span>
+<span class="kw">val</span> qp = QuantityParser(
+  unitDeclarationObjects = <span class="std">Seq</span>(SIBaseUnits),
+  unitCompanionObjects = <span class="std">Seq</span>(USCustomaryUnits.Mile, SIAcceptedUnits.Hour))
+<span class="cmt">// parse an expression in miles per hour, return as meters per second</span>
+<span class="kw">val</span> mps = qp[Meter &lt;/&gt; Second](<span class="lit">"60.withUnit[Mile &lt;/&gt; Hour]"</span>)</pre></span></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div><div class="toggleContainer block">
-            <span class="toggle">Known Subclasses</span>
-            <div class="subClasses hiddenContent"><a href="USCustomaryUnits$$Acre$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Acre">Acre</a>, <a href="MKSUnits$$Ampere$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Ampere">Ampere</a>, <a href="SIBaseUnits$$Ampere$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Ampere">Ampere</a>, <a href="SIAcceptedUnits$$ArcMinute$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.ArcMinute">ArcMinute</a>, <a href="SIAcceptedUnits$$ArcSecond$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.ArcSecond">ArcSecond</a>, <a href="SIPrefixes$$Atto$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Atto">Atto</a>, <a href="USCustomaryUnits$$BTU$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.BTU">BTU</a>, <a href="InfoUnits$$Bit$.html" class="extype" name="com.manyangled.coulomb.InfoUnits.Bit">Bit</a>, <a href="InfoUnits$$Byte$.html" class="extype" name="com.manyangled.coulomb.InfoUnits.Byte">Byte</a>, <a href="USCustomaryUnits$$Calorie$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Calorie">Calorie</a>, <a href="SIBaseUnits$$Candela$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Candela">Candela</a>, <a href="SIAcceptedUnits$$Celsius$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Celsius">Celsius</a>, <a href="SIPrefixes$$Centi$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Centi">Centi</a>, <a href="MKSUnits$$Coulomb$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Coulomb">Coulomb</a>, <a href="USCustomaryUnits$$Cup$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Cup">Cup</a>, <a href="SIAcceptedUnits$$Day$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Day">Day</a>, <a href="SIPrefixes$$Deca$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Deca">Deca</a>, <a href="SIPrefixes$$Deci$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Deci">Deci</a>, <a href="SIAcceptedUnits$$Degree$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Degree">Degree</a>, <a href="SIPrefixes$$Exa$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Exa">Exa</a>, <a href="BinaryPrefixes$$Exbi$.html" class="extype" name="com.manyangled.coulomb.BinaryPrefixes.Exbi">Exbi</a>, <a href="USCustomaryUnits$$Fahrenheit$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Fahrenheit">Fahrenheit</a>, <a href="MKSUnits$$Farad$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Farad">Farad</a>, <a href="SIPrefixes$$Femto$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Femto">Femto</a>, <a href="USCustomaryUnits$$FluidOunce$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.FluidOunce">FluidOunce</a>, <a href="USCustomaryUnits$$FoodCalorie$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.FoodCalorie">FoodCalorie</a>, <a href="USCustomaryUnits$$Foot$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Foot">Foot</a>, <a href="USCustomaryUnits$$FootPound$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.FootPound">FootPound</a>, <a href="USCustomaryUnits$$Gallon$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Gallon">Gallon</a>, <a href="BinaryPrefixes$$Gibi$.html" class="extype" name="com.manyangled.coulomb.BinaryPrefixes.Gibi">Gibi</a>, <a href="SIPrefixes$$Giga$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Giga">Giga</a>, <a href="SIAcceptedUnits$$Gram$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Gram">Gram</a>, <a href="SIAcceptedUnits$$Hectare$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Hectare">Hectare</a>, <a href="SIPrefixes$$Hecto$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Hecto">Hecto</a>, <a href="MKSUnits$$Henry$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Henry">Henry</a>, <a href="MKSUnits$$Hertz$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Hertz">Hertz</a>, <a href="USCustomaryUnits$$Horsepower$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Horsepower">Horsepower</a>, <a href="SIAcceptedUnits$$Hour$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Hour">Hour</a>, <a href="USCustomaryUnits$$Inch$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Inch">Inch</a>, <a href="MKSUnits$$Joule$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Joule">Joule</a>, <a href="MKSUnits$$Kelvin$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Kelvin">Kelvin</a>, <a href="SIBaseUnits$$Kelvin$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Kelvin">Kelvin</a>, <a href="BinaryPrefixes$$Kibi$.html" class="extype" name="com.manyangled.coulomb.BinaryPrefixes.Kibi">Kibi</a>, <a href="SIPrefixes$$Kilo$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Kilo">Kilo</a>, <a href="MKSUnits$$Kilogram$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Kilogram">Kilogram</a>, <a href="SIBaseUnits$$Kilogram$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Kilogram">Kilogram</a>, <a href="SIAcceptedUnits$$Kilometer$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Kilometer">Kilometer</a>, <a href="SIAcceptedUnits$$Liter$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Liter">Liter</a>, <a href="BinaryPrefixes$$Mebi$.html" class="extype" name="com.manyangled.coulomb.BinaryPrefixes.Mebi">Mebi</a>, <a href="SIPrefixes$$Mega$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Mega">Mega</a>, <a href="MKSUnits$$Meter$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Meter">Meter</a>, <a href="SIBaseUnits$$Meter$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Meter">Meter</a>, <a href="SIPrefixes$$Micro$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Micro">Micro</a>, <a href="USCustomaryUnits$$Mile$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Mile">Mile</a>, <a href="SIPrefixes$$Milli$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Milli">Milli</a>, <a href="SIAcceptedUnits$$Millibar$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Millibar">Millibar</a>, <a href="SIAcceptedUnits$$Milliliter$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Milliliter">Milliliter</a>, <a href="SIAcceptedUnits$$Millimeter$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Millimeter">Millimeter</a>, <a href="SIAcceptedUnits$$Minute$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Minute">Minute</a>, <a href="SIBaseUnits$$Mole$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Mole">Mole</a>, <a href="SIPrefixes$$Nano$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Nano">Nano</a>, <a href="InfoUnits$$Nat$.html" class="extype" name="com.manyangled.coulomb.InfoUnits.Nat">Nat</a>, <a href="MKSUnits$$Newton$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Newton">Newton</a>, <a href="MKSUnits$$Ohm$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Ohm">Ohm</a>, <a href="USCustomaryUnits$$Ounce$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Ounce">Ounce</a>, <a href="MKSUnits$$Pascal$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Pascal">Pascal</a>, <a href="BinaryPrefixes$$Pebi$.html" class="extype" name="com.manyangled.coulomb.BinaryPrefixes.Pebi">Pebi</a>, <a href="SIPrefixes$$Peta$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Peta">Peta</a>, <a href="SIPrefixes$$Pico$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Pico">Pico</a>, <a href="USCustomaryUnits$$Pint$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Pint">Pint</a>, <a href="USCustomaryUnits$$Pound$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Pound">Pound</a>, <a href="USCustomaryUnits$$Quart$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Quart">Quart</a>, <a href="MKSUnits$$Radian$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Radian">Radian</a>, <a href="MKSUnits$$Second$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Second">Second</a>, <a href="SIBaseUnits$$Second$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Second">Second</a>, <a href="USCustomaryUnits$$ShortTon$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.ShortTon">ShortTon</a>, <a href="USCustomaryUnits$$Tablespoon$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Tablespoon">Tablespoon</a>, <a href="USCustomaryUnits$$Teaspoon$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Teaspoon">Teaspoon</a>, <a href="BinaryPrefixes$$Tebi$.html" class="extype" name="com.manyangled.coulomb.BinaryPrefixes.Tebi">Tebi</a>, <a href="TempUnitCompanion.html" class="extype" name="com.manyangled.coulomb.TempUnitCompanion">TempUnitCompanion</a>, <a href="SIPrefixes$$Tera$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Tera">Tera</a>, <a href="MKSUnits$$Tesla$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Tesla">Tesla</a>, <a href="SIAcceptedUnits$$Tonne$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Tonne">Tonne</a>, <a href="MKSUnits$$Volt$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Volt">Volt</a>, <a href="MKSUnits$$Watt$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Watt">Watt</a>, <a href="MKSUnits$$Weber$.html" class="extype" name="com.manyangled.coulomb.MKSUnits.Weber">Weber</a>, <a href="USCustomaryUnits$$Yard$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Yard">Yard</a>, <a href="BinaryPrefixes$$Yobi$.html" class="extype" name="com.manyangled.coulomb.BinaryPrefixes.Yobi">Yobi</a>, <a href="SIPrefixes$$Yocto$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Yocto">Yocto</a>, <a href="SIPrefixes$$Yotta$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Yotta">Yotta</a>, <a href="BinaryPrefixes$$Zebi$.html" class="extype" name="com.manyangled.coulomb.BinaryPrefixes.Zebi">Zebi</a>, <a href="SIPrefixes$$Zepto$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Zepto">Zepto</a>, <a href="SIPrefixes$$Zetta$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes.Zetta">Zetta</a></div>
-          </div></div>
+        </div></div>
         
 
       <div id="mbrsel">
@@ -72,7 +78,7 @@
                 <span class="filtertype">Inherited<br />
                 </span>
                 <ol id="linearization">
-                  <li class="in" name="com.manyangled.coulomb.UnitCompanion"><span>UnitCompanion</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                  <li class="in" name="com.manyangled.coulomb.QuantityParser"><span>QuantityParser</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                 </ol>
               </div><div id="ancestors">
             <span class="filtertype"></span>
@@ -91,40 +97,27 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.manyangled.coulomb.UnitCompanion#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(n:String):com.manyangled.coulomb.UnitCompanion[U]"></a>
-      <a id="&lt;init&gt;:UnitCompanion[U]"></a>
+              <ol><li name="com.manyangled.coulomb.QuantityParser#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="&lt;init&gt;(unitDeclarationObjects:Seq[_],unitCompanionObjects:Seq[_&lt;:com.manyangled.coulomb.UnitCompanion[_]]):com.manyangled.coulomb.QuantityParser"></a>
+      <a id="&lt;init&gt;:QuantityParser"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">UnitCompanion</span><span class="params">(<span name="n">n: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
+        <span class="name">QuantityParser</span><span class="params">(<span name="unitDeclarationObjects">unitDeclarationObjects: <span class="extype" name="scala.Seq">Seq</span>[_]</span>, <span name="unitCompanionObjects">unitCompanionObjects: <span class="extype" name="scala.Seq">Seq</span>[_ &lt;: <a href="UnitCompanion.html" class="extype" name="com.manyangled.coulomb.UnitCompanion">UnitCompanion</a>[_]]</span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@&lt;init&gt;(n:String):com.manyangled.coulomb.UnitCompanion[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@&lt;init&gt;(unitDeclarationObjects:Seq[_],unitCompanionObjects:Seq[_&lt;:com.manyangled.coulomb.UnitCompanion[_]]):com.manyangled.coulomb.QuantityParser" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.manyangled.coulomb.UnitCompanion#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(uname:String,ucoef:Double):com.manyangled.coulomb.UnitCompanion[U]"></a>
-      <a id="&lt;init&gt;:UnitCompanion[U]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">new</span>
-      </span>
-      <span class="symbol">
-        <span class="name">UnitCompanion</span><span class="params">(<span name="uname">uname: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="ucoef">ucoef: <span class="extype" name="scala.Double">Double</span></span>)</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@&lt;init&gt;(uname:String,ucoef:Double):com.manyangled.coulomb.UnitCompanion[U]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">unitDeclarationObjects</dt><dd class="cmt"><p>a collection of objects to import units from. For each such object
+the run-time parsing will <code>import Object._</code> to obtain any unit definitions prior to attempting
+to parse each input string.</p></dd><dt class="param">unitCompanionObjects</dt><dd class="cmt"><p>a collection of unit names referring to the unit's companion object.
+For each such object the run-time parsing will <code>import Unit</code> to obtain that unit's definition
+prior to attempting to parse each input string.</p></dd></dl></div>
     </li></ol>
             </div>
 
@@ -146,7 +139,7 @@
         <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@!=(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -163,7 +156,7 @@
         <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@##():Int" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@##():Int" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -180,45 +173,30 @@
         <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@==(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@==(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.UnitCompanion#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply():com.manyangled.coulomb.Quantity[U]"></a>
-      <a id="apply():Quantity[U]"></a>
+    </li><li name="com.manyangled.coulomb.QuantityParser#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="apply[U&lt;:com.manyangled.coulomb.UnitExpr](quantityExpr:String)(implicitevidence$1:reflect.runtime.universe.TypeTag[U]):scala.util.Try[com.manyangled.coulomb.Quantity[U]]"></a>
+      <a id="apply[U&lt;:UnitExpr](String)(scala.reflect.api.JavaUniverse.TypeTag[U]):Try[Quantity[U]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">()</span><span class="result">: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.UnitCompanion.U">U</span>]</span>
+        <span class="name">apply</span><span class="tparams">[<span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="quantityExpr">quantityExpr: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.JavaUniverse.TypeTag</span>[<span class="extype" name="com.manyangled.coulomb.QuantityParser.apply.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.util.Try">Try</span>[<a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.QuantityParser.apply.U">U</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@apply():com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@apply[U&lt;:com.manyangled.coulomb.UnitExpr](quantityExpr:String)(implicitevidence$1:reflect.runtime.universe.TypeTag[U]):scala.util.Try[com.manyangled.coulomb.Quantity[U]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.manyangled.coulomb.UnitCompanion#apply" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="apply[N](v:N)(implicitnum:Numeric[N]):com.manyangled.coulomb.Quantity[U]"></a>
-      <a id="apply[N](N)(Numeric[N]):Quantity[U]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">apply</span><span class="tparams">[<span name="N">N</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="com.manyangled.coulomb.UnitCompanion.apply.N">N</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="num">num: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="com.manyangled.coulomb.UnitCompanion.apply.N">N</span>]</span>)</span><span class="result">: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.UnitCompanion.U">U</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@apply[N](v:N)(implicitnum:Numeric[N]):com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
+      <p class="shortcomment cmt">Parse a string containing an expression that evaluates to a unit Quantity object.</p><div class="fullcomment"><div class="comment cmt"><p>Parse a string containing an expression that evaluates to a unit Quantity object.</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>a <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a> type that specifies a <code>Quantity[U]</code> to return.  <code>U</code> is expected to
+be compatible with the unit type of the expression in the string, or parsing will fail.</p></dd><dt class="param">quantityExpr</dt><dd class="cmt"><p>a string containing an expression that evaluates to a <code>Quantity</code> object.</p></dd><dt>returns</dt><dd class="cmt"><p>the Quantity object created by run-time parsing, converted to compatible <code>Quantity[U]</code>,
+or failure if any stage of the run-time parsing and unit conversion was unsuccessful.</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -231,7 +209,7 @@
         <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@asInstanceOf[T0]:T0" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -248,7 +226,7 @@
         <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@clone():Object" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@clone():Object" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -271,7 +249,7 @@
         <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -288,7 +266,7 @@
         <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@equals(x$1:Any):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -305,7 +283,7 @@
         <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@finalize():Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@finalize():Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -316,23 +294,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.manyangled.coulomb.UnitCompanion#furec" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="furec:com.manyangled.coulomb.UnitRec[U]"></a>
-      <a id="furec:UnitRec[U]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">implicit </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">furec</span><span class="result">: <a href="UnitRec.html" class="extype" name="com.manyangled.coulomb.UnitRec">UnitRec</a>[<span class="extype" name="com.manyangled.coulomb.UnitCompanion.U">U</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@furec:com.manyangled.coulomb.UnitRec[U]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -345,7 +306,7 @@
         <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@getClass():Class[_]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@getClass():Class[_]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -362,7 +323,7 @@
         <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@hashCode():Int" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@hashCode():Int" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -379,7 +340,7 @@
         <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -396,7 +357,7 @@
         <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -413,7 +374,7 @@
         <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@notify():Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@notify():Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -430,7 +391,7 @@
         <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@notifyAll():Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@notifyAll():Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -447,7 +408,7 @@
         <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -464,11 +425,49 @@
         <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@toString():String" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@toString():String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.manyangled.coulomb.QuantityParser#unitCompanionObjects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unitCompanionObjects:Seq[_&lt;:com.manyangled.coulomb.UnitCompanion[_]]"></a>
+      <a id="unitCompanionObjects:Seq[_&lt;:UnitCompanion[_]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unitCompanionObjects</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[_ &lt;: <a href="UnitCompanion.html" class="extype" name="com.manyangled.coulomb.UnitCompanion">UnitCompanion</a>[_]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@unitCompanionObjects:Seq[_&lt;:com.manyangled.coulomb.UnitCompanion[_]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">a collection of unit names referring to the unit's companion object.</p><div class="fullcomment"><div class="comment cmt"><p>a collection of unit names referring to the unit's companion object.
+For each such object the run-time parsing will <code>import Unit</code> to obtain that unit's definition
+prior to attempting to parse each input string.</p></div></div>
+    </li><li name="com.manyangled.coulomb.QuantityParser#unitDeclarationObjects" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unitDeclarationObjects:Seq[_]"></a>
+      <a id="unitDeclarationObjects:Seq[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unitDeclarationObjects</span><span class="result">: <span class="extype" name="scala.Seq">Seq</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@unitDeclarationObjects:Seq[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">a collection of objects to import units from.</p><div class="fullcomment"><div class="comment cmt"><p>a collection of objects to import units from. For each such object
+the run-time parsing will <code>import Object._</code> to obtain any unit definitions prior to attempting
+to parse each input string.</p></div></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <a id="wait():Unit"></a>
@@ -481,7 +480,7 @@
         <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@wait():Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@wait():Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -504,7 +503,7 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -527,7 +526,7 @@
         <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.UnitCompanion@wait(x$1:Long):Unit" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@wait(x$1:Long):Unit" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
