@@ -607,7 +607,16 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     def unapply(tpe: Type): Boolean = tpe =:= typeOf[Unitless]
   }
 
-  def mapMul(lmap: Map[Type, Int], rmap: Map[Type, Int]): Map[Type, Int] = {
+  case class TypeKey(tpe: Type) {
+    override def canEqual(a: Any): Boolean = a.isInstanceOf[TypeKey]
+    override def equals(a: Any): Boolean = a match {
+      case TypeKey(t) => (tpe =:= t)
+      case _ => false
+    }
+    override def hashCode: Int = typeName(tpe).hashCode
+  }
+
+  def mapMul(lmap: Map[TypeKey, Int], rmap: Map[TypeKey, Int]): Map[TypeKey, Int] = {
     rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
       if (m.contains(t)) {
         val ne = m(t) + e
@@ -618,7 +627,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def mapDiv(lmap: Map[Type, Int], rmap: Map[Type, Int]): Map[Type, Int] = {
+  def mapDiv(lmap: Map[TypeKey, Int], rmap: Map[TypeKey, Int]): Map[TypeKey, Int] = {
     rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
       if (m.contains(t)) {
         val ne = m(t) - e
@@ -629,15 +638,15 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def mapPow(bmap: Map[Type, Int], exp: Int): Map[Type, Int] = {    
-    if (exp == 0) Map.empty[Type, Int] else bmap.mapValues(_ * exp)
+  def mapPow(bmap: Map[TypeKey, Int], exp: Int): Map[TypeKey, Int] = {
+    if (exp == 0) Map.empty[TypeKey, Int] else bmap.mapValues(_ * exp)
   }
 
-  def canonical(typeU: Type): (Double, Map[Type, Int]) = {
+  def canonical(typeU: Type): (Double, Map[TypeKey, Int]) = {
     typeU.dealias match {
-      case IsUnitless() => (1.0, Map.empty[Type, Int])
+      case IsUnitless() => (1.0, Map.empty[TypeKey, Int])
       case FUnit(_) => {
-        (1.0, Map(typeU -> 1))
+        (1.0, Map(TypeKey(typeU) -> 1))
       }
       case DUnit(_, coef, dsub) => {
         val (dcoef, dmap) = canonical(dsub)
@@ -660,7 +669,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case _ => {
         // This should never execute
         abort(s"Undefined Unit Type: ${typeName(typeU)}")
-        (0.0, Map.empty[Type, Int])
+        (0.0, Map.empty[TypeKey, Int])
       }
     }
   }
@@ -757,8 +766,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def mapToType(map: Map[Type, Int]): Type = {
-    val vec = map.toVector
+  def mapToType(map: Map[TypeKey, Int]): Type = {
+    val vec = map.toVector.map { case (TypeKey(t), e) => (t, e) }
     val ePos = vec.filter { case(_, e) => e > 0 }.sortBy { case (_, e) => e }
     val eNeg = vec.filter { case(_, e) => e < 0 }
       .map { case (u, e) => (u -> -e) }.sortBy { case (_, e) => e }
