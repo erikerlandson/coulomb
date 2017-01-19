@@ -18,33 +18,7 @@ package com.manyangled.coulomb
 
 object MKSUnits {
   import ChurchInt._
-  import SIBaseUnits.{
-    Meter => _, Kilogram => _, Second => _, Kelvin => _, Ampere => _, _
-  }
-
-  // These are declared as synonyms of SI base units
-  // It is important to declare synonyms of base units as derived, that is never
-  // re-declare a base unit that already exists.
-  // As long as synonyms are properly declared to be exactly equivalent to "originals"
-  // it is safe to import them together, because it will not matter which version the compiler
-  // sees, and which gets shadowed
-
-  trait Meter extends DerivedUnit[SIBaseUnits.Meter]
-  object Meter extends UnitCompanion[Meter]("meter")
-
-  trait Kilogram extends DerivedUnit[SIBaseUnits.Kilogram]
-  object Kilogram extends UnitCompanion[Kilogram]("kilogram")
-
-  trait Second extends DerivedUnit[SIBaseUnits.Second]
-  object Second extends UnitCompanion[Second]("second")
-
-  trait Ampere extends DerivedUnit[SIBaseUnits.Ampere]
-  object Ampere extends UnitCompanion[Ampere]("ampere")
-
-  trait Kelvin extends DerivedTemperature
-  object Kelvin extends TempUnitCompanion[Kelvin]("kelvin", 1.0, 0.0)
-
-  // These are derived from base units
+  import SIBaseUnits._
 
   trait Radian extends DerivedUnit[Unitless]
   object Radian extends UnitCompanion[Radian]("radian")
