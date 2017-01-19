@@ -131,6 +131,35 @@ The `coulomb` library pre-defines a variety of units and prefixes, which are sum
 * [USCustomaryUnits](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.USCustomaryUnits$): Some [customary non-SI units](https://en.wikipedia.org/wiki/United_States_customary_units) commonly used in the United States.
 * [BinaryPrefixes](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.BinaryPrefixes$): The [binary prefixes](https://en.wikipedia.org/wiki/Binary_prefix) Kibi, Mebi, Gibi, etc.
 
+#### Unit Types and Compatibility
+
+The concept of unit _compatibility_ is fundamental to the `coulomb` library and its implementation of unit analysis.
+Two unit type expressions are _compatible_ if they encode an equivalent "[abstract quantity](https://en.wikipedia.org/wiki/International_System_of_Quantities)."
+For example, `Meter` and `Mile` are compatible because they both encode the abstract quantity of Length.
+`Foot <^> _3` and `Liter` are compatible because they both encode a volume, or Length^3.
+`Kilo <*> Meter </> Hour` and `Foot <*> (Second <^> _neg1)` are compatible because they encode a velocity, or Length\*Time^-1.
+
+If two unit types are compatible, then they can be converted.
+Meters can always be converted to miles, and cubic feet can be converted to liters, etc.
+In `coulomb`, a unit quantity will be implicitly converted into a quantity of a different unit type whenever those types are compatible.
+Any attempt to convert between _incompatible_ unit types results in a compile-time type error.
+
+```scala
+scala> def foo(q: Quantity[Meter </> Second]) = q.str
+
+scala> foo(60.withUnit[Mile </> Hour])
+res3: String = 26.8224 meter / second
+
+scala> foo(1.withUnit[Mile <*> (Minute <^> _neg1)])
+res5: String = 26.8224 meter / second
+
+scala> foo(1.withUnit[Foot </> Day])
+res6: String = 3.527777777777778E-6 meter / second
+
+scala> foo(1.withUnit[Foot <*> Day])
+<console>:37: error: type mismatch;
+```
+
 #### Runtime Parsing
 
 `coulomb` supplies a class `QuantityParser` for [run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser) of `Quantity` objects.
