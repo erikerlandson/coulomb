@@ -119,6 +119,18 @@ val frequency = Quantity[Second <^> _neg1](60)
 val volume = Quantity[Meter <^> _3](1.5)
 ```
 
+#### Predefined Units
+
+The `coulomb` library pre-defines a variety of units and prefixes, which are summarized here:
+
+* [SIBaseUnits](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.SIBaseUnits$): The Standard International [base units](https://en.wikipedia.org/wiki/International_System_of_Units#Base_units) Meter, Kilogram, Second, Ampere, Kelvin, Mole and Candela.
+* [SIPrefixes](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.SIPrefixes$): Standard International [prefixes](https://en.wikipedia.org/wiki/International_System_of_Units#Prefixes) Kilo, Mega, Milli, Micro, etc.
+* [MKSUnits](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.MKSUnits$): The common "Meter-Kilogram-Second" [derived units](http://scienceworld.wolfram.com/physics/MKS.html).
+* [SIAcceptedUnits](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.SIAcceptedUnits$): A selection of units [accepted](https://en.wikipedia.org/wiki/Non-SI_units_mentioned_in_the_SI) by the Standard International system.
+* [InfoUnits](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.InfoUnits$): Units of information: Byte, Bit and Nat.
+* [USCustomaryUnits](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.USCustomaryUnits$): Some [customary non-SI units](https://en.wikipedia.org/wiki/United_States_customary_units) commonly used in the United States.
+* [BinaryPrefixes](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.BinaryPrefixes$): The [binary prefixes](https://en.wikipedia.org/wiki/Binary_prefix) Kibi, Mebi, Gibi, etc.
+
 #### Runtime Parsing
 
 `coulomb` supplies a class `QuantityParser` for [run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser) of `Quantity` objects.
