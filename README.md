@@ -69,6 +69,71 @@ Using these operators, a `UnitExpr` can be composed into unit type expressions o
 val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)
 val ohms = Quantity[(Kilogram <*> (Meter <^> _2)) </> ((Second <^> _3) <*> (Ampere <^> _2))](0.01)
 ```
+#### Runtime Parsing
+
+`coulomb` supplies a class `QuantityParser` for [run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser) of `Quantity` objects. This section demonstrates `QuantityParser` with an application to enhancing the [Typesafe `config` package](https://typesafehub.github.io/config/) with `coulomb` unit analysis.
+
+First import a selection of `coulomb` units, and the `ConfigFactory` for generating `Config` objects.  We generate a simple configuration with entries for "duration", "memory" and "bandwidth".  However, the values for these entries are expressions that evaluate to `Quantity` objects:
+
+```scala
+scala> import com.manyangled.coulomb._; import SIBaseUnits._; import SIPrefixes._; import InfoUnits._; import extensions._
+import com.manyangled.coulomb._
+import SIBaseUnits._
+import SIPrefixes._
+import InfoUnits._
+import extensions._
+
+scala> import com.typesafe.config.ConfigFactory
+import com.typesafe.config.ConfigFactory
+
+scala> val conf = ConfigFactory.parseString("""
+     | "duration" = "60.withUnit[Second]"
+     | "memory" = "100.withUnit[Giga <*> Byte]"
+     | "bandwidth" = "10.withUnit[Mega <*> Byte </> Second]"
+     | """)
+conf: com.typesafe.config.Config = Config(SimpleConfigObject({"bandwidth":"10.withUnit[Mega <*> Byte </> Second]","duration":"60.withUnit[Second]","memory":"100.withUnit[Giga <*> Byte]"}))
+```
+
+In order to make use of these `Quantity` expressions in a configuration we must enhance `Config` with a new method `getUnitQuantity`, which we do via an `implicit class` pattern below.  The contents of this enhancement class are simple: A `QuantityParser` object is declared that imports `SIBaseUnits._`, `SIPrefixes._` and `InfoUnits._`. The
+`getUnitQuantity` method is just a call to the `apply` method of the `QuantityParser`, that passes the configured value to the parser, along with an expected `UnitExpr` type.  If this type is compatible with the run-time evaluation of the string expression, it will be converted in the usual manner.  If the expected unit is incompatible, an error will be returned.
+
+```scala
+scala> object enhance {
+     |   implicit class WithUnits(conf: com.typesafe.config.Config) {
+     |     val qp = QuantityParser(Seq(SIBaseUnits, SIPrefixes, InfoUnits))
+     |     def getUnitQuantity[U <: UnitExpr :scala.reflect.runtime.universe.TypeTag](key: String) =
+     |       qp[U](conf.getString(key))
+     |   }
+     | }
+defined object enhance
+
+scala> import enhance._
+import enhance._
+```
+
+Lastly, we demonstrate the new enhancement, by invoking the `getUnitQuantity` method to evaluate and convert our three config settings:
+
+```scala
+
+scala> conf.getUnitQuantity[SIAcceptedUnits.Minute]("duration").get.str
+res0: String = 1.0 minute
+
+scala> conf.getUnitQuantity[Mega <*> Byte]("memory").get.str
+res1: String = 100000.0 mega-byte
+
+scala> conf.getUnitQuantity[Giga <*> Bit </> Second]("bandwidth").get.str
+res2: String = 0.08 (giga-bit) / second
+```
+
+If we ask for a unit type that is incompatible with the configuration, an error is returned:
+
+```scala
+scala> conf.getUnitQuantity[Giga <*> Bit </> Meter]("bandwidth")
+res3: scala.util.Try[com.manyangled.coulomb.Quantity[...]] =
+Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed:
+
+Implicit not found: CompatUnits[com.manyangled.coulomb.</>[com.manyangled.coulomb.<*>[com.manyangled.coulomb.SIPrefixes.Mega,com.manyangled.coulomb.InfoUnits.Byte],com.manyangled.coulomb.SIBaseUnits.Second], com.manyangled.coulomb.</>[com.manyangled.coulomb.<*>[com.manyangled.coulomb.SIPrefixes.Giga,com.manyangled.coulomb.InfoUnits.Bit],com.manyangled.coulomb.SIBaseUnits.Meter]]...
+```
 
 #### examples
 
