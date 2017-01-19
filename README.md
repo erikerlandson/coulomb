@@ -18,7 +18,9 @@ The key user-facing type, `Quantity`, is [documented here](https://erikerlandson
 The motivation for `coulomb` is to support the following features:
 
 1. allow a programmer to assocate unit analysis with values, in the form of static types
-  1. `val length = Quantity[Meter](1)`
+  1. `val length = 10.withUnit[Meter]`
+  1. `val duration = Second(30.0)`
+  1. `val mass = Quantity[Kilogram](100)`
 1. express those types with arbitrary and natural static type expressions
   1. `val speed = Quantity[(Kilo <*> Meter) </> Hour](100.0)`
   1. `val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)`
@@ -47,15 +49,15 @@ import com.manyangled.coulomb._
 import extensions._
 import SIBaseUnits._
 
-val length = Quantity[Meter](10)
+val length = 10.withUnit[Meter]
 val duration = Second(30.0)
-val mass = 100.withUnit[Kilogram]
+val mass = Quantity[Kilogram](100)
 ```
 
 The `UnitExpr` trait hierarchy provides three operator types for building more complex unit types: `<*>`, `</>`, and `<^>`:
 
 ```scala
-import ChurchInt._    // exponents are represented as Church integers _1, _2, ...
+import ChurchInt._   // exponents are represented as Church integer types _1, _2, ...
 import SIPrefixes._
 
 val area = Quantity[Meter <*> Meter](100)      // unit product
@@ -69,11 +71,62 @@ Using these operators, a `UnitExpr` can be composed into unit type expressions o
 val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)
 val ohms = Quantity[(Kilogram <*> (Meter <^> _2)) </> ((Second <^> _3) <*> (Ampere <^> _2))](0.01)
 ```
+
+#### Quantity Values
+
+The internal representation of a `Quantity` is opaque; however in the current design `Quantity` values are represented internally as `Double`.
+A quantity's value can be obtained in any of the standard Scala numeric types `Int`, `Long`, `Float` and `Double`:
+
+```scala
+val memory = 100.withUnit[Giga <*> Byte>]
+
+val memInt: Int = memory.toInt
+val memLong: Long = memory.toLong
+val memFloat: Float = memory.toFloat
+val memDouble: Double = memory.toDouble
+```
+
+#### The `str` And `unitStr` Method
+
+The `str` method can be used to obtain a human-readable string that represents a quantity's type and value.
+The `unitStr` method returns a similar string representing just the unit type:
+
+```scala
+scala> val bandwidth = Quantity[(Giga <*> Bit) </> Second](10)
+bandwidth: com.manyangled.coulomb.Quantity[...] = com.manyangled.coulomb.Quantity@40240000
+
+scala> bandwidth.str
+res0: String = 10.0 (giga-bit) / second
+
+scala> bandwidth.unitStr
+res1: String = (giga-bit) / second
+```
+
+#### Unit Exponents and Church Integers
+
+The `coulomb` library allows unit expression types to include integer exponents.
+Representing integers in the type system is accomplished using a type encoding of [Church numerals](https://en.wikipedia.org/wiki/Church_encoding).
+In `coulomb`, these are defined using the `ChurchInt` type, which pre-defines integer type "constants" `_0`, `_1`, `_2` ... `_9` and negative integers `_neg1`, `_neg2`, ... `_neg9`.
+(however, the `ChurchInt` type is not bounded, and can represent values outside this range, for example `_9#Add[_9]` or `_neg9#Mul[_9]`)
+The following examples demonstrate typical uses of type exponents in unit expressions:
+
+```scala
+import com.manyangled.coulomb._
+import SIBaseUnits._
+import ChurchInt._
+
+val frequency = Quantity[Second <^> _neg1](60)
+val volume = Quantity[Meter <^> _3](1.5)
+```
+
 #### Runtime Parsing
 
-`coulomb` supplies a class `QuantityParser` for [run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser) of `Quantity` objects. This section demonstrates `QuantityParser` with an application to enhancing the [Typesafe `config` package](https://typesafehub.github.io/config/) with `coulomb` unit analysis.
+`coulomb` supplies a class `QuantityParser` for [run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser) of `Quantity` objects.
+This section demonstrates `QuantityParser` with an application to enhancing the [Typesafe `config` package](https://typesafehub.github.io/config/) with `coulomb` unit analysis.
 
-First import a selection of `coulomb` units, and the `ConfigFactory` for generating `Config` objects.  We generate a simple configuration with entries for "duration", "memory" and "bandwidth".  However, the values for these entries are expressions that evaluate to `Quantity` objects:
+First import a selection of `coulomb` units, and the `ConfigFactory` for generating `Config` objects.
+We generate a simple configuration with entries for "duration", "memory" and "bandwidth".
+However, the values for these entries are expressions that evaluate to `Quantity` objects:
 
 ```scala
 scala> import com.manyangled.coulomb._; import SIBaseUnits._; import SIPrefixes._; import InfoUnits._; import extensions._
@@ -94,8 +147,11 @@ scala> val conf = ConfigFactory.parseString("""
 conf: com.typesafe.config.Config = Config(SimpleConfigObject({"bandwidth":"10.withUnit[Mega <*> Byte </> Second]","duration":"60.withUnit[Second]","memory":"100.withUnit[Giga <*> Byte]"}))
 ```
 
-In order to make use of these `Quantity` expressions in a configuration we must enhance `Config` with a new method `getUnitQuantity`, which we do via an `implicit class` pattern below.  The contents of this enhancement class are simple: A `QuantityParser` object is declared that imports `SIBaseUnits._`, `SIPrefixes._` and `InfoUnits._`. The
-`getUnitQuantity` method is just a call to the `apply` method of the `QuantityParser`, that passes the configured value to the parser, along with an expected `UnitExpr` type.  If this type is compatible with the run-time evaluation of the string expression, it will be converted in the usual manner.  If the expected unit is incompatible, an error will be returned.
+In order to make use of these `Quantity` expressions in a configuration we must enhance `Config` with a new method `getUnitQuantity`, which we do via an `implicit class` pattern below.
+The contents of this enhancement class are simple: A `QuantityParser` object is declared that imports `SIBaseUnits._`, `SIPrefixes._` and `InfoUnits._`.
+The `getUnitQuantity` method is just a call to the `apply` method of the `QuantityParser`, that passes the configured value to the parser, along with an expected `UnitExpr` type.
+If this type is compatible with the run-time evaluation of the string expression, it will be converted in the usual manner.
+If the expected unit is incompatible, an error will be returned.
 
 ```scala
 scala> object enhance {
