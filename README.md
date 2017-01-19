@@ -40,8 +40,8 @@ The motivation for `coulomb` is to support the following features:
 
 #### `Quantity` and `UnitExpr`
 
-`coulomb` defines the class `Quantity` for representing values with associated units.
-These units are represented by a type parameter of `Quantity`, which is some sub-trait of `UnitExpr`.
+`coulomb` defines the [class `Quantity`](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.Quantity) for representing values with associated units.
+These units are represented by a type parameter of `Quantity`, which is some sub-trait of [`UnitExpr`](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.UnitExpr).
 Here are some simple declarations of `Quantity` objects:
 
 ```scala
@@ -106,7 +106,7 @@ res1: String = (giga-bit) / second
 
 The `coulomb` library allows unit expression types to include integer exponents.
 Representing integers in the type system is accomplished using a type encoding of [Church numerals](https://en.wikipedia.org/wiki/Church_encoding).
-In `coulomb`, these are defined using the `ChurchInt` type, which pre-defines integer type "constants" `_0`, `_1`, `_2` ... `_9` and negative integers `_neg1`, `_neg2`, ... `_neg9`.
+In `coulomb`, these are defined using the [`ChurchInt` type](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.ChurchInt), which pre-defines integer type "constants" `_0`, `_1`, `_2` ... `_9` and negative integers `_neg1`, `_neg2`, ... `_neg9`.
 (however, the `ChurchInt` type is not bounded, and can represent values outside this range, for example `_9#Add[_9]` or `_neg9#Mul[_9]`)
 The following examples demonstrate typical uses of type exponents in unit expressions:
 
