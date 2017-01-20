@@ -160,6 +160,30 @@ scala> foo(1.withUnit[Foot <*> Day])
 <console>:37: error: type mismatch;
 ```
 
+#### Unit Conversions
+
+As described in the previous section, unit quantities can be converted from one unit type to another when the two types are compatible.
+Unit conversions come in a few different forms:
+```scala
+// Implicit conversion
+scala> val vol: Quantity[Meter <^> _3] = Liter(4000)
+vol: com.manyangled.coulomb.Quantity[...] = com.manyangled.coulomb.Quantity@40100000
+
+scala> vol.str
+res0: String = 4.0 meter ^ 3
+
+// Explicit conversion using the `as` method
+scala> Liter(4000).as[Meter <^> _3].str
+res1: String = 4.0 meter ^ 3
+
+// Creation of a conversion function using the `converter` factory function:
+scala> val f = Quantity.converter[Liter, Meter <^> _3]
+f: com.manyangled.coulomb.Quantity[...] => com.manyangled.coulomb.Quantity[...] = <function1>
+
+scala> f(Liter(4000)).str
+res2: String = 4.0 meter ^ 3
+```
+
 #### Unit Operations
 
 Unit quantities support math operations `+`, `-`, `*`, `/`, and `pow`.
