@@ -160,6 +160,44 @@ scala> foo(1.withUnit[Foot <*> Day])
 <console>:37: error: type mismatch;
 ```
 
+#### Unit Operations
+
+Unit quantities support math operations `+`, `-`, `*`, `/`, and `pow`.
+Quantities must be of compatible unit types to be added or subtracted.
+The unit of the left-hand argument is taken as the unit of the output:
+```scala
+scala> (Foot() + Yard()).str
+res0: String = 4.0 foot
+
+scala> (Foot(4) - Yard()).str
+res1: String = 1.0 foot
+```
+
+Quantities of any unit types may be multipied or divided.
+Result types are different than either argument, and are expressed in terms of Base units:
+```scala
+scala> (Mile(60) / Hour()).str
+res0: String = 26.8224 meter / second
+
+scala> (Yard() * Yard()).str
+res1: String = 0.83612736 meter ^ 2
+
+scala> (Yard() / Inch()).str
+res2: String = 36.0 unitless
+```
+
+When raising a unit to a power, the exponent is given as a type, in Church integer representation:
+```scala
+scala> Meter(3).pow[_2].str
+res25: String = 9.0 meter ^ 2
+
+scala> Meter(3).pow[_neg1].str
+res26: String = 0.3333333333333333 meter ^ -1
+
+scala> Meter(3).pow[_0].str
+res27: String = 1.0 unitless
+```
+
 #### Runtime Parsing
 
 `coulomb` supplies a class `QuantityParser` for [run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser) of `Quantity` objects.
