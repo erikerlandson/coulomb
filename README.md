@@ -222,6 +222,47 @@ scala> Meter(3).pow[_0].str
 res27: String = 1.0 unitless
 ```
 
+#### Declaring New Units
+
+The `coulomb` library strives to make it easy to add new units which work seamlessly with the unit analysis type system.
+There are two varieties of unit declaration: _base units_ and _derived units_.
+
+A base unit, as its name suggests, is not defined in terms of any other unit; it is axiomatic.
+The Standard International [Base Units](https://en.wikipedia.org/wiki/SI_base_unit) are all declared as base units in the `coulomb` [`SIBaseUnits` subpackage](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.SIBaseUnits$).
+In the [`InfoUnits` sub-package](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.InfoUnits$), `Byte` is declared as the base unit of information.
+Declaring a base unit is special in the sense that it also defines a new kind of fundamental _abstract quantity_.
+For example, by declaring `Meter` as a base unit, `coulomb` establishes `Meter` as the canonical representation of the abstract quantity of Length.
+Any other unit of Length must be declared as a _derived unit_, or it would be considered _incompatible_ with other lengths.
+
+Here is an example of defining a new base unit `Scoville`, representing an abstract quantity of [Spicy Heat](https://en.wikipedia.org/wiki/Scoville_scale):
+```scala
+object SpiceUnits {
+  trait Scoville extends BaseUnit
+  object Scoville extends UnitCompanion[Scoville]("scoville")
+}
+```
+
+The second variety of unit declarations is the _derived_ unit, which is defined in terms of some unit expression involving previously-defined units.
+Derived units do _not_ define new kinds of abstract quantity, and are generally more common than base units:
+```scala
+object NewUnits {
+  import SIBaseUnits._
+  import USCustomaryUnits.Foot
+  
+  // a furlong is 660 feet
+  trait Furlong extends DerivedUnit[Foot]
+  object Furlong extends UnitCompanion[Furlong]("furlong", 660.0)
+  
+  // speed of sound is 1130 feet/second (at sea level, 20C)
+  trait Mach extends DerivedUnit[Foot </> Second]
+  object Mach extends UnitCompanion[Mach]("mach", 1130.0)
+  
+  // a standard earth gravity is 9.807 meters per second-squared
+  trait EarthGravity extends DerivedUnit[Meter </> (Second <^> _2)]
+  object EarthGravity extends UnitCompanion[EarthGravity]("earthgravity", 9.807)
+}
+```
+
 #### Runtime Parsing
 
 `coulomb` supplies a class `QuantityParser` for [run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser) of `Quantity` objects.
