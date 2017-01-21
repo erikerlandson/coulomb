@@ -18,6 +18,17 @@ The key user-facing type, `Quantity`, is [documented here](https://erikerlandson
 * [Motivation](#motivation)
 * [Quantity and UnitExpr](#quantity-and-unitexpr)
 * [Quantity Values](#quantity-values)
+* [The str And unitStr Method](#the-str-and-unitstr-method)
+* [Unit Exponents and Church Integers](#unit-exponents-and-church-integers)
+* [Predefined Units](#predefined-units)
+* [Unit Types and Compatibility](#unit-types-and-compatibility)
+* [Unit Conversions](#unit-conversions)
+* [Unit Operations](#unit-operations)
+* [Declaring New Units](#declaring-new-units)
+* [Unitless Quantities](#unitless-quantities)
+* [Unit Prefixes](#unit-prefixes)
+* [Runtime Parsing](#runtime-parsing)
+* [Temperature Values](#temperature-values)
 
 #### Motivation
 
