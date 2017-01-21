@@ -102,7 +102,7 @@ The internal representation of a `Quantity` is opaque; however in the current de
 A quantity's value can be obtained in any of the standard Scala numeric types `Int`, `Long`, `Float` and `Double`:
 
 ```scala
-val memory = 100.withUnit[Giga <*> Byte>]
+val memory = 100.withUnit[Giga <*> Byte]
 
 val memInt: Int = memory.toInt
 val memLong: Long = memory.toLong
