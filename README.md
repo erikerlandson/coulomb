@@ -10,10 +10,11 @@ API documentation for `coulomb` is available at: https://erikerlandson.github.io
 There is also a [tutorial](#tutorial) below.
 
 ### How to include `coulomb` in your project
-
+```scala
 resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
 libraryDependencies += "com.manyangled" %% "coulomb" % "0.1.0"
+```
 
 ### Tutorial
 
