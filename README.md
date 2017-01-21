@@ -13,6 +13,12 @@ The key user-facing type, `Quantity`, is [documented here](https://erikerlandson
 
 ### Tutorial
 
+#### Table of Contents
+
+* [Motivation](#motivation)
+* [Quantity and UnitExpr](#quantity-and-unitexpr)
+* [Quantity Values](#quantity-values)
+
 #### Motivation
 
 The motivation for `coulomb` is to support the following features:
