@@ -263,6 +263,59 @@ object NewUnits {
 }
 ```
 
+#### Unitless Quantities
+
+When units in an expression all cancel out -- for example, a ratio of quanties with compatible units -- the value is said to be "unitless."
+In `coulomb` the unit expression subtype `Unitless` represents this particular state.
+Here are a few examples of situations when `Unitless` values arise:
+```scala
+// ratios of compatible unit types are always unitless
+scala> (1.withUnit[Yard] / 1.withUnit[Foot]).str
+res1: String = 3.0 unitless
+
+// raising to the zeroth power
+scala> 100.withUnit[Second].pow[_0].str
+res2: String = 1.0 unitless
+
+// Radians and other angular units are derived from Unitless
+scala> math.Pi.withUnit[Radian].as[Unitless].str
+res3: String = 3.141592653589793 unitless
+```
+
+#### Unit Prefixes
+
+Unit prefixes are "first-class" objects in `coulomb`.
+In fact, prefixes are derived units of `Unitless`:
+```scala
+scala> Kilo().as[Unitless].str
+res1: String = 1000.0 unitless
+
+scala> Kibi().as[Unitless].str
+res2: String = 1024.0 unitless
+```
+
+Because they are just another kind of derived unit, prefixes work seamlessly with all other units.
+```scala
+scala> Quantity[Meter <^> _3](3).as[Kilo <*> Liter].str
+res1: String = 3.0 kilo-liter
+
+scala> Quantity[Meter <^> _3](3).as[Mega <*> Liter].str
+res2: String = 0.003 mega-liter
+
+scala> (Kilo() * Meter()).str
+res3: String = 1000.0 meter
+
+scala> (Meter() / Mega()).str
+res4: String = 1.0E-6 meter
+```
+
+The `coulomb` library comes with definitions for the standard [SI prefixes](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.SIPrefixes$), and also standard [binary prefixes](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.BinaryPrefixes$).
+It is also easy to declare new prefix units:
+```scala
+trait Dozen extends PrefixUnit
+object Dozen extends UnitCompanion[Dozen]("dozen", 12.0)
+```
+
 #### Runtime Parsing
 
 `coulomb` supplies a class `QuantityParser` for [run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser) of `Quantity` objects.
