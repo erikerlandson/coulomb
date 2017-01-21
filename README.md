@@ -388,6 +388,49 @@ Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed:
 Implicit not found: CompatUnits[com.manyangled.coulomb.</>[com.manyangled.coulomb.<*>[com.manyangled.coulomb.SIPrefixes.Mega,com.manyangled.coulomb.InfoUnits.Byte],com.manyangled.coulomb.SIBaseUnits.Second], com.manyangled.coulomb.</>[com.manyangled.coulomb.<*>[com.manyangled.coulomb.SIPrefixes.Giga,com.manyangled.coulomb.InfoUnits.Bit],com.manyangled.coulomb.SIBaseUnits.Meter]]...
 ```
 
+#### Temperature Values
+
+In `coulomb` you can also work with [`Temperature` values](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.Temperature).
+A temperature object has a unit type like `Quantity`, but it is constrained to be a unit of temperature, for example
+Kelvin, Celsius or Fahrenheit.
+Another difference is that `Temperature` values convert between temperature units using the temperature scale offests.
+They are not just quantities of temperature, but temperature values:
+```scala
+import SIAcceptedUnits.Celsius; import USCustomaryUnits.Fahrenheit
+
+scala> 212.withTemperature[Fahrenheit].as[Celsius].str
+res1: String = 100.0 celsius
+
+scala> 0.withTemperature[Celsius].as[Fahrenheit].str
+res2: String = 32.0 fahrenheit
+```
+
+You can add or subtract a compatible temperature `Quantity` from a `Temperature`, and get a new `Temperature` value.
+Conversely, if you subtract one `Temperature` from another, you will get a `Quantity`.
+```scala
+// Add a quantity to a temperature to get a new temperature
+scala> val t1 = 50.withTemperature[Fahrenheit] + 1.withUnit[Celsius]
+t1: com.manyangled.coulomb.Temperature[com.manyangled.coulomb.USCustomaryUnits.Fahrenheit] = com.manyangled.coulomb.Temperature@262f8000
+
+scala> t1.str
+res19: String = 51.8 fahrenheit
+
+// subtract a quantity from a temperature to get a new temperature
+scala> val t2 = 50.withTemperature[Fahrenheit] - 1.withUnit[Celsius]
+t2: com.manyangled.coulomb.Temperature[com.manyangled.coulomb.USCustomaryUnits.Fahrenheit] = com.manyangled.coulomb.Temperature@d9d18003
+
+scala> t2.str
+res22: String = 48.2 fahrenheit
+
+// subtract two temperatures to get a quantity
+scala> val q = t1 - t2
+q: com.manyangled.coulomb.Quantity[com.manyangled.coulomb.USCustomaryUnits.Fahrenheit] = com.manyangled.coulomb.Quantity@8cc000ac
+
+scala> q.str
+res23: String = 3.6 fahrenheit
+
+```
+
 #### examples
 
 ```scala
