@@ -11,6 +11,8 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.scala-lang" % "scala-reflect" % scalaVersion.value,
     "org.scala-lang" % "scala-compiler" % scalaVersion.value,
+    "org.typelevel" %% "spire-macros" % "0.14.0",
+    "org.typelevel" %% "spire" % "0.14.0",
     "org.scalatest" %% "scalatest" % "3.0.1" % Test
   ),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
