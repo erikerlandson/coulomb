@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.manyangled.coulomb
 
+import spire.math.{ Rational, ConvertableFrom }
+
 class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
   def this(n: String) = this(n, 1.0)
 
@@ -24,7 +26,7 @@ class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
 
   def apply(): Quantity[U] = new Quantity[U](1.0)
 
-  implicit val furec: UnitRec[U] = UnitRec[U](uname, ucoef)
+  implicit val furec: UnitRec[U] = UnitRec[U](uname, Rational(ucoef))
 }
 
 class TempUnitCompanion[U <: TemperatureExpr](uname: String, ucoef: Double, uoffset: Double) extends UnitCompanion[U](uname, ucoef) {
