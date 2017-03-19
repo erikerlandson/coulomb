@@ -19,6 +19,8 @@ package com.manyangled.coulomb
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox
 
+import spire.math.Rational
+
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
 
@@ -43,10 +45,10 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     evalTree[Int](q"${ival}.value")
   }
   
-  def urecVal(unitT: Type): (String, Double) = {
+  def urecVal(unitT: Type): (String, Rational) = {
     val urt = appliedType(urecType, List(unitT))
     val ur = c.inferImplicitValue(urt, silent = false)
-    evalTree[(String, Double)](q"(${ur}.name, ${ur}.coef)")
+    evalTree[(String, Rational)](q"(${ur}.name, ${ur}.coef)")
   }
 
   def turecVal(unitT: Type): Double = {
@@ -111,7 +113,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   object DUnit {
-    def unapply(tpe: Type): Option[(String, Double, Type)] = {
+    def unapply(tpe: Type): Option[(String, Rational, Type)] = {
       val du = superClass(tpe, duType)
       if (du.isEmpty) None else {
         val (name, coef) = urecVal(tpe)
@@ -121,7 +123,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   object Prefix {
-    def unapply(tpe: Type): Option[(String, Double, Type)] = {
+    def unapply(tpe: Type): Option[(String, Rational, Type)] = {
       if (tpe.typeConstructor =:= mulType) {
         val (pre :: uexp :: Nil) = tpe.typeArgs
         val pu = superClass(pre, puType)
@@ -175,7 +177,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     if (exp == 0) Map.empty[TypeKey, Int] else bmap.mapValues(_ * exp)
   }
 
-  def canonical(typeU: Type): (Double, Map[TypeKey, Int]) = {
+  def canonical(typeU: Type): (Rational, Map[TypeKey, Int]) = {
     typeU.dealias match {
       case IsUnitless() => (1.0, Map.empty[TypeKey, Int])
       case FUnit(_) => {
@@ -197,7 +199,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       }
       case PowOp(bsub, exp) => {
         val (bcoef, bmap) = canonical(bsub)
-        (math.pow(bcoef, exp), mapPow(bmap, exp))
+        (bcoef.pow(exp), mapPow(bmap, exp))
       }
       case _ => {
         // This should never execute
@@ -220,7 +222,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     if (!compat) q"" // fail implicit resolution if they aren't compatible
     else {
       // if they are compatible, then create the corresponding witness
-      val cq = q"${coef1 / coef2}"
+      val coef = (coef1 / coef2).toDouble
+      val cq = q"$coef"
       q"""
         new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq)
       """
@@ -318,7 +321,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
     val mt = mapToType(mapMul(map1, map2))
 
-    val cq = q"${coef1 * coef2}"
+    val coef = (coef1 * coef2).toDouble
+    val cq = q"$coef"
 
     q"""
       new _root_.com.manyangled.coulomb.UnitExprMul[$tpeU1, $tpeU2] {
@@ -337,7 +341,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
     val mt = mapToType(mapDiv(map1, map2))
 
-    val cq = q"${coef1 / coef2}"
+    val coef = (coef1 / coef2).toDouble
+    val cq = q"$coef"
 
     q"""
       new _root_.com.manyangled.coulomb.UnitExprDiv[$tpeU1, $tpeU2] {
