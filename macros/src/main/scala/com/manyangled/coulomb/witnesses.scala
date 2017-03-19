@@ -19,6 +19,8 @@ package com.manyangled.coulomb
 import scala.annotation.implicitNotFound
 import scala.language.experimental.macros
 
+import spire.math.Rational
+
 case class ChurchIntValue[N <: ChurchInt](value: Int)
 
 object ChurchIntValue {
@@ -26,7 +28,7 @@ object ChurchIntValue {
     macro ChurchIntMacros.churchIntValue[N]
 }
 
-case class UnitRec[UE <: UnitExpr](name: String, coef: Double)
+case class UnitRec[UE <: UnitExpr](name: String, coef: Rational)
 
 case class TempUnitRec[UE <: TemperatureExpr](offset: Double)
 
