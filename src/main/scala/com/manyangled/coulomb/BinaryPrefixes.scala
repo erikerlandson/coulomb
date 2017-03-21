@@ -17,27 +17,29 @@ limitations under the License.
 package com.manyangled.coulomb
 
 object BinaryPrefixes {
+  import spire.math.Rational
+
+  @unitDecl("kibi", 1024)
   trait Kibi extends PrefixUnit
-  object Kibi extends UnitCompanion[Kibi]("kibi", 1024.0)
 
+  @unitDecl("mebi", Rational(1024).pow(2))
   trait Mebi extends PrefixUnit
-  object Mebi extends UnitCompanion[Mebi]("mebi", math.pow(1024.0, 2))
 
+  @unitDecl("gibi", Rational(1024).pow(3))
   trait Gibi extends PrefixUnit
-  object Gibi extends UnitCompanion[Gibi]("gibi", math.pow(1024.0, 3))
 
+  @unitDecl("tebi", Rational(1024).pow(4))
   trait Tebi extends PrefixUnit
-  object Tebi extends UnitCompanion[Tebi]("tebi", math.pow(1024.0, 4))
 
+  @unitDecl("pebi", Rational(1024).pow(5))
   trait Pebi extends PrefixUnit
-  object Pebi extends UnitCompanion[Pebi]("pebi", math.pow(1024.0, 5))
 
+  @unitDecl("exbi", Rational(1024).pow(6))
   trait Exbi extends PrefixUnit
-  object Exbi extends UnitCompanion[Exbi]("exbi", math.pow(1024.0, 6))
 
+  @unitDecl("zebi", Rational(1024).pow(7))
   trait Zebi extends PrefixUnit
-  object Zebi extends UnitCompanion[Zebi]("zebi", math.pow(1024.0, 7))
 
+  @unitDecl("yobi", Rational(1024).pow(8))
   trait Yobi extends PrefixUnit
-  object Yobi extends UnitCompanion[Yobi]("yobi", math.pow(1024.0, 8))
 }

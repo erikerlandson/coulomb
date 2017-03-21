@@ -335,5 +335,14 @@ object ConvertableTemps {
   implicit def witnessConvertableTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](implicit
       turecU1: TempUnitRec[U1], urecU1: UnitRec[U1],
       turecU2: TempUnitRec[U2], urecU2: UnitRec[U2]): ConvertableTemps[U1, U2] =
-    new ConvertableTemps[U1, U2](urecU1.coef.toDouble, turecU1.offset, urecU2.coef.toDouble, turecU2.offset)
+    new ConvertableTemps[U1, U2](
+      urecU1.coef.toDouble, turecU1.offset.toDouble, urecU2.coef.toDouble, turecU2.offset.toDouble)
+}
+
+object test {
+  import ChurchInt._
+  import SIBaseUnits._
+
+  @unitDecl("minute", 60)
+  trait Minute extends DerivedUnit[Second]
 }

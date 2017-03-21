@@ -17,12 +17,14 @@ limitations under the License.
 package com.manyangled.coulomb
 
 object InfoUnits {
+  import spire.math.Rational
+
+  @baseUnitDecl("byte")
   trait Byte extends BaseUnit
-  object Byte extends UnitCompanion[Byte]("byte")
 
+  @unitDecl("bit", Rational(1, 8))
   trait Bit extends DerivedUnit[Byte]
-  object Bit extends UnitCompanion[Bit]("bit", 0.125)
 
+  @unitDecl("nat", 1.4426950409)
   trait Nat extends DerivedUnit[Bit]
-  object Nat extends UnitCompanion[Nat]("nat", 1.4426950409)
 }

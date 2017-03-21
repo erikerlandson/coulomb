@@ -17,52 +17,53 @@ limitations under the License.
 package com.manyangled.coulomb
 
 object SIAcceptedUnits {
+  import spire.math.Rational
   import ChurchInt._
   import SIBaseUnits._
   import MKSUnits.{ Radian, Pascal }
 
+  @tempUnitDecl("celsius", 1.0, 273.15)
   trait Celsius extends DerivedTemperature
-  object Celsius extends TempUnitCompanion[Celsius]("celsius", 1.0, 273.15)
 
+  @unitDecl("minute", 60)
   trait Minute extends DerivedUnit[Second]
-  object Minute extends UnitCompanion[Minute]("minute", 60.0)
 
+  @unitDecl("hour", 3600)
   trait Hour extends DerivedUnit[Second]
-  object Hour extends UnitCompanion[Hour]("hour", 3600.0)
 
+  @unitDecl("day", 86400)
   trait Day extends DerivedUnit[Second]
-  object Day extends UnitCompanion[Day]("day", 86400.0)
 
+  @unitDecl("degree", math.Pi / 180.0)
   trait Degree extends DerivedUnit[Radian]
-  object Degree extends UnitCompanion[Degree]("degree", math.Pi / 180.0)
 
-  trait ArcMinute extends DerivedUnit[Radian]
-  object ArcMinute extends UnitCompanion[ArcMinute]("arcminute", math.Pi / 10800.0)
+  @unitDecl("arcminute", Rational(1, 60))
+  trait ArcMinute extends DerivedUnit[Degree]
 
-  trait ArcSecond extends DerivedUnit[Radian]
-  object ArcSecond extends UnitCompanion[ArcSecond]("arcsecond", math.Pi / 648000.0)
+  @unitDecl("arcsecond", Rational(1, 3600))
+  trait ArcSecond extends DerivedUnit[Degree]
 
+  @unitDecl("hectare", 10000)
   trait Hectare extends DerivedUnit[Meter <^> _2]
-  object Hectare extends UnitCompanion[Hectare]("hectare", 10000.0)
 
+  @unitDecl("liter", Rational(1, 1000))
   trait Liter extends DerivedUnit[Meter <^> _3]
-  object Liter extends UnitCompanion[Liter]("liter", 0.001)
 
+  @unitDecl("milliliter", Rational(1, 1000))
   trait Milliliter extends DerivedUnit[Liter]
-  object Milliliter extends UnitCompanion[Milliliter]("milliliter", 0.001)
 
+  @unitDecl("tonne", 1000)
   trait Tonne extends DerivedUnit[Kilogram]
-  object Tonne extends UnitCompanion[Tonne]("tonne", 1000.0)
 
+  @unitDecl("millibar", 100)
   trait Millibar extends DerivedUnit[Pascal]
-  object Millibar extends UnitCompanion[Millibar]("millibar", 100.0)
 
+  @unitDecl("kilometer", 1000)
   trait Kilometer extends DerivedUnit[Meter]
-  object Kilometer extends UnitCompanion[Kilometer]("kilometer", 1000.0)
 
+  @unitDecl("millimeter", Rational(1, 1000))
   trait Millimeter extends DerivedUnit[Meter]
-  object Millimeter extends UnitCompanion[Millimeter]("millimeter", 0.001)
 
+  @unitDecl("gram", Rational(1, 1000))
   trait Gram extends DerivedUnit[Kilogram]
-  object Gram extends UnitCompanion[Gram]("gram", 0.001)
 }
