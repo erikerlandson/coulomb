@@ -18,7 +18,7 @@ package com.manyangled.coulomb
 
 import spire.math.{ Rational, ConvertableFrom }
 
-class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
+class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Rational) {
   def this(n: String) = this(n, 1.0)
 
   def apply[N](v: N)(implicit num: Numeric[N]): Quantity[U] =
@@ -29,6 +29,7 @@ class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Double) {
   implicit val furec: UnitRec[U] = UnitRec[U](uname, Rational(ucoef))
 }
 
-class TempUnitCompanion[U <: TemperatureExpr](uname: String, ucoef: Double, uoffset: Double) extends UnitCompanion[U](uname, ucoef) {
+class TempUnitCompanion[U <: TemperatureExpr](uname: String, ucoef: Rational, uoffset: Rational)
+    extends UnitCompanion[U](uname, ucoef) {
   implicit val turec: TempUnitRec[U] = TempUnitRec[U](uoffset)
 }
