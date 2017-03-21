@@ -17,45 +17,46 @@ limitations under the License.
 package com.manyangled.coulomb
 
 object MKSUnits {
+  import spire.math.Rational
   import ChurchInt._
   import SIBaseUnits._
 
+  @unitDecl("radian", 1)
   trait Radian extends DerivedUnit[Unitless]
-  object Radian extends UnitCompanion[Radian]("radian")
 
+  @unitDecl("hertz", 1)
   trait Hertz extends DerivedUnit[Second <^> _neg1]
-  object Hertz extends UnitCompanion[Hertz]("hertz")
 
+  @unitDecl("newton", 1)
   trait Newton extends DerivedUnit[Kilogram <*> Meter </> (Second <^> _2)]
-  object Newton extends UnitCompanion[Newton]("newton")
 
+  @unitDecl("joule", 1)
   trait Joule extends DerivedUnit[Newton <*> Meter]
-  object Joule extends UnitCompanion[Joule]("joule")
 
+  @unitDecl("watt", 1)
   trait Watt extends DerivedUnit[Joule </> Second]
-  object Watt extends UnitCompanion[Watt]("watt")
 
+  @unitDecl("pascal", 1)
   trait Pascal extends DerivedUnit[Newton </> (Meter <^> _2)]
-  object Pascal extends UnitCompanion[Pascal]("pascal")
 
+  @unitDecl("coulomb", 1)
   trait Coulomb extends DerivedUnit[Ampere <*> Second]
-  object Coulomb extends UnitCompanion[Coulomb]("coulomb")
 
+  @unitDecl("volt", 1)
   trait Volt extends DerivedUnit[Watt </> Ampere]
-  object Volt extends UnitCompanion[Volt]("volt")
 
+  @unitDecl("ohm", 1)
   trait Ohm extends DerivedUnit[Volt </> Ampere]
-  object Ohm extends UnitCompanion[Ohm]("ohm")
 
+  @unitDecl("farad", 1)
   trait Farad extends DerivedUnit[Coulomb </> Volt]
-  object Farad extends UnitCompanion[Farad]("farad")
 
+  @unitDecl("weber", 1)
   trait Weber extends DerivedUnit[Joule </> Ampere]
-  object Weber extends UnitCompanion[Weber]("weber")
 
+  @unitDecl("tesla", 1)
   trait Tesla extends DerivedUnit[Weber </> (Meter <^> _2)]
-  object Tesla extends UnitCompanion[Tesla]("tesla")
 
+  @unitDecl("henry", 1)
   trait Henry extends DerivedUnit[Weber </> Ampere]
-  object Henry extends UnitCompanion[Henry]("henry")
 }

@@ -17,63 +17,65 @@ limitations under the License.
 package com.manyangled.coulomb
 
 object SIPrefixes {
+  import spire.math.Rational
+
+  @unitDecl("deca", 10)
   trait Deca extends PrefixUnit
-  object Deca extends UnitCompanion[Deca]("deca", 1e+1)
 
+  @unitDecl("hecto", 100)
   trait Hecto extends PrefixUnit
-  object Hecto extends UnitCompanion[Hecto]("hecto", 1e+2)
 
+  @unitDecl("kilo", 1000)
   trait Kilo extends PrefixUnit
-  object Kilo extends UnitCompanion[Kilo]("kilo", 1e+3)
 
+  @unitDecl("mega", Rational(10).pow(6))
   trait Mega extends PrefixUnit
-  object Mega extends UnitCompanion[Mega]("mega", 1e+6)
 
+  @unitDecl("giga", Rational(10).pow(9))
   trait Giga extends PrefixUnit
-  object Giga extends UnitCompanion[Giga]("giga", 1e+9)
 
+  @unitDecl("tera", Rational(10).pow(12))
   trait Tera extends PrefixUnit
-  object Tera extends UnitCompanion[Tera]("tera", 1e+12)
 
+  @unitDecl("peta", Rational(10).pow(15))
   trait Peta extends PrefixUnit
-  object Peta extends UnitCompanion[Peta]("peta", 1e+15)
 
+  @unitDecl("exa", Rational(10).pow(18))
   trait Exa extends PrefixUnit
-  object Exa extends UnitCompanion[Exa]("exa", 1e+18)
 
+  @unitDecl("zetta", Rational(10).pow(21))
   trait Zetta extends PrefixUnit
-  object Zetta extends UnitCompanion[Zetta]("zetta", 1e+21)
 
+  @unitDecl("yotta", Rational(10).pow(24))
   trait Yotta extends PrefixUnit
-  object Yotta extends UnitCompanion[Yotta]("yotta", 1e+24)
 
+  @unitDecl("deci", Rational(10).pow(-1))
   trait Deci extends PrefixUnit
-  object Deci extends UnitCompanion[Deci]("deci", 1e-1)
 
+  @unitDecl("centi", Rational(10).pow(-2))
   trait Centi extends PrefixUnit
-  object Centi extends UnitCompanion[Centi]("centi", 1e-2)
 
+  @unitDecl("milli", Rational(10).pow(-3))
   trait Milli extends PrefixUnit
-  object Milli extends UnitCompanion[Milli]("milli", 1e-3)
 
+  @unitDecl("micro", Rational(10).pow(-6))
   trait Micro extends PrefixUnit
-  object Micro extends UnitCompanion[Micro]("micro", 1e-6)
 
+  @unitDecl("nano", Rational(10).pow(-9))
   trait Nano extends PrefixUnit
-  object Nano extends UnitCompanion[Nano]("nano", 1e-9)
 
+  @unitDecl("pico", Rational(10).pow(-12))
   trait Pico extends PrefixUnit
-  object Pico extends UnitCompanion[Pico]("pico", 1e-12)
 
+  @unitDecl("femto", Rational(10).pow(-15))
   trait Femto extends PrefixUnit
-  object Femto extends UnitCompanion[Femto]("femto", 1e-15)
 
+  @unitDecl("atto", Rational(10).pow(-18))
   trait Atto extends PrefixUnit
-  object Atto extends UnitCompanion[Atto]("atto", 1e-18)
 
+  @unitDecl("zepto", Rational(10).pow(-21))
   trait Zepto extends PrefixUnit
-  object Zepto extends UnitCompanion[Zepto]("zepto", 1e-21)
 
+  @unitDecl("yocto", Rational(10).pow(-24))
   trait Yocto extends PrefixUnit
-  object Yocto extends UnitCompanion[Yocto]("yocto", 1e-24)
 }

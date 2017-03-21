@@ -30,7 +30,7 @@ object ChurchIntValue {
 
 case class UnitRec[UE <: UnitExpr](name: String, coef: Rational)
 
-case class TempUnitRec[UE <: TemperatureExpr](offset: Double)
+case class TempUnitRec[UE <: TemperatureExpr](offset: Rational)
 
 @implicitNotFound("Implicit not found: CompatUnits[${U1}, ${U2}].\nIncompatible Unit Expressions: ${U1} and ${U2}")
 class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
