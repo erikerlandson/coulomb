@@ -19,7 +19,7 @@ package com.manyangled.coulomb
 object InfoUnits {
   import spire.math.Rational
 
-  @baseUnitDecl("byte")
+  @unitDecl("byte")
   trait Byte extends BaseUnit
 
   @unitDecl("bit", Rational(1, 8))
