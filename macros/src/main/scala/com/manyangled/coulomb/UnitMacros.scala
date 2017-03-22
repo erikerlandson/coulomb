@@ -24,17 +24,12 @@ import scala.annotation.compileTimeOnly
 import spire.math.{ Rational, ConvertableFrom }
 
 @compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
-class unitDecl[N](name: String, coef: N) extends StaticAnnotation {
+class unitDecl(val name: String, val coef: Rational = 1) extends StaticAnnotation {
   def macroTransform(annottees: Any*): Any = macro UnitMacros.unitDecl
 }
 
 @compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
-class baseUnitDecl(name: String) extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro UnitMacros.baseUnitDecl
-}
-
-@compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
-class tempUnitDecl[N](name: String, coef: N, off: N) extends StaticAnnotation {
+class tempUnitDecl(name: String, coef: Rational, off: Rational) extends StaticAnnotation {
   def macroTransform(annottees: Any*): Any = macro UnitMacros.tempUnitDecl
 }
 
@@ -371,19 +366,22 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def unitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {
     val (qname, qcoef) = c.prefix.tree match {
-      // todo: type-arg list to unitDecl is actually empty here.
-      // figure out how to find type of $coef and get implicit ConvertableFrom object
-      // instead of calling the Rational factory function here
-      case q"new unitDecl[..$_]($qname, $coef)" => (qname, q"spire.math.Rational($coef)")
+      case q"new unitDecl($qname, coef = $coef)" => (qname, coef)
+      case q"new unitDecl($qname, $coef)" => (qname, coef)
+      case q"new unitDecl($qname)" => (qname, q"spire.math.Rational(1)")
       case _ => abort("Unexpected calling scope!")
     }
     val unitName = annottees.map(_.tree) match {
       case (decl: ClassDef) :: Nil => decl match {
-        case q"trait $uname extends DerivedUnit[$_]" => uname
+        case q"trait $uname extends BaseUnit" => {
+          if (evalTree[Rational](qcoef) != Rational(1)) abort("Base unit coefficients must be == 1")
+          uname
+        }
         case q"trait $uname extends PrefixUnit" => uname
-        case _ => abort("unitDecl must be applied to a unit or prefix trait")
+        case q"trait $uname extends DerivedUnit[$_]" => uname
+        case _ => abort("unitDecl must be applied to a unit trait declaration")
       }
-      case _ => abort("unitDecl must be applied to a unit or prefix trait")
+      case _ => abort("unitDecl must be applied to a unit trait declaration")
     }
     c.Expr(q"""
       ${annottees(0)}
@@ -392,34 +390,18 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     """)
   }
 
-  def baseUnitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {
-    val qname = c.prefix.tree match {
-      case q"new baseUnitDecl($qname)" => qname
-      case _ => abort("Unexpected calling scope!")
-    }
-    val unitName = annottees.map(_.tree) match {
-      case (decl: ClassDef) :: Nil => decl match {
-        case q"trait $uname extends BaseUnit" => uname
-        case _ => abort("baseUnitDecl must be applied to a base unit trait")
-      }
-      case _ => abort("baseUnitDecl must be applied to a base unit trait")
-    }
-    c.Expr(q"""
-      ${annottees(0)}
-      object ${unitName.toTermName} extends
-          com.manyangled.coulomb.UnitCompanion[$unitName]($qname, spire.math.Rational(1))
-    """)
-  }
-
   def tempUnitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {
     val (qname, qcoef, qoff) = c.prefix.tree match {
-      case q"new tempUnitDecl[..$_]($qname, $coef, $off)" =>
-        (qname, q"spire.math.Rational($coef)", q"spire.math.Rational($off)")
+      case q"new tempUnitDecl($qname, $coef, $off)" => (qname, coef, off)
       case _ => abort("Unexpected calling scope!")
     }
     val unitName = annottees.map(_.tree) match {
       case (decl: ClassDef) :: Nil => decl match {
-        case q"trait $uname extends BaseTemperature" => uname
+        case q"trait $uname extends BaseTemperature" => {
+          if (evalTree[Rational](qcoef) != Rational(1)) abort("Base temperature-unit coefficient must be == 1")
+          if (evalTree[Rational](qoff) != Rational(0)) abort("Base temperature-unit offset must be == 0")
+          uname
+        }
         case q"trait $uname extends DerivedTemperature" => uname
         case _ => abort("unitDecl must be applied to a temperature unit trait")
       }
