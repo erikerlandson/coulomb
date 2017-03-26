@@ -109,13 +109,15 @@ class Quantity[N, U <: UnitExpr](val value: N)
 
 */
 
-  /** A human-readable string representing the unit quantity with its associated type */
-  def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
+  /** A human-readable string representing the value and unit type of this quantity */
+  def str: String = macro UnitMacros.strImpl[U]
 
   /** A human-readable string representing the unit type of this quantity */
-  def unitStr(implicit uesU: UnitExprString[U]) = uesU.str
+  def unitStr: String = macro UnitMacros.unitStrImpl[U]
 
-  override def toString = s"Quantity($value)"
+  // I can define this with a macro, but its default behavior is to output string as the value-class
+  // so it doesn't really buy me anything.  This at least gets invoked automatically.
+  override def toString = s"Quantity(${this.value})"
 }
 
 /** Factory functions and implicit definitions associated with Quantity objects */
@@ -142,25 +144,6 @@ object Quantity {
    */
   def coefficient[U <: UnitExpr, U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Double =
     cu.coef
-
-  /**
-   * Obtain a human-readable string representing a unit type U
-   * @tparam U a unit type
-   * @return human readable string representing U
-   */
-  def unitStr[U <: UnitExpr](implicit uesU: UnitExprString[U]) = uesU.str
-
-  /** Obtain a unit quantity of unit type U from an Int */
-  def apply[U <: UnitExpr](v: Int) = new Quantity[U](v.toDouble)
-
-  /** Obtain a unit quantity of unit type U from a Long */
-  def apply[U <: UnitExpr](v: Long) = new Quantity[U](v.toDouble)
-
-  /** Obtain a unit quantity of unit type U from a Float */
-  def apply[U <: UnitExpr](v: Float) = new Quantity[U](v.toDouble)
-
-  /** Obtain a unit quantity of unit type U from a Double */
-  def apply[U <: UnitExpr](v: Double) = new Quantity[U](v)
 
   /**
    * Obtain a unit quantity from a Temperature with the same raw value and temperature unit
