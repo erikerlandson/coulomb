@@ -21,13 +21,13 @@ package object coulomb {
   def churchToInt[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
 
   /** enhances numeric types with utility methods for `coulomb` */
-  implicit class CoulombExtendWithUnits[N](v: N)(implicit num: Numeric[N]) {
+  implicit class CoulombExtendWithUnits[N](val v: N) extends AnyVal with Serializable {
     /** create a new unit Quantity of type U with numeric value of `this` */
-    def withUnit[U <: UnitExpr]: Quantity[U] =
-      new Quantity[U](num.toDouble(v))
+    def withUnit[U <: UnitExpr](implicit num: spire.math.Numeric[N]): Quantity[N, U] =
+      new Quantity[N, U](v)
 
     /** create a new unit Temperature of type U with numeric value of `this` */
-    def withTemperature[U <: TemperatureExpr]: Temperature[U] =
-      new Temperature[U](num.toDouble(v))
+    //def withTemperature[U <: TemperatureExpr]: Temperature[U] =
+    //  new Temperature[U](num.toDouble(v))
   }
 }
