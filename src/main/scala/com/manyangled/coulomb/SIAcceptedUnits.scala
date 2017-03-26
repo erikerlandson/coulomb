@@ -34,7 +34,7 @@ object SIAcceptedUnits {
   @unitDecl("day", 86400)
   trait Day extends DerivedUnit[Second]
 
-  @unitDecl("degree", math.Pi / 180.0)
+  @unitDecl("degree", 3.141592653589793 / 180.0)
   trait Degree extends DerivedUnit[Radian]
 
   @unitDecl("arcminute", Rational(1, 60))
