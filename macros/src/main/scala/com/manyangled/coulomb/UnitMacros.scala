@@ -87,8 +87,12 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def cuTree(u1T: Type, u2T: Type): Tree = {
-    val cut = appliedType(cuType, List(u1T, u2T))
-    c.inferImplicitValue(cut, silent = false)
+    try {
+      val cut = appliedType(cuType, List(u1T, u2T))
+      c.inferImplicitValue(cut, silent = false)
+    } catch {
+      case _: Throwable => abort(s"Imcompatible unit types:\n$u1T\nand\n$u2T")
+    }
   }
 
   def isIntegral(nT: Type): Boolean = {
