@@ -80,7 +80,6 @@ class Quantity[N, U <: UnitExpr](val value: N)
    */
   def -[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, U] = macro UnitMacros.subImpl[N, U, U2]
 
-/*
   /**
    * The product of two unit quantities
    * @tparam U2 the unit type of the right-hand quantity
@@ -88,8 +87,7 @@ class Quantity[N, U <: UnitExpr](val value: N)
    * @param that the right-hand side of the product
    * @return `this` * `that`, with units of RU
    */
-  def *[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprMul[U, U2] { type U = RU }): Quantity[RU] =
-    new Quantity[RU](uer.coef * this.value * that.value)
+   def *[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, _] = macro UnitMacros.mulImpl[N, U, U2]
 
   /**
    * The quotient, or ratio, of two unit quantities
@@ -98,9 +96,9 @@ class Quantity[N, U <: UnitExpr](val value: N)
    * @param that the right-hand side of the ratio
    * @return `this` / `that`, with units of RU
    */
-  def /[U2 <: UnitExpr, RU <: UnitExpr](that: Quantity[U2])(implicit uer: UnitExprDiv[U, U2] { type U = RU }): Quantity[RU] =
-    new Quantity[RU](uer.coef * this.value / that.value)
+   def /[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, _] = macro UnitMacros.divImpl[N, U, U2]
 
+/*
   /**
    * Raise a unit quantity to a power
    * @tparam E the church integer type representing the exponent
