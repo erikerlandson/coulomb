@@ -257,6 +257,22 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
+  def signature(typeU: Type): Map[TypeKey, Int] = {
+    typeU.dealias match {
+      case IsUnitless() => Map.empty[TypeKey, Int]
+      case FUnit(_) => Map(TypeKey(typeU) -> 1)
+      case DUnit(_, _, _) => Map(TypeKey(typeU) -> 1)
+      case MulOp(lsub, rsub) => mapMul(signature(lsub), signature(rsub))
+      case DivOp(lsub, rsub) => mapDiv(signature(lsub), signature(rsub))
+      case PowOp(bsub, exp) => mapPow(signature(bsub), exp)
+      case _ => {
+        // This should never execute
+        abort(s"Undefined Unit Type: ${typeName(typeU)}")
+        Map.empty[TypeKey, Int]
+      }
+    }
+  }
+
   def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
     val tpeU1 = fixType(weakTypeOf[U1])
     val tpeU2 = fixType(weakTypeOf[U2])
@@ -392,6 +408,26 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU]($nt)"
   }
 
+  def mulImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
+    val (map1, map2) = (signature(tpeU1), signature(tpeU2))
+    val mt = mapToType(mapMul(map1, map2))
+    val xt = fixByteShort(q"(${c.prefix.tree}.value) * (${that}.value)", tpeN)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $mt]($xt)"
+  }
+
+  def divImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
+    val (map1, map2) = (signature(tpeU1), signature(tpeU2))
+    val mt = mapToType(mapDiv(map1, map2))
+    val dt = fixByteShort(q"(${c.prefix.tree}.value) / (${that}.value)", tpeN)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $mt]($dt)"
+  }
+
   def ueAtomicString(typeU: Type): Boolean = {
     typeU.dealias match {
       case IsUnitless() => true
@@ -472,46 +508,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     val tPos = seqToType(ePos)
     val tNeg = seqToType(eNeg)
     if (eNeg.isEmpty) tPos else appliedType(divType, List(tPos, tNeg))
-  }
-
-  def unitExprMul[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
-
-    val (coef1, map1) = canonical(tpeU1)
-    val (coef2, map2) = canonical(tpeU2)
-
-    val mt = mapToType(mapMul(map1, map2))
-
-    val coef = (coef1 * coef2).toDouble
-    val cq = q"$coef"
-
-    q"""
-      new _root_.com.manyangled.coulomb.UnitExprMul[$tpeU1, $tpeU2] {
-        type U = $mt
-        def coef = $cq
-      }
-    """
-  }
-
-  def unitExprDiv[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
-
-    val (coef1, map1) = canonical(tpeU1)
-    val (coef2, map2) = canonical(tpeU2)
-
-    val mt = mapToType(mapDiv(map1, map2))
-
-    val coef = (coef1 / coef2).toDouble
-    val cq = q"$coef"
-
-    q"""
-      new _root_.com.manyangled.coulomb.UnitExprDiv[$tpeU1, $tpeU2] {
-        type U = $mt
-        def coef = $cq
-      }
-    """
   }
 
   def unitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {

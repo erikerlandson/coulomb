@@ -46,23 +46,3 @@ object UnitExprString {
   implicit def witnessUnitExprString[U <: UnitExpr]: UnitExprString[U] =
     macro UnitMacros.unitExprString[U]
 }
-
-trait UnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr] {
-  type U <: UnitExpr
-  def coef: Double
-}
-
-object UnitExprMul {
-  implicit def witnessUnitExprMul[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprMul[U1, U2] =
-    macro UnitMacros.unitExprMul[U1, U2]
-}
-
-trait UnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr] {
-  type U <: UnitExpr
-  def coef: Double
-}
-
-object UnitExprDiv {
-  implicit def witnessUnitExprDiv[U1 <: UnitExpr, U2 <: UnitExpr]: UnitExprDiv[U1, U2] =
-    macro UnitMacros.unitExprDiv[U1, U2]
-}
