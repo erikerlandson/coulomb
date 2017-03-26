@@ -59,6 +59,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   val cuType = typeOf[CompatUnits[DummyU, DummyU]].typeConstructor
   val isIntType = typeOf[spire.algebra.IsIntegral[Int]].typeConstructor
   val cToType = typeOf[spire.math.ConvertableTo[Int]].typeConstructor
+  val uesType = typeOf[UnitExprString[DummyU]].typeConstructor
 
   val fuType = typeOf[BaseUnit]
   val puType = typeOf[PrefixUnit]
@@ -84,6 +85,12 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     val urt = appliedType(turecType, List(unitT))
     val ur = c.inferImplicitValue(urt, silent = false)
     evalTree[Rational](q"${ur}.offset")
+  }
+
+  def uesVal(unitT: Type): String = {
+    val uest = appliedType(uesType, List(unitT))
+    val ues = c.inferImplicitValue(uest, silent = false)
+    evalTree[String](q"${ues}.str")
   }
 
   def cuTree(u1T: Type, u2T: Type): Tree = {
@@ -486,6 +493,16 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     q"""
       _root_.com.manyangled.coulomb.UnitExprString[$tpeU]($sq)
     """
+  }
+
+  def unitStrImpl[U: WeakTypeTag]: Tree = {
+    val str = uesVal(fixType(weakTypeOf[U]))
+    q"$str"
+  }
+
+  def strImpl[U: WeakTypeTag]: Tree = {
+    val str = unitStrImpl[U]
+    q"""${c.prefix.tree}.value.toString + " " + $str"""
   }
 
   def ueToType(u: Type, e: Int): Type =
