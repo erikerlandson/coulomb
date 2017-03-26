@@ -239,6 +239,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         (1.0, Map(TypeKey(typeU) -> 1))
       }
       case DUnit(_, coef, dsub) => {
+        // defensive: this should be caught at compile time in unitDecl
+        if (coef <= 0) abort(s"Unit coefficient for $typeU was <= 0")
         val (dcoef, dmap) = canonical(dsub)
         (coef * dcoef, dmap)
       }
@@ -306,6 +308,47 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     val q"new $_.CompatUnits[..$_]($_.Rational.apply($nq, $dq))" = cu
     val (n, d) = (evalTree[BigInt](nq), evalTree[BigInt](dq))
     Rational(n, d)
+  }
+
+  // This is hackery to evaluate the user's value for coefficient in the unit
+  // declaration at compile time.  If I could figure out a way to evaluate
+  // general expressions, it would be way cleaner and more robust.
+  def treeToRational(t: Tree): Rational = {
+    try {
+      t match {
+        case q"$_.Rational($arg1, $arg2)" => {
+          val a1 = evalTree[String](q"${arg1}.toString")
+          val a2 = evalTree[String](q"${arg2}.toString")
+          Rational(BigInt(a1), BigInt(a2))
+        }
+        case q"Rational($arg1, $arg2)" => {
+          val a1 = evalTree[String](q"${arg1}.toString")
+          val a2 = evalTree[String](q"${arg2}.toString")
+          Rational(BigInt(a1), BigInt(a2))
+        }
+        case q"$_.Rational($arg)" => {
+          val a = evalTree[String](q"${arg}.toString")
+          Rational(BigDecimal(a))
+        }
+        case q"Rational($arg)" => {
+          val a = evalTree[String](q"${arg}.toString")
+          Rational(BigDecimal(a))
+        }
+        case q"${arg}.toRational" => {
+          val a = evalTree[String](q"${arg}.toString")
+          Rational(BigDecimal(a))
+        }
+        case arg => {
+          val a = evalTree[String](q"${arg}.toString")
+          Rational(BigDecimal(a))
+        }
+      }
+    } catch {
+      case e: Throwable => {
+        println(s"e= $e")
+        abort(s"failed to evaluate expression ($t) as a Rational")
+      }
+    }
   }
 
   def cfpTree(coef: Rational, tpeN: Type): Tree = {
@@ -534,10 +577,13 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case q"new unitDecl($qname)" => (qname, q"spire.math.Rational(1)")
       case _ => abort("Unexpected calling scope!")
     }
+    val name = evalTree[String](qname)
+    val coef = treeToRational(qcoef)
+    if (coef <= 0) abort(s"Coefficient for unit $name must be > 0")
     val unitName = annottees.map(_.tree) match {
       case (decl: ClassDef) :: Nil => decl match {
         case q"trait $uname extends BaseUnit" => {
-          if (evalTree[Rational](qcoef) != Rational(1)) abort("Base unit coefficients must be == 1")
+          if (coef != 1) abort(s"Coefficient for base unit $name must be 1")
           uname
         }
         case q"trait $uname extends PrefixUnit" => uname
@@ -558,11 +604,15 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case q"new tempUnitDecl($qname, $coef, $off)" => (qname, coef, off)
       case _ => abort("Unexpected calling scope!")
     }
+    val name = evalTree[String](qname)
+    val coef = treeToRational(qcoef)
+    val off = treeToRational(qoff)
+    if (coef <= 0) abort(s"Coefficient for unit $name must be > 0")
     val unitName = annottees.map(_.tree) match {
       case (decl: ClassDef) :: Nil => decl match {
         case q"trait $uname extends BaseTemperature" => {
-          if (evalTree[Rational](qcoef) != Rational(1)) abort("Base temperature-unit coefficient must be == 1")
-          if (evalTree[Rational](qoff) != Rational(0)) abort("Base temperature-unit offset must be == 0")
+          if (coef != 1) abort(s"Coefficient for base temperature $name must be 1")
+          if (off != 0) abort(s"Offset for base temperature $name must be 0")
           uname
         }
         case q"trait $uname extends DerivedTemperature" => uname
