@@ -18,15 +18,13 @@ package com.manyangled.coulomb
 
 import spire.math.{ Rational, ConvertableFrom }
 
-class UnitCompanion[U <: UnitExpr](uname: String, ucoef: Rational) {
-  def this(n: String) = this(n, 1.0)
+class UnitCompanion[U <: UnitExpr](val name: String, val coef: Rational) {
 
-  def apply[N](v: N)(implicit num: Numeric[N]): Quantity[U] =
-    new Quantity[U](num.toDouble(v))
+  def apply[N](v: N)(implicit num: Numeric[N]): Quantity[N, U] = new Quantity[N, U](v)
 
-  def apply(): Quantity[U] = new Quantity[U](1.0)
+  override def toString = s"UnitCompanion($name, $coef)"
 
-  implicit val furec: UnitRec[U] = UnitRec[U](uname, Rational(ucoef))
+  implicit val furec: UnitRec[U] = UnitRec[U](name, Rational(coef))
 }
 
 class TempUnitCompanion[U <: TemperatureExpr](uname: String, ucoef: Rational, uoffset: Rational)

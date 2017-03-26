@@ -18,6 +18,7 @@ package com.manyangled.coulomb
 
 import scala.util.Try
 
+/*
 /**
  * A run-time parser for string expressions that evaluate to [[Quantity]] objects.
  * Parsing returns a compatible unit Quantity type, or failure.
@@ -113,3 +114,4 @@ object QuantityParser {
         USCustomaryUnits),
         Seq.empty)
 }
+*/

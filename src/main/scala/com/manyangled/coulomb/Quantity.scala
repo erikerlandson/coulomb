@@ -17,6 +17,7 @@ limitations under the License.
 package com.manyangled.coulomb
 
 import scala.language.implicitConversions
+import scala.language.experimental.macros
 
 /**
  * Define a derived unit of temperature. By definition, all derived temperatures are defined in
@@ -44,7 +45,7 @@ trait DerivedTemperature extends DerivedUnit[SIBaseUnits.Kelvin] with Temperatur
  * val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)
  * }}}
  */
-class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
+class Quantity[N, U <: UnitExpr](val value: N)
     extends AnyVal with Serializable {
 
   /**
@@ -53,14 +54,13 @@ class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
    * then a compile-time error will occur
    * @return a new value of type Quantity[U2], equivalent to `this` quantity
    */
-  def as[U2 <: UnitExpr](implicit cu: ConvertableUnits[U, U2]): Quantity[U2] =
-    cu.convert(this)
+  def toUnit[U2 <: UnitExpr]: Quantity[N, U2] = macro UnitMacros.toUnitImpl[N, U, U2]
 
   /**
    * Obtain a new quantity with same units, but negated value
    * @return negated unit quantity
    */
-  def unary_- : Quantity[U] = new Quantity[U](-this.value)
+  def unary_- : Quantity[N, U] = macro UnitMacros.negImpl[N, U]
 
   /**
    * The sum of two unit quantities
@@ -69,8 +69,7 @@ class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
    * @param that the right-hand side of the quantity sum
    * @return `this` + `that`, with units of left-hand side `this`
    */
-  def +[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Quantity[U] =
-    new Quantity[U](this.value + cu.coef * that.value)
+  def +[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, U] = macro UnitMacros.addImpl[N, U, U2]
 
   /**
    * The difference of two unit quantities
@@ -79,9 +78,9 @@ class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
    * @param that the right-hand side of the difference
    * @return `this` - `that`, with units of left-hand side `this`
    */
-  def -[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Quantity[U] =
-    new Quantity[U](this.value - cu.coef * that.value)
+  def -[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, U] = macro UnitMacros.subImpl[N, U, U2]
 
+/*
   /**
    * The product of two unit quantities
    * @tparam U2 the unit type of the right-hand quantity
@@ -110,27 +109,20 @@ class Quantity[U <: UnitExpr](private [coulomb] val value: Double)
   def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E]): Quantity[U <^> E] =
     new Quantity[U <^> E](math.pow(this.value, exp.value))
 
-  /** The raw value of the unit quantity, rounded to nearest integer and returned as an Int */
-  def toInt: Int = value.round.toInt
-
-  /** The raw value of the unit quantity, rounded to nearest integer and return as a Long */
-  def toLong: Long = value.round
-
-  /** The raw value of the unit quantity returned as a Float */
-  def toFloat: Float = value.toFloat
-
-  /** The raw value of the unit quantity returned as a Double */
-  def toDouble: Double = value
+*/
 
   /** A human-readable string representing the unit quantity with its associated type */
   def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
 
   /** A human-readable string representing the unit type of this quantity */
   def unitStr(implicit uesU: UnitExprString[U]) = uesU.str
+
+  override def toString = s"Quantity($value)"
 }
 
 /** Factory functions and implicit definitions associated with Quantity objects */
 object Quantity {
+/*
   /**
    * Obtain a function that converts objects of Quantity[U] into compatible Quantity[U2]
    * @tparam U the unit type of input quantity.
@@ -183,8 +175,10 @@ object Quantity {
 
   implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](q: Quantity[U])(implicit
     cu: ConvertableUnits[U, U2]): Quantity[U2] = cu.convert(q)
+*/
 }
 
+/*
 /**
  * A temperature value.
  * @tparam U a temperature unit, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
@@ -302,7 +296,9 @@ object Temperature {
       implicit ct: ConvertableTemps[U, U2]): Temperature[U2] =
     ct.convert(t)
 }
+*/
 
+/*
 class ConvertableUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
   val converter = ConvertableUnits.converter[U1, U2](coef)
   def convert(q1: Quantity[U1]): Quantity[U2] = converter(q1)
@@ -316,7 +312,9 @@ object ConvertableUnits {
       cu: CompatUnits[U1, U2]): ConvertableUnits[U1, U2] =
     new ConvertableUnits[U1, U2](cu.coef)
 }
+*/
 
+/*
 class ConvertableTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](
     val coef1: Double, val off1: Double, val coef2: Double, val off2: Double) {
   val converter = ConvertableTemps.converter[U1, U2](coef1, off1, coef2, off2)
@@ -338,3 +336,4 @@ object ConvertableTemps {
     new ConvertableTemps[U1, U2](
       urecU1.coef.toDouble, turecU1.offset.toDouble, urecU2.coef.toDouble, turecU2.offset.toDouble)
 }
+*/

@@ -21,7 +21,7 @@ import scala.reflect.macros.whitebox
 import scala.annotation.StaticAnnotation
 import scala.annotation.compileTimeOnly
 
-import spire.math.{ Rational, ConvertableFrom }
+import spire.math._
 
 @compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
 class unitDecl(val name: String, val coef: Rational = 1) extends StaticAnnotation {
@@ -36,12 +36,29 @@ class tempUnitDecl(name: String, coef: Rational, off: Rational) extends StaticAn
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
 
+  implicit val liftRational = Liftable[Rational] { r =>
+    val rnStr = r.numerator.toBigInt.toString
+    val rdStr = r.denominator.toBigInt.toString
+    q"spire.math.Rational.apply(BigInt($rnStr), BigInt($rdStr))"
+  }
+
+  implicit val liftBigInt = Liftable[BigInt] { v =>
+    q"BigInt(${v.toString})"
+  }
+
+  implicit val liftBigDecimal = Liftable[BigDecimal] { v =>
+    q"BigDecimal(${v.toString})"
+  }
+
   trait DummyU extends BaseUnit
   trait DummyT extends BaseTemperature
 
   val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
   val urecType = typeOf[UnitRec[DummyU]].typeConstructor
   val turecType = typeOf[TempUnitRec[DummyT]].typeConstructor
+  val cuType = typeOf[CompatUnits[DummyU, DummyU]].typeConstructor
+  val isIntType = typeOf[spire.algebra.IsIntegral[Int]].typeConstructor
+  val cToType = typeOf[spire.math.ConvertableTo[Int]].typeConstructor
 
   val fuType = typeOf[BaseUnit]
   val puType = typeOf[PrefixUnit]
@@ -67,6 +84,21 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     val urt = appliedType(turecType, List(unitT))
     val ur = c.inferImplicitValue(urt, silent = false)
     evalTree[Rational](q"${ur}.offset")
+  }
+
+  def cuTree(u1T: Type, u2T: Type): Tree = {
+    val cut = appliedType(cuType, List(u1T, u2T))
+    c.inferImplicitValue(cut, silent = false)
+  }
+
+  def isIntegral(nT: Type): Boolean = {
+    try {
+      val t = appliedType(isIntType, List(nT))
+      c.inferImplicitValue(t, silent = false)
+      true
+    } catch {
+      case _: Throwable => false
+    }
   }
 
   object MulOp {
@@ -234,12 +266,126 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     if (!compat) q"" // fail implicit resolution if they aren't compatible
     else {
       // if they are compatible, then create the corresponding witness
-      val coef = (coef1 / coef2).toDouble
-      val cq = q"$coef"
+      val coef = coef1 / coef2
       q"""
-        new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($cq)
+        new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($coef)
       """
     }
+  }
+
+  def cuCoef(cu: Tree): Rational = {
+    // I'm doing it this way because evaluating Rational(n,d) expressions w/ evalTree
+    // directly is failing inside the macro context.
+    val q"new $_.CompatUnits[..$_]($_.Rational.apply($nq, $dq))" = cu
+    val (n, d) = (evalTree[BigInt](nq), evalTree[BigInt](dq))
+    Rational(n, d)
+  }
+
+  def cfpTree(coef: Rational, tpeN: Type): Tree = {
+    tpeN match {
+      case t if (t =:= typeOf[Float]) => {
+        val cv = implicitly[ConvertableTo[Float]].fromRational(coef)
+        q"$cv"
+      }
+      case t if (t =:= typeOf[Double]) => {
+        val cv = implicitly[ConvertableTo[Double]].fromRational(coef)
+        q"$cv"
+      }
+      case t if (t =:= typeOf[BigDecimal]) => {
+        val cv = implicitly[ConvertableTo[BigDecimal]].fromRational(coef)
+        q"$cv"
+      }
+      case t if (t =:= typeOf[Rational]) => {
+        q"$coef"
+      }
+      case _ => abort(s"Unimplemented non-integral type $tpeN")
+    }
+  }
+
+  def coefLimit(coef: Rational, lim: BigInt): Rational = {
+    val clim = coef.limitTo(lim)
+    val pdif = ((clim - coef).abs / coef).toDouble * 100.0
+    if (pdif > 0.01) c.info(c.enclosingPosition,
+      s"WARNING: approximated coefficient $coef with $clim, with $pdif percent error", false)
+    clim
+  }
+
+  def ndTree(coef: Rational, tpeN: Type): (Tree, Tree) = {
+    tpeN match {
+      case t if ((t =:= typeOf[Int]) || (t =:= typeOf[Byte]) || (t =:= typeOf[Short])) => {
+        // Byte and Short appear to be cast to Int for '*' and '/' anyway
+        val cx = coefLimit(coef, 32767)
+        val (n, d) = (cx.numerator.toInt, cx.denominator.toInt)
+        (q"$n", q"$d")
+      }
+      case t if (t =:= typeOf[Long]) => {
+        val cx = coefLimit(coef, 2147483647L)
+        val (n, d) = (cx.numerator.toLong, cx.denominator.toLong)
+        (q"$n", q"$d")
+      }
+      case t if (t =:= typeOf[BigInt]) => {
+        val (n, d) = (coef.numerator.toBigInt, coef.denominator.toBigInt)
+        (q"$n", q"$d")
+      }
+      case _ => abort(s"unexpected integral type $tpeN")
+    }
+  }
+
+  def xCoefTree(coef: Rational, n: Tree, tpeN: Type): Tree = {
+    if (coef == 1) n else {
+      if (isIntegral(tpeN)) {
+        val (nq, dq) = ndTree(coef, tpeN)
+        if (coef.isWhole) q"($n) * ($nq)" else q"(($n) * ($nq)) / ($dq)"
+      } else {
+        val cq = cfpTree(coef, tpeN)
+        q"($n) * ($cq)"
+      }
+    }
+  }
+
+  def fixByteShort(et: Tree, tpeN: Type): Tree = (et, tpeN) match {
+    case (x, t) if (t =:= typeOf[Byte]) => q"($x).toByte"
+    case (x, t) if (t =:= typeOf[Short]) => q"($x).toShort"
+    case (x, _) => x
+  }
+
+  def toUnitImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
+    val cu = cuTree(tpeU1, tpeU2)
+    val coef = cuCoef(cu)
+    val xt = fixByteShort(xCoefTree(coef, q"(${c.prefix.tree}).value", tpeN), tpeN)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2]($xt)"
+  }
+
+  def addImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
+    val cu = cuTree(tpeU2, tpeU1)
+    val coef = cuCoef(cu)
+    val xt = xCoefTree(coef, q"($that).value", tpeN)
+    val rt = fixByteShort(q"(${c.prefix.tree}.value) + ($xt)", tpeN)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]($rt)"
+  }
+
+  def subImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
+    val cu = cuTree(tpeU2, tpeU1)
+    val coef = cuCoef(cu)
+    val xt = xCoefTree(coef, q"($that).value", tpeN)
+    val rt = fixByteShort(q"(${c.prefix.tree}.value) - ($xt)", tpeN)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]($rt)"
+  }
+
+  def negImpl[N: WeakTypeTag, U: WeakTypeTag]: Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU = fixType(weakTypeOf[U])
+    val nt = fixByteShort(q"-(${c.prefix.tree}.value)", tpeN)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU]($nt)"
   }
 
   def ueAtomicString(typeU: Type): Boolean = {
