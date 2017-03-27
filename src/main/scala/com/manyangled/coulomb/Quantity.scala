@@ -98,16 +98,12 @@ class Quantity[N, U <: UnitExpr](val value: N)
    */
    def /[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, _] = macro UnitMacros.divImpl[N, U, U2]
 
-/*
   /**
    * Raise a unit quantity to a power
    * @tparam E the church integer type representing the exponent
    * @return `this` ^ E, in units compatible with `U <^> E`
    */
-  def pow[E <: ChurchInt](implicit exp: ChurchIntValue[E]): Quantity[U <^> E] =
-    new Quantity[U <^> E](math.pow(this.value, exp.value))
-
-*/
+  def pow[E <: ChurchInt]: Quantity[N, _] = macro UnitMacros.powImpl[N, U, E]
 
   /** A human-readable string representing the value and unit type of this quantity */
   def str: String = macro UnitMacros.strImpl[U]
