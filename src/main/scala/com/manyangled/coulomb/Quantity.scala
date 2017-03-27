@@ -140,6 +140,9 @@ object Quantity {
   def coefficient[U1 <: UnitExpr, U2 <: UnitExpr]: spire.math.Rational =
     macro UnitMacros.coefficientImpl[U1, U2]
 
+  /** A human-readable string representing the unit type U */
+  def unitStr[U <: UnitExpr]: String = macro UnitMacros.unitStrImpl[U]
+
 /*
   /**
    * Obtain a unit quantity from a Temperature with the same raw value and temperature unit
