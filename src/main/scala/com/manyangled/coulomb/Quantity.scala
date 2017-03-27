@@ -118,29 +118,29 @@ class Quantity[N, U <: UnitExpr](val value: N)
 
 /** Factory functions and implicit definitions associated with Quantity objects */
 object Quantity {
-/*
   /**
-   * Obtain a function that converts objects of Quantity[U] into compatible Quantity[U2]
-   * @tparam U the unit type of input quantity.
-   * @tparam U2 the unit type of the output. If U2 is not compatible with U,
+   * Obtain a function that converts objects of Quantity[N, U1] into compatible Quantity[N, U2]
+   * @tparam N the numeric representation type
+   * @tparam U1 the unit type of input quantity.
+   * @tparam U2 the unit type of the output. If U2 is not compatible with U1,
    * then a compile-time error will occur.
-   * @return a function for converting Quantity[U] into Quantity[U2]
+   * @return a function for converting Quantity[N, U1] into Quantity[N, U2]
    */
-  def converter[U <: UnitExpr, U2 <: UnitExpr](implicit cu: ConvertableUnits[U, U2]):
-      Quantity[U] => Quantity[U2] =
-    cu.converter
+  def converter[N, U1 <: UnitExpr, U2 <: UnitExpr]: Quantity[N, U1] => Quantity[N, U2] =
+    macro UnitMacros.converterImpl[N, U1, U2]
 
   /**
    * Obtain the numeric coefficient that represents the conversion factor from
-   * a quantity with units U to a quantity of unit type U2
-   * @tparam U the unit type of input quantity.
-   * @tparam U2 the unit type of the output. If U2 is not compatible with U,
+   * a quantity with units U1 to a quantity of unit type U2
+   * @tparam U1 the unit type of input quantity.
+   * @tparam U2 the unit type of the output. If U2 is not compatible with U1,
    * then a compile-time error will occur.
-   * @return numeric coefficient, aka the conversion factor from Quantity[U] into Quantity[U2]
+   * @return numeric coefficient, aka the conversion factor from U1 into U2
    */
-  def coefficient[U <: UnitExpr, U2 <: UnitExpr](implicit cu: CompatUnits[U, U2]): Double =
-    cu.coef
+  def coefficient[U1 <: UnitExpr, U2 <: UnitExpr]: spire.math.Rational =
+    macro UnitMacros.coefficientImpl[U1, U2]
 
+/*
   /**
    * Obtain a unit quantity from a Temperature with the same raw value and temperature unit
    * @tparam U a unit of temperature, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
@@ -149,10 +149,10 @@ object Quantity {
    * @return a unit quantity of the same unit type U and raw numeric value of t
    */
   def fromTemperature[U <: TemperatureExpr](t: Temperature[U]) = new Quantity[U](t.value)
-
-  implicit def implicitUnitConvert[U <: UnitExpr, U2 <: UnitExpr](q: Quantity[U])(implicit
-    cu: ConvertableUnits[U, U2]): Quantity[U2] = cu.convert(q)
 */
+
+  implicit def implicitUnitConvert[N, U <: UnitExpr, U2 <: UnitExpr](q: Quantity[N, U]): Quantity[N, U2] =
+    macro UnitMacros.unitConvertImpl[N, U, U2]
 }
 
 /*
