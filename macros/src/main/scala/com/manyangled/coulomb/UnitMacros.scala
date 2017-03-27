@@ -478,6 +478,31 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $mt]($dt)"
   }
 
+  def powValTree(n: Tree, tpeN: Type, exp: Int): Tree = {
+    tpeN match {
+      case t if (t =:= typeOf[Byte]) => q"math.pow($n, $exp).toByte"
+      case t if (t =:= typeOf[Short]) => q"math.pow($n, $exp).toShort"
+      case t if (t =:= typeOf[Int]) => q"math.pow($n, $exp).toInt"
+      case t if (t =:= typeOf[Long]) => q"math.pow($n, $exp).toLong"
+      case t if (t =:= typeOf[Float]) => q"math.pow($n, $exp).toFloat"
+      case t if (t =:= typeOf[Double]) => q"math.pow($n, $exp)"
+      case t if (t =:= typeOf[BigInt]) => q"${n}.pow($exp)"
+      case t if (t =:= typeOf[BigDecimal]) => q"${n}.pow($exp)"
+      case t if (t =:= typeOf[Rational]) => q"${n}.pow($exp)"
+      case _ => abort(s"Unimplemented type $tpeN")
+    }
+  }
+
+  def powImpl[N: WeakTypeTag, U: WeakTypeTag, E: WeakTypeTag]: Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU = fixType(weakTypeOf[U])
+    val tpeE = fixType(weakTypeOf[E])
+    val exp = intVal(tpeE)
+    val tpeP = mapToType(mapPow(signature(tpeU), exp))
+    val pt = powValTree(q"${c.prefix.tree}.value", tpeN, exp)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeP]($pt)"
+  }
+
   def ueAtomicString(typeU: Type): Boolean = {
     typeU.dealias match {
       case IsUnitless() => true
