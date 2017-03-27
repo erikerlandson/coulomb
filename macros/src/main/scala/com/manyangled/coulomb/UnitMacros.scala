@@ -429,6 +429,41 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2]($xt)"
   }
 
+  def converterImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
+    val tft = q"""
+      (q1: com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]) =>
+        new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2](q1.value)
+    """
+    val cu = cuTree(tpeU1, tpeU2)
+    val coef = cuCoef(cu)
+    val q"(..$_) => new com.manyangled.coulomb.Quantity[..$_]($rt)" = tft
+    val xt = fixByteShort(xCoefTree(coef, rt, tpeN), tpeN)
+    q"""
+      (q1: com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]) =>
+        new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2]($xt)
+    """
+  }
+
+  def unitConvertImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](q: Tree): Tree = {
+    val tpeN = fixType(weakTypeOf[N])
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
+    val cu = cuTree(tpeU1, tpeU2)
+    val coef = cuCoef(cu)
+    val xt = fixByteShort(xCoefTree(coef, q"${q}.value", tpeN), tpeN)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2]($xt)"
+  }
+
+  def coefficientImpl[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+    val tpeU1 = fixType(weakTypeOf[U1])
+    val tpeU2 = fixType(weakTypeOf[U2])
+    val cu = cuTree(tpeU1, tpeU2)
+    q"${cu}.coef"
+  }
+
   def addImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
     val tpeN = fixType(weakTypeOf[N])
     val tpeU1 = fixType(weakTypeOf[U1])
