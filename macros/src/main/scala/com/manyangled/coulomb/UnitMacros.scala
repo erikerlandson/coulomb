@@ -310,42 +310,18 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     Rational(n, d)
   }
 
-  // This is hackery to evaluate the user's value for coefficient in the unit
-  // declaration at compile time.  If I could figure out a way to evaluate
-  // general expressions, it would be way cleaner and more robust.
   def treeToRational(t: Tree): Rational = {
     try {
-      t match {
-        case q"$_.Rational($arg1, $arg2)" => {
-          val a1 = evalTree[String](q"${arg1}.toString")
-          val a2 = evalTree[String](q"${arg2}.toString")
-          Rational(BigInt(a1), BigInt(a2))
+      val aug = q"""
+        {
+          import spire.math._
+          Rational($t)
         }
-        case q"Rational($arg1, $arg2)" => {
-          val a1 = evalTree[String](q"${arg1}.toString")
-          val a2 = evalTree[String](q"${arg2}.toString")
-          Rational(BigInt(a1), BigInt(a2))
-        }
-        case q"$_.Rational($arg)" => {
-          val a = evalTree[String](q"${arg}.toString")
-          Rational(BigDecimal(a))
-        }
-        case q"Rational($arg)" => {
-          val a = evalTree[String](q"${arg}.toString")
-          Rational(BigDecimal(a))
-        }
-        case q"${arg}.toRational" => {
-          val a = evalTree[String](q"${arg}.toString")
-          Rational(BigDecimal(a))
-        }
-        case arg => {
-          val a = evalTree[String](q"${arg}.toString")
-          Rational(BigDecimal(a))
-        }
-      }
+      """
+      evalTree[Rational](aug)
     } catch {
       case e: Throwable => {
-        println(s"e= $e")
+        println(s"$e")
         abort(s"failed to evaluate expression ($t) as a Rational")
       }
     }
