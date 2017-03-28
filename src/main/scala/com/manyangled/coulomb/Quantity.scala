@@ -279,22 +279,6 @@ object Temperature {
 */
 
 /*
-class ConvertableUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Double) {
-  val converter = ConvertableUnits.converter[U1, U2](coef)
-  def convert(q1: Quantity[U1]): Quantity[U2] = converter(q1)
-}
-
-object ConvertableUnits {
-  def converter[U1 <: UnitExpr, U2 <: UnitExpr](coef: Double): Quantity[U1] => Quantity[U2] =
-    (q1: Quantity[U1]) => new Quantity[U2](coef * q1.value)
-
-  implicit def witnessConvertableUnits[U1 <: UnitExpr, U2 <: UnitExpr](implicit
-      cu: CompatUnits[U1, U2]): ConvertableUnits[U1, U2] =
-    new ConvertableUnits[U1, U2](cu.coef)
-}
-*/
-
-/*
 class ConvertableTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](
     val coef1: Double, val off1: Double, val coef2: Double, val off2: Double) {
   val converter = ConvertableTemps.converter[U1, U2](coef1, off1, coef2, off2)
