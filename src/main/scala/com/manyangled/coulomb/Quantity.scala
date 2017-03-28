@@ -56,6 +56,13 @@ class Quantity[N, U <: UnitExpr](val value: N)
    */
   def toUnit[U2 <: UnitExpr]: Quantity[N, U2] = macro UnitMacros.toUnitImpl[N, U, U2]
 
+/*
+  /** Convert a quantity of representation type N to a new quantity of type N2, with same units */
+  def toRep[N2](implicit cfN: spire.math.ConvertableFrom[N], ctN2: spire.math.ConvertableTo[N2]):
+      Quantity[N2, U] =
+    new Quantity[N2, U](cfN.toType[N2](this.value))
+*/
+
   /**
    * Obtain a new quantity with same units, but negated value
    * @return negated unit quantity
