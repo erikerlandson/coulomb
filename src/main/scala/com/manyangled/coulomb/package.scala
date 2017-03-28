@@ -23,7 +23,7 @@ package object coulomb {
   /** enhances numeric types with utility methods for `coulomb` */
   implicit class CoulombExtendWithUnits[N](val v: N) extends AnyVal with Serializable {
     /** create a new unit Quantity of type U with numeric value of `this` */
-    def withUnit[U <: UnitExpr](implicit num: spire.math.Numeric[N]): Quantity[N, U] =
+    def withUnit[U <: UnitExpr](implicit num: spire.math.ConvertableTo[N]): Quantity[N, U] =
       new Quantity[N, U](v)
 
     /** create a new unit Temperature of type U with numeric value of `this` */

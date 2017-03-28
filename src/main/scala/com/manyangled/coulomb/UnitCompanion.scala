@@ -22,7 +22,7 @@ class UnitCompanion[U <: UnitExpr](val name: String, val coef: Rational) {
   // defensive: this should be caught at compile time in UnitMacros.unitDecl
   require(coef > 0, "Unit coefficients must be strictly > 0")
 
-  def apply[N](v: N)(implicit num: Numeric[N]): Quantity[N, U] = new Quantity[N, U](v)
+  def apply[N](v: N)(implicit num: spire.math.ConvertableTo[N]): Quantity[N, U] = new Quantity[N, U](v)
 
   override def toString = s"UnitCompanion($name, $coef)"
 
