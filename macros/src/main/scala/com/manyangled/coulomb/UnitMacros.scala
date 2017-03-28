@@ -283,8 +283,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeU1, tpeU2) = weakType2[U1, U2]
 
     val (coef1, map1) = canonical(tpeU1)
     val (coef2, map2) = canonical(tpeU2)
@@ -396,9 +395,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def toUnitImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
     val cu = cuTree(tpeU1, tpeU2)
     val coef = cuCoef(cu)
     val xt = fixByteShort(xCoefTree(coef, q"(${c.prefix.tree}).value", tpeN), tpeN)
@@ -406,9 +403,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def converterImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
     val tft = q"""
       (q1: com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]) =>
         new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2](q1.value)
@@ -424,9 +419,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitConvertImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](q: Tree): Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
     val cu = cuTree(tpeU1, tpeU2)
     val coef = cuCoef(cu)
     val xt = fixByteShort(xCoefTree(coef, q"${q}.value", tpeN), tpeN)
@@ -434,16 +427,13 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def coefficientImpl[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeU1, tpeU2) = weakType2[U1, U2]
     val cu = cuTree(tpeU1, tpeU2)
     q"${cu}.coef"
   }
 
   def addImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
     val cu = cuTree(tpeU2, tpeU1)
     val coef = cuCoef(cu)
     val xt = xCoefTree(coef, q"($that).value", tpeN)
@@ -452,9 +442,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def subImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
     val cu = cuTree(tpeU2, tpeU1)
     val coef = cuCoef(cu)
     val xt = xCoefTree(coef, q"($that).value", tpeN)
@@ -463,16 +451,13 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def negImpl[N: WeakTypeTag, U: WeakTypeTag]: Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU = fixType(weakTypeOf[U])
+    val (tpeN, tpeU) = weakType2[N, U]
     val nt = fixByteShort(q"-(${c.prefix.tree}.value)", tpeN)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU]($nt)"
   }
 
   def mulImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
     val (map1, map2) = (signature(tpeU1), signature(tpeU2))
     val mt = mapToType(mapMul(map1, map2))
     val xt = fixByteShort(q"(${c.prefix.tree}.value) * (${that}.value)", tpeN)
@@ -480,9 +465,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def divImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU1 = fixType(weakTypeOf[U1])
-    val tpeU2 = fixType(weakTypeOf[U2])
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
     val (map1, map2) = (signature(tpeU1), signature(tpeU2))
     val mt = mapToType(mapDiv(map1, map2))
     val dt = fixByteShort(q"(${c.prefix.tree}.value) / (${that}.value)", tpeN)
@@ -505,9 +488,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def powImpl[N: WeakTypeTag, U: WeakTypeTag, E: WeakTypeTag]: Tree = {
-    val tpeN = fixType(weakTypeOf[N])
-    val tpeU = fixType(weakTypeOf[U])
-    val tpeE = fixType(weakTypeOf[E])
+    val (tpeN, tpeU, tpeE) = weakType3[N, U, E]
     val exp = intVal(tpeE)
     val tpeP = mapToType(mapPow(signature(tpeU), exp))
     val pt = powValTree(q"${c.prefix.tree}.value", tpeN, exp)
@@ -566,7 +547,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitExprString[U: WeakTypeTag]: Tree = {
-    val tpeU = fixType(weakTypeOf[U])
+    val tpeU = weakType1[U]
     val str = ueString(tpeU)
     val sq = q"$str"
     q"""
@@ -575,7 +556,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitStrImpl[U: WeakTypeTag]: Tree = {
-    val str = uesVal(fixType(weakTypeOf[U]))
+    val str = uesVal(weakType1[U])
     q"$str"
   }
 
