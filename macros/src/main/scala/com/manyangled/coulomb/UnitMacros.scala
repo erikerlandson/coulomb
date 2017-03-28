@@ -39,7 +39,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   implicit val liftRational = Liftable[Rational] { r =>
     val rnStr = r.numerator.toBigInt.toString
     val rdStr = r.denominator.toBigInt.toString
-    q"spire.math.Rational.apply(BigInt($rnStr), BigInt($rdStr))"
+    q"spire.math.Rational(BigInt($rnStr), BigInt($rdStr))"
   }
 
   implicit val liftBigInt = Liftable[BigInt] { v =>
@@ -99,6 +99,33 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       c.inferImplicitValue(cut, silent = false)
     } catch {
       case _: Throwable => abort(s"Imcompatible unit types:\n$u1T\nand\n$u2T")
+    }
+  }
+
+  def cuCoef(cu: Tree): Rational = {
+    // I'm doing it this way because evaluating Rational(n,d) expressions w/ evalTree
+    // directly is failing inside the macro context.
+    val q"new $_.CompatUnits[..$_]($_.Rational.apply($nq, $dq))" = cu
+    val (n, d) = (evalTree[BigInt](nq), evalTree[BigInt](dq))
+    Rational(n, d)
+  }
+
+  def cuCoef(u1T: Type, u2T: Type): Rational = cuCoef(cuTree(u1T, u2T))
+
+  def evalTreeRational(t: Tree): Rational = {
+    try {
+      val aug = q"""
+        {
+          import spire.math._
+          Rational($t)
+        }
+      """
+      evalTree[Rational](aug)
+    } catch {
+      case e: Throwable => {
+        println(s"$e")
+        abort(s"failed to evaluate expression ($t) as a Rational")
+      }
     }
   }
 
@@ -301,31 +328,6 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def cuCoef(cu: Tree): Rational = {
-    // I'm doing it this way because evaluating Rational(n,d) expressions w/ evalTree
-    // directly is failing inside the macro context.
-    val q"new $_.CompatUnits[..$_]($_.Rational.apply($nq, $dq))" = cu
-    val (n, d) = (evalTree[BigInt](nq), evalTree[BigInt](dq))
-    Rational(n, d)
-  }
-
-  def treeToRational(t: Tree): Rational = {
-    try {
-      val aug = q"""
-        {
-          import spire.math._
-          Rational($t)
-        }
-      """
-      evalTree[Rational](aug)
-    } catch {
-      case e: Throwable => {
-        println(s"$e")
-        abort(s"failed to evaluate expression ($t) as a Rational")
-      }
-    }
-  }
-
   def cfpTree(coef: Rational, tpeN: Type): Tree = {
     tpeN match {
       case t if (t =:= typeOf[Float]) => {
@@ -396,9 +398,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def toUnitImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
-    val cu = cuTree(tpeU1, tpeU2)
-    val coef = cuCoef(cu)
-    val xt = fixByteShort(xCoefTree(coef, q"(${c.prefix.tree}).value", tpeN), tpeN)
+    val xt = fixByteShort(xCoefTree(cuCoef(tpeU1, tpeU2), q"(${c.prefix.tree}).value", tpeN), tpeN)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2]($xt)"
   }
 
@@ -408,10 +408,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       (q1: com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]) =>
         new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2](q1.value)
     """
-    val cu = cuTree(tpeU1, tpeU2)
-    val coef = cuCoef(cu)
     val q"(..$_) => new com.manyangled.coulomb.Quantity[..$_]($rt)" = tft
-    val xt = fixByteShort(xCoefTree(coef, rt, tpeN), tpeN)
+    val xt = fixByteShort(xCoefTree(cuCoef(tpeU1, tpeU2), rt, tpeN), tpeN)
     q"""
       (q1: com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]) =>
         new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2]($xt)
@@ -420,32 +418,26 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def unitConvertImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](q: Tree): Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
-    val cu = cuTree(tpeU1, tpeU2)
-    val coef = cuCoef(cu)
-    val xt = fixByteShort(xCoefTree(coef, q"${q}.value", tpeN), tpeN)
+    val xt = fixByteShort(xCoefTree(cuCoef(tpeU1, tpeU2), q"${q}.value", tpeN), tpeN)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU2]($xt)"
   }
 
   def coefficientImpl[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
     val (tpeU1, tpeU2) = weakType2[U1, U2]
-    val cu = cuTree(tpeU1, tpeU2)
-    q"${cu}.coef"
+    val coef = cuCoef(tpeU1, tpeU2)
+    q"$coef"
   }
 
   def addImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
-    val cu = cuTree(tpeU2, tpeU1)
-    val coef = cuCoef(cu)
-    val xt = xCoefTree(coef, q"($that).value", tpeN)
+    val xt = xCoefTree(cuCoef(tpeU2, tpeU1), q"($that).value", tpeN)
     val rt = fixByteShort(q"(${c.prefix.tree}.value) + ($xt)", tpeN)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]($rt)"
   }
 
   def subImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
-    val cu = cuTree(tpeU2, tpeU1)
-    val coef = cuCoef(cu)
-    val xt = xCoefTree(coef, q"($that).value", tpeN)
+    val xt = xCoefTree(cuCoef(tpeU2, tpeU1), q"($that).value", tpeN)
     val rt = fixByteShort(q"(${c.prefix.tree}.value) - ($xt)", tpeN)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]($rt)"
   }
@@ -595,7 +587,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case _ => abort("Unexpected calling scope!")
     }
     val name = evalTree[String](qname)
-    val coef = treeToRational(qcoef)
+    val coef = evalTreeRational(qcoef)
     if (coef <= 0) abort(s"Coefficient for unit $name must be > 0")
     val unitName = annottees.map(_.tree) match {
       case (decl: ClassDef) :: Nil => decl match {
@@ -622,8 +614,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case _ => abort("Unexpected calling scope!")
     }
     val name = evalTree[String](qname)
-    val coef = treeToRational(qcoef)
-    val off = treeToRational(qoff)
+    val coef = evalTreeRational(qcoef)
+    val off = evalTreeRational(qoff)
     if (coef <= 0) abort(s"Coefficient for unit $name must be > 0")
     val unitName = annottees.map(_.tree) match {
       case (decl: ClassDef) :: Nil => decl match {
