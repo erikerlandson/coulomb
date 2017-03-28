@@ -43,6 +43,14 @@ private [coulomb] class MacroCommon(val c: whitebox.Context) {
   // translates types like 'this.U' into the "actual" type
   def fixType(tpe: Type) = tpe.baseType(tpe.baseClasses.head)
 
+  def weakType1[T1: WeakTypeTag]: Type = fixType(weakTypeOf[T1])
+
+  def weakType2[T1: WeakTypeTag, T2: WeakTypeTag]: (Type, Type) =
+    (fixType(weakTypeOf[T1]), fixType(weakTypeOf[T2]))
+
+  def weakType3[T1: WeakTypeTag, T2: WeakTypeTag, T3: WeakTypeTag]: (Type, Type, Type) =
+    (fixType(weakTypeOf[T1]), fixType(weakTypeOf[T2]), fixType(weakTypeOf[T3]))
+
   def churchType(i: Int): Type = {
     i match {
       case v if (v > 0) => appliedType(incType, List(churchType(v - 1)))
