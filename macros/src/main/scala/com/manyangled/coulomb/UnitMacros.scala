@@ -543,6 +543,29 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     q"new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2]($xt)"
   }
 
+  def addTQImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
+    val xt = xCoefTree(cuCoef(tpeU2, tpeU1), q"($that).value", tpeN)
+    val rt = fixByteShort(q"(${c.prefix.tree}.value) + ($xt)", tpeN)
+    q"new com.manyangled.coulomb.Temperature[$tpeN, $tpeU1]($rt)"
+  }
+
+  def subTQImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
+    val xt = xCoefTree(cuCoef(tpeU2, tpeU1), q"($that).value", tpeN)
+    val rt = fixByteShort(q"(${c.prefix.tree}.value) - ($xt)", tpeN)
+    q"new com.manyangled.coulomb.Temperature[$tpeN, $tpeU1]($rt)"
+  }
+
+  def subTTImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
+    val ((_, coef1), off1) = (urecVal(tpeU1), turecVal(tpeU1))
+    val ((_, coef2), off2) = (urecVal(tpeU2), turecVal(tpeU2))
+    val xt = xTempTree(coef2, off2, coef1, off1, q"($that).value", tpeN)
+    val rt = fixByteShort(q"(${c.prefix.tree}.value) - ($xt)", tpeN)
+    q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]($rt)"
+  }
+
   def ueAtomicString(typeU: Type): Boolean = {
     typeU.dealias match {
       case IsUnitless() => true
