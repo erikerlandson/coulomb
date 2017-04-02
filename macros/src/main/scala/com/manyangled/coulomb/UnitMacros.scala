@@ -328,7 +328,18 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def cfpTree(coef: Rational, tpeN: Type): Tree = {
+  def coefLimit(coef: Rational, lim: BigInt): Rational = {
+    val clim = coef.limitTo(lim)
+    // I don't feel sure about a policy here, and my attempts to make it configurable
+    // at compile time have been failing, see:
+    // https://github.com/scala/scala-dev/issues/353
+    //val pdif = ((clim - coef).abs / coef).toDouble * 100.0
+    //if (pdif > 0.01) c.info(c.enclosingPosition,
+    //  s"WARNING: approximated coefficient $coef with $clim, with $pdif percent error", false)
+    clim
+  }
+
+  def ratToFPTree(coef: Rational, tpeN: Type): Tree = {
     tpeN match {
       case t if (t =:= typeOf[Float]) => {
         val cv = implicitly[ConvertableTo[Float]].fromRational(coef)
@@ -349,15 +360,26 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def coefLimit(coef: Rational, lim: BigInt): Rational = {
-    val clim = coef.limitTo(lim)
-    val pdif = ((clim - coef).abs / coef).toDouble * 100.0
-    if (pdif > 0.01) c.info(c.enclosingPosition,
-      s"WARNING: approximated coefficient $coef with $clim, with $pdif percent error", false)
-    clim
+  def ratToIntTree(coef: Rational, tpeN: Type): Tree = {
+    tpeN match {
+      case t if ((t =:= typeOf[Int]) || (t =:= typeOf[Byte]) || (t =:= typeOf[Short])) => {
+        // Byte and Short appear to be cast to Int for arithmetic
+        val iv = coef.toInt
+        q"$iv"
+      }
+      case t if (t =:= typeOf[Long]) => {
+        val iv = coef.toLong
+        q"$iv"
+      }
+      case t if (t =:= typeOf[BigInt]) => {
+        val iv = coef.toBigInt
+        q"$iv"
+      }
+      case _ => abort(s"unexpected integral type $tpeN")
+    }
   }
 
-  def ndTree(coef: Rational, tpeN: Type): (Tree, Tree) = {
+  def ratToNDTree(coef: Rational, tpeN: Type): (Tree, Tree) = {
     tpeN match {
       case t if ((t =:= typeOf[Int]) || (t =:= typeOf[Byte]) || (t =:= typeOf[Short])) => {
         // Byte and Short appear to be cast to Int for '*' and '/' anyway
@@ -381,11 +403,36 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   def xCoefTree(coef: Rational, n: Tree, tpeN: Type): Tree = {
     if (coef == 1) n else {
       if (isIntegral(tpeN)) {
-        val (nq, dq) = ndTree(coef, tpeN)
+        val (nq, dq) = ratToNDTree(coef, tpeN)
         if (coef.isWhole) q"($n) * ($nq)" else q"(($n) * ($nq)) / ($dq)"
       } else {
-        val cq = cfpTree(coef, tpeN)
+        val cq = ratToFPTree(coef, tpeN)
         q"($n) * ($cq)"
+      }
+    }
+  }
+
+  def xTempTree(
+      coef1: Rational, off1: Rational,
+      coef2: Rational, off2: Rational,
+      n: Tree, tpeN: Type): Tree = {
+    val coef = coef1 / coef2
+    if (coef == 1) {
+      val off = off1 - off2
+      if (off == 0) n else {
+        val oq = if (isIntegral(tpeN)) ratToIntTree(off, tpeN) else ratToFPTree(off, tpeN)
+        q"$n + $oq"
+      }
+    } else {
+      val oq1 = if (isIntegral(tpeN)) ratToIntTree(off1, tpeN) else ratToFPTree(off1, tpeN)
+      val oq2 = if (isIntegral(tpeN)) ratToIntTree(off2, tpeN) else ratToFPTree(off2, tpeN)
+      if (isIntegral(tpeN)) {
+        val (nq, dq) = ratToNDTree(coef, tpeN)
+        if (coef.isWhole) q"(($n + $oq1) * $nq) - $oq2"
+        else q"((($n + $oq1) * $nq) / $dq) - $oq2"
+      } else {
+        val cq = ratToFPTree(coef, tpeN)
+        q"(($n + $oq1) * $cq) - $oq2"
       }
     }
   }
@@ -485,6 +532,15 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     val tpeP = mapToType(mapPow(signature(tpeU), exp))
     val pt = powValTree(q"${c.prefix.tree}.value", tpeN, exp)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeP]($pt)"
+  }
+
+  def toUnitTempImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
+    val ((_, coef1), off1) = (urecVal(tpeU1), turecVal(tpeU1))
+    val ((_, coef2), off2) = (urecVal(tpeU2), turecVal(tpeU2))
+    val xt = fixByteShort(
+      xTempTree(coef1, off1, coef2, off2, q"(${c.prefix.tree}).value", tpeN), tpeN)
+    q"new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2]($xt)"
   }
 
   def ueAtomicString(typeU: Type): Boolean = {
