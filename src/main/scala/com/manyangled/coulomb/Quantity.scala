@@ -306,3 +306,20 @@ object ConvertableTemps {
       urecU1.coef.toDouble, turecU1.offset.toDouble, urecU2.coef.toDouble, turecU2.offset.toDouble)
 }
 */
+
+/*
+object test {
+  import com.manyangled.coulomb._
+  import SIBaseUnits._
+  import USCustomaryUnits._
+  import SIPrefixes._
+  import ChurchInt._
+  import spire.math._
+  import Integral._
+  import spire.std.byte._
+  import spire.std.short._
+  
+  implicit val ttt = CoefMaxErr(0.0)
+  val m = Meter(1).toUnit[Tera <*> Foot]
+}
+*/

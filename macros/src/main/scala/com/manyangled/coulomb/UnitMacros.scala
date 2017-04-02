@@ -33,8 +33,93 @@ class tempUnitDecl(name: String, coef: Rational, off: Rational) extends StaticAn
   def macroTransform(annottees: Any*): Any = macro UnitMacros.tempUnitDecl
 }
 
+@compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
+class checkCoefQE(pctErr: Double) extends StaticAnnotation {
+  def macroTransform(annottees: Any*): Any = macro UnitMacros.checkCoefQE
+}
+
+class CoefMaxErr(val pctErr: Double) {
+  def apply(): Double = pctErr
+}
+
+class CoefMaxErrShim(val pctErr: Double)
+object CoefMaxErrShim {
+  implicit def witnessCoefMaxErrShim(implicit cme: CoefMaxErr): CoefMaxErrShim = {
+    val t = cme.pctErr
+    new CoefMaxErrShim(t)
+  }
+}
+
+class DemoEvidence(val value: Int)
+class DemoEvidenceTP[T](val value: T)
+
+object demoModule {
+  def foo: Int = macro DemoMacros.fooImpl
+  def goo(implicit de: DemoEvidence): Int = macro DemoMacros.gooImpl
+  def moo(implicit de: DemoEvidence): Int = de.value
+}
+
+class DemoMacros(val c: whitebox.Context) {
+  import c.universe._
+
+  val detpType = typeOf[DemoEvidenceTP[Int]].typeConstructor
+
+  def fooImpl: Tree = {
+    val vInt = try {
+      val appt = appliedType(detpType, List(typeOf[Int]))
+      val impl = c.inferImplicitValue(appt, silent = false)
+      println(s"impl= $impl")
+      val eval = c.eval(c.Expr[DemoEvidenceTP[Int]](c.untypecheck(impl.duplicate)))
+      eval.value
+    } catch {
+      case e: Throwable => {
+        println(s"Eval failed with: $e")
+        //println(s"Eval failed with: $e\nStack trace:\n${e.printStackTrace}")
+        0
+      }
+    }
+    println(s"vInt= $vInt")
+    q"$vInt"
+  }
+
+  def gooImpl(de: Tree): Tree = {
+    val vInt = try {
+      println(s"de= $de")
+      val macroStack = c.enclosingMacros
+      println(s"macrostack:")
+      macroStack.foreach { m =>
+        println(s"${m.macroApplication}")
+      }
+      //val eval = c.eval(c.Expr[DemoEvidence](c.untypecheck(de.duplicate)))
+      //eval.value
+      0
+    } catch {
+      case e: Throwable => {
+        println(s"Eval failed with: $e\nStack trace:\n${e.printStackTrace}")
+        0
+      }
+    }
+    q"$vInt"
+  }
+}
+
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
+
+  def coefMaxErr: Option[Double] = {
+    try {
+      //val cme = c.inferImplicitValue(typeOf[CoefMaxErr], silent = false)
+      //println(s"cme= $cme")
+      //val cme2 = evalTree[Double](q"${cme}.apply()")
+      //Some(cme2)
+      None
+    } catch {
+      case e: Throwable => {
+        println(s"$e")
+        None
+      }
+    }
+  }
 
   implicit val liftRational = Liftable[Rational] { r =>
     val rnStr = r.numerator.toBigInt.toString
@@ -349,24 +434,50 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def coefLimit(coef: Rational, lim: BigInt): Rational = {
-    val clim = coef.limitTo(lim)
-    val pdif = ((clim - coef).abs / coef).toDouble * 100.0
-    if (pdif > 0.01) c.info(c.enclosingPosition,
-      s"WARNING: approximated coefficient $coef with $clim, with $pdif percent error", false)
+  def checkCoefQE(annottees: c.Expr[Any]*): c.Expr[Any] = {
+    println(s"prefix= ${c.prefix.tree}")
+    println(s"annottees=\n$annottees")
+    val macroStack = c.enclosingMacros
+    println(s"macrostack:")
+    macroStack.foreach { m =>
+      println(s"${m.macroApplication}")
+    }
+    annottees(0)
+  }
+
+  def coefLimit(coef: Rational, lim: BigInt, cmin: Rational): Rational = {
+    val cl = coef.limitTo(lim)
+    val clim = if (cl < cmin) cmin else cl
+    val maxErr = coefMaxErr
+    if (!maxErr.isEmpty) {
+      val pdif = ((clim - coef).abs / coef).toDouble * 100.0
+      if (pdif > maxErr.get) c.info(c.enclosingPosition,
+        s"WARNING: approximated coefficient $coef with $clim, with $pdif percent error", true)
+    }
     clim
+  }
+
+  def overflowRiskCheck(coef: Rational, totalBits: Int, minBits: Int): Unit = {
+    val d = coef.denominator.toBigInt
+    val maxRep = BigInt(2).pow(totalBits) - 1
+    val min = BigInt(2).pow(minBits) - 1
+    val test = maxRep / coef.numerator.toBigInt
+    if (test < min) c.info(c.enclosingPosition,
+      s"WARNING: maximum safe integer value under conversion is $test", true)
   }
 
   def ndTree(coef: Rational, tpeN: Type): (Tree, Tree) = {
     tpeN match {
       case t if ((t =:= typeOf[Int]) || (t =:= typeOf[Byte]) || (t =:= typeOf[Short])) => {
         // Byte and Short appear to be cast to Int for '*' and '/' anyway
-        val cx = coefLimit(coef, 32767)
+        val cx = coefLimit(coef, Int.MaxValue, Rational(BigInt(1), Int.MaxValue))
+        overflowRiskCheck(cx, 31, 31 - 11)
         val (n, d) = (cx.numerator.toInt, cx.denominator.toInt)
         (q"$n", q"$d")
       }
       case t if (t =:= typeOf[Long]) => {
-        val cx = coefLimit(coef, 2147483647L)
+        val cx = coefLimit(coef, Long.MaxValue, Rational(BigInt(1), Long.MaxValue))
+        overflowRiskCheck(cx, 63, 63 - 22)
         val (n, d) = (cx.numerator.toLong, cx.denominator.toLong)
         (q"$n", q"$d")
       }

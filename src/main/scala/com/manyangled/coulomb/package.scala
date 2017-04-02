@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.manyangled
 
+import scala.language.experimental.macros
+
 package object coulomb {
   /** obtain the integer value of a ChurchInt type */
   def churchToInt[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
@@ -30,4 +32,11 @@ package object coulomb {
     //def withTemperature[U <: TemperatureExpr]: Temperature[U] =
     //  new Temperature[U](num.toDouble(v))
   }
+
+  //implicit val demoEvidence: DemoEvidence = new DemoEvidence(42)
+  implicit val demoEvidence: DemoEvidenceTP[Int] = new DemoEvidenceTP[Int](42)
+
+  @unitDecl("foo", 42)
+  trait Foo extends DerivedUnit[SIBaseUnits.Meter]
+  
 }
