@@ -163,7 +163,6 @@ object Quantity {
     macro UnitMacros.unitConvertImpl[N, U, U2]
 }
 
-/*
 /**
  * A temperature value.
  * @tparam U a temperature unit, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
@@ -177,7 +176,7 @@ object Quantity {
  * val fq = cq.as[Fahrenheit]      // == Quantity[Fahrenheit](1.8)
  * }}}
  */
-class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double)
+class Temperature[N, U <: TemperatureExpr](val value: N)
     extends AnyVal with Serializable {
 
   /**
@@ -185,9 +184,15 @@ class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double)
    * @tparam U2 the new temperature unit expression to convert to.
    * @return a new value of type Temperature[U2], equivalent to `this`
    */
-  def as[U2 <: TemperatureExpr](implicit ct: ConvertableTemps[U, U2]): Temperature[U2] =
-    ct.convert(this)
+  def toUnit[U2 <: TemperatureExpr]: Temperature[N, U2] =
+    macro UnitMacros.toUnitTempImpl[N, U, U2]
 
+  /** Convert a quantity of representation type N to a new quantity of type N2, with same units */
+  def toRep[N2](implicit cfN: spire.math.ConvertableFrom[N], ctN2: spire.math.ConvertableTo[N2]):
+      Temperature[N2, U] =
+    new Temperature[N2, U](cfN.toType[N2](this.value))
+
+/*
   /**
    * Add a Quantity of temperature units to a temperature to get a new temperature
    * @tparam U2 the temperature unit of right side.  If U2 is not a compatible unit (temperature)
@@ -217,28 +222,20 @@ class Temperature[U <: TemperatureExpr](private [coulomb] val value: Double)
   def -[U2 <: TemperatureExpr](that: Temperature[U2])(implicit
       ct: ConvertableTemps[U2, U]): Quantity[U] =
     new Quantity[U](this.value - ct.convert(that).value)
-
-  /** The raw value of the temperature, rounded to nearest integer and returned as an Int */
-  def toInt: Int = value.round.toInt
-
-  /** The raw value of the temperature, rounded to nearest integer and returned as a Long */
-  def toLong: Long = value.round
-
-  /** The raw value of the temperature, rounded to nearest integer and returned as a Float */
-  def toFloat: Float = value.toFloat
-
-  /** The raw value of the temperature, rounded to nearest integer and returned as a Double */
-  def toDouble: Double = value
+*/
 
   /** A human-readable string representing the temperature with its associated unit type */  
-  def str(implicit uesU: UnitExprString[U]) = s"$value ${uesU.str}"
+  def str: String = macro UnitMacros.strImpl[U]
 
   /** A human-readable string representing the unit type of this temperature */
-  def unitStr(implicit uesU: UnitExprString[U]) = uesU.str
+  def unitStr: String = macro UnitMacros.unitStrImpl[U]
+
+  override def toString = s"Temperature(${this.value})"
 }
 
 /** Factory functions and implicit definitions associated with Temperature objects */
 object Temperature {
+/*
   /**
    * Obtain a function that converts objects of Temperature[U] into compatible Temperature[U2]
    * @tparam U the unit type of input temp.
@@ -256,18 +253,6 @@ object Temperature {
    */
   def unitStr[U <: TemperatureExpr](implicit uesU: UnitExprString[U]) = uesU.str
 
-  /** Obtain a temperature of type U from an Int */
-  def apply[U <: TemperatureExpr](v: Int) = new Temperature[U](v.toDouble)
-
-  /** Obtain a temperature of type U from a Long */
-  def apply[U <: TemperatureExpr](v: Long) = new Temperature[U](v.toDouble)
-
-  /** Obtain a temperature of type U from a Float */
-  def apply[U <: TemperatureExpr](v: Float) = new Temperature[U](v.toDouble)
-
-  /** Obtain a temperature of type U from a Doiuble */
-  def apply[U <: TemperatureExpr](v: Double) = new Temperature[U](v)
-
   /**
    * Obtain a temperature from a unit Quantity with same raw value and temperature unit
    * @tparam U a unit of temperature, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
@@ -280,29 +265,5 @@ object Temperature {
   implicit def implicitTempConvert[U <: TemperatureExpr, U2 <: TemperatureExpr](t: Temperature[U])(
       implicit ct: ConvertableTemps[U, U2]): Temperature[U2] =
     ct.convert(t)
-}
 */
-
-/*
-class ConvertableTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](
-    val coef1: Double, val off1: Double, val coef2: Double, val off2: Double) {
-  val converter = ConvertableTemps.converter[U1, U2](coef1, off1, coef2, off2)
-  def convert(t1: Temperature[U1]): Temperature[U2] = converter(t1)
 }
-
-object ConvertableTemps {
-  def converter[U1 <: TemperatureExpr, U2 <: TemperatureExpr](
-    coef1: Double, off1: Double, coef2: Double, off2: Double): Temperature[U1] => Temperature[U2] =
-    (t1: Temperature[U1]) => {
-      val k = (t1.value + off1) * coef1
-      val v2 = (k / coef2) - off2
-      new Temperature[U2](v2)
-    }
-
-  implicit def witnessConvertableTemps[U1 <: TemperatureExpr, U2 <: TemperatureExpr](implicit
-      turecU1: TempUnitRec[U1], urecU1: UnitRec[U1],
-      turecU2: TempUnitRec[U2], urecU2: UnitRec[U2]): ConvertableTemps[U1, U2] =
-    new ConvertableTemps[U1, U2](
-      urecU1.coef.toDouble, turecU1.offset.toDouble, urecU2.coef.toDouble, turecU2.offset.toDouble)
-}
-*/

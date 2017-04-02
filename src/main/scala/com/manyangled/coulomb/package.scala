@@ -27,7 +27,8 @@ package object coulomb {
       new Quantity[N, U](v)
 
     /** create a new unit Temperature of type U with numeric value of `this` */
-    //def withTemperature[U <: TemperatureExpr]: Temperature[U] =
-    //  new Temperature[U](num.toDouble(v))
+    def withTemperature[U <: TemperatureExpr](implicit
+        num: spire.math.ConvertableTo[N]): Temperature[N, U] =
+      new Temperature[N, U](v)
   }
 }
