@@ -192,7 +192,6 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
       Temperature[N2, U] =
     new Temperature[N2, U](cfN.toType[N2](this.value))
 
-/*
   /**
    * Add a Quantity of temperature units to a temperature to get a new temperature
    * @tparam U2 the temperature unit of right side.  If U2 is not a compatible unit (temperature)
@@ -200,8 +199,8 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
    * @param that the right hand side of sum
    * @return a new temperature that is sum of left-hand temp plus right-hand temp quantity
    */
-  def +[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Temperature[U] =
-    new Temperature[U](this.value + cu.coef * that.value)
+  def +[U2 <: UnitExpr](that: Quantity[N, U2]): Temperature[N, U] =
+    macro UnitMacros.addTQImpl[N, U, U2]
 
   /**
    * Subtract a Quantity of temperature units from a temperature to get a new temperature
@@ -210,8 +209,8 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
    * @param that the right hand side of difference
    * @return a new temperature that is the left-hand temp minus right-hand temp quantity
    */
-  def -[U2 <: UnitExpr](that: Quantity[U2])(implicit cu: CompatUnits[U2, U]): Temperature[U] =
-    new Temperature[U](this.value - cu.coef * that.value)
+  def -[U2 <: UnitExpr](that: Quantity[N, U2]): Temperature[N, U] =
+    macro UnitMacros.subTQImpl[N, U, U2]
 
   /**
    * Subtract two temperatures to get a Quantity of temperature units
@@ -219,10 +218,8 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
    * @param that the right hand side of difference
    * @return a new unit Quantity equal to `this` - `that`
    */
-  def -[U2 <: TemperatureExpr](that: Temperature[U2])(implicit
-      ct: ConvertableTemps[U2, U]): Quantity[U] =
-    new Quantity[U](this.value - ct.convert(that).value)
-*/
+  def -[U2 <: TemperatureExpr](that: Temperature[N, U2]): Quantity[N, U] =
+    macro UnitMacros.subTTImpl[N, U, U2]
 
   /** A human-readable string representing the temperature with its associated unit type */  
   def str: String = macro UnitMacros.strImpl[U]
