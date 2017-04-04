@@ -148,7 +148,6 @@ object Quantity {
   /** A human-readable string representing the unit type U */
   def unitStr[U <: UnitExpr]: String = macro UnitMacros.unitStrImpl[U]
 
-/*
   /**
    * Obtain a unit quantity from a Temperature with the same raw value and temperature unit
    * @tparam U a unit of temperature, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
@@ -156,8 +155,7 @@ object Quantity {
    * @param t the temperature value of unit type U
    * @return a unit quantity of the same unit type U and raw numeric value of t
    */
-  def fromTemperature[U <: TemperatureExpr](t: Temperature[U]) = new Quantity[U](t.value)
-*/
+  def fromTemperature[N, U <: TemperatureExpr](t: Temperature[N, U]) = new Quantity[N, U](t.value)
 
   implicit def implicitUnitConvert[N, U <: UnitExpr, U2 <: UnitExpr](q: Quantity[N, U]): Quantity[N, U2] =
     macro UnitMacros.unitConvertImpl[N, U, U2]
@@ -232,23 +230,22 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
 
 /** Factory functions and implicit definitions associated with Temperature objects */
 object Temperature {
-/*
   /**
    * Obtain a function that converts objects of Temperature[U] into compatible Temperature[U2]
    * @tparam U the unit type of input temp.
    * @tparam U2 the unit type of the output.
    * @return a function for converting Temperature[U] into Temperature[U2]
    */
-  def converter[U <: TemperatureExpr, U2 <: TemperatureExpr](implicit
-      ct: ConvertableTemps[U, U2]): Temperature[U] => Temperature[U2] =
-    ct.converter
+  def converter[N, U1 <: TemperatureExpr, U2 <: TemperatureExpr]:
+      Temperature[N, U1] => Temperature[N, U2] =
+    macro UnitMacros.tempConverterImpl[N, U1, U2]
 
   /**
    * Obtain a human-readable string representing a unit type U
    * @tparam U a unit type representing a temperature
    * @return human readable string representing U
    */
-  def unitStr[U <: TemperatureExpr](implicit uesU: UnitExprString[U]) = uesU.str
+  def unitStr[U <: TemperatureExpr]: String = macro UnitMacros.unitStrImpl[U]
 
   /**
    * Obtain a temperature from a unit Quantity with same raw value and temperature unit
@@ -257,10 +254,9 @@ object Temperature {
    * @param q the quantity of temperature-unit type U
    * @return a temperature of same unit type U and raw numeric value of q
    */
-  def fromQuantity[U <: TemperatureExpr](q: Quantity[U]) = new Temperature[U](q.value)
+  def fromQuantity[N, U <: TemperatureExpr](q: Quantity[N, U]) = new Temperature[N, U](q.value)
 
-  implicit def implicitTempConvert[U <: TemperatureExpr, U2 <: TemperatureExpr](t: Temperature[U])(
-      implicit ct: ConvertableTemps[U, U2]): Temperature[U2] =
-    ct.convert(t)
-*/
+  implicit def implicitTempConvert[N, U1 <: TemperatureExpr, U2 <: TemperatureExpr](
+      t: Temperature[N, U1]): Temperature[N, U2] =
+    macro UnitMacros.unitConvertTempImpl[N, U1, U2]
 }
