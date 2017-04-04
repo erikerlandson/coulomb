@@ -543,6 +543,30 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     q"new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2]($xt)"
   }
 
+  def unitConvertTempImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](t: Tree): Tree = {
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
+    val ((_, coef1), off1) = (urecVal(tpeU1), turecVal(tpeU1))
+    val ((_, coef2), off2) = (urecVal(tpeU2), turecVal(tpeU2))
+    val xt = fixByteShort(xTempTree(coef1, off1, coef2, off2, q"${t}.value", tpeN), tpeN)
+    q"new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2]($xt)"
+  }
+
+  def tempConverterImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+    val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
+    val ((_, coef1), off1) = (urecVal(tpeU1), turecVal(tpeU1))
+    val ((_, coef2), off2) = (urecVal(tpeU2), turecVal(tpeU2))
+    val tft = q"""
+      (t1: com.manyangled.coulomb.Temperature[$tpeN, $tpeU1]) =>
+        new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2](t1.value)
+    """
+    val q"(..$_) => new com.manyangled.coulomb.Temperature[..$_]($rt)" = tft
+    val xt = fixByteShort(xTempTree(coef1, off1, coef2, off2, rt, tpeN), tpeN)
+    q"""
+      (t1: com.manyangled.coulomb.Temperature[$tpeN, $tpeU1]) =>
+        new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2]($xt)
+    """
+  }
+
   def addTQImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
     val xt = xCoefTree(cuCoef(tpeU2, tpeU1), q"($that).value", tpeN)
