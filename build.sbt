@@ -35,6 +35,7 @@ lazy val coulomb = (project in file("."))
   .dependsOn(unitexpr, macros)
   .settings(name := "coulomb")
   .settings(commonSettings :_*)
+  .settings(libraryDependencies += "com.typesafe" % "config" % "1.3.1")
 
 lazy val macros = (project in file("macros"))
   .dependsOn(unitexpr)
