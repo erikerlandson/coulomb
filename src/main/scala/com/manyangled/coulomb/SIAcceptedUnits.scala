@@ -22,7 +22,7 @@ object SIAcceptedUnits {
   import SIBaseUnits._
   import MKSUnits.{ Radian, Pascal }
 
-  @tempUnitDecl("celsius", 1.0, 273.15)
+  @tempUnitDecl("celsius", 1, Rational(27315, 100))
   trait Celsius extends DerivedTemperature
 
   @unitDecl("minute", 60)
