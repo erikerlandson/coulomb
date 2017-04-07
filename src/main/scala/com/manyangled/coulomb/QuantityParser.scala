@@ -18,7 +18,6 @@ package com.manyangled.coulomb
 
 import scala.util.Try
 
-/*
 /**
  * A run-time parser for string expressions that evaluate to [[Quantity]] objects.
  * Parsing returns a compatible unit Quantity type, or failure.
@@ -53,7 +52,11 @@ class QuantityParser(
     runtimeMirror(c.getClassLoader).classSymbol(c).fullName
   }
 
-  private val importSeq = Seq("com.manyangled.coulomb._", "extensions._", "ChurchInt._") ++
+  private val importSeq = Seq(
+    "com.manyangled.coulomb._",
+    "ChurchInt._",
+    "spire.math._",
+    "Integral._") ++
     unitDeclarationObjects.map(objectName).map(n => s"${n}._") ++
     unitCompanionObjects.map(objectName)
 
@@ -67,12 +70,13 @@ class QuantityParser(
    * @return the Quantity object created by run-time parsing, converted to compatible `Quantity[U]`,
    * or failure if any stage of the run-time parsing and unit conversion was unsuccessful.
    */
-  def apply[U <: UnitExpr :TypeTag](quantityExpr: String): Try[Quantity[U]] = {
+  def apply[N: TypeTag, U <: UnitExpr :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
     val tpeU = typeOf[U]
+    val tpeN = typeOf[N]
     for (
-      qeTree <- Try { toolbox.parse(s"$importStr ($quantityExpr)") };
-      qeEval <- Try { toolbox.eval(q"${qeTree}.as[$tpeU]") };
-      qret <- Try { qeEval.asInstanceOf[Quantity[U]] }
+      qeTree <- Try { toolbox.parse(s"${importStr}($quantityExpr).toRep[$tpeN].toUnit[$tpeU]") };
+      qeEval <- Try { toolbox.eval(qeTree) };
+      qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
     ) yield {
       qret
     }
@@ -114,4 +118,21 @@ object QuantityParser {
         USCustomaryUnits),
         Seq.empty)
 }
-*/
+
+object DemoQP {
+  import scala.reflect.runtime.universe.TypeTag
+  import com.typesafe.config.ConfigFactory
+
+  val conf = ConfigFactory.parseString("""
+    "duration" = "60.withUnit[Second]"
+    "memory" = "100.withUnit[Giga <*> Byte]"
+    "bandwidth" = "10.withUnit[Mega <*> Byte </> Second]"
+  """)
+
+  private val qp = QuantityParser(Seq(SIBaseUnits, SIPrefixes, InfoUnits))
+
+  implicit class TypesafeConfigWithUnits(conf: com.typesafe.config.Config) {
+    def getUnitQuantity[N :TypeTag, U <: UnitExpr :TypeTag](key: String) =
+      qp[N, U](conf.getString(key))
+  }
+}
