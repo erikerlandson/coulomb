@@ -383,12 +383,12 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     tpeN match {
       case t if ((t =:= typeOf[Int]) || (t =:= typeOf[Byte]) || (t =:= typeOf[Short])) => {
         // Byte and Short appear to be cast to Int for '*' and '/' anyway
-        val cx = coefLimit(coef, 32767)
+        val cx = coefLimit(coef, Int.MaxValue)
         val (n, d) = (cx.numerator.toInt, cx.denominator.toInt)
         (q"$n", q"$d")
       }
       case t if (t =:= typeOf[Long]) => {
-        val cx = coefLimit(coef, 2147483647L)
+        val cx = coefLimit(coef, Long.MaxValue)
         val (n, d) = (cx.numerator.toLong, cx.denominator.toLong)
         (q"$n", q"$d")
       }
