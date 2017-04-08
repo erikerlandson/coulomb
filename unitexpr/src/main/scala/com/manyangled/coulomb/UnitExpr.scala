@@ -59,10 +59,10 @@ trait PrefixUnit extends DerivedUnit[Unitless]
  * {{{
  * import USCustomaryUnits._
  * // a quantity of acre-feet (a unit of volume, usually for water)
- * val afq = Quantity[Acre <*> Foot](10)
+ * val afq = Quantity[Acre %* Foot](10)
  * }}}
  */
-sealed trait <*> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
+sealed trait %* [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
 /**
  * The unit quotient of two unit expressions
@@ -71,10 +71,10 @@ sealed trait <*> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
  * {{{
  * import SIBaseUnits._
  * // a velocity in meters per second
- * val v = Quantity[Meter </> Second](10)
+ * val v = Quantity[Meter %/ Second](10)
  * }}}
  */
-sealed trait </> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
+sealed trait %/ [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
 
 /**
  * A power (exponent) of a unit expression
@@ -83,10 +83,10 @@ sealed trait </> [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
  * {{{
  * import SIBaseUnits._
  * // an area in square meters
- * val area = Quantity[Meter <^> _2](10)
+ * val area = Quantity[Meter %^ _2](10)
  * }}}
  */
-sealed trait <^> [UE <: UnitExpr, P <: ChurchInt] extends UnitExpr
+sealed trait %^ [UE <: UnitExpr, P <: ChurchInt] extends UnitExpr
 
 /**
  * An expression representing a temperature given in some defined temperature unit.

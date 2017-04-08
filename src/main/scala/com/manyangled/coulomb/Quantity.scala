@@ -40,9 +40,9 @@ trait DerivedTemperature extends DerivedUnit[SIBaseUnits.Kelvin] with Temperatur
  * // a length of 5 meters
  * val length = Quantity[Meter](5)
  * // a velocity in meters per second
- * val speed = Quantity[Meter </> Second](10)
+ * val speed = Quantity[Meter %/ Second](10)
  * // an acceleration in meters per second-squared
- * val acceleration = Quantity[Meter </> (Second <^> _2)](9.8)
+ * val acceleration = Quantity[Meter %/ (Second %^ _2)](9.8)
  * }}}
  */
 class Quantity[N, U <: UnitExpr](val value: N)
@@ -88,7 +88,7 @@ class Quantity[N, U <: UnitExpr](val value: N)
   /**
    * The product of two unit quantities
    * @tparam U2 the unit type of the right-hand quantity
-   * @tparam RU the unit type of the result quantity, is compatible with `U <*> U2`
+   * @tparam RU the unit type of the result quantity, is compatible with `U %* U2`
    * @param that the right-hand side of the product
    * @return `this` * `that`, with units of RU
    */
@@ -97,7 +97,7 @@ class Quantity[N, U <: UnitExpr](val value: N)
   /**
    * The quotient, or ratio, of two unit quantities
    * @tparam U2 the unit type of the right-hand quantity
-   * @tparam RU the unit type of the result quantity, is compatible with `U </> U2`
+   * @tparam RU the unit type of the result quantity, is compatible with `U %/ U2`
    * @param that the right-hand side of the ratio
    * @return `this` / `that`, with units of RU
    */
@@ -106,7 +106,7 @@ class Quantity[N, U <: UnitExpr](val value: N)
   /**
    * Raise a unit quantity to a power
    * @tparam E the church integer type representing the exponent
-   * @return `this` ^ E, in units compatible with `U <^> E`
+   * @return `this` ^ E, in units compatible with `U %^ E`
    */
   def pow[E <: ChurchInt]: Quantity[N, _] = macro UnitMacros.powImpl[N, U, E]
 
