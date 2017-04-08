@@ -65,9 +65,9 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   val puType = typeOf[PrefixUnit]
   val duType = typeOf[DerivedUnit[DummyU]].typeConstructor
 
-  val mulType = typeOf[<*>[DummyU, DummyU]].typeConstructor
-  val divType = typeOf[</>[DummyU, DummyU]].typeConstructor
-  val powType = typeOf[<^>[DummyU, ChurchInt._0]].typeConstructor
+  val mulType = typeOf[%*[DummyU, DummyU]].typeConstructor
+  val divType = typeOf[%/[DummyU, DummyU]].typeConstructor
+  val powType = typeOf[%^[DummyU, ChurchInt._0]].typeConstructor
 
   def intVal(intT: Type): Int = {
     val ivt = appliedType(ivalType, List(intT))

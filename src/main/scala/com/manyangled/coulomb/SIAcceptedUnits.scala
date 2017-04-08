@@ -44,10 +44,10 @@ object SIAcceptedUnits {
   trait ArcSecond extends DerivedUnit[Degree]
 
   @unitDecl("hectare", 10000)
-  trait Hectare extends DerivedUnit[Meter <^> _2]
+  trait Hectare extends DerivedUnit[Meter %^ _2]
 
   @unitDecl("liter", Rational(1, 1000))
-  trait Liter extends DerivedUnit[Meter <^> _3]
+  trait Liter extends DerivedUnit[Meter %^ _3]
 
   @unitDecl("milliliter", Rational(1, 1000))
   trait Milliliter extends DerivedUnit[Liter]
