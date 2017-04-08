@@ -35,7 +35,7 @@ import scala.util.Try
  *   unitDeclarationObjects = Seq(SIBaseUnits),
  *   unitCompanionObjects = Seq(USCustomaryUnits.Mile, SIAcceptedUnits.Hour))
  * // parse an expression in miles per hour, return as meters per second
- * val mps = qp[Meter </> Second]("60.withUnit[Mile &lt;/&gt; Hour]")
+ * val mps = qp[Meter %/ Second]("60.withUnit[Mile &lt;/&gt; Hour]")
  * }}}
  */
 class QuantityParser(
@@ -125,8 +125,8 @@ object DemoQP {
 
   val conf = ConfigFactory.parseString("""
     "duration" = "60.withUnit[Second]"
-    "memory" = "100.withUnit[Giga <*> Byte]"
-    "bandwidth" = "10.withUnit[Mega <*> Byte </> Second]"
+    "memory" = "100.withUnit[Giga %* Byte]"
+    "bandwidth" = "10.withUnit[Mega %* Byte %/ Second]"
   """)
 
   private val qp = QuantityParser(Seq(SIBaseUnits, SIPrefixes, InfoUnits))

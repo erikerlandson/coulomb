@@ -38,7 +38,7 @@ object USCustomaryUnits {
   trait Mile extends DerivedUnit[Yard]
 
   @unitDecl("acre", 43560)
-  trait Acre extends DerivedUnit[Foot <^> _2]
+  trait Acre extends DerivedUnit[Foot %^ _2]
 
   @unitDecl("ounce", Rational(1, 16))
   trait Ounce extends DerivedUnit[Pound]
