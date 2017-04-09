@@ -590,6 +590,13 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]($rt)"
   }
 
+  def implLT(that: Tree): Tree = q"${c.prefix.tree}.value < ${that}.value"
+  def implGT(that: Tree): Tree = q"${c.prefix.tree}.value > ${that}.value"
+  def implLE(that: Tree): Tree = q"${c.prefix.tree}.value <= ${that}.value"
+  def implGE(that: Tree): Tree = q"${c.prefix.tree}.value >= ${that}.value"
+  def implEQ(that: Tree): Tree = q"${c.prefix.tree}.value == ${that}.value"
+  def implNE(that: Tree): Tree = q"${c.prefix.tree}.value != ${that}.value"
+
   def ueAtomicString(typeU: Type): Boolean = {
     typeU.dealias match {
       case IsUnitless() => true
