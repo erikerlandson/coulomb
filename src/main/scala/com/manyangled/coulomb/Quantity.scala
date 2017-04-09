@@ -110,6 +110,13 @@ class Quantity[N, U <: UnitExpr](val value: N)
    */
   def pow[E <: ChurchInt]: Quantity[N, _] = macro UnitMacros.powImpl[N, U, E]
 
+  def <(that: Quantity[N, U]): Boolean = macro UnitMacros.implLT
+  def >(that: Quantity[N, U]): Boolean = macro UnitMacros.implGT
+  def <=(that: Quantity[N, U]): Boolean = macro UnitMacros.implLE
+  def >=(that: Quantity[N, U]): Boolean = macro UnitMacros.implGE
+  def ===(that: Quantity[N, U]): Boolean = macro UnitMacros.implEQ
+  def =!=(that: Quantity[N, U]): Boolean = macro UnitMacros.implNE
+
   /** A human-readable string representing the value and unit type of this quantity */
   def str: String = macro UnitMacros.strImpl[U]
 
@@ -218,6 +225,13 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
    */
   def -[U2 <: TemperatureExpr](that: Temperature[N, U2]): Quantity[N, U] =
     macro UnitMacros.subTTImpl[N, U, U2]
+
+  def <(that: Temperature[N, U]): Boolean = macro UnitMacros.implLT
+  def >(that: Temperature[N, U]): Boolean = macro UnitMacros.implGT
+  def <=(that: Temperature[N, U]): Boolean = macro UnitMacros.implLE
+  def >=(that: Temperature[N, U]): Boolean = macro UnitMacros.implGE
+  def ===(that: Temperature[N, U]): Boolean = macro UnitMacros.implEQ
+  def =!=(that: Temperature[N, U]): Boolean = macro UnitMacros.implNE
 
   /** A human-readable string representing the temperature with its associated unit type */  
   def str: String = macro UnitMacros.strImpl[U]
