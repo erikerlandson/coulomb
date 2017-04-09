@@ -36,6 +36,8 @@ class tempUnitDecl(name: String, coef: Rational, off: Rational) extends StaticAn
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
 
+  // the tree this produces may also be read by the cuCoef method below, so
+  // if you change this, make sure cuCoef can read the new tree patterns
   implicit val liftRational = Liftable[Rational] { r =>
     val rnStr = r.numerator.toBigInt.toString
     val rdStr = r.denominator.toBigInt.toString
@@ -48,6 +50,21 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   implicit val liftBigDecimal = Liftable[BigDecimal] { v =>
     q"BigDecimal(${v.toString})"
+  }
+
+  implicit val liftReal = Liftable[Real] { v =>
+    val r = implicitly[ConvertableTo[Rational]].fromReal(v)
+    q"spire.math.Real($r)"
+  }
+
+  implicit val liftAlgebraic = Liftable[Algebraic] { v =>
+    val r = implicitly[ConvertableTo[Rational]].fromAlgebraic(v)
+    q"spire.math.Algebraic($r)"
+  }
+
+  implicit val liftNumber = Liftable[Number] { v =>
+    val r = v.toRational
+    q"spire.math.Number($r)"
   }
 
   trait DummyU extends BaseUnit
@@ -102,6 +119,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
+  // This reads a tree pattern produced by liftRational, above.  So the tree patterns
+  // that this expects need to stay in sync with the output from liftRational
   def cuCoef(cu: Tree): Rational = {
     // I'm doing it this way because evaluating Rational(n,d) expressions w/ evalTree
     // directly is failing inside the macro context.
@@ -356,6 +375,18 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case t if (t =:= typeOf[Rational]) => {
         q"$coef"
       }
+      case t if (t =:= typeOf[Real]) => {
+        val cv = implicitly[ConvertableTo[Real]].fromRational(coef)
+        q"$cv"
+      }
+      case t if (t =:= typeOf[Algebraic]) => {
+        val cv = implicitly[ConvertableTo[Algebraic]].fromRational(coef)
+        q"$cv"
+      }
+      case t if (t =:= typeOf[Number]) => {
+        val cv = implicitly[ConvertableTo[Number]].fromRational(coef)
+        q"$cv"
+      }
       case _ => abort(s"Unimplemented non-integral type $tpeN")
     }
   }
@@ -522,6 +553,9 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       case t if (t =:= typeOf[BigInt]) => q"${n}.pow($exp)"
       case t if (t =:= typeOf[BigDecimal]) => q"${n}.pow($exp)"
       case t if (t =:= typeOf[Rational]) => q"${n}.pow($exp)"
+      case t if (t =:= typeOf[Real]) => q"${n}.pow($exp)"
+      case t if (t =:= typeOf[Algebraic]) => q"${n}.pow($exp)"
+      case t if (t =:= typeOf[Number]) => q"${n}.pow($exp)"
       case _ => abort(s"Unimplemented type $tpeN")
     }
   }
