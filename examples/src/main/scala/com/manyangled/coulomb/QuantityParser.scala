@@ -16,7 +16,7 @@ limitations under the License.
 
 package com.manyangled.coulomb
 
-import scala.util.Try
+import scala.util.{ Try, Success, Failure }
 
 /**
  * A run-time parser for string expressions that evaluate to [[Quantity]] objects.
@@ -73,11 +73,11 @@ class QuantityParser(
   def apply[N: TypeTag, U <: UnitExpr :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
     val tpeU = typeOf[U]
     val tpeN = typeOf[N]
-    for (
-      qeTree <- Try { toolbox.parse(s"${importStr}($quantityExpr).toRep[$tpeN].toUnit[$tpeU]") };
-      qeEval <- Try { toolbox.eval(qeTree) };
+    for {
+      qeTree <- Try { toolbox.parse(s"${importStr}($quantityExpr).toRep[$tpeN].toUnit[$tpeU]") }
+      qeEval <- Try { toolbox.eval(qeTree) }
       qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
-    ) yield {
+    } yield {
       qret
     }
   }
@@ -124,15 +124,23 @@ object DemoQP {
   import com.typesafe.config.ConfigFactory
 
   val conf = ConfigFactory.parseString("""
-    "duration" = "60.withUnit[Second]"
-    "memory" = "100.withUnit[Giga %* Byte]"
-    "bandwidth" = "10.withUnit[Mega %* Byte %/ Second]"
+    "duration" = "60 Second"
+    "memory" = "100 Giga * Byte"
+    "bandwidth" = "10 Mega * Byte / Second"
   """)
 
-  private val qp = QuantityParser(Seq(SIBaseUnits, SIPrefixes, InfoUnits))
+  private val qp = QuantityParser(Seq(StandardTypeOps, SIBaseUnits, SIPrefixes, InfoUnits))
 
   implicit class TypesafeConfigWithUnits(conf: com.typesafe.config.Config) {
-    def getUnitQuantity[N :TypeTag, U <: UnitExpr :TypeTag](key: String) =
-      qp[N, U](conf.getString(key))
+    def getUnitQuantity[N :TypeTag, U <: UnitExpr :TypeTag](key: String) = {
+      for {
+        raw <- Try { conf.getString(key) }
+        (v, u) <- Try {
+          val tok = raw.split(" ")
+          (tok.head, tok.tail.mkString(" "))
+        }
+        qv <- qp[N, U](s"($v).withUnit[$u]")
+      } yield { qv }
+    }
   }
 }
