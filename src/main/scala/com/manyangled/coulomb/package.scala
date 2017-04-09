@@ -16,6 +16,8 @@ limitations under the License.
 
 package com.manyangled
 
+import scala.language.experimental.macros
+
 package object coulomb {
   /** obtain the integer value of a ChurchInt type */
   def churchToInt[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
@@ -31,4 +33,8 @@ package object coulomb {
         num: spire.math.ConvertableTo[N]): Temperature[N, U] =
       new Temperature[N, U](v)
   }
+
+  /** implicit factory for standard Scala Ordering typeclass */
+  implicit def coulombQuantityIsOrdering[N, U <: UnitExpr]: Ordering[Quantity[N, U]] =
+    macro UnitMacros.orderingImpl[N, U]
 }

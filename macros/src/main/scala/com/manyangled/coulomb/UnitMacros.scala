@@ -597,6 +597,21 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   def implEQ(that: Tree): Tree = q"${c.prefix.tree}.value == ${that}.value"
   def implNE(that: Tree): Tree = q"${c.prefix.tree}.value != ${that}.value"
 
+  def orderingImpl[N: WeakTypeTag, U: WeakTypeTag]: Tree = {
+    val (tpeN, tpeU) = weakType2[N, U]
+    q"""
+      new scala.math.Ordering[com.manyangled.coulomb.Quantity[$tpeN, $tpeU]] {
+        def compare(
+          x: com.manyangled.coulomb.Quantity[$tpeN, $tpeU],
+          y: com.manyangled.coulomb.Quantity[$tpeN, $tpeU]): Int = {
+          if (x.value < y.value) return -1
+          else if (x.value > y.value) return 1
+          else return 0
+        }
+      }
+    """
+  }
+
   def ueAtomicString(typeU: Type): Boolean = {
     typeU.dealias match {
       case IsUnitless() => true
