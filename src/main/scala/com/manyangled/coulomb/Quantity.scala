@@ -20,19 +20,6 @@ import scala.language.implicitConversions
 import scala.language.experimental.macros
 
 /**
- * Define a derived unit of temperature. By definition, all derived temperatures are defined in
- * terms of [[SIBaseUnits.Kelvin]].
- * The three common temperatures Kelvin, Celsius and Fahrenheit are already defined in `coulomb`
- * and so use cases for new derived temperatures are expected to be rare.
- * {{{
- * // example defining Fahrenheit temperature unit (already defined by coulomb)
- * trait Fahrenheit extends DerivedTemperature
- * object Fahrenheit extends TempUnitCompanion[Fahrenheit]("fahrenheit", 5.0 / 9.0, 459.67)
- * }}}
- */
-trait DerivedTemperature extends DerivedUnit[SIBaseUnits.Kelvin] with TemperatureExpr
-
-/**
  * A value (quantity) having an associated static unit type
  * @tparam U The unit expression representing the associated unit
  * {{{
