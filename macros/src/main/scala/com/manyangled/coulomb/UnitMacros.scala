@@ -23,16 +23,6 @@ import scala.annotation.compileTimeOnly
 
 import spire.math._
 
-@compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
-class unitDecl(val name: String, val coef: Rational = 1) extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro UnitMacros.unitDecl
-}
-
-@compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
-class tempUnitDecl(name: String, coef: Rational, off: Rational) extends StaticAnnotation {
-  def macroTransform(annottees: Any*): Any = macro UnitMacros.tempUnitDecl
-}
-
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
 
@@ -285,7 +275,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         (1.0, Map(TypeKey(typeU) -> 1))
       }
       case DUnit(_, coef, dsub) => {
-        // defensive: this should be caught at compile time in unitDecl
+        // defensive: this should be caught at compile time in UnitDecl
         if (coef <= 0) abort(s"Unit coefficient for $typeU was <= 0")
         val (dcoef, dmap) = canonical(dsub)
         (coef * dcoef, dmap)
@@ -740,9 +730,9 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def unitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {
     val (qname, qcoef) = c.prefix.tree match {
-      case q"new unitDecl($qname, coef = $coef)" => (qname, coef)
-      case q"new unitDecl($qname, $coef)" => (qname, coef)
-      case q"new unitDecl($qname)" => (qname, q"spire.math.Rational(1)")
+      case q"new UnitDecl($qname, coef = $coef)" => (qname, coef)
+      case q"new UnitDecl($qname, $coef)" => (qname, coef)
+      case q"new UnitDecl($qname)" => (qname, q"spire.math.Rational(1)")
       case _ => abort("Unexpected calling scope!")
     }
     val name = evalTree[String](qname)
@@ -756,9 +746,9 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         }
         case q"trait $uname extends PrefixUnit" => uname
         case q"trait $uname extends DerivedUnit[$_]" => uname
-        case _ => abort("unitDecl must be applied to a unit trait declaration")
+        case _ => abort("UnitDecl must be applied to a unit trait declaration")
       }
-      case _ => abort("unitDecl must be applied to a unit trait declaration")
+      case _ => abort("UnitDecl must be applied to a unit trait declaration")
     }
     c.Expr(q"""
       ${annottees(0)}
@@ -769,7 +759,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def tempUnitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {
     val (qname, qcoef, qoff) = c.prefix.tree match {
-      case q"new tempUnitDecl($qname, $coef, $off)" => (qname, coef, off)
+      case q"new TempUnitDecl($qname, $coef, $off)" => (qname, coef, off)
       case _ => abort("Unexpected calling scope!")
     }
     val name = evalTree[String](qname)
@@ -784,9 +774,9 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
           uname
         }
         case q"trait $uname extends DerivedTemperature" => uname
-        case _ => abort("unitDecl must be applied to a temperature unit trait")
+        case _ => abort("TempUnitDecl must be applied to a temperature unit trait")
       }
-      case _ => abort("unitDecl must be applied to a temperature unit trait")
+      case _ => abort("TempUnitDecl must be applied to a temperature unit trait")
     }
     c.Expr(q"""
       ${annottees(0)}

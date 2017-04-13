@@ -22,48 +22,48 @@ object SIAcceptedUnits {
   import SIBaseUnits._
   import MKSUnits.{ Radian, Pascal }
 
-  @tempUnitDecl("celsius", 1, Rational(27315, 100))
+  @TempUnitDecl("celsius", 1, Rational(27315, 100))
   trait Celsius extends DerivedTemperature
 
-  @unitDecl("minute", 60)
+  @UnitDecl("minute", 60)
   trait Minute extends DerivedUnit[Second]
 
-  @unitDecl("hour", 3600)
+  @UnitDecl("hour", 3600)
   trait Hour extends DerivedUnit[Second]
 
-  @unitDecl("day", 86400)
+  @UnitDecl("day", 86400)
   trait Day extends DerivedUnit[Second]
 
-  @unitDecl("degree", math.Pi / 180.0)
+  @UnitDecl("degree", math.Pi / 180.0)
   trait Degree extends DerivedUnit[Radian]
 
-  @unitDecl("arcminute", Rational(1, 60))
+  @UnitDecl("arcminute", Rational(1, 60))
   trait ArcMinute extends DerivedUnit[Degree]
 
-  @unitDecl("arcsecond", Rational(1, 3600))
+  @UnitDecl("arcsecond", Rational(1, 3600))
   trait ArcSecond extends DerivedUnit[Degree]
 
-  @unitDecl("hectare", 10000)
+  @UnitDecl("hectare", 10000)
   trait Hectare extends DerivedUnit[Meter %^ _2]
 
-  @unitDecl("liter", Rational(1, 1000))
+  @UnitDecl("liter", Rational(1, 1000))
   trait Liter extends DerivedUnit[Meter %^ _3]
 
-  @unitDecl("milliliter", Rational(1, 1000))
+  @UnitDecl("milliliter", Rational(1, 1000))
   trait Milliliter extends DerivedUnit[Liter]
 
-  @unitDecl("tonne", 1000)
+  @UnitDecl("tonne", 1000)
   trait Tonne extends DerivedUnit[Kilogram]
 
-  @unitDecl("millibar", 100)
+  @UnitDecl("millibar", 100)
   trait Millibar extends DerivedUnit[Pascal]
 
-  @unitDecl("kilometer", 1000)
+  @UnitDecl("kilometer", 1000)
   trait Kilometer extends DerivedUnit[Meter]
 
-  @unitDecl("millimeter", Rational(1, 1000))
+  @UnitDecl("millimeter", Rational(1, 1000))
   trait Millimeter extends DerivedUnit[Meter]
 
-  @unitDecl("gram", Rational(1, 1000))
+  @UnitDecl("gram", Rational(1, 1000))
   trait Gram extends DerivedUnit[Kilogram]
 }

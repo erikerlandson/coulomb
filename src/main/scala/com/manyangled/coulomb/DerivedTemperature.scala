@@ -23,7 +23,7 @@ package com.manyangled.coulomb
  * and so use cases for new derived temperatures are expected to be rare.
  * {{{
  * // example defining Fahrenheit temperature unit (already defined by coulomb)
- * @tempUnitDecl("fahrenheit", 5.0 / 9.0, 459.67)
+ * @TempUnitDecl("fahrenheit", 5.0 / 9.0, 459.67)
  * trait Fahrenheit extends DerivedTemperature
  * }}}
  */
