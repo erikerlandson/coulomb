@@ -25,66 +25,66 @@ object USCustomaryUnits {
   import SIAcceptedUnits.Milliliter
   import MKSUnits.{ Joule, Watt }
 
-  @unitDecl("inch", Rational(1, 12))
+  @UnitDecl("inch", Rational(1, 12))
   trait Inch extends DerivedUnit[Foot]
 
-  @unitDecl("foot", Rational(1, 3))
+  @UnitDecl("foot", Rational(1, 3))
   trait Foot extends DerivedUnit[Yard]
 
-  @unitDecl("yard", Rational(9144, 10000))
+  @UnitDecl("yard", Rational(9144, 10000))
   trait Yard extends DerivedUnit[Meter]
 
-  @unitDecl("mile", 1760)
+  @UnitDecl("mile", 1760)
   trait Mile extends DerivedUnit[Yard]
 
-  @unitDecl("acre", 43560)
+  @UnitDecl("acre", 43560)
   trait Acre extends DerivedUnit[Foot %^ _2]
 
-  @unitDecl("ounce", Rational(1, 16))
+  @UnitDecl("ounce", Rational(1, 16))
   trait Ounce extends DerivedUnit[Pound]
 
-  @unitDecl("pound", Rational(45359237, 100000000))
+  @UnitDecl("pound", Rational(45359237, 100000000))
   trait Pound extends DerivedUnit[Kilogram]
 
-  @unitDecl("shortton", 2000)
+  @UnitDecl("shortton", 2000)
   trait ShortTon extends DerivedUnit[Pound]
 
-  @tempUnitDecl("fahrenheit", Rational(5, 9), Rational(45967, 100))
+  @TempUnitDecl("fahrenheit", Rational(5, 9), Rational(45967, 100))
   trait Fahrenheit extends DerivedTemperature
 
-  @unitDecl("BTU", 1055)
+  @UnitDecl("BTU", 1055)
   trait BTU extends DerivedUnit[Joule]
 
-  @unitDecl("calorie", 4.184)
+  @UnitDecl("calorie", 4.184)
   trait Calorie extends DerivedUnit[Joule]
 
-  @unitDecl("foodcalorie", 1000)
+  @UnitDecl("foodcalorie", 1000)
   trait FoodCalorie extends DerivedUnit[Calorie]
 
-  @unitDecl("footpound", 1.356)
+  @UnitDecl("footpound", 1.356)
   trait FootPound extends DerivedUnit[Joule]
 
-  @unitDecl("horsepower", 745.7)
+  @UnitDecl("horsepower", 745.7)
   trait Horsepower extends DerivedUnit[Watt]
 
-  @unitDecl("teaspoon", Rational(1, 3))
+  @UnitDecl("teaspoon", Rational(1, 3))
   trait Teaspoon extends DerivedUnit[Tablespoon]
 
-  @unitDecl("tablespoon", Rational(1, 2))
+  @UnitDecl("tablespoon", Rational(1, 2))
   trait Tablespoon extends DerivedUnit[FluidOunce]
 
-  @unitDecl("fluidounce", Rational(1, 8))
+  @UnitDecl("fluidounce", Rational(1, 8))
   trait FluidOunce extends DerivedUnit[Cup]
 
-  @unitDecl("cup", Rational(2365882365L, 10000000L))
+  @UnitDecl("cup", Rational(2365882365L, 10000000L))
   trait Cup extends DerivedUnit[Milliliter]
 
-  @unitDecl("pint", 2)
+  @UnitDecl("pint", 2)
   trait Pint extends DerivedUnit[Cup]
 
-  @unitDecl("quart", 4)
+  @UnitDecl("quart", 4)
   trait Quart extends DerivedUnit[Cup]
 
-  @unitDecl("gallon", 16)
+  @UnitDecl("gallon", 16)
   trait Gallon extends DerivedUnit[Cup]
 }

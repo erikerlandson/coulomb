@@ -21,42 +21,42 @@ object MKSUnits {
   import ChurchInt._
   import SIBaseUnits._
 
-  @unitDecl("radian", 1)
+  @UnitDecl("radian", 1)
   trait Radian extends DerivedUnit[Unitless]
 
-  @unitDecl("hertz", 1)
+  @UnitDecl("hertz", 1)
   trait Hertz extends DerivedUnit[Second %^ _neg1]
 
-  @unitDecl("newton", 1)
+  @UnitDecl("newton", 1)
   trait Newton extends DerivedUnit[Kilogram %* Meter %/ (Second %^ _2)]
 
-  @unitDecl("joule", 1)
+  @UnitDecl("joule", 1)
   trait Joule extends DerivedUnit[Newton %* Meter]
 
-  @unitDecl("watt", 1)
+  @UnitDecl("watt", 1)
   trait Watt extends DerivedUnit[Joule %/ Second]
 
-  @unitDecl("pascal", 1)
+  @UnitDecl("pascal", 1)
   trait Pascal extends DerivedUnit[Newton %/ (Meter %^ _2)]
 
-  @unitDecl("coulomb", 1)
+  @UnitDecl("coulomb", 1)
   trait Coulomb extends DerivedUnit[Ampere %* Second]
 
-  @unitDecl("volt", 1)
+  @UnitDecl("volt", 1)
   trait Volt extends DerivedUnit[Watt %/ Ampere]
 
-  @unitDecl("ohm", 1)
+  @UnitDecl("ohm", 1)
   trait Ohm extends DerivedUnit[Volt %/ Ampere]
 
-  @unitDecl("farad", 1)
+  @UnitDecl("farad", 1)
   trait Farad extends DerivedUnit[Coulomb %/ Volt]
 
-  @unitDecl("weber", 1)
+  @UnitDecl("weber", 1)
   trait Weber extends DerivedUnit[Joule %/ Ampere]
 
-  @unitDecl("tesla", 1)
+  @UnitDecl("tesla", 1)
   trait Tesla extends DerivedUnit[Weber %/ (Meter %^ _2)]
 
-  @unitDecl("henry", 1)
+  @UnitDecl("henry", 1)
   trait Henry extends DerivedUnit[Weber %/ Ampere]
 }

@@ -19,7 +19,7 @@ package com.manyangled.coulomb
 import spire.math.{ Rational, ConvertableFrom }
 
 class UnitCompanion[U <: UnitExpr](val name: String, val coef: Rational) {
-  // defensive: this should be caught at compile time in UnitMacros.unitDecl
+  // defensive: this should be caught at compile time in UnitDecl
   require(coef > 0, "Unit coefficients must be strictly > 0")
 
   def apply[N](v: N)(implicit num: spire.math.ConvertableTo[N]): Quantity[N, U] = new Quantity[N, U](v)

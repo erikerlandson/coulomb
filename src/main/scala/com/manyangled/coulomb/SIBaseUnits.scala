@@ -17,24 +17,24 @@ limitations under the License.
 package com.manyangled.coulomb
 
 object SIBaseUnits {
-  @unitDecl("meter")
+  @UnitDecl("meter")
   trait Meter extends BaseUnit
 
-  @unitDecl("second")
+  @UnitDecl("second")
   trait Second extends BaseUnit
 
-  @unitDecl("kilogram")
+  @UnitDecl("kilogram")
   trait Kilogram extends BaseUnit
 
-  @unitDecl("ampere")
+  @UnitDecl("ampere")
   trait Ampere extends BaseUnit
 
-  @unitDecl("mole")
+  @UnitDecl("mole")
   trait Mole extends BaseUnit
 
-  @unitDecl("candela")
+  @UnitDecl("candela")
   trait Candela extends BaseUnit
 
-  @tempUnitDecl("kelvin", 1, 0)
+  @TempUnitDecl("kelvin", 1, 0)
   trait Kelvin extends BaseTemperature
 }
