@@ -21,15 +21,19 @@ import scala.language.experimental.macros
 
 /**
  * A value (quantity) having an associated static unit type
+ * @tparam N The numeric representation type for a quantity value
  * @tparam U The unit expression representing the associated unit
+ * @param value The quantity value
  * {{{
- * import MKSUnits._
+ * import com.manyangled.coulomb._
+ * import ChurchInt._
+ * import SIBaseUnits._
  * // a length of 5 meters
- * val length = Quantity[Meter](5)
+ * val length = Meter(5.0)
  * // a velocity in meters per second
- * val speed = Quantity[Meter %/ Second](10)
+ * val speed = 10.withUnit[Meter %/ Second]
  * // an acceleration in meters per second-squared
- * val acceleration = Quantity[Meter %/ (Second %^ _2)](9.8)
+ * val acceleration = 9.8f.withUnit[Meter %/ (Second %^ _2)]
  * }}}
  */
 class Quantity[N, U <: UnitExpr](val value: N)
@@ -39,11 +43,11 @@ class Quantity[N, U <: UnitExpr](val value: N)
    * Convert a quantity into new units.
    * @tparam U2 the new unit expression to convert to. If U2 is not a compatible unit
    * then a compile-time error will occur
-   * @return a new value of type Quantity[U2], equivalent to `this` quantity
+   * @return a new value of type Quantity[N, U2], equivalent to `this` quantity
    */
   def toUnit[U2 <: UnitExpr]: Quantity[N, U2] = macro UnitMacros.toUnitImpl[N, U, U2]
 
-  /** Convert a quantity of representation type N to a new quantity of type N2, with same units */
+  /** Convert a quantity of numeric type N to a new quantity of type N2, with same units */
   def toRep[N2](implicit cfN: spire.math.ConvertableFrom[N], ctN2: spire.math.ConvertableTo[N2]):
       Quantity[N2, U] =
     new Quantity[N2, U](cfN.toType[N2](this.value))
@@ -75,18 +79,16 @@ class Quantity[N, U <: UnitExpr](val value: N)
   /**
    * The product of two unit quantities
    * @tparam U2 the unit type of the right-hand quantity
-   * @tparam RU the unit type of the result quantity, is compatible with `U %* U2`
    * @param that the right-hand side of the product
-   * @return `this` * `that`, with units of RU
+   * @return `this` * `that`, with units compatible with `U %* U2`
    */
    def *[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, _] = macro UnitMacros.mulImpl[N, U, U2]
 
   /**
    * The quotient, or ratio, of two unit quantities
    * @tparam U2 the unit type of the right-hand quantity
-   * @tparam RU the unit type of the result quantity, is compatible with `U %/ U2`
    * @param that the right-hand side of the ratio
-   * @return `this` / `that`, with units of RU
+   * @return `this` / `that`, with units compatible with `U %/ U2`
    */
    def /[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, _] = macro UnitMacros.divImpl[N, U, U2]
 
@@ -97,11 +99,22 @@ class Quantity[N, U <: UnitExpr](val value: N)
    */
   def pow[E <: ChurchInt]: Quantity[N, _] = macro UnitMacros.powImpl[N, U, E]
 
+  /** Returns `true` if and only if `this.value` < `that.value` */
   def <(that: Quantity[N, U]): Boolean = macro UnitMacros.implLT
+
+  /** Returns `true` if and only if `this.value` > `that.value` */
   def >(that: Quantity[N, U]): Boolean = macro UnitMacros.implGT
+
+  /** Returns `true` if and only if `this.value` <= `that.value` */
   def <=(that: Quantity[N, U]): Boolean = macro UnitMacros.implLE
+
+  /** Returns `true` if and only if `this.value` >= `that.value` */
   def >=(that: Quantity[N, U]): Boolean = macro UnitMacros.implGE
+
+  /** Returns `true` if and only if `this.value` == `that.value` */
   def ===(that: Quantity[N, U]): Boolean = macro UnitMacros.implEQ
+
+  /** Returns `true` if and only if `this.value` != `that.value` */
   def =!=(that: Quantity[N, U]): Boolean = macro UnitMacros.implNE
 
   /** A human-readable string representing the value and unit type of this quantity */
@@ -144,6 +157,7 @@ object Quantity {
 
   /**
    * Obtain a unit quantity from a Temperature with the same raw value and temperature unit
+   * @tparam N the numeric representation type
    * @tparam U a unit of temperature, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
    * or USCustomaryUnits.Fahrenheit
    * @param t the temperature value of unit type U
@@ -151,21 +165,28 @@ object Quantity {
    */
   def fromTemperature[N, U <: TemperatureExpr](t: Temperature[N, U]) = new Quantity[N, U](t.value)
 
-  implicit def implicitUnitConvert[N, U <: UnitExpr, U2 <: UnitExpr](q: Quantity[N, U]): Quantity[N, U2] =
+  /** Implicit conversion between quantities of compatible units and same numeric type */
+  implicit def implicitUnitConvert[N, U <: UnitExpr, U2 <: UnitExpr](q: Quantity[N, U]):
+      Quantity[N, U2] =
     macro UnitMacros.unitConvertImpl[N, U, U2]
 }
 
 /**
  * A temperature value.
+ * @tparam N The numeric representation type for a temperature value
  * @tparam U a temperature unit, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
  * or USCustomaryUnits.Fahrenheit
  * {{{
+ * import com.manyangled.coulomb._
+ * import SIBaseUnits._
+ * import SIAcceptedUnits._
+ * import USCustomaryUnits._
  * // a Temperature takes temperature baseline offsets into account during conversion
- * val c = Temperature[Celsius](1)
- * val f = c.as[Fahrenheit]        // == Temperature[Fahrenheit](33.8)
+ * val c = (1.0).withTemperature[Celsius]
+ * val f = c.toUnit[Fahrenheit]       // f = Temperature[Double, Fahrenheit](33.8)
  * // a Quantity of temperature only considers amounts of unit
- * val cq = Quantity[Celsius](1)
- * val fq = cq.as[Fahrenheit]      // == Quantity[Fahrenheit](1.8)
+ * val cq = (1.0).withUnit[Celsius]
+ * val fq = cq.toUnit[Fahrenheit]     // fq = Quantity[Double, Fahrenheit](1.8)
  * }}}
  */
 class Temperature[N, U <: TemperatureExpr](val value: N)
@@ -213,12 +234,23 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
   def -[U2 <: TemperatureExpr](that: Temperature[N, U2]): Quantity[N, U] =
     macro UnitMacros.subTTImpl[N, U, U2]
 
-  def <(that: Temperature[N, U]): Boolean = macro UnitMacros.implLT
-  def >(that: Temperature[N, U]): Boolean = macro UnitMacros.implGT
-  def <=(that: Temperature[N, U]): Boolean = macro UnitMacros.implLE
-  def >=(that: Temperature[N, U]): Boolean = macro UnitMacros.implGE
-  def ===(that: Temperature[N, U]): Boolean = macro UnitMacros.implEQ
-  def =!=(that: Temperature[N, U]): Boolean = macro UnitMacros.implNE
+  /** Returns `true` if and only if `this.value` < `that.value` */
+  def <(that: Quantity[N, U]): Boolean = macro UnitMacros.implLT
+
+  /** Returns `true` if and only if `this.value` > `that.value` */
+  def >(that: Quantity[N, U]): Boolean = macro UnitMacros.implGT
+
+  /** Returns `true` if and only if `this.value` <= `that.value` */
+  def <=(that: Quantity[N, U]): Boolean = macro UnitMacros.implLE
+
+  /** Returns `true` if and only if `this.value` >= `that.value` */
+  def >=(that: Quantity[N, U]): Boolean = macro UnitMacros.implGE
+
+  /** Returns `true` if and only if `this.value` == `that.value` */
+  def ===(that: Quantity[N, U]): Boolean = macro UnitMacros.implEQ
+
+  /** Returns `true` if and only if `this.value` != `that.value` */
+  def =!=(that: Quantity[N, U]): Boolean = macro UnitMacros.implNE
 
   /** A human-readable string representing the temperature with its associated unit type */  
   def str: String = macro UnitMacros.strImpl[U]
@@ -233,6 +265,7 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
 object Temperature {
   /**
    * Obtain a function that converts objects of Temperature[U] into compatible Temperature[U2]
+   * @tparam N the numeric representation type
    * @tparam U the unit type of input temp.
    * @tparam U2 the unit type of the output.
    * @return a function for converting Temperature[U] into Temperature[U2]
@@ -250,6 +283,7 @@ object Temperature {
 
   /**
    * Obtain a temperature from a unit Quantity with same raw value and temperature unit
+   * @tparam N the numeric representation type
    * @tparam U a unit of temperature, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
    * or USCustomaryUnits.Fahrenheit
    * @param q the quantity of temperature-unit type U
@@ -257,6 +291,7 @@ object Temperature {
    */
   def fromQuantity[N, U <: TemperatureExpr](q: Quantity[N, U]) = new Temperature[N, U](q.value)
 
+  /** Implicit conversion between temperatures of compatible units and same numeric type */
   implicit def implicitTempConvert[N, U1 <: TemperatureExpr, U2 <: TemperatureExpr](
       t: Temperature[N, U1]): Temperature[N, U2] =
     macro UnitMacros.unitConvertTempImpl[N, U1, U2]
