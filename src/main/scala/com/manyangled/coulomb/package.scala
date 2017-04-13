@@ -19,6 +19,18 @@ package com.manyangled
 import scala.language.experimental.macros
 
 package object coulomb {
+  /**
+   * An "infix" type alias for [[Quantity]]
+   * @tparam N The numeric representation type of the quantity value
+   * @tparam U The unit type of the quantity
+   * {{{
+   * import com.manyangled.coulomb._
+   * import SIBaseUnits._
+   * def f(v: Double WithUnit (Meter %/ Second)) = v * 60D.withUnit[Second]
+   * }}}
+   */
+  type WithUnit[N, U <: UnitExpr] = Quantity[N, U]
+
   /** obtain the integer value of a ChurchInt type */
   def churchToInt[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
 
