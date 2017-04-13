@@ -24,7 +24,7 @@ trait UnitExpr
 /**
  * Base units are axiomatic units. The
  * [[https://en.wikipedia.org/wiki/International_System_of_Units Standard International]]
- * (SI) unit system defines seven Base units, which `coulomb` defines in [[SIBaseUnits]].
+ * (SI) unit system defines seven Base units, which `coulomb` defines in SIBaseUnits.
  * Exactly one `BaseUnit` is defined for each category of quantity (e.g. length, mass, time, etc).
  */
 trait BaseUnit extends UnitExpr
@@ -42,7 +42,7 @@ trait BaseUnit extends UnitExpr
 trait DerivedUnit[U <: UnitExpr] extends UnitExpr
 
 /**
- * Prefix units represent standard unitless multipliers applied to units, e.g. [[SIPrefixes]]
+ * Prefix units represent standard unitless multipliers applied to units, e.g. SIPrefixes
  * defines units `Kilo` (10^3), `Mega` (10^6), etc.
  * {{{
  * // define a new prefix Dozen, representing multiplier of 12
@@ -95,7 +95,7 @@ trait TemperatureExpr extends UnitExpr
 
 /**
  * Define a base unit of temperature.  There should be exactly one such base unit, which is
- * [[SIBaseUnits.Kelvin]].  Any other unit of temperature should be a [[DerivedTemperature]].
+ * SIBaseUnits.Kelvin.  Any other unit of temperature should be a DerivedTemperature.
  */
 trait BaseTemperature extends BaseUnit with TemperatureExpr
 
