@@ -26,6 +26,13 @@ trait UnitExpr
  * [[https://en.wikipedia.org/wiki/International_System_of_Units Standard International]]
  * (SI) unit system defines seven Base units, which `coulomb` defines in SIBaseUnits.
  * Exactly one `BaseUnit` is defined for each category of quantity (e.g. length, mass, time, etc).
+ * {{{
+ * import com.manyangled.coulomb._
+ * import spire.math._
+ * // A base unit for loop iterations
+ * @UnitDecl("iteration")
+ * trait Iteration extends BaseUnit
+ * }}}
  */
 trait BaseUnit extends UnitExpr
 
@@ -33,10 +40,12 @@ trait BaseUnit extends UnitExpr
  * Derived units are defined in terms of another [[UnitExpr]]
  * @tparam U The [[UnitExpr]] used to define the new unit
  * {{{
- * // define a new unit Furlong in terms of Meter
+ * import com.manyangled.coulomb._
  * import SIBaseUnits._
+ * import spire.math._
+ * // A furlong is 201.168 meters
+ * @UnitDecl("furlong", 201.168)
  * trait Furlong extends DerivedUnit[Meter]
- * object Furlong extends UnitCompanion[Furlong]("furlong", 201.168)
  * }}}
  */
 trait DerivedUnit[U <: UnitExpr] extends UnitExpr
@@ -46,8 +55,8 @@ trait DerivedUnit[U <: UnitExpr] extends UnitExpr
  * defines units `Kilo` (10^3), `Mega` (10^6), etc.
  * {{{
  * // define a new prefix Dozen, representing multiplier of 12
+ * @UnitDecl("dozen", 12)
  * trait Dozen extends PrefixUnit
- * object Dozen extends UnitCompanion[Dozen]("dozen", 12.0)
  * }}}
  */
 trait PrefixUnit extends DerivedUnit[Unitless]
@@ -59,7 +68,7 @@ trait PrefixUnit extends DerivedUnit[Unitless]
  * {{{
  * import USCustomaryUnits._
  * // a quantity of acre-feet (a unit of volume, usually for water)
- * val afq = Quantity[Acre %* Foot](10)
+ * val afq = 10D.withUnit[Acre %* Foot]
  * }}}
  */
 sealed trait %* [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
@@ -71,7 +80,7 @@ sealed trait %* [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
  * {{{
  * import SIBaseUnits._
  * // a velocity in meters per second
- * val v = Quantity[Meter %/ Second](10)
+ * val v = 10f.withUnit[Meter %/ Second]
  * }}}
  */
 sealed trait %/ [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
@@ -83,7 +92,7 @@ sealed trait %/ [LUE <: UnitExpr, RUE <: UnitExpr] extends UnitExpr
  * {{{
  * import SIBaseUnits._
  * // an area in square meters
- * val area = Quantity[Meter %^ _2](10)
+ * val area = 10.withUnit[Meter %^ _2]
  * }}}
  */
 sealed trait %^ [UE <: UnitExpr, P <: ChurchInt] extends UnitExpr
@@ -96,6 +105,8 @@ trait TemperatureExpr extends UnitExpr
 /**
  * Define a base unit of temperature.  There should be exactly one such base unit, which is
  * SIBaseUnits.Kelvin.  Any other unit of temperature should be a DerivedTemperature.
+ * The base temperature unit Kelvin is defined in SIBaseUnits; other uses of BaseTemperature
+ * would be rare.
  */
 trait BaseTemperature extends BaseUnit with TemperatureExpr
 
@@ -104,8 +115,8 @@ trait BaseTemperature extends BaseUnit with TemperatureExpr
  * units cancel out will also be of type Unitless
  * {{{
  * import USCustomaryUnits._
- * // ratio will have type Unitless, since length units cancel
- * val ratio = Quantity[Yard](1) / Quantity[Foot](1)
+ * // ratio will have a type compatible with Unitless, since length units cancel
+ * val ratio = (Yard(1.0) / Foot(1.0)).toUnit[Unitless]
  * }}}
  */
 sealed trait Unitless extends UnitExpr
