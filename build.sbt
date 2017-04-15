@@ -19,17 +19,6 @@ def commonSettings = Seq(
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
 
-site.settings
-
-site.includeScaladoc()
-
-//Re-enable if/when we want to support gh-pages w/ jekyll
-//site.jekyllSupport(),
-
-ghpages.settings
-
-git.remoteRepo := "git@github.com:erikerlandson/coulomb.git"
-
 lazy val coulomb = (project in file("."))
   .aggregate(unitexpr, macros)
   .dependsOn(unitexpr, macros)
@@ -50,3 +39,22 @@ lazy val examples = (project in file("examples"))
   .settings(name := "coulomb-examples")
   .settings(commonSettings :_*)
   .settings(libraryDependencies += "com.typesafe" % "config" % "1.3.1")
+
+enablePlugins(SiteScaladocPlugin)
+
+enablePlugins(GhpagesPlugin)
+
+git.remoteRepo := "git@github.com:erikerlandson/coulomb.git"
+
+lazy val siteDocProjects = List(coulomb, macros, unitexpr)
+
+lazy val siteDocSettings = siteDocProjects.flatMap { project =>
+  SiteScaladocPlugin.scaladocSettings(
+    config(project.id),
+    mappings in (Compile, packageDoc) in project,
+    s"api/${project.id}"
+  )
+}
+
+lazy val site = (project in file("site"))
+  .settings(siteDocSettings)
