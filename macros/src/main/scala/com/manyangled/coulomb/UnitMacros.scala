@@ -195,33 +195,33 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   object FUnit {
-    def unapply(tpe: Type): Option[String] = {
+    def unapply(tpe: Type): Option[(String, String)] = {
       if (superClass(tpe, fuType).isEmpty) None else {
-        val (name, _, _) = urecVal(tpe)
-        Option(name)
+        val (name, _, abbv) = urecVal(tpe)
+        Option(name, abbv)
       }
     }
   }
 
   object DUnit {
-    def unapply(tpe: Type): Option[(String, Rational, Type)] = {
+    def unapply(tpe: Type): Option[(String, String, Rational, Type)] = {
       val du = superClass(tpe, duType)
       if (du.isEmpty) None else {
-        val (name, coef, _) = urecVal(tpe)
-        Option(name, coef, du.get.typeArgs(0))
+        val (name, coef, abbv) = urecVal(tpe)
+        Option(name, abbv, coef, du.get.typeArgs(0))
       }
     }
   }
 
   object Prefix {
-    def unapply(tpe: Type): Option[(String, Rational, Type)] = {
+    def unapply(tpe: Type): Option[(String, String, Rational, Type)] = {
       if (tpe.typeConstructor =:= mulType) {
         val (pre :: uexp :: Nil) = tpe.typeArgs
         val pu = superClass(pre, puType)
         if (pu.isEmpty) None else uexp match {
-          case FUnit(_) | DUnit(_, _, _) => {
-            val (name, coef, _) = urecVal(pre)
-            Option(name, coef, uexp)
+          case FUnit(_, _) | DUnit(_, _, _, _) => {
+            val (name, coef, abbv) = urecVal(pre)
+            Option(name, abbv, coef, uexp)
           }
           case _ => None
         }
@@ -271,10 +271,10 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   def canonical(typeU: Type): (Rational, Map[TypeKey, Int]) = {
     typeU.dealias match {
       case IsUnitless() => (1.0, Map.empty[TypeKey, Int])
-      case FUnit(_) => {
+      case FUnit(_, _) => {
         (1.0, Map(TypeKey(typeU) -> 1))
       }
-      case DUnit(_, coef, dsub) => {
+      case DUnit(_, _, coef, dsub) => {
         // defensive: this should be caught at compile time in UnitDecl
         if (coef <= 0) abort(s"Unit coefficient for $typeU was <= 0")
         val (dcoef, dmap) = canonical(dsub)
@@ -305,8 +305,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   def signature(typeU: Type): Map[TypeKey, Int] = {
     typeU.dealias match {
       case IsUnitless() => Map.empty[TypeKey, Int]
-      case FUnit(_) => Map(TypeKey(typeU) -> 1)
-      case DUnit(_, _, _) => Map(TypeKey(typeU) -> 1)
+      case FUnit(_, _) => Map(TypeKey(typeU) -> 1)
+      case DUnit(_, _, _, _) => Map(TypeKey(typeU) -> 1)
       case MulOp(lsub, rsub) => mapMul(signature(lsub), signature(rsub))
       case DivOp(lsub, rsub) => mapDiv(signature(lsub), signature(rsub))
       case PowOp(bsub, exp) => mapPow(signature(bsub), exp)
@@ -636,47 +636,88 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     """
   }
 
-  def ueAtomicString(typeU: Type): Boolean = {
+  def atomicStr(typeU: Type): Boolean = {
     typeU.dealias match {
       case IsUnitless() => true
-      case FUnit(_) => true
-      case DUnit(_, _, _) => true
+      case FUnit(_, _) => true
+      case DUnit(_, _, _, _) => true
       case PowOp(_, exp) if (exp == 0) => true
-      case PowOp(bsub, exp) if (exp == 1 && ueAtomicString(bsub)) => true
+      case PowOp(bsub, exp) if (exp == 1 && atomicStr(bsub)) => true
+      case Prefix(_, _, _, sub) if (atomicStr(sub)) => true
       case _ => false
     }
   }
 
-  def ueString(typeU: Type): String = {
+  def unitString(typeU: Type): String = {
     typeU.dealias match {
       case IsUnitless() => "unitless"
-      case FUnit(name) => name
-      case DUnit(name, _, _) => name
-      case Prefix(name, _, sub) => {
-        val str = ueString(sub)
-        val s = if (ueAtomicString(sub)) str else s"($str)"
+      case FUnit(name, _) => name
+      case DUnit(name, _, _, _) => name
+      case Prefix(name, _, _, sub) => {
+        val str = unitString(sub)
+        val s = if (atomicStr(sub)) str else s"($str)"
         s"${name}-$s"
       }
       case FlatMulOp(ssub) => {
         ssub.map { sub =>
-          val str = ueString(sub)
-          if (ueAtomicString(sub)) str else s"($str)"
+          val str = unitString(sub)
+          if (atomicStr(sub)) str else s"($str)"
         }.mkString(" * ")
       }
       case DivOp(lsub, rsub) => {
-        val lstr = ueString(lsub)
-        val rstr = ueString(rsub)
-        val ls = if (ueAtomicString(lsub)) lstr else s"($lstr)"
-        val rs = if (ueAtomicString(rsub)) rstr else s"($rstr)"
+        val lstr = unitString(lsub)
+        val rstr = unitString(rsub)
+        val ls = if (atomicStr(lsub)) lstr else s"($lstr)"
+        val rs = if (atomicStr(rsub)) rstr else s"($rstr)"
         s"$ls / $rs"
       }
       case PowOp(bsub, exp) => {
         if (exp == 0) "unitless"
-        else if (exp == 1) ueString(bsub)
+        else if (exp == 1) unitString(bsub)
         else {
-          val bstr = ueString(bsub)
-          val bs = if (ueAtomicString(bsub)) bstr else s"($bstr)"
+          val bstr = unitString(bsub)
+          val bs = if (atomicStr(bsub)) bstr else s"($bstr)"
           s"$bs ^ $exp"
+        }
+      }
+      case _ => {
+        // This should never execute
+        abort(s"Undefined Unit Type: ${typeName(typeU)}")
+        ""
+      }
+    }
+  }
+
+  def abbvString(typeU: Type): String = {
+    typeU.dealias match {
+      case IsUnitless() => "1"
+      case FUnit(_, abbv) => abbv
+      case DUnit(_, abbv, _, _) => abbv
+      case Prefix(_, abbv, _, sub) => {
+        val str = abbvString(sub)
+        val s = if (atomicStr(sub)) str else s"($str)"
+        s"${abbv}$s"
+      }
+      case FlatMulOp(ssub) => {
+        ssub.map { sub =>
+          val str = abbvString(sub)
+          if (atomicStr(sub)) str else s"($str)"
+        }.mkString(" ")
+      }
+      case DivOp(lsub, rsub) => {
+        val lstr = abbvString(lsub)
+        val rstr = abbvString(rsub)
+        val ls = if (atomicStr(lsub)) lstr else s"($lstr)"
+        val rs = if (atomicStr(rsub)) rstr else s"($rstr)"
+        s"$ls / $rs"
+      }
+      case PowOp(bsub, exp) => {
+        if (exp == 0) "1"
+        else if (exp == 1) abbvString(bsub)
+        else {
+          val bstr = abbvString(bsub)
+          val bs = if (atomicStr(bsub)) bstr else s"($bstr)"
+          s"$bs^$exp"
         }
       }
       case _ => {
@@ -689,7 +730,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def unitExprString[U: WeakTypeTag]: Tree = {
     val tpeU = weakType1[U]
-    val str = ueString(tpeU)
+    val str = unitString(tpeU)
     val sq = q"$str"
     q"""
       _root_.com.manyangled.coulomb.UnitExprString[$tpeU]($sq)
@@ -697,7 +738,12 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitStrImpl[U: WeakTypeTag]: Tree = {
-    val str = uesVal(weakType1[U])
+    val str = unitString(weakType1[U])
+    q"$str"
+  }
+
+  def abbvStrImpl[U: WeakTypeTag]: Tree = {
+    val str = abbvString(weakType1[U])
     q"$str"
   }
 
