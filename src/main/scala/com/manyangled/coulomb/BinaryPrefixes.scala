@@ -19,27 +19,27 @@ package com.manyangled.coulomb
 object BinaryPrefixes {
   import spire.math.Rational
 
-  @UnitDecl("kibi", 1024)
+  @UnitDecl("kibi", 1024, "Ki")
   trait Kibi extends PrefixUnit
 
-  @UnitDecl("mebi", Rational(1024).pow(2))
+  @UnitDecl("mebi", Rational(1024).pow(2), "Mi")
   trait Mebi extends PrefixUnit
 
-  @UnitDecl("gibi", Rational(1024).pow(3))
+  @UnitDecl("gibi", Rational(1024).pow(3), "Gi")
   trait Gibi extends PrefixUnit
 
-  @UnitDecl("tebi", Rational(1024).pow(4))
+  @UnitDecl("tebi", Rational(1024).pow(4), "Ti")
   trait Tebi extends PrefixUnit
 
-  @UnitDecl("pebi", Rational(1024).pow(5))
+  @UnitDecl("pebi", Rational(1024).pow(5), "Pi")
   trait Pebi extends PrefixUnit
 
-  @UnitDecl("exbi", Rational(1024).pow(6))
+  @UnitDecl("exbi", Rational(1024).pow(6), "Ei")
   trait Exbi extends PrefixUnit
 
-  @UnitDecl("zebi", Rational(1024).pow(7))
+  @UnitDecl("zebi", Rational(1024).pow(7), "Zi")
   trait Zebi extends PrefixUnit
 
-  @UnitDecl("yobi", Rational(1024).pow(8))
+  @UnitDecl("yobi", Rational(1024).pow(8), "Yi")
   trait Yobi extends PrefixUnit
 }
