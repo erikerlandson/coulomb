@@ -34,6 +34,12 @@ object SIAcceptedUnits {
   @UnitDecl("day", 86400, "d")
   trait Day extends DerivedUnit[Second]
 
+  @UnitDecl("week", 7, "wk")
+  trait Week extends DerivedUnit[Day]
+
+  @UnitDecl("percent", Rational(1, 100), "%")
+  trait Percent extends DerivedUnit[Unitless]
+
   @UnitDecl("degree", math.Pi / 180.0, "°")
   trait Degree extends DerivedUnit[Radian]
 
