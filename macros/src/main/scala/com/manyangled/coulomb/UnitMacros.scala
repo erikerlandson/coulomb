@@ -82,10 +82,10 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     evalTree[Int](q"${ival}.value")
   }
   
-  def urecVal(unitT: Type): (String, Rational) = {
+  def urecVal(unitT: Type): (String, Rational, String) = {
     val urt = appliedType(urecType, List(unitT))
     val ur = c.inferImplicitValue(urt, silent = false)
-    evalTree[(String, Rational)](q"(${ur}.name, ${ur}.coef)")
+    evalTree[(String, Rational, String)](q"(${ur}.name, ${ur}.coef, ${ur}.abbv)")
   }
 
   def turecVal(unitT: Type): Rational = {
@@ -197,7 +197,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   object FUnit {
     def unapply(tpe: Type): Option[String] = {
       if (superClass(tpe, fuType).isEmpty) None else {
-        val (name, _) = urecVal(tpe)
+        val (name, _, _) = urecVal(tpe)
         Option(name)
       }
     }
@@ -207,7 +207,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     def unapply(tpe: Type): Option[(String, Rational, Type)] = {
       val du = superClass(tpe, duType)
       if (du.isEmpty) None else {
-        val (name, coef) = urecVal(tpe)
+        val (name, coef, _) = urecVal(tpe)
         Option(name, coef, du.get.typeArgs(0))
       }
     }
@@ -220,7 +220,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         val pu = superClass(pre, puType)
         if (pu.isEmpty) None else uexp match {
           case FUnit(_) | DUnit(_, _, _) => {
-            val (name, coef) = urecVal(pre)
+            val (name, coef, _) = urecVal(pre)
             Option(name, coef, uexp)
           }
           case _ => None
@@ -560,8 +560,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def toUnitTempImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
-    val ((_, coef1), off1) = (urecVal(tpeU1), turecVal(tpeU1))
-    val ((_, coef2), off2) = (urecVal(tpeU2), turecVal(tpeU2))
+    val ((_, coef1, _), off1) = (urecVal(tpeU1), turecVal(tpeU1))
+    val ((_, coef2, _), off2) = (urecVal(tpeU2), turecVal(tpeU2))
     val xt = fixByteShort(
       xTempTree(coef1, off1, coef2, off2, q"(${c.prefix.tree}).value", tpeN), tpeN)
     q"new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2]($xt)"
@@ -569,16 +569,16 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def unitConvertTempImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](t: Tree): Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
-    val ((_, coef1), off1) = (urecVal(tpeU1), turecVal(tpeU1))
-    val ((_, coef2), off2) = (urecVal(tpeU2), turecVal(tpeU2))
+    val ((_, coef1, _), off1) = (urecVal(tpeU1), turecVal(tpeU1))
+    val ((_, coef2, _), off2) = (urecVal(tpeU2), turecVal(tpeU2))
     val xt = fixByteShort(xTempTree(coef1, off1, coef2, off2, q"${t}.value", tpeN), tpeN)
     q"new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2]($xt)"
   }
 
   def tempConverterImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
-    val ((_, coef1), off1) = (urecVal(tpeU1), turecVal(tpeU1))
-    val ((_, coef2), off2) = (urecVal(tpeU2), turecVal(tpeU2))
+    val ((_, coef1, _), off1) = (urecVal(tpeU1), turecVal(tpeU1))
+    val ((_, coef2, _), off2) = (urecVal(tpeU2), turecVal(tpeU2))
     val tft = q"""
       (t1: com.manyangled.coulomb.Temperature[$tpeN, $tpeU1]) =>
         new com.manyangled.coulomb.Temperature[$tpeN, $tpeU2](t1.value)
@@ -607,8 +607,8 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def subTTImpl[N: WeakTypeTag, U1: WeakTypeTag, U2: WeakTypeTag](that: Tree): Tree = {
     val (tpeN, tpeU1, tpeU2) = weakType3[N, U1, U2]
-    val ((_, coef1), off1) = (urecVal(tpeU1), turecVal(tpeU1))
-    val ((_, coef2), off2) = (urecVal(tpeU2), turecVal(tpeU2))
+    val ((_, coef1, _), off1) = (urecVal(tpeU1), turecVal(tpeU1))
+    val ((_, coef2, _), off2) = (urecVal(tpeU2), turecVal(tpeU2))
     val xt = xTempTree(coef2, off2, coef1, off1, q"($that).value", tpeN)
     val rt = fixByteShort(q"(${c.prefix.tree}.value) - ($xt)", tpeN)
     q"new com.manyangled.coulomb.Quantity[$tpeN, $tpeU1]($rt)"
@@ -729,19 +729,23 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {
-    val (qname, qcoef) = c.prefix.tree match {
-      case q"new UnitDecl($qname, coef = $coef)" => (qname, coef)
-      case q"new UnitDecl($qname, $coef)" => (qname, coef)
-      case q"new UnitDecl($qname)" => (qname, q"spire.math.Rational(1)")
-      case _ => abort("Unexpected calling scope!")
+    val qone = q"spire.math.Rational(1)"
+    val (qname, qcoef, qabbv) = c.prefix.tree match {
+      case q"new UnitDecl($name, coef = $coef, abbv = $abbv)" => (name, coef, abbv)
+      case q"new UnitDecl($name, abbv = $abbv, coef = $coef)" => (name, coef, abbv)
+      case q"new UnitDecl($name, $coef, abbv = $abbv)" => (name, coef, abbv)
+      case q"new UnitDecl($name, $coef, $abbv)" => (name, coef, abbv)
+      case q"new UnitDecl($name, abbv = $abbv)" => (name, qone, abbv)
+      case q"new UnitDecl($name, coef = $coef)" => (name, coef, name)
+      case q"new UnitDecl($name, $coef)" => (name, coef, name)
+      case q"new UnitDecl($name)" => (name, qone, name)
+      case _ => abort(s"Unexpected UnitDecl calling pattern: ${c.prefix.tree}")
     }
-    val name = evalTree[String](qname)
     val coef = evalTreeRational(qcoef)
-    if (coef <= 0) abort(s"Coefficient for unit $name must be > 0")
     val unitName = annottees.map(_.tree) match {
       case (decl: ClassDef) :: Nil => decl match {
         case q"trait $uname extends BaseUnit" => {
-          if (coef != 1) abort(s"Coefficient for base unit $name must be 1")
+          if (coef != 1) abort(s"Coefficient for base unit $uname must be 1")
           uname
         }
         case q"trait $uname extends PrefixUnit" => uname
@@ -750,27 +754,28 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       }
       case _ => abort("UnitDecl must be applied to a unit trait declaration")
     }
+    if (coef <= 0) abort(s"Coefficient for unit $unitName must be > 0")
     c.Expr(q"""
       ${annottees(0)}
       object ${unitName.toTermName} extends
-          com.manyangled.coulomb.UnitCompanion[$unitName]($qname, $qcoef)
+          com.manyangled.coulomb.UnitCompanion[$unitName]($qname, $qcoef, $qabbv)
     """)
   }
 
   def tempUnitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {
-    val (qname, qcoef, qoff) = c.prefix.tree match {
-      case q"new TempUnitDecl($qname, $coef, $off)" => (qname, coef, off)
-      case _ => abort("Unexpected calling scope!")
+    val (qname, qcoef, qoff, qabbv) = c.prefix.tree match {
+      case q"new TempUnitDecl($name, $coef, $off, abbv = $abbv)" => (name, coef, off, abbv)
+      case q"new TempUnitDecl($name, $coef, $off, $abbv)" => (name, coef, off, abbv)
+      case q"new TempUnitDecl($name, $coef, $off)" => (name, coef, off, name)
+      case _ => abort(s"Unexpected TempUnitDecl calling pattern: ${c.prefix.tree}")
     }
-    val name = evalTree[String](qname)
     val coef = evalTreeRational(qcoef)
     val off = evalTreeRational(qoff)
-    if (coef <= 0) abort(s"Coefficient for unit $name must be > 0")
     val unitName = annottees.map(_.tree) match {
       case (decl: ClassDef) :: Nil => decl match {
         case q"trait $uname extends BaseTemperature" => {
-          if (coef != 1) abort(s"Coefficient for base temperature $name must be 1")
-          if (off != 0) abort(s"Offset for base temperature $name must be 0")
+          if (coef != 1) abort(s"Coefficient for base temperature $uname must be 1")
+          if (off != 0) abort(s"Offset for base temperature $uname must be 0")
           uname
         }
         case q"trait $uname extends DerivedTemperature" => uname
@@ -778,10 +783,11 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       }
       case _ => abort("TempUnitDecl must be applied to a temperature unit trait")
     }
+    if (coef <= 0) abort(s"Coefficient for unit $unitName must be > 0")
     c.Expr(q"""
       ${annottees(0)}
       object ${unitName.toTermName} extends
-          com.manyangled.coulomb.TempUnitCompanion[$unitName]($qname, $qcoef, $qoff)
+          com.manyangled.coulomb.TempUnitCompanion[$unitName]($qname, $qcoef, $qoff, $qabbv)
     """)
   }
 }
