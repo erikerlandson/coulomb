@@ -38,7 +38,9 @@ import spire.math._
  * }}}
  */
 @compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
-class UnitDecl(val name: String, val coef: Rational = 1) extends StaticAnnotation {
+class UnitDecl(name: String,
+    coef: Rational = 1,
+    abbv: String = "") extends StaticAnnotation {
   def macroTransform(annottees: Any*): Any = macro UnitMacros.unitDecl
 }
 
@@ -58,6 +60,9 @@ class UnitDecl(val name: String, val coef: Rational = 1) extends StaticAnnotatio
  * }}}
  */
 @compileTimeOnly("Must enable the Scala macro paradise compiler plugin to expand static annotations")
-class TempUnitDecl(name: String, coef: Rational, off: Rational) extends StaticAnnotation {
+class TempUnitDecl(name: String,
+    coef: Rational,
+    off: Rational,
+    abbv: String = "") extends StaticAnnotation {
   def macroTransform(annottees: Any*): Any = macro UnitMacros.tempUnitDecl
 }

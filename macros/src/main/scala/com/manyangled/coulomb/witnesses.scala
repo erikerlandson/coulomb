@@ -28,7 +28,7 @@ object ChurchIntValue {
     macro ChurchIntMacros.churchIntValue[N]
 }
 
-case class UnitRec[UE <: UnitExpr](name: String, coef: Rational)
+case class UnitRec[UE <: UnitExpr](name: String, coef: Rational, abbv: String)
 
 case class TempUnitRec[UE <: TemperatureExpr](offset: Rational)
 

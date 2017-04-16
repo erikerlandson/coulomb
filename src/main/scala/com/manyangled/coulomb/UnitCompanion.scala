@@ -18,18 +18,21 @@ package com.manyangled.coulomb
 
 import spire.math.{ Rational, ConvertableFrom }
 
-class UnitCompanion[U <: UnitExpr](val name: String, val coef: Rational) {
+class UnitCompanion[U <: UnitExpr](val name: String, val coef: Rational, val abbv: String) {
   // defensive: this should be caught at compile time in UnitDecl
   require(coef > 0, "Unit coefficients must be strictly > 0")
 
-  def apply[N](v: N)(implicit num: spire.math.ConvertableTo[N]): Quantity[N, U] = new Quantity[N, U](v)
+  def apply[N](v: N)(implicit num: spire.math.ConvertableTo[N]): Quantity[N, U] =
+    new Quantity[N, U](v)
 
-  override def toString = s"UnitCompanion($name, $coef)"
+  override def toString = s"UnitCompanion($name, $coef, $abbv)"
 
-  implicit val furec: UnitRec[U] = UnitRec[U](name, Rational(coef))
+  implicit val furec: UnitRec[U] = UnitRec[U](name, Rational(coef), abbv)
 }
 
-class TempUnitCompanion[U <: TemperatureExpr](uname: String, ucoef: Rational, uoffset: Rational)
-    extends UnitCompanion[U](uname, ucoef) {
+class TempUnitCompanion[U <: TemperatureExpr](uname: String,
+    ucoef: Rational, uoffset: Rational,
+    abbv: String)
+    extends UnitCompanion[U](uname, ucoef, abbv) {
   implicit val turec: TempUnitRec[U] = TempUnitRec[U](uoffset)
 }
