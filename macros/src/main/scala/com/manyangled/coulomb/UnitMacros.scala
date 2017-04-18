@@ -63,7 +63,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   val ivalType = typeOf[ChurchIntValue[ChurchInt._0]].typeConstructor
   val urecType = typeOf[UnitRec[DummyU]].typeConstructor
   val turecType = typeOf[TempUnitRec[DummyT]].typeConstructor
-  val cuType = typeOf[CompatUnits[DummyU, DummyU]].typeConstructor
+  val cuType = typeOf[ConvertableUnits[DummyU, DummyU]].typeConstructor
   val isIntType = typeOf[spire.algebra.IsIntegral[Int]].typeConstructor
   val cToType = typeOf[spire.math.ConvertableTo[Int]].typeConstructor
   val uesType = typeOf[UnitExprString[DummyU]].typeConstructor
@@ -105,7 +105,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       val cut = appliedType(cuType, List(u1T, u2T))
       c.inferImplicitValue(cut, silent = false)
     } catch {
-      case _: Throwable => abort(s"Imcompatible unit types:\n$u1T\nand\n$u2T")
+      case _: Throwable => abort(s"Imconvertable unit types:\n$u1T\nand\n$u2T")
     }
   }
 
@@ -114,7 +114,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   def cuCoef(cu: Tree): Rational = {
     // I'm doing it this way because evaluating Rational(n,d) expressions w/ evalTree
     // directly is failing inside the macro context.
-    val q"new $_.CompatUnits[..$_]($_.Rational.apply($nq, $dq))" = cu
+    val q"new $_.ConvertableUnits[..$_]($_.Rational.apply($nq, $dq))" = cu
     val (n, d) = (evalTree[BigInt](nq), evalTree[BigInt](dq))
     Rational(n, d)
   }
@@ -318,21 +318,21 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
     }
   }
 
-  def compatUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
+  def convertableUnits[U1: WeakTypeTag, U2: WeakTypeTag]: Tree = {
     val (tpeU1, tpeU2) = weakType2[U1, U2]
 
     val (coef1, map1) = canonical(tpeU1)
     val (coef2, map2) = canonical(tpeU2)
 
-    // units are compatible if their canonical representations are equal
+    // units are convertable if their canonical representations are equal
     val compat = (map1 == map2)
 
-    if (!compat) q"" // fail implicit resolution if they aren't compatible
+    if (!compat) q"" // fail implicit resolution if they aren't convertable
     else {
-      // if they are compatible, then create the corresponding witness
+      // if they are convertable, then create the corresponding witness
       val coef = coef1 / coef2
       q"""
-        new _root_.com.manyangled.coulomb.CompatUnits[$tpeU1, $tpeU2]($coef)
+        new _root_.com.manyangled.coulomb.ConvertableUnits[$tpeU1, $tpeU2]($coef)
       """
     }
   }

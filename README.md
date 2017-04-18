@@ -28,7 +28,7 @@ libraryDependencies += "com.manyangled" %% "coulomb" % "0.1.0"
 * [The str And unitStr Method](#the-str-and-unitstr-method)
 * [Unit Exponents and Church Integers](#unit-exponents-and-church-integers)
 * [Predefined Units](#predefined-units)
-* [Unit Types and Compatibility](#unit-types-and-compatibility)
+* [Unit Types and Convertability](#unit-types-and-convertability)
 * [Unit Conversions](#unit-conversions)
 * [Unit Operations](#unit-operations)
 * [Declaring New Units](#declaring-new-units)
@@ -48,9 +48,9 @@ The motivation for `coulomb` is to support the following features:
 1. express those types with arbitrary and natural static type expressions
   1. `val speed = Quantity[(Kilo %* Meter) %/ Hour](100.0)`
   1. `val acceleration = Quantity[Meter %/ (Second %^ _2)](9.8)`
-1. let the compiler determine which unit expressions are equivalent (aka _compatible_) and transparently convert beween them
+1. let the compiler determine which unit expressions are equivalent (aka _convertable_) and transparently convert beween them
   1. `val mps: Quantity[Meter %/ Second] = Quantity[Mile %/ Hour](60.0)`
-1. cause compile-time error when operations are attempted with _incompatible_ unit types
+1. cause compile-time error when operations are attempted with _non-convertable_ unit types
   1. `val mps: Quantity[Meter %/ Second] = Quantity[Mile](60.0) // compile-time type error!`
 1. automatically determine correct output unit types for operations on unit quantities
   1. `val mps: Quantity[Meter %/ Second] = Mile(60) / Hour()`
@@ -155,18 +155,18 @@ The `coulomb` library pre-defines a variety of units and prefixes, which are sum
 * [USCustomaryUnits](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.USCustomaryUnits$): Some [customary non-SI units](https://en.wikipedia.org/wiki/United_States_customary_units) commonly used in the United States.
 * [BinaryPrefixes](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.BinaryPrefixes$): The [binary prefixes](https://en.wikipedia.org/wiki/Binary_prefix) Kibi, Mebi, Gibi, etc.
 
-#### Unit Types and Compatibility
+#### Unit Types and Convertability
 
-The concept of unit _compatibility_ is fundamental to the `coulomb` library and its implementation of unit analysis.
-Two unit type expressions are _compatible_ if they encode an equivalent "[abstract quantity](https://en.wikipedia.org/wiki/International_System_of_Quantities)."
-For example, `Meter` and `Mile` are compatible because they both encode the abstract quantity of Length.
-`Foot %^ _3` and `Liter` are compatible because they both encode a volume, or Length^3.
-`Kilo %* Meter %/ Hour` and `Foot %* (Second %^ _neg1)` are compatible because they encode a velocity, or Length\*Time^-1.
+The concept of unit _convertability_ is fundamental to the `coulomb` library and its implementation of unit analysis.
+Two unit type expressions are _convertable_ if they encode an equivalent "[abstract quantity](https://en.wikipedia.org/wiki/International_System_of_Quantities)."
+For example, `Meter` and `Mile` are convertable because they both encode the abstract quantity of Length.
+`Foot %^ _3` and `Liter` are convertable because they both encode a volume, or Length^3.
+`Kilo %* Meter %/ Hour` and `Foot %* (Second %^ _neg1)` are convertable because they encode a velocity, or Length\*Time^-1.
 
-If two unit types are compatible, then they can be converted.
+If two unit types are convertable, then they can be converted.
 Meters can always be converted to miles, and cubic feet can be converted to liters, etc.
-In `coulomb`, a unit quantity will be implicitly converted into a quantity of a different unit type whenever those types are compatible.
-Any attempt to convert between _incompatible_ unit types results in a compile-time type error.
+In `coulomb`, a unit quantity will be implicitly converted into a quantity of a different unit type whenever those types are convertable.
+Any attempt to convert between _non-convertable_ unit types results in a compile-time type error.
 
 ```scala
 scala> def foo(q: Quantity[Meter %/ Second]) = q.str
@@ -186,7 +186,7 @@ scala> foo(1.withUnit[Foot %* Day])
 
 #### Unit Conversions
 
-As described in the previous section, unit quantities can be converted from one unit type to another when the two types are compatible.
+As described in the previous section, unit quantities can be converted from one unit type to another when the two types are convertable.
 Unit conversions come in a few different forms:
 ```scala
 // Implicit conversion
@@ -211,7 +211,7 @@ res2: String = 4.0 meter ^ 3
 #### Unit Operations
 
 Unit quantities support math operations `+`, `-`, `*`, `/`, and `pow`.
-Quantities must be of compatible unit types to be added or subtracted.
+Quantities must be of convertable unit types to be added or subtracted.
 The unit of the left-hand argument is taken as the unit of the output:
 ```scala
 scala> (Foot() + Yard()).str
@@ -256,7 +256,7 @@ The Standard International [Base Units](https://en.wikipedia.org/wiki/SI_base_un
 In the [`InfoUnits` sub-package](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.InfoUnits$), `Byte` is declared as the base unit of information.
 Declaring a base unit is special in the sense that it also defines a new kind of fundamental _abstract quantity_.
 For example, by declaring `Meter` as a base unit, `coulomb` establishes `Meter` as the canonical representation of the abstract quantity of Length.
-Any other unit of Length must be declared as a _derived unit_, or it would be considered _incompatible_ with other lengths.
+Any other unit of Length must be declared as a _derived unit_, or it would be considered _non-convertable_ with other lengths.
 
 Here is an example of defining a new base unit `Scoville`, representing an abstract quantity of [Spicy Heat](https://en.wikipedia.org/wiki/Scoville_scale):
 ```scala
@@ -289,11 +289,11 @@ object NewUnits {
 
 #### Unitless Quantities
 
-When units in an expression all cancel out -- for example, a ratio of quanties with compatible units -- the value is said to be "unitless."
+When units in an expression all cancel out -- for example, a ratio of quanties with convertable units -- the value is said to be "unitless."
 In `coulomb` the unit expression subtype `Unitless` represents this particular state.
 Here are a few examples of situations when `Unitless` values arise:
 ```scala
-// ratios of compatible unit types are always unitless
+// ratios of convertable unit types are always unitless
 scala> (1.withUnit[Yard] / 1.withUnit[Foot]).str
 res1: String = 3.0 unitless
 
@@ -371,8 +371,8 @@ conf: com.typesafe.config.Config = Config(SimpleConfigObject({"bandwidth":"10.wi
 In order to make use of these `Quantity` expressions in a configuration we must enhance `Config` with a new method `getUnitQuantity`, which we do via an `implicit class` pattern below.
 The contents of this enhancement class are simple: A `QuantityParser` object is declared that imports `SIBaseUnits._`, `SIPrefixes._` and `InfoUnits._`.
 The `getUnitQuantity` method is just a call to the `apply` method of the `QuantityParser`, that passes the configured value to the parser, along with an expected `UnitExpr` type.
-If this type is compatible with the run-time evaluation of the string expression, it will be converted in the usual manner.
-If the expected unit is incompatible, an error will be returned.
+If this type is convertable to the run-time evaluation of the string expression, it will be converted in the usual manner.
+If the expected unit is non-convertable, an error will be returned.
 
 ```scala
 scala> object enhance {
@@ -402,14 +402,14 @@ scala> conf.getUnitQuantity[Giga %* Bit %/ Second]("bandwidth").get.str
 res2: String = 0.08 (giga-bit) / second
 ```
 
-If we ask for a unit type that is incompatible with the configuration, an error is returned:
+If we ask for a unit type that is non-convertable to the configuration, an error is returned:
 
 ```scala
 scala> conf.getUnitQuantity[Giga %* Bit %/ Meter]("bandwidth")
 res3: scala.util.Try[com.manyangled.coulomb.Quantity[...]] =
 Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed:
 
-Implicit not found: CompatUnits[com.manyangled.coulomb.%/[com.manyangled.coulomb.%*[com.manyangled.coulomb.SIPrefixes.Mega,com.manyangled.coulomb.InfoUnits.Byte],com.manyangled.coulomb.SIBaseUnits.Second], com.manyangled.coulomb.%/[com.manyangled.coulomb.%*[com.manyangled.coulomb.SIPrefixes.Giga,com.manyangled.coulomb.InfoUnits.Bit],com.manyangled.coulomb.SIBaseUnits.Meter]]...
+Implicit not found: ConvertableUnits[com.manyangled.coulomb.%/[com.manyangled.coulomb.%*[com.manyangled.coulomb.SIPrefixes.Mega,com.manyangled.coulomb.InfoUnits.Byte],com.manyangled.coulomb.SIBaseUnits.Second], com.manyangled.coulomb.%/[com.manyangled.coulomb.%*[com.manyangled.coulomb.SIPrefixes.Giga,com.manyangled.coulomb.InfoUnits.Bit],com.manyangled.coulomb.SIBaseUnits.Meter]]...
 ```
 
 #### Temperature Values
@@ -429,7 +429,7 @@ scala> 0.withTemperature[Celsius].as[Fahrenheit].str
 res2: String = 32.0 fahrenheit
 ```
 
-You can add or subtract a compatible temperature `Quantity` from a `Temperature`, and get a new `Temperature` value.
+You can add or subtract a convertable temperature `Quantity` from a `Temperature`, and get a new `Temperature` value.
 Conversely, if you subtract one `Temperature` from another, you will get a `Quantity`.
 ```scala
 // Add a quantity to a temperature to get a new temperature

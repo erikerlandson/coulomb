@@ -20,7 +20,7 @@ import scala.util.{ Try, Success, Failure }
 
 /**
  * A run-time parser for string expressions that evaluate to [[Quantity]] objects.
- * Parsing returns a compatible unit Quantity type, or failure.
+ * Parsing returns a convertable unit Quantity type, or failure.
  * @param unitDeclarationObjects a collection of objects to import units from. For each such object
  * the run-time parsing will `import Object._` to obtain any unit definitions prior to attempting
  * to parse each input string.
@@ -65,9 +65,9 @@ class QuantityParser(
   /**
    * Parse a string containing an expression that evaluates to a unit Quantity object.
    * @tparam U a [[UnitExpr]] type that specifies a `Quantity[U]` to return.  `U` is expected to
-   * be compatible with the unit type of the expression in the string, or parsing will fail.
+   * be convertable to the unit type of the expression in the string, or parsing will fail.
    * @param quantityExpr a string containing an expression that evaluates to a `Quantity` object.
-   * @return the Quantity object created by run-time parsing, converted to compatible `Quantity[U]`,
+   * @return the Quantity object created by run-time parsing, converted to convertable `Quantity[U]`,
    * or failure if any stage of the run-time parsing and unit conversion was unsuccessful.
    */
   def apply[N: TypeTag, U <: UnitExpr :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
