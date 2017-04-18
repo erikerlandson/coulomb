@@ -118,10 +118,19 @@ class Quantity[N, U <: UnitExpr](val value: N)
   def =!=(that: Quantity[N, U]): Boolean = macro UnitMacros.implNE
 
   /** A human-readable string representing the value and unit type of this quantity */
-  def str: String = macro UnitMacros.strImpl[U]
+  def toStr: String = macro UnitMacros.toStrImpl[U]
+
+  /**
+   * A human-readable string representing the value and unit type of this quantity,
+   * using the full unit names
+   */
+  def toStrFull: String = macro UnitMacros.toStrFullImpl[U]
 
   /** A human-readable string representing the unit type of this quantity */
   def unitStr: String = macro UnitMacros.unitStrImpl[U]
+
+  /** A human-readable string representing the unit type of this quantity, using full unit names */
+  def unitStrFull: String = macro UnitMacros.unitStrFullImpl[U]
 
   // I can define this with a macro, but its default behavior is to output string as the value-class
   // so it doesn't really buy me anything.  This at least gets invoked automatically.
@@ -154,7 +163,9 @@ object Quantity {
 
   /** A human-readable string representing the unit type U */
   def unitStr[U <: UnitExpr]: String = macro UnitMacros.unitStrImpl[U]
-  def abbvStr[U <: UnitExpr]: String = macro UnitMacros.abbvStrImpl[U]
+
+  /** A human-readable string representing the unit type U, using full unit names */
+  def unitStrFull[U <: UnitExpr]: String = macro UnitMacros.unitStrFullImpl[U]
 
   /**
    * Obtain a unit quantity from a Temperature with the same raw value and temperature unit
@@ -254,10 +265,19 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
   def =!=(that: Quantity[N, U]): Boolean = macro UnitMacros.implNE
 
   /** A human-readable string representing the temperature with its associated unit type */  
-  def str: String = macro UnitMacros.strImpl[U]
+  def toStr: String = macro UnitMacros.toStrImpl[U]
 
-  /** A human-readable string representing the unit type of this temperature */
+  /**
+   * A human-readable string representing the value and unit type of this quantity,
+   * using the full unit names
+   */
+  def toStrFull: String = macro UnitMacros.toStrFullImpl[U]
+
+  /** A human-readable string representing the unit type of this quantity */
   def unitStr: String = macro UnitMacros.unitStrImpl[U]
+
+  /** A human-readable string representing the unit type of this quantity, using full unit names */
+  def unitStrFull: String = macro UnitMacros.unitStrFullImpl[U]
 
   override def toString = s"Temperature(${this.value})"
 }
@@ -275,12 +295,11 @@ object Temperature {
       Temperature[N, U1] => Temperature[N, U2] =
     macro UnitMacros.tempConverterImpl[N, U1, U2]
 
-  /**
-   * Obtain a human-readable string representing a unit type U
-   * @tparam U a unit type representing a temperature
-   * @return human readable string representing U
-   */
+  /** A human-readable string representing the unit type U */
   def unitStr[U <: TemperatureExpr]: String = macro UnitMacros.unitStrImpl[U]
+
+  /** A human-readable string representing the unit type U, using full unit names */
+  def unitStrFull[U <: TemperatureExpr]: String = macro UnitMacros.unitStrFullImpl[U]
 
   /**
    * Obtain a temperature from a unit Quantity with same raw value and temperature unit

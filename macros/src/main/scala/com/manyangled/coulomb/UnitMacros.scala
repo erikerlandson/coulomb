@@ -738,18 +738,23 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def unitStrImpl[U: WeakTypeTag]: Tree = {
-    val str = unitString(weakType1[U])
-    q"$str"
-  }
-
-  def abbvStrImpl[U: WeakTypeTag]: Tree = {
     val str = abbvString(weakType1[U])
     q"$str"
   }
 
-  def strImpl[U: WeakTypeTag]: Tree = {
-    val str = unitStrImpl[U]
-    q"""${c.prefix.tree}.value.toString + " " + $str"""
+  def unitStrFullImpl[U: WeakTypeTag]: Tree = {
+    val str = unitString(weakType1[U])
+    q"$str"
+  }
+
+  def toStrImpl[U: WeakTypeTag]: Tree = {
+    val str = " " + abbvString(weakType1[U])
+    q"${c.prefix.tree}.value.toString + $str"
+  }
+
+  def toStrFullImpl[U: WeakTypeTag]: Tree = {
+    val str = " " + unitString(weakType1[U])
+    q"${c.prefix.tree}.value.toString + $str"
   }
 
   def ueToType(u: Type, e: Int): Type =
