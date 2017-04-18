@@ -41,7 +41,7 @@ class Quantity[N, U <: UnitExpr](val value: N)
 
   /**
    * Convert a quantity into new units.
-   * @tparam U2 the new unit expression to convert to. If U2 is not a compatible unit
+   * @tparam U2 the new unit expression to convert to. If U2 is not a convertable unit
    * then a compile-time error will occur
    * @return a new value of type Quantity[N, U2], equivalent to `this` quantity
    */
@@ -60,7 +60,7 @@ class Quantity[N, U <: UnitExpr](val value: N)
 
   /**
    * The sum of two unit quantities
-   * @tparam U2 the unit type of the right-hand quantity.  U2 must be compatible with U, or
+   * @tparam U2 the unit type of the right-hand quantity.  U2 must be convertable to U, or
    * a compile-time error will occur
    * @param that the right-hand side of the quantity sum
    * @return `this` + `that`, with units of left-hand side `this`
@@ -69,7 +69,7 @@ class Quantity[N, U <: UnitExpr](val value: N)
 
   /**
    * The difference of two unit quantities
-   * @tparam U2 the unit type of the right-hand quantity.  U2 must be compatible with U, or
+   * @tparam U2 the unit type of the right-hand quantity.  U2 must be convertable to U, or
    * a compile-time error will occur
    * @param that the right-hand side of the difference
    * @return `this` - `that`, with units of left-hand side `this`
@@ -80,7 +80,7 @@ class Quantity[N, U <: UnitExpr](val value: N)
    * The product of two unit quantities
    * @tparam U2 the unit type of the right-hand quantity
    * @param that the right-hand side of the product
-   * @return `this` * `that`, with units compatible with `U %* U2`
+   * @return `this` * `that`, with units convertable to `U %* U2`
    */
    def *[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, _] = macro UnitMacros.mulImpl[N, U, U2]
 
@@ -88,14 +88,14 @@ class Quantity[N, U <: UnitExpr](val value: N)
    * The quotient, or ratio, of two unit quantities
    * @tparam U2 the unit type of the right-hand quantity
    * @param that the right-hand side of the ratio
-   * @return `this` / `that`, with units compatible with `U %/ U2`
+   * @return `this` / `that`, with units convertable to `U %/ U2`
    */
    def /[U2 <: UnitExpr](that: Quantity[N, U2]): Quantity[N, _] = macro UnitMacros.divImpl[N, U, U2]
 
   /**
    * Raise a unit quantity to a power
    * @tparam E the church integer type representing the exponent
-   * @return `this` ^ E, in units compatible with `U %^ E`
+   * @return `this` ^ E, in units convertable to `U %^ E`
    */
   def pow[E <: ChurchInt]: Quantity[N, _] = macro UnitMacros.powImpl[N, U, E]
 
@@ -140,10 +140,10 @@ class Quantity[N, U <: UnitExpr](val value: N)
 /** Factory functions and implicit definitions associated with Quantity objects */
 object Quantity {
   /**
-   * Obtain a function that converts objects of Quantity[N, U1] into compatible Quantity[N, U2]
+   * Obtain a function that converts objects of Quantity[N, U1] into convertable Quantity[N, U2]
    * @tparam N the numeric representation type
    * @tparam U1 the unit type of input quantity.
-   * @tparam U2 the unit type of the output. If U2 is not compatible with U1,
+   * @tparam U2 the unit type of the output. If U2 is not convertable to U1,
    * then a compile-time error will occur.
    * @return a function for converting Quantity[N, U1] into Quantity[N, U2]
    */
@@ -154,7 +154,7 @@ object Quantity {
    * Obtain the numeric coefficient that represents the conversion factor from
    * a quantity with units U1 to a quantity of unit type U2
    * @tparam U1 the unit type of input quantity.
-   * @tparam U2 the unit type of the output. If U2 is not compatible with U1,
+   * @tparam U2 the unit type of the output. If U2 is not convertable to U1,
    * then a compile-time error will occur.
    * @return numeric coefficient, aka the conversion factor from U1 into U2
    */
@@ -177,7 +177,7 @@ object Quantity {
    */
   def fromTemperature[N, U <: TemperatureExpr](t: Temperature[N, U]) = new Quantity[N, U](t.value)
 
-  /** Implicit conversion between quantities of compatible units and same numeric type */
+  /** Implicit conversion between quantities of convertable units and same numeric type */
   implicit def implicitUnitConvert[N, U <: UnitExpr, U2 <: UnitExpr](q: Quantity[N, U]):
       Quantity[N, U2] =
     macro UnitMacros.unitConvertImpl[N, U, U2]
@@ -219,7 +219,7 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
 
   /**
    * Add a Quantity of temperature units to a temperature to get a new temperature
-   * @tparam U2 the temperature unit of right side.  If U2 is not a compatible unit (temperature)
+   * @tparam U2 the temperature unit of right side.  If U2 is not a convertable unit (temperature)
    * a compile-time error will ocurr.
    * @param that the right hand side of sum
    * @return a new temperature that is sum of left-hand temp plus right-hand temp quantity
@@ -229,7 +229,7 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
 
   /**
    * Subtract a Quantity of temperature units from a temperature to get a new temperature
-   * @tparam U2 the temperature unit of right side.  If U2 is not a compatible unit (temperature)
+   * @tparam U2 the temperature unit of right side.  If U2 is not a convertable unit (temperature)
    * a compile-time error will ocurr.
    * @param that the right hand side of difference
    * @return a new temperature that is the left-hand temp minus right-hand temp quantity
@@ -285,7 +285,7 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
 /** Factory functions and implicit definitions associated with Temperature objects */
 object Temperature {
   /**
-   * Obtain a function that converts objects of Temperature[U] into compatible Temperature[U2]
+   * Obtain a function that converts objects of Temperature[U] into convertable Temperature[U2]
    * @tparam N the numeric representation type
    * @tparam U the unit type of input temp.
    * @tparam U2 the unit type of the output.
@@ -311,7 +311,7 @@ object Temperature {
    */
   def fromQuantity[N, U <: TemperatureExpr](q: Quantity[N, U]) = new Temperature[N, U](q.value)
 
-  /** Implicit conversion between temperatures of compatible units and same numeric type */
+  /** Implicit conversion between temperatures of convertable units and same numeric type */
   implicit def implicitTempConvert[N, U1 <: TemperatureExpr, U2 <: TemperatureExpr](
       t: Temperature[N, U1]): Temperature[N, U2] =
     macro UnitMacros.unitConvertTempImpl[N, U1, U2]

@@ -32,12 +32,12 @@ case class UnitRec[UE <: UnitExpr](name: String, coef: Rational, abbv: String)
 
 case class TempUnitRec[UE <: TemperatureExpr](offset: Rational)
 
-@implicitNotFound("Implicit not found: CompatUnits[${U1}, ${U2}].\nIncompatible Unit Expressions: ${U1} and ${U2}")
-class CompatUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Rational)
+@implicitNotFound("Implicit not found: ConvertableUnits[${U1}, ${U2}].\nInconvertable Unit Expressions: ${U1} and ${U2}")
+class ConvertableUnits[U1 <: UnitExpr, U2 <: UnitExpr](val coef: Rational)
 
-object CompatUnits {
-  implicit def witnessCompatUnits[U1 <: UnitExpr, U2 <: UnitExpr]: CompatUnits[U1, U2] =
-    macro UnitMacros.compatUnits[U1, U2]
+object ConvertableUnits {
+  implicit def witnessConvertableUnits[U1 <: UnitExpr, U2 <: UnitExpr]: ConvertableUnits[U1, U2] =
+    macro UnitMacros.convertableUnits[U1, U2]
 }
 
 case class UnitExprString[U <: UnitExpr](str: String)

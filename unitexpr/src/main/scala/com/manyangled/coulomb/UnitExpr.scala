@@ -115,7 +115,7 @@ trait BaseTemperature extends BaseUnit with TemperatureExpr
  * units cancel out will also be of type Unitless
  * {{{
  * import USCustomaryUnits._
- * // ratio will have a type compatible with Unitless, since length units cancel
+ * // ratio will have a type convertable to Unitless, since length units cancel
  * val ratio = (Yard(1.0) / Foot(1.0)).toUnit[Unitless]
  * }}}
  */
