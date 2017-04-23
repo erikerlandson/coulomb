@@ -27,11 +27,13 @@ lazy val coulomb = (project in file("."))
 
 lazy val macros = (project in file("macros"))
   .dependsOn(unitexpr)
-  .settings(name := "coulomb-macros")
+  .settings(name := "coulomb-macros",
+            test := {})
   .settings(commonSettings :_*)
 
 lazy val unitexpr = (project in file("unitexpr"))
-  .settings(name := "coulomb-unitexpr")
+  .settings(name := "coulomb-unitexpr",
+            test := {})
   .settings(commonSettings :_*)
 
 lazy val examples = (project in file("examples"))
