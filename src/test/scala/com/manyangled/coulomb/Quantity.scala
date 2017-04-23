@@ -16,9 +16,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   import SIAcceptedUnits._
 
   import spire.math._
-  import Integral._
-  import spire.std.byte._
-  import spire.std.short._
 
   val epsilon = 1e-4
   implicit val doubleTolerant = TolerantNumerics.tolerantDoubleEquality(epsilon)
