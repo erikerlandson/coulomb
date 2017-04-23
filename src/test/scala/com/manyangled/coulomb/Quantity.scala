@@ -20,7 +20,7 @@ class QuantitySpec extends FlatSpec with Matchers {
   import spire.std.byte._
   import spire.std.short._
 
-  implicit val epsilon = 1e-4
+  val epsilon = 1e-4
   implicit val doubleTolerant = TolerantNumerics.tolerantDoubleEquality(epsilon)
   implicit val floatTolerant = TolerantNumerics.tolerantFloatEquality(epsilon.toFloat)
   implicit val bigDecimalTolerant = new org.scalactic.Equality[BigDecimal] {
