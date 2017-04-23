@@ -165,4 +165,22 @@ class QuantitySpec extends FlatSpec with Matchers {
     (-Kilogram(42.0)).qtup should beQ[Double, Kilogram](-42.0)
     (-(1.withUnit[Kilogram %/ Mole])).qtup should beQ[Int, Kilogram %/ Mole](-1)
   }
+
+  it should "implement +" in {
+    val literToCup = 4.22675283773 // Rational(2000000000 / 473176473)
+
+    // Full rational numerator multiplication overflows smaller integers.
+    // todo: investigate heuristics on smaller rationals
+    // see: https://github.com/erikerlandson/coulomb/issues/15
+    (Cup(100L) + Liter(100L)).qtup should beQ[Long, Cup](1.0 + literToCup, 100)
+    (Cup(BigInt(100)) + Liter(BigInt(100))).qtup should beQ[BigInt, Cup](1.0 + literToCup, 100)
+
+    (Cup(1f) + Liter(1f)).qtup should beQ[Float, Cup](1.0 + literToCup)
+    (Cup(1D) + Liter(1D)).qtup should beQ[Double, Cup](1.0 + literToCup)
+    (Cup(BigDecimal(1)) + Liter(BigDecimal(1))).qtup should beQ[BigDecimal, Cup](1.0 + literToCup)
+    (Cup(Rational(1)) + Liter(Rational(1))).qtup should beQ[Rational, Cup](1.0 + literToCup)
+    (Cup(Algebraic(1)) + Liter(Algebraic(1))).qtup should beQ[Algebraic, Cup](1.0 + literToCup)
+    (Cup(Real(1)) + Liter(Real(1))).qtup should beQ[Real, Cup](1.0 + literToCup)
+    (Cup(Number(1)) + Liter(Number(1))).qtup should beQ[Number, Cup](1.0 + literToCup)
+  }
 }
