@@ -139,12 +139,21 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def isIntegral(nT: Type): Boolean = {
-    try {
-      val t = appliedType(isIntType, List(nT))
-      c.inferImplicitValue(t, silent = false)
-      true
-    } catch {
-      case _: Throwable => false
+    nT match {
+      case t if (t =:= typeOf[Byte]) => true
+      case t if (t =:= typeOf[Short]) => true
+      case t if (t =:= typeOf[Int]) => true
+      case t if (t =:= typeOf[Long]) => true
+      case t if (t =:= typeOf[BigInt]) => true
+      case _ => {
+        try {
+          val t = appliedType(isIntType, List(nT))
+          c.inferImplicitValue(t, silent = false)
+          true
+        } catch {
+          case _: Throwable => false
+        }
+      }
     }
   }
 

@@ -55,8 +55,7 @@ class QuantityParser(
   private val importSeq = Seq(
     "com.manyangled.coulomb._",
     "ChurchInt._",
-    "spire.math._",
-    "Integral._") ++
+    "spire.math._") ++
     unitDeclarationObjects.map(objectName).map(n => s"${n}._") ++
     unitCompanionObjects.map(objectName)
 
