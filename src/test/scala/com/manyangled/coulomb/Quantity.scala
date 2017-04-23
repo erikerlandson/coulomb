@@ -106,8 +106,15 @@ class QuantitySpec extends FlatSpec with Matchers {
     "1D.withUnit[Mole %/ Liter].toUnit[(Kilo %* Mole) %/ (Meter %^ _4)]" shouldNot compile
   }
 
-  it should "implement toUnit" in {
+  it should "implement toUnit over supported numeric types" in {
     val meterToFoot = 3.2808399
+
+    // integral types
+    100.toByte.withUnit[Meter].toUnit[Foot].qtup should beQ[Byte, Foot](meterToFoot, 100)
+    100.toShort.withUnit[Meter].toUnit[Foot].qtup should beQ[Short, Foot](meterToFoot, 100)
+    100.withUnit[Meter].toUnit[Foot].qtup should beQ[Int, Foot](meterToFoot, 100)
+    100L.withUnit[Meter].toUnit[Foot].qtup should beQ[Long, Foot](meterToFoot, 100)
+    BigInt(100).withUnit[Meter].toUnit[Foot].qtup should beQ[BigInt, Foot](meterToFoot, 100)
 
     // non-integral types
     1f.withUnit[Meter].toUnit[Foot].qtup should beQ[Float, Foot](meterToFoot)
@@ -117,12 +124,21 @@ class QuantitySpec extends FlatSpec with Matchers {
     Algebraic(1).withUnit[Meter].toUnit[Foot].qtup should beQ[Algebraic, Foot](meterToFoot)
     Real(1).withUnit[Meter].toUnit[Foot].qtup should beQ[Real, Foot](meterToFoot)
     Number(1).withUnit[Meter].toUnit[Foot].qtup should beQ[Number, Foot](meterToFoot)
+  }
 
-    // integral types
-    10.toByte.withUnit[Meter].toUnit[Foot].qtup should beQ[Byte, Foot](meterToFoot, 10)
-    100.toShort.withUnit[Meter].toUnit[Foot].qtup should beQ[Short, Foot](meterToFoot, 100)
-    100.withUnit[Meter].toUnit[Foot].qtup should beQ[Int, Foot](meterToFoot, 100)
-    100L.withUnit[Meter].toUnit[Foot].qtup should beQ[Long, Foot](meterToFoot, 100)
-    BigInt(100).withUnit[Meter].toUnit[Foot].qtup should beQ[BigInt, Foot](meterToFoot, 100)
+  it should "implement toRef over supported numeric types" in {
+    37.withUnit[Second].toRep[Byte].qtup should beQ[Byte, Second](37.0)
+    37.withUnit[Second].toRep[Short].qtup should beQ[Short, Second](37.0)
+    37.withUnit[Second].toRep[Int].qtup should beQ[Int, Second](37.0)
+    37.withUnit[Second].toRep[Long].qtup should beQ[Long, Second](37.0)
+    37.withUnit[Second].toRep[BigInt].qtup should beQ[BigInt, Second](37.0)
+
+    37.withUnit[Second].toRep[Float].qtup should beQ[Float, Second](37.0)
+    37.withUnit[Second].toRep[Double].qtup should beQ[Double, Second](37.0)
+    37.withUnit[Second].toRep[BigDecimal].qtup should beQ[BigDecimal, Second](37.0)
+    37.withUnit[Second].toRep[Rational].qtup should beQ[Rational, Second](37.0)
+    37.withUnit[Second].toRep[Algebraic].qtup should beQ[Algebraic, Second](37.0)
+    37.withUnit[Second].toRep[Real].qtup should beQ[Real, Second](37.0)
+    37.withUnit[Second].toRep[Number].qtup should beQ[Number, Second](37.0)
   }
 }
