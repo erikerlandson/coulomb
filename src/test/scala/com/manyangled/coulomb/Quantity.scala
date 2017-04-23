@@ -145,6 +145,15 @@ class QuantitySpec extends FlatSpec with Matchers {
     Number(1).withUnit[Meter].toUnit[Foot].qtup should beQ[Number, Foot](meterToFoot)
   }
 
+  it should "implement toUnit optimization cases" in {
+    // numerator only conversion
+    Yard(2).toUnit[Foot].qtup should beQ[Int, Foot](6)
+
+    // identity
+    Meter(2).toUnit[Meter].qtup should beQ[Int, Meter](2)
+    Meter(2.0).toUnit[Meter].qtup should beQ[Double, Meter](2)
+  }
+
   it should "implement toRef over supported numeric types" in {
     37.withUnit[Second].toRep[Byte].qtup should beQ[Byte, Second](37.0)
     37.withUnit[Second].toRep[Short].qtup should beQ[Short, Second](37.0)
@@ -182,5 +191,14 @@ class QuantitySpec extends FlatSpec with Matchers {
     (Cup(Algebraic(1)) + Liter(Algebraic(1))).qtup should beQ[Algebraic, Cup](1.0 + literToCup)
     (Cup(Real(1)) + Liter(Real(1))).qtup should beQ[Real, Cup](1.0 + literToCup)
     (Cup(Number(1)) + Liter(Number(1))).qtup should beQ[Number, Cup](1.0 + literToCup)
+  }
+
+  it should "implement + optimization cases" in {
+    // numerator only conversion
+    (Cup(1) + Quart(1)).qtup should beQ[Int, Cup](5)
+
+    // identity
+    (Cup(1) + Cup(1)).qtup should beQ[Int, Cup](2)
+    (Cup(1.0) + Cup(1.0)).qtup should beQ[Double, Cup](2.0)
   }
 }
