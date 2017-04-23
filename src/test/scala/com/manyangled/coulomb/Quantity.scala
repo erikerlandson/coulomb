@@ -93,6 +93,25 @@ class QuantitySpec extends FlatSpec with Matchers {
 
   it should "allocate a Quantity" in {
     val q = new Quantity[Double, Meter](1.0)
+    q.qtup should beQ[Double, Meter](1)
+  }
+
+  it should "define the Standard International Base Units" in {
+    val m = Meter(1D)
+    val s = Second(1f)
+    val kg = Kilogram(1)
+    val a = Ampere(1L)
+    val mol = Mole(BigInt(1))
+    val c = Candela(BigDecimal(1))
+    val k = Kelvin(Rational(1))
+
+    m.qtup should beQ[Double, Meter](1)
+    s.qtup should beQ[Float, Second](1)
+    kg.qtup should beQ[Int, Kilogram](1)
+    a.qtup should beQ[Long, Ampere](1)
+    mol.qtup should beQ[BigInt, Mole](1)
+    c.qtup should beQ[BigDecimal, Candela](1)
+    k.qtup should beQ[Rational, Kelvin](1)
   }
 
   it should "enforce unit convertability at compile time" in {
