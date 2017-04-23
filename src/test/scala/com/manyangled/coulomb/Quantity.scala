@@ -160,4 +160,9 @@ class QuantitySpec extends FlatSpec with Matchers {
     37.withUnit[Second].toRep[Real].qtup should beQ[Real, Second](37.0)
     37.withUnit[Second].toRep[Number].qtup should beQ[Number, Second](37.0)
   }
+
+  it should "implement unary -" in {
+    (-Kilogram(42.0)).qtup should beQ[Double, Kilogram](-42.0)
+    (-(1.withUnit[Kilogram %/ Mole])).qtup should beQ[Int, Kilogram %/ Mole](-1)
+  }
 }
