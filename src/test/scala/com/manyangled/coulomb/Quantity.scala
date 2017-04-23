@@ -109,17 +109,20 @@ class QuantitySpec extends FlatSpec with Matchers {
   it should "implement toUnit" in {
     val meterToFoot = 3.2808399
 
-    1D.withUnit[Meter].toUnit[Foot].qtup should beQ[Double, Foot](meterToFoot)
+    // non-integral types
     1f.withUnit[Meter].toUnit[Foot].qtup should beQ[Float, Foot](meterToFoot)
-    100.withUnit[Meter].toUnit[Foot].qtup should beQ[Int, Foot](meterToFoot, 100)
-    100L.withUnit[Meter].toUnit[Foot].qtup should beQ[Long, Foot](meterToFoot, 100)
-    100.toShort.withUnit[Meter].toUnit[Foot].qtup should beQ[Short, Foot](meterToFoot, 100)
-    10.toByte.withUnit[Meter].toUnit[Foot].qtup should beQ[Byte, Foot](meterToFoot, 10)
+    1D.withUnit[Meter].toUnit[Foot].qtup should beQ[Double, Foot](meterToFoot)
     BigDecimal(1D).withUnit[Meter].toUnit[Foot].qtup should beQ[BigDecimal, Foot](meterToFoot)
-    BigInt(100).withUnit[Meter].toUnit[Foot].qtup should beQ[BigInt, Foot](meterToFoot, 100)
     Rational(1).withUnit[Meter].toUnit[Foot].qtup should beQ[Rational, Foot](meterToFoot)
     Algebraic(1).withUnit[Meter].toUnit[Foot].qtup should beQ[Algebraic, Foot](meterToFoot)
     Real(1).withUnit[Meter].toUnit[Foot].qtup should beQ[Real, Foot](meterToFoot)
     Number(1).withUnit[Meter].toUnit[Foot].qtup should beQ[Number, Foot](meterToFoot)
+
+    // integral types
+    10.toByte.withUnit[Meter].toUnit[Foot].qtup should beQ[Byte, Foot](meterToFoot, 10)
+    100.toShort.withUnit[Meter].toUnit[Foot].qtup should beQ[Short, Foot](meterToFoot, 100)
+    100.withUnit[Meter].toUnit[Foot].qtup should beQ[Int, Foot](meterToFoot, 100)
+    100L.withUnit[Meter].toUnit[Foot].qtup should beQ[Long, Foot](meterToFoot, 100)
+    BigInt(100).withUnit[Meter].toUnit[Foot].qtup should beQ[BigInt, Foot](meterToFoot, 100)
   }
 }
