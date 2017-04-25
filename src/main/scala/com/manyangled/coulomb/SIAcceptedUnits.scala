@@ -70,6 +70,9 @@ object SIAcceptedUnits {
   @UnitDecl("millimeter", Rational(1, 1000), "mm")
   trait Millimeter extends DerivedUnit[Meter]
 
+  @UnitDecl("centimeter", Rational(1, 100), "cm")
+  trait Centimeter extends DerivedUnit[Meter]
+
   @UnitDecl("gram", Rational(1, 1000), "g")
   trait Gram extends DerivedUnit[Kilogram]
 }
