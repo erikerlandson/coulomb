@@ -128,6 +128,31 @@ class QuantitySpec extends FlatSpec with Matchers {
       MatchResult(t, msg, "Expected Quantity type and value")
     }
 
+  def beQXI[N :TypeTag, U <: UnitExpr :TypeTag](tval: Int)(implicit
+      tcf: spire.math.ConvertableFrom[N]) =
+    Matcher { qtuple: (Any, Type, Type) =>
+      val (qA, tN, tU) = qtuple
+      val (t, msg) = (tN, tU) match {
+        case (tn, _) if (!(tn =:= typeOf[N])) =>
+          (false, s"Representation type $tn did not match target ${typeOf[N]}")
+        case (_, tu) if (!(tu =:= typeOf[U])) =>
+          (false, s"Unit type $tu did not match target ${typeOf[U]}")
+        case (tn, _) if (
+          !(tn =:= typeOf[Byte]) &&
+          !(tn =:= typeOf[Short]) &&
+          !(tn =:= typeOf[Int]) &&
+          !(tn =:= typeOf[Long]) &&
+          !(tn =:= typeOf[BigInt])) => (false, s"unrecognized integral type $tn")
+        case _ => {
+          val q = qA.asInstanceOf[Quantity[N, U]]
+          if (tcf.toInt(q.value) == tval) (true, "") else {
+            (false, s"Value ${q.value} did not match target $tval")
+          }
+        }
+      }
+      MatchResult(t, msg, "Expected Quantity type and value")
+    }
+
   it should "allocate a Quantity" in {
     val q = new Quantity[Double, Meter](1.0)
     q.qtup should beQ[Double, Meter](1)
@@ -144,9 +169,9 @@ class QuantitySpec extends FlatSpec with Matchers {
 
     m.qtup should beQ[Double, Meter](1)
     s.qtup should beQ[Float, Second](1)
-    kg.qtup should beQ[Int, Kilogram](1)
+    kg.qtup should beQXI[Int, Kilogram](1)
     a.qtup should beQ[Long, Ampere](1)
-    mol.qtup should beQ[BigInt, Mole](1)
+    mol.qtup should beQXI[BigInt, Mole](1)
     c.qtup should beQ[BigDecimal, Candela](1)
     k.qtup should beQ[Rational, Kelvin](1)
   }
@@ -184,19 +209,19 @@ class QuantitySpec extends FlatSpec with Matchers {
 
   it should "implement toUnit optimization cases" in {
     // numerator only conversion
-    Yard(2).toUnit[Foot].qtup should beQ[Int, Foot](6)
+    Yard(2).toUnit[Foot].qtup should beQXI[Int, Foot](6)
 
     // identity
-    Meter(2).toUnit[Meter].qtup should beQ[Int, Meter](2)
+    Meter(2).toUnit[Meter].qtup should beQXI[Int, Meter](2)
     Meter(2.0).toUnit[Meter].qtup should beQ[Double, Meter](2)
   }
 
   it should "implement toRef over supported numeric types" in {
-    37.withUnit[Second].toRep[Byte].qtup should beQ[Byte, Second](37.0)
-    37.withUnit[Second].toRep[Short].qtup should beQ[Short, Second](37.0)
-    37.withUnit[Second].toRep[Int].qtup should beQ[Int, Second](37.0)
-    37.withUnit[Second].toRep[Long].qtup should beQ[Long, Second](37.0)
-    37.withUnit[Second].toRep[BigInt].qtup should beQ[BigInt, Second](37.0)
+    37.withUnit[Second].toRep[Byte].qtup should beQXI[Byte, Second](37)
+    37.withUnit[Second].toRep[Short].qtup should beQXI[Short, Second](37)
+    37.withUnit[Second].toRep[Int].qtup should beQXI[Int, Second](37)
+    37.withUnit[Second].toRep[Long].qtup should beQXI[Long, Second](37)
+    37.withUnit[Second].toRep[BigInt].qtup should beQXI[BigInt, Second](37)
 
     37.withUnit[Second].toRep[Float].qtup should beQ[Float, Second](37.0)
     37.withUnit[Second].toRep[Double].qtup should beQ[Double, Second](37.0)
@@ -209,7 +234,7 @@ class QuantitySpec extends FlatSpec with Matchers {
 
   it should "implement unary -" in {
     (-Kilogram(42.0)).qtup should beQ[Double, Kilogram](-42.0)
-    (-(1.withUnit[Kilogram %/ Mole])).qtup should beQ[Int, Kilogram %/ Mole](-1)
+    (-(1.withUnit[Kilogram %/ Mole])).qtup should beQXI[Int, Kilogram %/ Mole](-1)
   }
 
   it should "implement +" in {
@@ -232,10 +257,10 @@ class QuantitySpec extends FlatSpec with Matchers {
 
   it should "implement + optimization cases" in {
     // numerator only conversion
-    (Cup(1) + Quart(1)).qtup should beQ[Int, Cup](5)
+    (Cup(1) + Quart(1)).qtup should beQXI[Int, Cup](5)
 
     // identity
-    (Cup(1) + Cup(1)).qtup should beQ[Int, Cup](2)
+    (Cup(1) + Cup(1)).qtup should beQXI[Int, Cup](2)
     (Cup(1.0) + Cup(1.0)).qtup should beQ[Double, Cup](2.0)
   }
 
@@ -264,10 +289,10 @@ class QuantitySpec extends FlatSpec with Matchers {
 
   it should "implement - optimization cases" in {
     // numerator only conversion
-    (Inch(13) - Foot(1)).qtup should beQ[Int, Inch](1)
+    (Inch(13) - Foot(1)).qtup should beQXI[Int, Inch](1)
 
     // identity
-    (Inch(2) - Inch(1)).qtup should beQ[Int, Inch](1)
+    (Inch(2) - Inch(1)).qtup should beQXI[Int, Inch](1)
     (Inch(2.0) - Inch(1.0)).qtup should beQ[Double, Inch](1)
   }
 }
