@@ -295,4 +295,26 @@ class QuantitySpec extends FlatSpec with Matchers {
     (Inch(2) - Inch(1)).qtup should beQXI[Int, Inch](1)
     (Inch(2.0) - Inch(1.0)).qtup should beQ[Double, Inch](1)
   }
+
+  it should "implement *" in {
+    (Acre(2.toByte) * Foot(3.toByte)).qtup should beQXI[Byte, Acre %* Foot](6)
+    (Acre(2.toShort) * Foot(3.toShort)).qtup should beQXI[Short, Acre %* Foot](6)
+    (Acre(2) * Foot(3)).qtup should beQXI[Int, Acre %* Foot](6)
+    (Acre(2L) * Foot(3L)).qtup should beQXI[Long, Acre %* Foot](6)
+    (Acre(BigInt(2)) * Foot(BigInt(3))).qtup should beQXI[BigInt, Acre %* Foot](6)
+
+    (Acre(2f) * Foot(3f)).qtup should beQ[Float, Acre %* Foot](6)
+    (Acre(2D) * Foot(3D)).qtup should beQ[Double, Acre %* Foot](6)
+    (Acre(BigDecimal(2)) * Foot(BigDecimal(3))).qtup should beQ[BigDecimal, Acre %* Foot](6)
+    (Acre(Rational(2)) * Foot(Rational(3))).qtup should beQ[Rational, Acre %* Foot](6)
+    (Acre(Algebraic(2)) * Foot(Algebraic(3))).qtup should beQ[Algebraic, Acre %* Foot](6)
+    (Acre(Real(2)) * Foot(Real(3))).qtup should beQ[Real, Acre %* Foot](6)
+    (Acre(Number(2)) * Foot(Number(3))).qtup should beQ[Number, Acre %* Foot](6)
+  }
+
+  it should "implement * miscellaneous" in {
+    (2.withUnit[Meter %/ Second] * Second(3)).qtup should beQXI[Int, Meter](6)
+    (2D.withUnit[Mole %/ Liter] * 2D.withUnit[Liter %/ Second] * 2D.withUnit[Second])
+      .qtup should beQ[Double, Mole](8)
+  }
 }
