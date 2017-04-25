@@ -18,8 +18,48 @@ class QuantitySpec extends FlatSpec with Matchers {
   import spire.math._
 
   val epsilon = 1e-4
-  implicit val doubleTolerant = TolerantNumerics.tolerantDoubleEquality(epsilon)
-  implicit val floatTolerant = TolerantNumerics.tolerantFloatEquality(epsilon.toFloat)
+  implicit val byteTolerant = new org.scalactic.Equality[Byte] {
+    def areEqual(x: Byte, a: Any) = a match {
+      case y: Byte => math.abs(x - y) <= 1
+      case _ => false
+    }    
+  }
+  implicit val shortTolerant = new org.scalactic.Equality[Short] {
+    def areEqual(x: Short, a: Any) = a match {
+      case y: Short => math.abs(x - y) <= 1
+      case _ => false
+    }    
+  }
+  implicit val intTolerant = new org.scalactic.Equality[Int] {
+    def areEqual(x: Int, a: Any) = a match {
+      case y: Int => math.abs(x - y) <= 1
+      case _ => false
+    }    
+  }
+  implicit val longTolerant = new org.scalactic.Equality[Long] {
+    def areEqual(x: Long, a: Any) = a match {
+      case y: Long => math.abs(x - y) <= 1
+      case _ => false
+    }    
+  }
+  implicit val bigIntTolerant = new org.scalactic.Equality[BigInt] {
+    def areEqual(x: BigInt, a: Any) = a match {
+      case y: BigInt => (x - y).abs <= 1
+      case _ => false
+    }    
+  }
+  implicit val floatTolerant = new org.scalactic.Equality[Float] {
+    def areEqual(x: Float, a: Any) = a match {
+      case y: Float => math.abs(x - y) <= epsilon.toFloat
+      case _ => false
+    }    
+  }
+  implicit val doubleTolerant = new org.scalactic.Equality[Double] {
+    def areEqual(x: Double, a: Any) = a match {
+      case y: Double => math.abs(x - y) <= epsilon
+      case _ => false
+    }    
+  }
   implicit val bigDecimalTolerant = new org.scalactic.Equality[BigDecimal] {
     def areEqual(x: BigDecimal, a: Any) = a match {
       case y: BigDecimal => (x - y).abs <= BigDecimal(epsilon)
@@ -197,5 +237,37 @@ class QuantitySpec extends FlatSpec with Matchers {
     // identity
     (Cup(1) + Cup(1)).qtup should beQ[Int, Cup](2)
     (Cup(1.0) + Cup(1.0)).qtup should beQ[Double, Cup](2.0)
+  }
+
+  it should "implement -" in {
+    val inchToCentimeter = 2.54 // Rational(127 / 50)
+
+    (Centimeter(100.toByte) - Inch(10.toByte)).qtup should beQ[Byte, Centimeter](10.0 - inchToCentimeter, 10)
+    (Centimeter(1000.toShort) - Inch(100.toShort)).qtup should beQ[Short, Centimeter](
+      10.0 - inchToCentimeter, 100)
+    (Centimeter(1000) - Inch(100)).qtup should beQ[Int, Centimeter](10.0 - inchToCentimeter, 100)
+    (Centimeter(1000L) - Inch(100L)).qtup should beQ[Long, Centimeter](10.0 - inchToCentimeter, 100)
+    (Centimeter(BigInt(1000)) - Inch(BigInt(100))).qtup should beQ[BigInt, Centimeter](
+      10.0 - inchToCentimeter, 100)
+
+    (Centimeter(10f) - Inch(1f)).qtup should beQ[Float, Centimeter](10.0 - inchToCentimeter)
+    (Centimeter(10D) - Inch(1D)).qtup should beQ[Double, Centimeter](10.0 - inchToCentimeter)
+    (Centimeter(BigDecimal(10)) - Inch(BigDecimal(1))).qtup should beQ[BigDecimal, Centimeter](
+      10.0 - inchToCentimeter)
+    (Centimeter(Rational(10)) - Inch(Rational(1))).qtup should beQ[Rational, Centimeter](
+      10.0 - inchToCentimeter)
+    (Centimeter(Algebraic(10)) - Inch(Algebraic(1))).qtup should beQ[Algebraic, Centimeter](
+      10.0 - inchToCentimeter)
+    (Centimeter(Real(10)) - Inch(Real(1))).qtup should beQ[Real, Centimeter](10.0 - inchToCentimeter)
+    (Centimeter(Number(10)) - Inch(Number(1))).qtup should beQ[Number, Centimeter](10.0 - inchToCentimeter)
+  }
+
+  it should "implement - optimization cases" in {
+    // numerator only conversion
+    (Inch(13) - Foot(1)).qtup should beQ[Int, Inch](1)
+
+    // identity
+    (Inch(2) - Inch(1)).qtup should beQ[Int, Inch](1)
+    (Inch(2.0) - Inch(1.0)).qtup should beQ[Double, Inch](1)
   }
 }
