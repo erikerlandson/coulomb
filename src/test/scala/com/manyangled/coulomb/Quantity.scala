@@ -355,4 +355,118 @@ class QuantitySpec extends FlatSpec with Matchers {
     Meter(7).pow[_1].qtup should beQXI[Int, Meter](7)
     Second(Rational(1, 11)).pow[_neg1].qtup should beQ[Rational, Second %^ _neg1](11)
   }
+
+  it should "implement <" in {
+    (Meter(1) < Meter(2)) should be (true)
+    (Meter(1) < Meter(1)) should be (false)
+    (Meter(2) < Meter(1)) should be (false)
+
+    (Meter(1D) < Meter(2D)) should be (true)
+    (Meter(1D) < Meter(1D)) should be (false)
+    (Meter(2D) < Meter(1D)) should be (false)
+
+    (Yard(1) < Foot(6)) should be (true)
+    (Yard(1) < Foot(4)) should be (false)
+    (Yard(1) < Foot(3)) should be (false)
+    (Yard(1) < Foot(2)) should be (false)
+
+    (Yard(1f) < Foot(4f)) should be (true)
+    (Yard(1f) < Foot(3f)) should be (false)
+    (Yard(1f) < Foot(2f)) should be (false)
+  }
+
+  it should "implement >" in {
+    (Meter(1) > Meter(2)) should be (false)
+    (Meter(1) > Meter(1)) should be (false)
+    (Meter(2) > Meter(1)) should be (true)
+
+    (Meter(1D) > Meter(2D)) should be (false)
+    (Meter(1D) > Meter(1D)) should be (false)
+    (Meter(2D) > Meter(1D)) should be (true)
+
+    (Yard(1) > Foot(6)) should be (false)
+    (Yard(1) > Foot(4)) should be (false)
+    (Yard(1) > Foot(3)) should be (false)
+    (Yard(1) > Foot(2)) should be (true)
+
+    (Yard(1f) > Foot(4f)) should be (false)
+    (Yard(1f) > Foot(3f)) should be (false)
+    (Yard(1f) > Foot(2f)) should be (true)
+  }
+
+  it should "implement <=" in {
+    (Meter(1) <= Meter(2)) should be (true)
+    (Meter(1) <= Meter(1)) should be (true)
+    (Meter(2) <= Meter(1)) should be (false)
+
+    (Meter(1D) <= Meter(2D)) should be (true)
+    (Meter(1D) <= Meter(1D)) should be (true)
+    (Meter(2D) <= Meter(1D)) should be (false)
+
+    (Yard(1) <= Foot(6)) should be (true)
+    (Yard(1) <= Foot(4)) should be (true)
+    (Yard(1) <= Foot(3)) should be (true)
+    (Yard(1) <= Foot(2)) should be (false)
+
+    (Yard(1f) <= Foot(4f)) should be (true)
+    (Yard(1f) <= Foot(3f)) should be (true)
+    (Yard(1f) <= Foot(2f)) should be (false)
+  }
+
+  it should "implement >=" in {
+    (Meter(1) >= Meter(2)) should be (false)
+    (Meter(1) >= Meter(1)) should be (true)
+    (Meter(2) >= Meter(1)) should be (true)
+
+    (Meter(1D) >= Meter(2D)) should be (false)
+    (Meter(1D) >= Meter(1D)) should be (true)
+    (Meter(2D) >= Meter(1D)) should be (true)
+
+    (Yard(1) >= Foot(6)) should be (false)
+    (Yard(1) >= Foot(4)) should be (true)
+    (Yard(1) >= Foot(3)) should be (true)
+    (Yard(1) >= Foot(2)) should be (true)
+
+    (Yard(1f) >= Foot(4f)) should be (false)
+    (Yard(1f) >= Foot(3f)) should be (true)
+    (Yard(1f) >= Foot(2f)) should be (true)
+  }
+
+  it should "implement ===" in {
+    (Meter(1) === Meter(2)) should be (false)
+    (Meter(1) === Meter(1)) should be (true)
+    (Meter(2) === Meter(1)) should be (false)
+
+    (Meter(1D) === Meter(2D)) should be (false)
+    (Meter(1D) === Meter(1D)) should be (true)
+    (Meter(2D) === Meter(1D)) should be (false)
+
+    (Yard(1) === Foot(6)) should be (false)
+    (Yard(1) === Foot(4)) should be (true)
+    (Yard(1) === Foot(3)) should be (true)
+    (Yard(1) === Foot(2)) should be (false)
+
+    (Yard(1f) === Foot(4f)) should be (false)
+    (Yard(1f) === Foot(3f)) should be (true)
+    (Yard(1f) === Foot(2f)) should be (false)
+  }
+
+  it should "implement =!=" in {
+    (Meter(1) =!= Meter(2)) should be (true)
+    (Meter(1) =!= Meter(1)) should be (false)
+    (Meter(2) =!= Meter(1)) should be (true)
+
+    (Meter(1D) =!= Meter(2D)) should be (true)
+    (Meter(1D) =!= Meter(1D)) should be (false)
+    (Meter(2D) =!= Meter(1D)) should be (true)
+
+    (Yard(1) =!= Foot(6)) should be (true)
+    (Yard(1) =!= Foot(4)) should be (false)
+    (Yard(1) =!= Foot(3)) should be (false)
+    (Yard(1) =!= Foot(2)) should be (true)
+
+    (Yard(1f) =!= Foot(4f)) should be (true)
+    (Yard(1f) =!= Foot(3f)) should be (false)
+    (Yard(1f) =!= Foot(2f)) should be (true)
+  }
 }
