@@ -469,4 +469,40 @@ class QuantitySpec extends FlatSpec with Matchers {
     (Yard(1f) =!= Foot(3f)) should be (false)
     (Yard(1f) =!= Foot(2f)) should be (true)
   }
+
+  it should "implement toStr" in {
+    Meter(1).toStr should be ("1 m")
+    1.withUnit[Kilo %* Meter].toStr should be ("1 km")
+    (Meter(1.5) / Second(1.0)).toStr should be ("1.5 m / s")
+    Second(1.0).pow[_neg1].toStr should be ("1.0 s^-1")
+    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].toStr should be ("1 (acre ft) / (m s)")
+    1.withUnit[Meter %/ (Second %^ _2)].toStr should be ("1 m / (s^2)")
+  }
+
+  it should "implement toStrFull" in {
+    Meter(1).toStrFull should be ("1 meter")
+    1.withUnit[Kilo %* Meter].toStrFull should be ("1 kilo-meter")
+    (Meter(1.5) / Second(1.0)).toStrFull should be ("1.5 meter / second")
+    Second(1.0).pow[_neg1].toStrFull should be ("1.0 second ^ -1")
+    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].toStrFull should be ("1 (acre * foot) / (meter * second)")
+    1.withUnit[Meter %/ (Second %^ _2)].toStrFull should be ("1 meter / (second ^ 2)")
+  }
+
+  it should "implement unitStr" in {
+    Meter(1).unitStr should be ("m")
+    1.withUnit[Kilo %* Meter].unitStr should be ("km")
+    (Meter(1.5) / Second(1.0)).unitStr should be ("m / s")
+    Second(1.0).pow[_neg1].unitStr should be ("s^-1")
+    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].unitStr should be ("(acre ft) / (m s)")
+    1.withUnit[Meter %/ (Second %^ _2)].unitStr should be ("m / (s^2)")
+  }
+
+  it should "implement unitStrFull" in {
+    Meter(1).unitStrFull should be ("meter")
+    1.withUnit[Kilo %* Meter].unitStrFull should be ("kilo-meter")
+    (Meter(1.5) / Second(1.0)).unitStrFull should be ("meter / second")
+    Second(1.0).pow[_neg1].unitStrFull should be ("second ^ -1")
+    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].unitStrFull should be ("(acre * foot) / (meter * second)")
+    1.withUnit[Meter %/ (Second %^ _2)].unitStrFull should be ("meter / (second ^ 2)")
+  }
 }
