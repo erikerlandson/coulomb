@@ -505,4 +505,19 @@ class QuantitySpec extends FlatSpec with Matchers {
     1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].unitStrFull should be ("(acre * foot) / (meter * second)")
     1.withUnit[Meter %/ (Second %^ _2)].unitStrFull should be ("meter / (second ^ 2)")
   }
+
+  it should "implement converter companion method" in {
+    val f1 = Quantity.converter[Double, Kilo %* Meter, Mile]
+    f1(1D.withUnit[Kilo %* Meter]).qtup should beQ[Double, Mile](0.62137)
+    f1(Mile(1.0)).qtup should beQ[Double, Mile](1.0)
+
+    val f2 = Quantity.converter[Algebraic, Meter %/ (Second %^ _2), Foot %/ (Second %^ _2)]
+    f2(Algebraic(9.801).withUnit[Meter %/ (Second %^ _2)])
+      .qtup should beQ[Algebraic, Foot %/ (Second %^ _2)](32.1555)
+    f2(Algebraic(1).withUnit[Foot %/ (Second %^ _2)])
+      .qtup should beQ[Algebraic, Foot %/ (Second %^ _2)](1.0)
+
+    "Quantity.converter[Algebraic, Meter %/ (Second %^ _2), Mole %/ (Second %^ _2)]" shouldNot compile
+    "Quantity.converter[Algebraic, Meter %/ (Second %^ _2), Foot %/ (Second %^ _3)]" shouldNot compile
+  }
 }
