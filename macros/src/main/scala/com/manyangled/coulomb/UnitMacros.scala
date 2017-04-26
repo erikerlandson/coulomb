@@ -785,7 +785,9 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       .map { case (u, e) => (u -> -e) }.sortBy { case (_, e) => e }
     val tPos = seqToType(ePos)
     val tNeg = seqToType(eNeg)
-    if (eNeg.isEmpty) tPos else appliedType(divType, List(tPos, tNeg))
+    if (eNeg.isEmpty) tPos
+    else if (ePos.isEmpty) appliedType(powType, List(tNeg, churchType(-1)))
+    else appliedType(divType, List(tPos, tNeg))
   }
 
   def unitDecl(annottees: c.Expr[Any]*): c.Expr[Any] = {

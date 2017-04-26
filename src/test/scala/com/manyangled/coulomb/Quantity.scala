@@ -333,4 +333,26 @@ class QuantitySpec extends FlatSpec with Matchers {
     (Meter(Real(10)) / Second(Real(3))).qtup should beQ[Real, Meter %/ Second](3.33333)
     (Meter(Number(10)) / Second(Number(3))).qtup should beQ[Number, Meter %/ Second](3.33333)
   }
+
+  it should "implement pow" in {
+    Meter(3.toByte).pow[_2].qtup should beQXI[Byte, Meter %^ _2](9)
+    Meter(3.toShort).pow[_2].qtup should beQXI[Short, Meter %^ _2](9)
+    Meter(3).pow[_2].qtup should beQXI[Int, Meter %^ _2](9)
+    Meter(3L).pow[_2].qtup should beQXI[Long, Meter %^ _2](9)
+    Meter(BigInt(3)).pow[_2].qtup should beQXI[BigInt, Meter %^ _2](9)
+
+    Meter(3f).pow[_2].qtup should beQ[Float, Meter %^ _2](9)
+    Meter(3D).pow[_2].qtup should beQ[Double, Meter %^ _2](9)
+    Meter(BigDecimal(3)).pow[_2].qtup should beQ[BigDecimal, Meter %^ _2](9)
+    Meter(Rational(3)).pow[_2].qtup should beQ[Rational, Meter %^ _2](9)
+    Meter(Algebraic(3)).pow[_2].qtup should beQ[Algebraic, Meter %^ _2](9)
+    Meter(Real(3)).pow[_2].qtup should beQ[Real, Meter %^ _2](9)
+    Meter(Number(3)).pow[_2].qtup should beQ[Number, Meter %^ _2](9)
+  }
+
+  it should "implement pow miscellaneous" in {
+    5D.withUnit[Meter %/ Second].pow[_0].qtup should beQ[Double, Unitless](1)
+    Meter(7).pow[_1].qtup should beQXI[Int, Meter](7)
+    Second(Rational(1, 11)).pow[_neg1].qtup should beQ[Rational, Second %^ _neg1](11)
+  }
 }
