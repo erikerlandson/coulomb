@@ -20,4 +20,14 @@ class TemperatureSpec extends FlatSpec with Matchers {
     val t = new Temperature[Double, Kelvin](1.0)
     t.ttup should beT[Double, Kelvin](1)
   }
+
+  it should "define common temperature types" in {
+    val k = 1D.withTemperature[Kelvin]
+    val c = 1.withTemperature[Celsius]
+    val f = 1f.withTemperature[Fahrenheit]
+
+    k.ttup should beT[Double, Kelvin](1)
+    c.ttup should beTXI[Int, Celsius](1)
+    f.ttup should beT[Float, Fahrenheit](1)
+  }
 }
