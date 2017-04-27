@@ -520,4 +520,14 @@ class QuantitySpec extends FlatSpec with Matchers {
     "Quantity.converter[Algebraic, Meter %/ (Second %^ _2), Mole %/ (Second %^ _2)]" shouldNot compile
     "Quantity.converter[Algebraic, Meter %/ (Second %^ _2), Foot %/ (Second %^ _3)]" shouldNot compile
   }
+
+  it should "implement coefficient companion method" in {
+    Quantity.coefficient[Yard, Meter] should be (Rational(9144, 10000))
+    Quantity.coefficient[Mile %/ Hour, Meter %/ Second] should be (Rational(1397, 3125))
+    Quantity.coefficient[(Kilo %* Meter) %/ (Second %^ _2), Mile %/ (Minute %^ _2)] should be (
+      Rational(3125000, 1397))
+
+    "Quantity.coefficient[Mile %/ Hour, Meter %/ Kilogram]" shouldNot compile
+    "Quantity.coefficient[(Kilo %* Meter) %/ (Second %^ _2), Mile %/ (Ampere %^ _2)]" shouldNot compile
+  }
 }
