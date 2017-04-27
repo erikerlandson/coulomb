@@ -30,4 +30,15 @@ class TemperatureSpec extends FlatSpec with Matchers {
     c.ttup should beTXI[Int, Celsius](1)
     f.ttup should beT[Float, Fahrenheit](1)
   }
+
+  it should "enforce convertability at compile time" in {
+    "1D.withTemperature[Kelvin].toUnit[Celsius]" should compile
+    "1D.withTemperature[Kelvin].toUnit[Meter]" shouldNot compile
+
+    "1D.withTemperature[Celsius].toUnit[Fahrenheit]" should compile
+    "1D.withTemperature[Celsius].toUnit[Second]" shouldNot compile
+
+    "1D.withTemperature[Fahrenheit].toUnit[Kelvin]" should compile
+    "1D.withTemperature[Fahrenheit].toUnit[Kilogram]" shouldNot compile
+  }
 }
