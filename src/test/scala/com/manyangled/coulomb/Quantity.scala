@@ -530,4 +530,16 @@ class QuantitySpec extends FlatSpec with Matchers {
     "Quantity.coefficient[Mile %/ Hour, Meter %/ Kilogram]" shouldNot compile
     "Quantity.coefficient[(Kilo %* Meter) %/ (Second %^ _2), Mile %/ (Ampere %^ _2)]" shouldNot compile
   }
+
+  it should "implement unitStr companion method" in {
+    Quantity.unitStr[Meter] should be ("m")
+    Quantity.unitStr[Kilo %* Meter] should be ("km")
+    Quantity.unitStr[Meter %/ Second] should be ("m / s")
+  }
+
+  it should "implement unitStrFull companion method" in {
+    Quantity.unitStrFull[Meter] should be ("meter")
+    Quantity.unitStrFull[Kilo %* Meter] should be ("kilo-meter")
+    Quantity.unitStrFull[Meter %/ Second] should be ("meter / second")
+  }
 }
