@@ -542,4 +542,14 @@ class QuantitySpec extends FlatSpec with Matchers {
     Quantity.unitStrFull[Kilo %* Meter] should be ("kilo-meter")
     Quantity.unitStrFull[Meter %/ Second] should be ("meter / second")
   }
+
+  it should "implement implicit conversion between convertable units" in {
+    (1D.withUnit[Yard] :Quantity[Double, Foot]).qtup should beQ[Double, Foot](3)
+
+    val q: Quantity[Double, Mile %/ Hour] = 1D.withUnit[Kilo %* Meter %/ Second]
+    q.qtup should beQ[Double, Mile %/ Hour](2236.936292)
+
+    def f(a: Double WithUnit (Meter %/ (Second %^ _2))) = a
+    f(32D.withUnit[Foot %/ (Second %^ _2)]).qtup should beQ[Double, Meter %/ (Second %^ _2)](9.7536)
+  }
 }
