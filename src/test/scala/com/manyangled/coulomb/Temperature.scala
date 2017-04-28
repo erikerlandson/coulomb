@@ -94,4 +94,64 @@ class TemperatureSpec extends FlatSpec with Matchers {
     (212.withTemperature[Fahrenheit] - 50.withTemperature[Celsius]).qtup should beQ[Int, Fahrenheit](90)
     (212f.withTemperature[Fahrenheit] - 50f.withTemperature[Celsius]).qtup should beQ[Float, Fahrenheit](90)
   }
+
+  it should "implement <" in {
+    (1.withTemperature[Celsius] < 2.withTemperature[Celsius]) should be (true)
+    (1.withTemperature[Celsius] < 1.withTemperature[Celsius]) should be (false)
+    (1.withTemperature[Celsius] < 0.withTemperature[Celsius]) should be (false)
+
+    (Rational(0).withTemperature[Celsius] < Rational(33).withTemperature[Fahrenheit]) should be (true)
+    (Rational(0).withTemperature[Celsius] < Rational(32).withTemperature[Fahrenheit]) should be (false)
+    (Rational(0).withTemperature[Celsius] < Rational(31).withTemperature[Fahrenheit]) should be (false)
+  }
+
+  it should "implement >" in {
+    (1.withTemperature[Celsius] > 2.withTemperature[Celsius]) should be (false)
+    (1.withTemperature[Celsius] > 1.withTemperature[Celsius]) should be (false)
+    (1.withTemperature[Celsius] > 0.withTemperature[Celsius]) should be (true)
+
+    (Rational(0).withTemperature[Celsius] > Rational(33).withTemperature[Fahrenheit]) should be (false)
+    (Rational(0).withTemperature[Celsius] > Rational(32).withTemperature[Fahrenheit]) should be (false)
+    (Rational(0).withTemperature[Celsius] > Rational(31).withTemperature[Fahrenheit]) should be (true)
+  }
+
+  it should "implement <=" in {
+    (1.withTemperature[Celsius] <= 2.withTemperature[Celsius]) should be (true)
+    (1.withTemperature[Celsius] <= 1.withTemperature[Celsius]) should be (true)
+    (1.withTemperature[Celsius] <= 0.withTemperature[Celsius]) should be (false)
+
+    (Rational(0).withTemperature[Celsius] <= Rational(33).withTemperature[Fahrenheit]) should be (true)
+    (Rational(0).withTemperature[Celsius] <= Rational(32).withTemperature[Fahrenheit]) should be (true)
+    (Rational(0).withTemperature[Celsius] <= Rational(31).withTemperature[Fahrenheit]) should be (false)
+  }
+
+  it should "implement >=" in {
+    (1.withTemperature[Celsius] >= 2.withTemperature[Celsius]) should be (false)
+    (1.withTemperature[Celsius] >= 1.withTemperature[Celsius]) should be (true)
+    (1.withTemperature[Celsius] >= 0.withTemperature[Celsius]) should be (true)
+
+    (Rational(0).withTemperature[Celsius] >= Rational(33).withTemperature[Fahrenheit]) should be (false)
+    (Rational(0).withTemperature[Celsius] >= Rational(32).withTemperature[Fahrenheit]) should be (true)
+    (Rational(0).withTemperature[Celsius] >= Rational(31).withTemperature[Fahrenheit]) should be (true)
+  }
+
+  it should "implement ===" in {
+    (1.withTemperature[Celsius] === 2.withTemperature[Celsius]) should be (false)
+    (1.withTemperature[Celsius] === 1.withTemperature[Celsius]) should be (true)
+    (1.withTemperature[Celsius] === 0.withTemperature[Celsius]) should be (false)
+
+    (Rational(0).withTemperature[Celsius] === Rational(33).withTemperature[Fahrenheit]) should be (false)
+    (Rational(0).withTemperature[Celsius] === Rational(32).withTemperature[Fahrenheit]) should be (true)
+    (Rational(0).withTemperature[Celsius] === Rational(31).withTemperature[Fahrenheit]) should be (false)
+  }
+
+  it should "implement =!=" in {
+    (1.withTemperature[Celsius] =!= 2.withTemperature[Celsius]) should be (true)
+    (1.withTemperature[Celsius] =!= 1.withTemperature[Celsius]) should be (false)
+    (1.withTemperature[Celsius] =!= 0.withTemperature[Celsius]) should be (true)
+
+    (Rational(0).withTemperature[Celsius] =!= Rational(33).withTemperature[Fahrenheit]) should be (true)
+    (Rational(0).withTemperature[Celsius] =!= Rational(32).withTemperature[Fahrenheit]) should be (false)
+    (Rational(0).withTemperature[Celsius] =!= Rational(31).withTemperature[Fahrenheit]) should be (true)
+  }
 }
