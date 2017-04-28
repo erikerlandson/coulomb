@@ -247,22 +247,22 @@ class Temperature[N, U <: TemperatureExpr](val value: N)
     macro UnitMacros.subTTImpl[N, U, U2]
 
   /** Returns `true` if and only if `this.value` < `that.value` */
-  def <(that: Quantity[N, U]): Boolean = macro UnitMacros.implLT
+  def <(that: Temperature[N, U]): Boolean = macro UnitMacros.implLT
 
   /** Returns `true` if and only if `this.value` > `that.value` */
-  def >(that: Quantity[N, U]): Boolean = macro UnitMacros.implGT
+  def >(that: Temperature[N, U]): Boolean = macro UnitMacros.implGT
 
   /** Returns `true` if and only if `this.value` <= `that.value` */
-  def <=(that: Quantity[N, U]): Boolean = macro UnitMacros.implLE
+  def <=(that: Temperature[N, U]): Boolean = macro UnitMacros.implLE
 
   /** Returns `true` if and only if `this.value` >= `that.value` */
-  def >=(that: Quantity[N, U]): Boolean = macro UnitMacros.implGE
+  def >=(that: Temperature[N, U]): Boolean = macro UnitMacros.implGE
 
   /** Returns `true` if and only if `this.value` == `that.value` */
-  def ===(that: Quantity[N, U]): Boolean = macro UnitMacros.implEQ
+  def ===(that: Temperature[N, U]): Boolean = macro UnitMacros.implEQ
 
   /** Returns `true` if and only if `this.value` != `that.value` */
-  def =!=(that: Quantity[N, U]): Boolean = macro UnitMacros.implNE
+  def =!=(that: Temperature[N, U]): Boolean = macro UnitMacros.implNE
 
   /** A human-readable string representing the temperature with its associated unit type */  
   def toStr: String = macro UnitMacros.toStrImpl[U]
