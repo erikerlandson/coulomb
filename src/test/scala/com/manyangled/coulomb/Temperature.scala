@@ -178,4 +178,13 @@ class TemperatureSpec extends FlatSpec with Matchers {
     (1.5).withTemperature[Fahrenheit].unitStrFull should be ("fahrenheit")
     0f.withTemperature[Kelvin].unitStrFull should be ("kelvin")
   }
+
+  it should "implement converter companion method" in {
+    val f1 = Temperature.converter[Double, Fahrenheit, Celsius]
+    f1(212D.withTemperature[Fahrenheit]).ttup should beT[Double, Celsius](100)
+    f1(50D.withTemperature[Celsius]).ttup should beT[Double, Celsius](50)
+
+    val f2 = Temperature.converter[Int, Celsius, Fahrenheit]
+    f2(100.withTemperature[Celsius]).ttup should beT[Int, Fahrenheit](212)
+  }
 }
