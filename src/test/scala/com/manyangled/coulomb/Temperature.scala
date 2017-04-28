@@ -54,4 +54,20 @@ class TemperatureSpec extends FlatSpec with Matchers {
     20L.withTemperature[Celsius].toUnit[Kelvin].ttup should beT[Long, Kelvin](293)
     BigDecimal(20).withTemperature[Celsius].toUnit[Kelvin].ttup should beT[BigDecimal, Kelvin](293.15)
   }
+
+  it should "implement toRef" in {
+    (37.0).withTemperature[Celsius].toRep[Byte].ttup should beTXI[Byte, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[Short].ttup should beTXI[Short, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[Int].ttup should beTXI[Int, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[Long].ttup should beTXI[Long, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[BigInt].ttup should beTXI[BigInt, Celsius](37)
+
+    (37.0).withTemperature[Celsius].toRep[Float].ttup should beT[Float, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[Double].ttup should beT[Double, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[BigDecimal].ttup should beT[BigDecimal, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[Rational].ttup should beT[Rational, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[Algebraic].ttup should beT[Algebraic, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[Real].ttup should beT[Real, Celsius](37)
+    (37.0).withTemperature[Celsius].toRep[Number].ttup should beT[Number, Celsius](37)
+  }
 }
