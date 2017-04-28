@@ -41,4 +41,17 @@ class TemperatureSpec extends FlatSpec with Matchers {
     "1D.withTemperature[Fahrenheit].toUnit[Kelvin]" should compile
     "1D.withTemperature[Fahrenheit].toUnit[Kilogram]" shouldNot compile
   }
+
+  it should "implement toUnit" in {
+    32.withTemperature[Fahrenheit].toUnit[Celsius].ttup should beT[Int, Celsius](0)
+    32D.withTemperature[Fahrenheit].toUnit[Celsius].ttup should beT[Double, Celsius](0)
+
+    // identity
+    32.withTemperature[Fahrenheit].toUnit[Fahrenheit].ttup should beTXI[Int, Fahrenheit](32)
+    32f.withTemperature[Fahrenheit].toUnit[Fahrenheit].ttup should beT[Float, Fahrenheit](32)
+
+    // unit coefficient
+    20L.withTemperature[Celsius].toUnit[Kelvin].ttup should beT[Long, Kelvin](293)
+    BigDecimal(20).withTemperature[Celsius].toUnit[Kelvin].ttup should beT[BigDecimal, Kelvin](293.15)
+  }
 }
