@@ -31,6 +31,18 @@ package object coulomb {
    */
   type WithUnit[N, U <: UnitExpr] = Quantity[N, U]
 
+  /**
+   * An "infix" type alias for [[Temperature]]
+   * @tparam N The numeric representation type of the temperature value
+   * @tparam U The unit type of the temperature
+   * {{{
+   * import com.manyangled.coulomb._
+   * import SIBaseUnits._
+   * def f(t: Double WithTemperature Kelvin) = t + 100D.withUnit[Kelvin]
+   * }}}
+   */
+  type WithTemperature[N, U <: TemperatureExpr] = Temperature[N, U]
+
   /** obtain the integer value of a ChurchInt type */
   def churchToInt[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
 
