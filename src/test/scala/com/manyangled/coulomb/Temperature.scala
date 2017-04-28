@@ -70,4 +70,28 @@ class TemperatureSpec extends FlatSpec with Matchers {
     (37.0).withTemperature[Celsius].toRep[Real].ttup should beT[Real, Celsius](37)
     (37.0).withTemperature[Celsius].toRep[Number].ttup should beT[Number, Celsius](37)
   }
+
+  it should "implement T + Q => T" in {
+    (0.withTemperature[Celsius] + 18.withUnit[Fahrenheit]).ttup should beTXI[Int, Celsius](10)
+    (0D.withTemperature[Celsius] + 18D.withUnit[Fahrenheit]).ttup should beT[Double, Celsius](10)
+
+    (0.withTemperature[Fahrenheit] + 10.withUnit[Celsius]).ttup should beTXI[Int, Fahrenheit](18)
+    (0D.withTemperature[Fahrenheit] + 10D.withUnit[Celsius]).ttup should beT[Double, Fahrenheit](18)
+  }
+
+  it should "implement T - Q => T" in {
+    (32.withTemperature[Celsius] - 18.withUnit[Fahrenheit]).ttup should beTXI[Int, Celsius](22)
+    (32D.withTemperature[Celsius] - 18D.withUnit[Fahrenheit]).ttup should beT[Double, Celsius](22)
+
+    (32.withTemperature[Fahrenheit] - 10.withUnit[Celsius]).ttup should beTXI[Int, Fahrenheit](14)
+    (32D.withTemperature[Fahrenheit] - 10D.withUnit[Celsius]).ttup should beT[Double, Fahrenheit](14)
+  }
+
+  it should "implement T - T => Q" in {
+    (150.withTemperature[Celsius] - 212.withTemperature[Fahrenheit]).qtup should beQ[Int, Celsius](50)
+    (150D.withTemperature[Celsius] - 212D.withTemperature[Fahrenheit]).qtup should beQ[Double, Celsius](50)
+
+    (212.withTemperature[Fahrenheit] - 50.withTemperature[Celsius]).qtup should beQ[Int, Fahrenheit](90)
+    (212f.withTemperature[Fahrenheit] - 50f.withTemperature[Celsius]).qtup should beQ[Float, Fahrenheit](90)
+  }
 }
