@@ -199,4 +199,24 @@ class TemperatureSpec extends FlatSpec with Matchers {
     Temperature.unitStrFull[Fahrenheit] should be ("fahrenheit")
     Temperature.unitStrFull[Kelvin] should be ("kelvin")
   }
+
+  it should "implement implicit conversion between convertable temps" in {
+    (37D.withTemperature[Celsius] :Temperature[Double, Fahrenheit]).ttup should beT[Double, Fahrenheit](98.6)
+
+    val t: Temperature[Double, Fahrenheit] = 37D.withTemperature[Celsius]
+    t.ttup should beT[Double, Fahrenheit](98.6)
+
+    def f(t: Float WithTemperature Celsius) = t
+    f(98.6f.withTemperature[Fahrenheit]).ttup should beT[Float, Celsius](37)
+  }
+
+  it should "support fromQuantity and fromTemperature" in {
+    Temperature.fromQuantity(32.withUnit[Fahrenheit]).ttup should beTXI[Int, Fahrenheit](32)
+    Temperature.fromQuantity(300f.withUnit[Kelvin]).ttup should beT[Float, Kelvin](300)
+    Temperature.fromQuantity(BigDecimal(100).withUnit[Celsius]).ttup should beT[BigDecimal, Celsius](100)
+
+    Quantity.fromTemperature(32.withTemperature[Fahrenheit]).qtup should beQXI[Int, Fahrenheit](32)
+    Quantity.fromTemperature(300f.withTemperature[Kelvin]).qtup should beQ[Float, Kelvin](300)
+    Quantity.fromTemperature(Algebraic(100).withTemperature[Celsius]).qtup should beQ[Algebraic, Celsius](100)
+  }
 }
