@@ -154,4 +154,28 @@ class TemperatureSpec extends FlatSpec with Matchers {
     (Rational(0).withTemperature[Celsius] =!= Rational(32).withTemperature[Fahrenheit]) should be (false)
     (Rational(0).withTemperature[Celsius] =!= Rational(31).withTemperature[Fahrenheit]) should be (true)
   }
+
+  it should "implement toStr" in {
+    1.withTemperature[Celsius].toStr should be ("1 °C")
+    (1.5).withTemperature[Fahrenheit].toStr should be ("1.5 °F")
+    0f.withTemperature[Kelvin].toStr should be ("0.0 K")
+  }
+
+  it should "implement toStrFull" in {
+    1.withTemperature[Celsius].toStrFull should be ("1 celsius")
+    (1.5).withTemperature[Fahrenheit].toStrFull should be ("1.5 fahrenheit")
+    0f.withTemperature[Kelvin].toStrFull should be ("0.0 kelvin")
+  }
+
+  it should "implement unitStr" in {
+    1.withTemperature[Celsius].unitStr should be ("°C")
+    (1.5).withTemperature[Fahrenheit].unitStr should be ("°F")
+    0f.withTemperature[Kelvin].unitStr should be ("K")
+  }
+
+  it should "implement unitStrFull" in {
+    1.withTemperature[Celsius].unitStrFull should be ("celsius")
+    (1.5).withTemperature[Fahrenheit].unitStrFull should be ("fahrenheit")
+    0f.withTemperature[Kelvin].unitStrFull should be ("kelvin")
+  }
 }
