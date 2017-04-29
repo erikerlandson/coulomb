@@ -25,7 +25,7 @@ libraryDependencies += "com.manyangled" %% "coulomb" % "0.1.0"
 * [Features](#features)
 * [Quantity and UnitExpr](#quantity-and-unitexpr)
 * [Quantity Values](#quantity-values)
-* [The str And unitStr Method](#string-representations)
+* [String Representations](#string-representations)
 * [Unit Exponents and Church Integers](#unit-exponents-and-church-integers)
 * [Predefined Units](#predefined-units)
 * [Unit Types and Convertability](#unit-types-and-convertability)
