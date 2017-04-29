@@ -23,7 +23,6 @@ import scala.language.experimental.macros
  * A value (quantity) having an associated static unit type
  * @tparam N The numeric representation type for a quantity value
  * @tparam U The unit expression representing the associated unit
- * @param value The quantity value
  * {{{
  * import com.manyangled.coulomb._
  * import ChurchInt._
@@ -35,6 +34,7 @@ import scala.language.experimental.macros
  * // an acceleration in meters per second-squared
  * val acceleration = 9.8f.withUnit[Meter %/ (Second %^ _2)]
  * }}}
+ * @param value The quantity value
  */
 class Quantity[N, U <: UnitExpr](val value: N)
     extends AnyVal with Serializable {
