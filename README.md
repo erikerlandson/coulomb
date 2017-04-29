@@ -15,7 +15,10 @@ There is also a [tutorial](#tutorial) below.
 ```scala
 resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
-libraryDependencies += "com.manyangled" %% "coulomb" % "0.1.0"
+libraryDependencies ++= Seq(
+  "com.manyangled" %% "coulomb" % "0.2.0",
+  "com.manyangled" %% "coulomb-unitexpr" % "0.2.0",
+  "com.manyangled" %% "coulomb-macros" % "0.2.0")
 ```
 
 ### Tutorial
