@@ -231,6 +231,32 @@ scala> f(Liter(4000.0)).toStrFull
 res2: String = 4.0 meter ^ 3
 ```
 
+**A note on conversions for quantities having integral types (Int, Long, etc).**
+In order to maintain operations in the chosen numeric representation type, conversion factors
+are expressed as multiplication of a numerator, followed by division.  For example, the
+conversion coefficient from Liter to Cup is `2000000000 / 473176473`, and so the conversion
+`100.withUnit[Liter].toUnit[Cup]` looks like this: `100 * 2000000000 / 473176473`, which
+will suffer from integer overflows.  To address this problem, conversion coefficients
+in the case of integral representations are _reduced_ to approximate values using smaller
+numerators and denominators.  The smallest numerator and denominator are found that yield
+an error of < one part in a thousand (i.e. relative error is < 0.001).  For example, in the
+above Int conversion, the conversion coefficient `2000000000 / 473176473` is approximated
+as: `224/53`, which allows much larger quantity values to be converted safely, and yet
+has a relative error of < 0.0001; less than one part in ten thousand.  In the event that
+coeffients reduce the maximum safe values "too far", or an accurate approximation cannot be
+found, a compiler warning is emitted, as in this example, which emits both warnings
+(and with good reason, since the resulting conversion is bad):
+```scala
+scala> 1.withUnit[Tera %* Meter].toUnit[Meter]
+<console>:39: warning: Coefficient approximation deviates by 0.997852516353 relative error
+       1.withUnit[Tera %* Meter].toUnit[Meter]
+                                       ^
+<console>:39: warning: Maximum safe value is 1
+       1.withUnit[Tera %* Meter].toUnit[Meter]
+                                       ^
+res1: com.manyangled.coulomb.Quantity[Int,com.manyangled.coulomb.SIBaseUnits.Meter] = Quantity(2147483647)
+```
+
 #### Unit Operations
 Unit quantities support math operations `+`, `-`, `*`, `/`, and `pow`.
 Quantities must be of convertable unit types to be added or subtracted.
