@@ -105,7 +105,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
       val cut = appliedType(cuType, List(u1T, u2T))
       c.inferImplicitValue(cut, silent = false)
     } catch {
-      case _: Throwable => abort(s"Imconvertable unit types:\n$u1T\nand\n$u2T")
+      case _: Throwable => abort(s"non-convertable unit types:\n$u1T\nand\n$u2T")
     }
   }
 
@@ -699,7 +699,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
 
   def abbvString(typeU: Type): String = {
     typeU.dealias match {
-      case IsUnitless() => "1"
+      case IsUnitless() => "unitless"
       case FUnit(_, abbv) => abbv
       case DUnit(_, abbv, _, _) => abbv
       case Prefix(_, abbv, _, sub) => {
@@ -721,7 +721,7 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         s"$ls / $rs"
       }
       case PowOp(bsub, exp) => {
-        if (exp == 0) "1"
+        if (exp == 0) "unitless"
         else if (exp == 1) abbvString(bsub)
         else {
           val bstr = abbvString(bsub)
