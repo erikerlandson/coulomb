@@ -44,21 +44,10 @@ lazy val examples = (project in file("examples"))
   .settings(commonSettings :_*)
   .settings(libraryDependencies += "com.typesafe" % "config" % "1.3.1")
 
-enablePlugins(SiteScaladocPlugin)
+enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
-enablePlugins(GhpagesPlugin)
+siteSubdirName in ScalaUnidoc := "latest/api"
+
+addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc)
 
 git.remoteRepo := "git@github.com:erikerlandson/coulomb.git"
-
-lazy val siteDocProjects = List(coulomb, macros, unitexpr)
-
-lazy val siteDocSettings = siteDocProjects.flatMap { project =>
-  SiteScaladocPlugin.scaladocSettings(
-    config(project.id),
-    mappings in (Compile, packageDoc) in project,
-    s"api/${project.id}"
-  )
-}
-
-lazy val site = (project in file("site"))
-  .settings(siteDocSettings)
