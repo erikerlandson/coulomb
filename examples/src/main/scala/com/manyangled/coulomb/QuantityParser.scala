@@ -27,7 +27,7 @@ import scala.util.{ Try, Success, Failure }
  * @param unitCompanionObjects a collection of unit names referring to the unit's companion object.
  * For each such object the run-time parsing will `import Unit` to obtain that unit's definition
  * prior to attempting to parse each input string.
- * @note `QuantityParser` always imports `com.manyangled.coulomb._`, `extensions._` and `ChurchInt._`
+ * @note `QuantityParser` always imports `com.manyangled.coulomb._`, `ChurchInt._` & `spire.math._`
  * {{{
  * import SIBaseUnits._
  * // create a parser that knows about all SIBaseUnit units, Mile and Hour
@@ -35,7 +35,7 @@ import scala.util.{ Try, Success, Failure }
  *   unitDeclarationObjects = Seq(SIBaseUnits),
  *   unitCompanionObjects = Seq(USCustomaryUnits.Mile, SIAcceptedUnits.Hour))
  * // parse an expression in miles per hour, return as meters per second
- * val mps = qp[Meter %/ Second]("60.withUnit[Mile &lt;/&gt; Hour]")
+ * val mps = qp[Float, Meter %/ Second]("60f.withUnit[Mile %/ Hour]")
  * }}}
  */
 class QuantityParser(
@@ -63,6 +63,7 @@ class QuantityParser(
 
   /**
    * Parse a string containing an expression that evaluates to a unit Quantity object.
+   * @tparam N the numeric representation type
    * @tparam U a [[UnitExpr]] type that specifies a `Quantity[U]` to return.  `U` is expected to
    * be convertable to the unit type of the expression in the string, or parsing will fail.
    * @param quantityExpr a string containing an expression that evaluates to a `Quantity` object.
