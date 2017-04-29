@@ -243,7 +243,7 @@ an error of < one part in a thousand (i.e. relative error is < 0.001).  For exam
 above Int conversion, the conversion coefficient `2000000000 / 473176473` is approximated
 as: `224/53`, which allows much larger quantity values to be converted safely, and yet
 has a relative error of < 0.0001; less than one part in ten thousand.  In the event that
-coeffients reduce the maximum safe values "too far", or an accurate approximation cannot be
+coefficients reduce the maximum safe values "too far", or an accurate approximation cannot be
 found, a compiler warning is emitted, as in this example, which emits both warnings
 (and with good reason, since the resulting conversion is bad):
 ```scala
