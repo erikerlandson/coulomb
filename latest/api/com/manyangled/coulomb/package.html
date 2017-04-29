@@ -47,13 +47,35 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"></div>
+          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
         
 
       <div id="mbrsel">
         <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
-        
-        
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By Inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="com.manyangled.coulomb"><span>coulomb</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show All</span></li>
+            </ol>
+          </div>
         <div id="visbl">
             <span class="filtertype">Visibility</span>
             <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
@@ -66,63 +88,63 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.manyangled.coulomb.&lt;*&gt;" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="&lt;*&gt;[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr"></a>
-      <a id="&lt;*&gt;[LUE&lt;:UnitExpr,RUE&lt;:UnitExpr]:&lt;*&gt;[LUE,RUE]"></a>
+              <ol><li name="com.manyangled.coulomb.%*" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="%*[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr"></a>
+      <a id="%*[LUE&lt;:UnitExpr,RUE&lt;:UnitExpr]:%*[LUE,RUE]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">sealed </span>
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="$less$times$greater.html"><span title="gt4s: $less$times$greater" class="name">&lt;*&gt;</span></a><span class="tparams">[<span name="LUE">LUE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="RUE">RUE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>
+        <a href="$percent$times.html"><span title="gt4s: $percent$times" class="name">%*</span></a><span class="tparams">[<span name="LUE">LUE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="RUE">RUE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@&lt;*&gt;[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@%*[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">The unit product of two other unit expressions</p><div class="fullcomment"><div class="comment cmt"><p>The unit product of two other unit expressions</p></div><dl class="paramcmts block"><dt class="tparam">LUE</dt><dd class="cmt"><p>the left-hand unit expression</p></dd><dt class="tparam">RUE</dt><dd class="cmt"><p>the right-hand unit expression</p><pre><span class="kw">import</span> USCustomaryUnits._
 <span class="cmt">// a quantity of acre-feet (a unit of volume, usually for water)</span>
-<span class="kw">val</span> afq = Quantity[Acre &lt;*&gt; Foot](<span class="num">10</span>)</pre></dd></dl></div>
-    </li><li name="com.manyangled.coulomb.&lt;/&gt;" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="&lt;/&gt;[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr"></a>
-      <a id="&lt;/&gt;[LUE&lt;:UnitExpr,RUE&lt;:UnitExpr]:&lt;/&gt;[LUE,RUE]"></a>
+<span class="kw">val</span> afq = <span class="num">10</span>D.withUnit[Acre %* Foot]</pre></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.%/" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="%/[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr"></a>
+      <a id="%/[LUE&lt;:UnitExpr,RUE&lt;:UnitExpr]:%/[LUE,RUE]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">sealed </span>
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="$less$div$greater.html"><span title="gt4s: $less$div$greater" class="name">&lt;/&gt;</span></a><span class="tparams">[<span name="LUE">LUE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="RUE">RUE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>
+        <a href="$percent$div.html"><span title="gt4s: $percent$div" class="name">%/</span></a><span class="tparams">[<span name="LUE">LUE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="RUE">RUE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@&lt;/&gt;[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@%/[LUE&lt;:com.manyangled.coulomb.UnitExpr,RUE&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">The unit quotient of two unit expressions</p><div class="fullcomment"><div class="comment cmt"><p>The unit quotient of two unit expressions</p></div><dl class="paramcmts block"><dt class="tparam">LUE</dt><dd class="cmt"><p>the left-hand unit expression</p></dd><dt class="tparam">RUE</dt><dd class="cmt"><p>the right-hand unit expression</p><pre><span class="kw">import</span> SIBaseUnits._
 <span class="cmt">// a velocity in meters per second</span>
-<span class="kw">val</span> v = Quantity[Meter &lt;/&gt; Second](<span class="num">10</span>)</pre></dd></dl></div>
-    </li><li name="com.manyangled.coulomb.&lt;^&gt;" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="&lt;^&gt;[UE&lt;:com.manyangled.coulomb.UnitExpr,P&lt;:com.manyangled.coulomb.ChurchInt]extendsUnitExpr"></a>
-      <a id="&lt;^&gt;[UE&lt;:UnitExpr,P&lt;:ChurchInt]:&lt;^&gt;[UE,P]"></a>
+<span class="kw">val</span> v = <span class="num">10</span>f.withUnit[Meter %/ Second]</pre></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.%^" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="%^[UE&lt;:com.manyangled.coulomb.UnitExpr,P&lt;:com.manyangled.coulomb.ChurchInt]extendsUnitExpr"></a>
+      <a id="%^[UE&lt;:UnitExpr,P&lt;:ChurchInt]:%^[UE,P]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">sealed </span>
         <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <a href="$less$up$greater.html"><span title="gt4s: $less$up$greater" class="name">&lt;^&gt;</span></a><span class="tparams">[<span name="UE">UE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="P">P &lt;: <a href="ChurchInt.html" class="extype" name="com.manyangled.coulomb.ChurchInt">ChurchInt</a></span>]</span><span class="result"> extends <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>
+        <a href="$percent$up.html"><span title="gt4s: $percent$up" class="name">%^</span></a><span class="tparams">[<span name="UE">UE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="P">P &lt;: <a href="ChurchInt.html" class="extype" name="com.manyangled.coulomb.ChurchInt">ChurchInt</a></span>]</span><span class="result"> extends <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@&lt;^&gt;[UE&lt;:com.manyangled.coulomb.UnitExpr,P&lt;:com.manyangled.coulomb.ChurchInt]extendsUnitExpr" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@%^[UE&lt;:com.manyangled.coulomb.UnitExpr,P&lt;:com.manyangled.coulomb.ChurchInt]extendsUnitExpr" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">A power (exponent) of a unit expression</p><div class="fullcomment"><div class="comment cmt"><p>A power (exponent) of a unit expression</p></div><dl class="paramcmts block"><dt class="tparam">UE</dt><dd class="cmt"><p>the unit expression being raised to a power</p></dd><dt class="tparam">P</dt><dd class="cmt"><p>the exponent (power)</p><pre><span class="kw">import</span> SIBaseUnits._
 <span class="cmt">// an area in square meters</span>
-<span class="kw">val</span> area = Quantity[Meter &lt;^&gt; _2](<span class="num">10</span>)</pre></dd></dl></div>
+<span class="kw">val</span> area = <span class="num">10.</span>withUnit[Meter %^ _2]</pre></dd></dl></div>
     </li><li name="com.manyangled.coulomb.BaseTemperature" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="BaseTemperatureextendsBaseUnitwithTemperatureExpr"></a>
       <a id="BaseTemperature:BaseTemperature"></a>
@@ -140,7 +162,9 @@
       </a>
     </span>
       <p class="shortcomment cmt">Define a base unit of temperature.</p><div class="fullcomment"><div class="comment cmt"><p>Define a base unit of temperature.  There should be exactly one such base unit, which is
-<a href="SIBaseUnits$$Kelvin.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Kelvin">SIBaseUnits.Kelvin</a>.  Any other unit of temperature should be a <a href="DerivedTemperature.html" class="extype" name="com.manyangled.coulomb.DerivedTemperature">DerivedTemperature</a>.
+SIBaseUnits.Kelvin.  Any other unit of temperature should be a DerivedTemperature.
+The base temperature unit Kelvin is defined in SIBaseUnits; other uses of BaseTemperature
+would be rare.
 </p></div></div>
     </li><li name="com.manyangled.coulomb.BaseUnit" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="BaseUnitextendsUnitExpr"></a>
@@ -160,9 +184,12 @@
     </span>
       <p class="shortcomment cmt">Base units are axiomatic units.</p><div class="fullcomment"><div class="comment cmt"><p>Base units are axiomatic units. The
 <a href="https://en.wikipedia.org/wiki/International_System_of_Units" target="_blank">Standard International</a>
-(SI) unit system defines seven Base units, which <code>coulomb</code> defines in <a href="SIBaseUnits$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits">SIBaseUnits</a>.
-Exactly one <code>BaseUnit</code> is defined for each category of quantity (e.g. length, mass, time, etc).
-</p></div></div>
+(SI) unit system defines seven Base units, which <code>coulomb</code> defines in SIBaseUnits.
+Exactly one <code>BaseUnit</code> is defined for each category of quantity (e.g. length, mass, time, etc).</p><pre><span class="kw">import</span> com.manyangled.coulomb._
+<span class="kw">import</span> spire.math._
+<span class="cmt">// A base unit for loop iterations</span>
+@UnitDecl(<span class="lit">"iteration"</span>)
+<span class="kw">trait</span> Iteration <span class="kw">extends</span> BaseUnit</pre></div></div>
     </li><li name="com.manyangled.coulomb.ChurchInt" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="ChurchIntextendsAnyRef"></a>
       <a id="ChurchInt:ChurchInt"></a>
@@ -197,46 +224,46 @@ Exactly one <code>BaseUnit</code> is defined for each category of quantity (e.g.
       </a>
     </span>
       
-    </li><li name="com.manyangled.coulomb.CompatTemps" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="CompatTemps[U1&lt;:com.manyangled.coulomb.TemperatureExpr,U2&lt;:com.manyangled.coulomb.TemperatureExpr]extendsAnyRef"></a>
-      <a id="CompatTemps[U1&lt;:TemperatureExpr,U2&lt;:TemperatureExpr]:CompatTemps[U1,U2]"></a>
+    </li><li name="com.manyangled.coulomb.ConvertableUnits" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ConvertableUnits[U1&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyRef"></a>
+      <a id="ConvertableUnits[U1&lt;:UnitExpr,U2&lt;:UnitExpr]:ConvertableUnits[U1,U2]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="CompatTemps.html"><span class="name">CompatTemps</span></a><span class="tparams">[<span name="U1">U1 &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>, <span name="U2">U2 &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+        <a href="ConvertableUnits.html"><span class="name">ConvertableUnits</span></a><span class="tparams">[<span name="U1">U1 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@CompatTemps[U1&lt;:com.manyangled.coulomb.TemperatureExpr,U2&lt;:com.manyangled.coulomb.TemperatureExpr]extendsAnyRef" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="com.manyangled.coulomb.CompatUnits" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="CompatUnits[U1&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyRef"></a>
-      <a id="CompatUnits[U1&lt;:UnitExpr,U2&lt;:UnitExpr]:CompatUnits[U1,U2]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a href="CompatUnits.html"><span class="name">CompatUnits</span></a><span class="tparams">[<span name="U1">U1 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@CompatUnits[U1&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyRef" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@ConvertableUnits[U1&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyRef" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Annotations</dt><dd>
                 <span class="name">@implicitNotFound</span><span class="args">(<span>
       
-      <span class="defval" name="&quot;Implicit not found: CompatUnits[${U1}, ${U2}].\nIncompatible Unit Expressions: ${U1} and ${U2}&quot;">...</span>
+      <span class="defval" name="&quot;Implicit not found: ConvertableUnits[${U1}, ${U2}].\nInconvertable Unit Expressions: ${U1} and ${U2}&quot;">...</span>
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.manyangled.coulomb.CoulombExtendWithUnits" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CoulombExtendWithUnits[N]extendsAnyValwithSerializable"></a>
+      <a id="CoulombExtendWithUnits[N]:CoulombExtendWithUnits[N]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit final </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="package$$CoulombExtendWithUnits.html"><span class="name">CoulombExtendWithUnits</span></a><span class="tparams">[<span name="N">N</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@CoulombExtendWithUnits[N]extendsAnyValwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">enhances numeric types with utility methods for <code>coulomb</code></p>
     </li><li name="com.manyangled.coulomb.DerivedTemperature" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="DerivedTemperatureextendsDerivedUnit[com.manyangled.coulomb.SIBaseUnits.Kelvin]withTemperatureExpr"></a>
       <a id="DerivedTemperature:DerivedTemperature"></a>
@@ -257,8 +284,8 @@ Exactly one <code>BaseUnit</code> is defined for each category of quantity (e.g.
 terms of <a href="SIBaseUnits$$Kelvin.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Kelvin">SIBaseUnits.Kelvin</a>.
 The three common temperatures Kelvin, Celsius and Fahrenheit are already defined in <code>coulomb</code>
 and so use cases for new derived temperatures are expected to be rare.</p><pre><span class="cmt">// example defining Fahrenheit temperature unit (already defined by coulomb)</span>
-<span class="kw">trait</span> Fahrenheit <span class="kw">extends</span> DerivedTemperature
-<span class="kw">object</span> Fahrenheit <span class="kw">extends</span> TempUnitCompanion[Fahrenheit](<span class="lit">"fahrenheit"</span>, <span class="num">5.0</span> / <span class="num">9.0</span>, <span class="num">459.67</span>)</pre></div></div>
+@TempUnitDecl(<span class="lit">"fahrenheit"</span>, <span class="num">5.0</span> / <span class="num">9.0</span>, <span class="num">459.67</span>)
+<span class="kw">trait</span> Fahrenheit <span class="kw">extends</span> DerivedTemperature</pre></div></div>
     </li><li name="com.manyangled.coulomb.DerivedUnit" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="DerivedUnit[U&lt;:com.manyangled.coulomb.UnitExpr]extendsUnitExpr"></a>
       <a id="DerivedUnit[U&lt;:UnitExpr]:DerivedUnit[U]"></a>
@@ -275,10 +302,12 @@ and so use cases for new derived temperatures are expected to be rare.</p><pre><
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Derived units are defined in terms of another <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></p><div class="fullcomment"><div class="comment cmt"><p>Derived units are defined in terms of another <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>The <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a> used to define the new unit</p><pre><span class="cmt">// define a new unit Furlong in terms of Meter</span>
+      <p class="shortcomment cmt">Derived units are defined in terms of another <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></p><div class="fullcomment"><div class="comment cmt"><p>Derived units are defined in terms of another <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>The <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a> used to define the new unit</p><pre><span class="kw">import</span> com.manyangled.coulomb._
 <span class="kw">import</span> SIBaseUnits._
-<span class="kw">trait</span> Furlong <span class="kw">extends</span> DerivedUnit[Meter]
-<span class="kw">object</span> Furlong <span class="kw">extends</span> UnitCompanion[Furlong](<span class="lit">"furlong"</span>, <span class="num">201.168</span>)</pre></dd></dl></div>
+<span class="kw">import</span> spire.math._
+<span class="cmt">// A furlong is 201.168 meters</span>
+@UnitDecl(<span class="lit">"furlong"</span>, <span class="num">201.168</span>)
+<span class="kw">trait</span> Furlong <span class="kw">extends</span> DerivedUnit[Meter]</pre></dd></dl></div>
     </li><li name="com.manyangled.coulomb.PrefixUnit" visbl="pub" data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="PrefixUnitextendsDerivedUnit[com.manyangled.coulomb.Unitless]"></a>
       <a id="PrefixUnit:PrefixUnit"></a>
@@ -295,33 +324,27 @@ and so use cases for new derived temperatures are expected to be rare.</p><pre><
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Prefix units represent standard unitless multipliers applied to units, e.g.</p><div class="fullcomment"><div class="comment cmt"><p>Prefix units represent standard unitless multipliers applied to units, e.g. <a href="SIPrefixes$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes">SIPrefixes</a>
+      <p class="shortcomment cmt">Prefix units represent standard unitless multipliers applied to units, e.g.</p><div class="fullcomment"><div class="comment cmt"><p>Prefix units represent standard unitless multipliers applied to units, e.g. SIPrefixes
 defines units <code>Kilo</code> (10<sup>3), <code>Mega</code> (10</sup>6), etc.</p><pre><span class="cmt">// define a new prefix Dozen, representing multiplier of 12</span>
-<span class="kw">trait</span> Dozen <span class="kw">extends</span> PrefixUnit
-<span class="kw">object</span> Dozen <span class="kw">extends</span> UnitCompanion[Dozen](<span class="lit">"dozen"</span>, <span class="num">12.0</span>)</pre></div></div>
+@UnitDecl(<span class="lit">"dozen"</span>, <span class="num">12</span>)
+<span class="kw">trait</span> Dozen <span class="kw">extends</span> PrefixUnit</pre></div></div>
     </li><li name="com.manyangled.coulomb.Quantity" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="Quantity[U&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyValwithSerializable"></a>
-      <a id="Quantity[U&lt;:UnitExpr]:Quantity[U]"></a>
+      <a id="Quantity[N,U&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyValwithSerializable"></a>
+      <a id="Quantity[N,U&lt;:UnitExpr]:Quantity[N,U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Quantity.html"><span class="name">Quantity</span></a><span class="tparams">[<span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Quantity.html"><span class="name">Quantity</span></a><span class="tparams">[<span name="N">N</span>, <span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@Quantity[U&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyValwithSerializable" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@Quantity[N,U&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyValwithSerializable" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">A value (quantity) having an associated static unit type</p><div class="fullcomment"><div class="comment cmt"><p>A value (quantity) having an associated static unit type</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>The unit expression representing the associated unit</p><pre><span class="kw">import</span> MKSUnits._
-<span class="cmt">// a length of 5 meters</span>
-<span class="kw">val</span> length = Quantity[Meter](<span class="num">5</span>)
-<span class="cmt">// a velocity in meters per second</span>
-<span class="kw">val</span> speed = Quantity[Meter &lt;/&gt; Second](<span class="num">10</span>)
-<span class="cmt">// an acceleration in meters per second-squared</span>
-<span class="kw">val</span> acceleration = Quantity[Meter &lt;/&gt; (Second &lt;^&gt; _2)](<span class="num">9.8</span>)</pre></dd></dl></div>
+      <p class="shortcomment cmt">A value (quantity) having an associated static unit type</p><div class="fullcomment"><div class="comment cmt"><p>A value (quantity) having an associated static unit type</p></div><dl class="paramcmts block"><dt class="tparam">N</dt><dd class="cmt"><p>The numeric representation type for a quantity value</p></dd><dt class="tparam">U</dt><dd class="cmt"><p>The unit expression representing the associated unit</p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.QuantityParser" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="QuantityParserextendsAnyRef"></a>
       <a id="QuantityParser:QuantityParser"></a>
@@ -339,13 +362,13 @@ defines units <code>Kilo</code> (10<sup>3), <code>Mega</code> (10</sup>6), etc.<
       </a>
     </span>
       <p class="shortcomment cmt">A run-time parser for string expressions that evaluate to <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a> objects.</p><div class="fullcomment"><div class="comment cmt"><p>A run-time parser for string expressions that evaluate to <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a> objects.
-Parsing returns a compatible unit Quantity type, or failure.</p></div><dl class="attributes block"> <dt>Note</dt><dd><span class="cmt"><p><code>QuantityParser</code> always imports <code>com.manyangled.coulomb._</code>, <code>extensions._</code> and <code>ChurchInt._</code></p><pre><span class="kw">import</span> SIBaseUnits._
+Parsing returns a convertable unit Quantity type, or failure.</p></div><dl class="attributes block"> <dt>Note</dt><dd><span class="cmt"><p><code>QuantityParser</code> always imports <code>com.manyangled.coulomb._</code>, <code>ChurchInt._</code> &amp; <code>spire.math._</code></p><pre><span class="kw">import</span> SIBaseUnits._
 <span class="cmt">// create a parser that knows about all SIBaseUnit units, Mile and Hour</span>
 <span class="kw">val</span> qp = QuantityParser(
   unitDeclarationObjects = <span class="std">Seq</span>(SIBaseUnits),
   unitCompanionObjects = <span class="std">Seq</span>(USCustomaryUnits.Mile, SIAcceptedUnits.Hour))
 <span class="cmt">// parse an expression in miles per hour, return as meters per second</span>
-<span class="kw">val</span> mps = qp[Meter &lt;/&gt; Second](<span class="lit">"60.withUnit[Mile &lt;/&gt; Hour]"</span>)</pre></span></dd></dl></div>
+<span class="kw">val</span> mps = qp[<span class="std">Float</span>, Meter %/ Second](<span class="lit">"60f.withUnit[Mile %/ Hour]"</span>)</pre></span></dd></dl></div>
     </li><li name="com.manyangled.coulomb.TempUnitCompanion" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="TempUnitCompanion[U&lt;:com.manyangled.coulomb.TemperatureExpr]extendsUnitCompanion[U]"></a>
       <a id="TempUnitCompanion[U&lt;:TemperatureExpr]:TempUnitCompanion[U]"></a>
@@ -363,6 +386,39 @@ Parsing returns a compatible unit Quantity type, or failure.</p></div><dl class=
       </a>
     </span>
       
+    </li><li name="com.manyangled.coulomb.TempUnitDecl" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="TempUnitDeclextendsAnnotationwithStaticAnnotation"></a>
+      <a id="TempUnitDecl:TempUnitDecl"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="TempUnitDecl.html"><span class="name">TempUnitDecl</span></a><span class="result"> extends <span class="extype" name="scala.annotation.Annotation">Annotation</span> with <span class="extype" name="scala.annotation.StaticAnnotation">StaticAnnotation</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@TempUnitDeclextendsAnnotationwithStaticAnnotation" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Annotate a temperature unit trait with name, conversion coefficient, etc</p><div class="fullcomment"><div class="comment cmt"><p>Annotate a temperature unit trait with name, conversion coefficient, etc</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@compileTimeOnly</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;macro annotation could not be expanded (the most common reason for that is that you need to enable the macro paradise plugin; another possibility is that you try to use macro annotation in the same compilation run that defines it)&quot;">...</span>
+    </span>)</span>
+              
+                <span class="name">@compileTimeOnly</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;Must enable the Scala macro paradise compiler plugin to expand static annotations&quot;">...</span>
+    </span>)</span>
+              
+        </dd><dt>Note</dt><dd><span class="cmt"><p>Coefficient &amp; offset may be provided as any numeric type that is implicitly convertable
+to spire.math.Rational</p><pre><span class="kw">import</span> com.manyangled.coulomb._
+<span class="kw">import</span> spire.math._
+<span class="cmt">// K = (F + 459.67) * 5/9</span>
+@TempUnitDecl(<span class="lit">"fahrenheit"</span>, <span class="num">5.0</span> / <span class="num">9.0</span>, <span class="num">459.67</span>)
+<span class="kw">trait</span> Fahrenheit <span class="kw">extends</span> DerivedTemperature</pre></span></dd></dl></div>
     </li><li name="com.manyangled.coulomb.TempUnitRec" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="TempUnitRec[UE&lt;:com.manyangled.coulomb.TemperatureExpr]extendsProductwithSerializable"></a>
       <a id="TempUnitRec[UE&lt;:TemperatureExpr]:TempUnitRec[UE]"></a>
@@ -372,7 +428,7 @@ Parsing returns a compatible unit Quantity type, or failure.</p></div><dl class=
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="TempUnitRec.html"><span class="name">TempUnitRec</span></a><span class="tparams">[<span name="UE">UE &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="params">(<span name="offset">offset: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="TempUnitRec.html"><span class="name">TempUnitRec</span></a><span class="tparams">[<span name="UE">UE &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="params">(<span name="offset">offset: <span class="extype" name="spire.math.Rational">Rational</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#com.manyangled.coulomb.package@TempUnitRec[UE&lt;:com.manyangled.coulomb.TemperatureExpr]extendsProductwithSerializable" title="Permalink" target="_top">
@@ -381,28 +437,32 @@ Parsing returns a compatible unit Quantity type, or failure.</p></div><dl class=
     </span>
       
     </li><li name="com.manyangled.coulomb.Temperature" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="Temperature[U&lt;:com.manyangled.coulomb.TemperatureExpr]extendsAnyValwithSerializable"></a>
-      <a id="Temperature[U&lt;:TemperatureExpr]:Temperature[U]"></a>
+      <a id="Temperature[N,U&lt;:com.manyangled.coulomb.TemperatureExpr]extendsAnyValwithSerializable"></a>
+      <a id="Temperature[N,U&lt;:TemperatureExpr]:Temperature[N,U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier">final </span>
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <a href="Temperature.html"><span class="name">Temperature</span></a><span class="tparams">[<span name="U">U &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="Temperature.html"><span class="name">Temperature</span></a><span class="tparams">[<span name="N">N</span>, <span name="U">U &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@Temperature[U&lt;:com.manyangled.coulomb.TemperatureExpr]extendsAnyValwithSerializable" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@Temperature[N,U&lt;:com.manyangled.coulomb.TemperatureExpr]extendsAnyValwithSerializable" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">A temperature value.</p><div class="fullcomment"><div class="comment cmt"><p>A temperature value.</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>a temperature unit, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
-or USCustomaryUnits.Fahrenheit</p><pre><span class="cmt">// a Temperature takes temperature baseline offsets into account during conversion</span>
-<span class="kw">val</span> c = Temperature[Celsius](<span class="num">1</span>)
-<span class="kw">val</span> f = c.as[Fahrenheit]        <span class="cmt">// == Temperature[Fahrenheit](33.8)</span>
+      <p class="shortcomment cmt">A temperature value.</p><div class="fullcomment"><div class="comment cmt"><p>A temperature value.</p></div><dl class="paramcmts block"><dt class="tparam">N</dt><dd class="cmt"><p>The numeric representation type for a temperature value</p></dd><dt class="tparam">U</dt><dd class="cmt"><p>a temperature unit, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
+or USCustomaryUnits.Fahrenheit</p><pre><span class="kw">import</span> com.manyangled.coulomb._
+<span class="kw">import</span> SIBaseUnits._
+<span class="kw">import</span> SIAcceptedUnits._
+<span class="kw">import</span> USCustomaryUnits._
+<span class="cmt">// a Temperature takes temperature baseline offsets into account during conversion</span>
+<span class="kw">val</span> c = (<span class="num">1.0</span>).withTemperature[Celsius]
+<span class="kw">val</span> f = c.toUnit[Fahrenheit]       <span class="cmt">// f = Temperature[Double, Fahrenheit](33.8)</span>
 <span class="cmt">// a Quantity of temperature only considers amounts of unit</span>
-<span class="kw">val</span> cq = Quantity[Celsius](<span class="num">1</span>)
-<span class="kw">val</span> fq = cq.as[Fahrenheit]      <span class="cmt">// == Quantity[Fahrenheit](1.8)</span></pre></dd></dl></div>
+<span class="kw">val</span> cq = (<span class="num">1.0</span>).withUnit[Celsius]
+<span class="kw">val</span> fq = cq.toUnit[Fahrenheit]     <span class="cmt">// fq = Quantity[Double, Fahrenheit](1.8)</span></pre></dd></dl></div>
     </li><li name="com.manyangled.coulomb.TemperatureExpr" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="TemperatureExprextendsUnitExpr"></a>
       <a id="TemperatureExpr:TemperatureExpr"></a>
@@ -437,6 +497,40 @@ or USCustomaryUnits.Fahrenheit</p><pre><span class="cmt">// a Temperature takes 
       </a>
     </span>
       
+    </li><li name="com.manyangled.coulomb.UnitDecl" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="UnitDeclextendsAnnotationwithStaticAnnotation"></a>
+      <a id="UnitDecl:UnitDecl"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">class</span>
+      </span>
+      <span class="symbol">
+        <a href="UnitDecl.html"><span class="name">UnitDecl</span></a><span class="result"> extends <span class="extype" name="scala.annotation.Annotation">Annotation</span> with <span class="extype" name="scala.annotation.StaticAnnotation">StaticAnnotation</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@UnitDeclextendsAnnotationwithStaticAnnotation" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Annotate a unit trait with name, conversion coefficient, etc</p><div class="fullcomment"><div class="comment cmt"><p>Annotate a unit trait with name, conversion coefficient, etc</p></div><dl class="attributes block"> <dt>Annotations</dt><dd>
+                <span class="name">@compileTimeOnly</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;macro annotation could not be expanded (the most common reason for that is that you need to enable the macro paradise plugin; another possibility is that you try to use macro annotation in the same compilation run that defines it)&quot;">...</span>
+    </span>)</span>
+              
+                <span class="name">@compileTimeOnly</span><span class="args">(<span>
+      
+      <span class="defval" name="&quot;Must enable the Scala macro paradise compiler plugin to expand static annotations&quot;">...</span>
+    </span>)</span>
+              
+        </dd><dt>Note</dt><dd><span class="cmt"><p>Coefficient may be provided as any numeric type that is implicitly convertable
+to spire.math.Rational</p><pre><span class="kw">import</span> com.manyangled.coulomb._
+<span class="kw">import</span> SIBaseUnits._
+<span class="kw">import</span> spire.math._
+<span class="cmt">// A furlong is 201.168 meters</span>
+@UnitDecl(<span class="lit">"furlong"</span>, <span class="num">201.168</span>)
+<span class="kw">trait</span> Furlong <span class="kw">extends</span> DerivedUnit[Meter]</pre></span></dd></dl></div>
     </li><li name="com.manyangled.coulomb.UnitExpr" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
       <a id="UnitExprextendsAnyRef"></a>
       <a id="UnitExpr:UnitExpr"></a>
@@ -455,40 +549,6 @@ or USCustomaryUnits.Fahrenheit</p><pre><span class="cmt">// a Temperature takes 
     </span>
       <p class="shortcomment cmt">In <code>coulomb</code> all units are static types of a form given by the <code>UnitExpr</code> trait hierarchy
 </p>
-    </li><li name="com.manyangled.coulomb.UnitExprDiv" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="UnitExprDiv[U1&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyRef"></a>
-      <a id="UnitExprDiv[U1&lt;:UnitExpr,U2&lt;:UnitExpr]:UnitExprDiv[U1,U2]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a href="UnitExprDiv.html"><span class="name">UnitExprDiv</span></a><span class="tparams">[<span name="U1">U1 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@UnitExprDiv[U1&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyRef" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="com.manyangled.coulomb.UnitExprMul" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="UnitExprMul[U1&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyRef"></a>
-      <a id="UnitExprMul[U1&lt;:UnitExpr,U2&lt;:UnitExpr]:UnitExprMul[U1,U2]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a href="UnitExprMul.html"><span class="name">UnitExprMul</span></a><span class="tparams">[<span name="U1">U1 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@UnitExprMul[U1&lt;:com.manyangled.coulomb.UnitExpr,U2&lt;:com.manyangled.coulomb.UnitExpr]extendsAnyRef" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="com.manyangled.coulomb.UnitExprString" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="UnitExprString[U&lt;:com.manyangled.coulomb.UnitExpr]extendsProductwithSerializable"></a>
       <a id="UnitExprString[U&lt;:UnitExpr]:UnitExprString[U]"></a>
@@ -515,7 +575,7 @@ or USCustomaryUnits.Fahrenheit</p><pre><span class="cmt">// a Temperature takes 
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a href="UnitRec.html"><span class="name">UnitRec</span></a><span class="tparams">[<span name="UE">UE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="coef">coef: <span class="extype" name="scala.Double">Double</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a href="UnitRec.html"><span class="name">UnitRec</span></a><span class="tparams">[<span name="UE">UE &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="name">name: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="coef">coef: <span class="extype" name="spire.math.Rational">Rational</span></span>, <span name="abbv">abbv: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#com.manyangled.coulomb.package@UnitRec[UE&lt;:com.manyangled.coulomb.UnitExpr]extendsProductwithSerializable" title="Permalink" target="_top">
@@ -541,8 +601,42 @@ or USCustomaryUnits.Fahrenheit</p><pre><span class="cmt">// a Temperature takes 
     </span>
       <p class="shortcomment cmt">A unitless value.</p><div class="fullcomment"><div class="comment cmt"><p>A unitless value.  Each <a href="PrefixUnit.html" class="extype" name="com.manyangled.coulomb.PrefixUnit">PrefixUnit</a> is derived from Unitless.  Unit Expressions where all
 units cancel out will also be of type Unitless</p><pre><span class="kw">import</span> USCustomaryUnits._
-<span class="cmt">// ratio will have type Unitless, since length units cancel</span>
-<span class="kw">val</span> ratio = Quantity[Yard](<span class="num">1</span>) / Quantity[Foot](<span class="num">1</span>)</pre></div></div>
+<span class="cmt">// ratio will have a type convertable to Unitless, since length units cancel</span>
+<span class="kw">val</span> ratio = (Yard(<span class="num">1.0</span>) / Foot(<span class="num">1.0</span>)).toUnit[Unitless]</pre></div></div>
+    </li><li name="com.manyangled.coulomb.WithTemperature" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WithTemperature[N,U&lt;:com.manyangled.coulomb.TemperatureExpr]=com.manyangled.coulomb.Temperature[N,U]"></a>
+      <a id="WithTemperature[N,U&lt;:TemperatureExpr]:WithTemperature[N,U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">WithTemperature</span><span class="tparams">[<span name="N">N</span>, <span name="U">U &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="result"> = <a href="Temperature.html" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.WithTemperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.WithTemperature.U">U</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@WithTemperature[N,U&lt;:com.manyangled.coulomb.TemperatureExpr]=com.manyangled.coulomb.Temperature[N,U]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An &quot;infix&quot; type alias for <a href="Temperature.html" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a></p>
+    </li><li name="com.manyangled.coulomb.WithUnit" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WithUnit[N,U&lt;:com.manyangled.coulomb.UnitExpr]=com.manyangled.coulomb.Quantity[N,U]"></a>
+      <a id="WithUnit[N,U&lt;:UnitExpr]:WithUnit[N,U]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">WithUnit</span><span class="tparams">[<span name="N">N</span>, <span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> = <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.WithUnit.N">N</span>, <span class="extype" name="com.manyangled.coulomb.WithUnit.U">U</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@WithUnit[N,U&lt;:com.manyangled.coulomb.UnitExpr]=com.manyangled.coulomb.Quantity[N,U]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">An &quot;infix&quot; type alias for <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a></p>
     </li></ol>
             </div>
 
@@ -601,36 +695,36 @@ units cancel out will also be of type Unitless</p><pre><span class="kw">import</
       </a>
     </span>
       
-    </li><li name="com.manyangled.coulomb.CompatTemps" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="CompatTemps"></a>
-      <a id="CompatTemps:CompatTemps"></a>
+    </li><li name="com.manyangled.coulomb.ConvertableUnits" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="ConvertableUnits"></a>
+      <a id="ConvertableUnits:ConvertableUnits"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="CompatTemps$.html"><span class="name">CompatTemps</span></a>
+        <a href="ConvertableUnits$.html"><span class="name">ConvertableUnits</span></a>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@CompatTemps" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@ConvertableUnits" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       
-    </li><li name="com.manyangled.coulomb.CompatUnits" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="CompatUnits"></a>
-      <a id="CompatUnits:CompatUnits"></a>
+    </li><li name="com.manyangled.coulomb.DemoQP" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="DemoQP"></a>
+      <a id="DemoQP:DemoQP"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <a href="CompatUnits$.html"><span class="name">CompatUnits</span></a>
+        <a href="DemoQP$.html"><span class="name">DemoQP</span></a>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@CompatUnits" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@DemoQP" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -755,6 +849,23 @@ units cancel out will also be of type Unitless</p><pre><span class="kw">import</
       </a>
     </span>
       
+    </li><li name="com.manyangled.coulomb.StandardTypeOps" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="StandardTypeOps"></a>
+      <a id="StandardTypeOps:StandardTypeOps"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="StandardTypeOps$.html"><span class="name">StandardTypeOps</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.package@StandardTypeOps" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">define UnitExpr aliases for standard operators *, /, ^</p>
     </li><li name="com.manyangled.coulomb.Temperature" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="Temperature"></a>
       <a id="Temperature:Temperature"></a>
@@ -789,40 +900,6 @@ units cancel out will also be of type Unitless</p><pre><span class="kw">import</
       </a>
     </span>
       
-    </li><li name="com.manyangled.coulomb.UnitExprDiv" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="UnitExprDiv"></a>
-      <a id="UnitExprDiv:UnitExprDiv"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="UnitExprDiv$.html"><span class="name">UnitExprDiv</span></a>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@UnitExprDiv" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
-    </li><li name="com.manyangled.coulomb.UnitExprMul" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="UnitExprMul"></a>
-      <a id="UnitExprMul:UnitExprMul"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a href="UnitExprMul$.html"><span class="name">UnitExprMul</span></a>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@UnitExprMul" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      
     </li><li name="com.manyangled.coulomb.UnitExprString" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="UnitExprString"></a>
       <a id="UnitExprString:UnitExprString"></a>
@@ -840,40 +917,40 @@ units cancel out will also be of type Unitless</p><pre><span class="kw">import</
       </a>
     </span>
       
-    </li><li name="com.manyangled.coulomb.Unitless" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="Unitless"></a>
-      <a id="Unitless:Unitless"></a>
+    </li><li name="com.manyangled.coulomb#churchToInt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="churchToInt[N&lt;:com.manyangled.coulomb.ChurchInt](implicitiv:com.manyangled.coulomb.ChurchIntValue[N]):Int"></a>
+      <a id="churchToInt[N&lt;:ChurchInt](ChurchIntValue[N]):Int"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <a href="Unitless$.html"><span class="name">Unitless</span></a>
+        <span class="name">churchToInt</span><span class="tparams">[<span name="N">N &lt;: <a href="ChurchInt.html" class="extype" name="com.manyangled.coulomb.ChurchInt">ChurchInt</a></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="iv">iv: <a href="ChurchIntValue.html" class="extype" name="com.manyangled.coulomb.ChurchIntValue">ChurchIntValue</a>[<span class="extype" name="com.manyangled.coulomb.churchToInt.N">N</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@Unitless" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@churchToInt[N&lt;:com.manyangled.coulomb.ChurchInt](implicitiv:com.manyangled.coulomb.ChurchIntValue[N]):Int" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      
-    </li><li name="com.manyangled.coulomb.extensions" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="extensions"></a>
-      <a id="extensions:extensions"></a>
+      <p class="shortcomment cmt">obtain the integer value of a ChurchInt type</p>
+    </li><li name="com.manyangled.coulomb#coulombQuantityIsOrdering" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="coulombQuantityIsOrdering[N,U&lt;:com.manyangled.coulomb.UnitExpr]:Ordering[com.manyangled.coulomb.Quantity[N,U]]"></a>
+      <a id="coulombQuantityIsOrdering[N,U&lt;:UnitExpr]:Ordering[Quantity[N,U]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="modifier">implicit macro </span>
+        <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <a href="extensions$.html"><span class="name">extensions</span></a>
+        <span class="name">coulombQuantityIsOrdering</span><span class="tparams">[<span name="N">N</span>, <span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result">: <span class="extype" name="scala.Ordering">Ordering</span>[<a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.coulombQuantityIsOrdering.N">N</span>, <span class="extype" name="com.manyangled.coulomb.coulombQuantityIsOrdering.U">U</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.package@extensions" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.package@coulombQuantityIsOrdering[N,U&lt;:com.manyangled.coulomb.UnitExpr]:Ordering[com.manyangled.coulomb.Quantity[N,U]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">type extensions and implicits for working with units</p>
+      <p class="shortcomment cmt">implicit factory for standard Scala Ordering typeclass</p>
     </li><li name="com.manyangled.coulomb.infraChurchInt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="infraChurchInt"></a>
       <a id="infraChurchInt:infraChurchInt"></a>
@@ -900,7 +977,11 @@ units cancel out will also be of type Unitless</p><pre><span class="kw">import</
         </div>
 
         <div id="inheritedMembers">
-        
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
         
         </div>
 

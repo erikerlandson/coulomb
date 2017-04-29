@@ -51,9 +51,12 @@
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Base units are axiomatic units. The
 <a href="https://en.wikipedia.org/wiki/International_System_of_Units" target="_blank">Standard International</a>
-(SI) unit system defines seven Base units, which <code>coulomb</code> defines in <a href="SIBaseUnits$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits">SIBaseUnits</a>.
-Exactly one <code>BaseUnit</code> is defined for each category of quantity (e.g. length, mass, time, etc).
-</p></div><div class="toggleContainer block">
+(SI) unit system defines seven Base units, which <code>coulomb</code> defines in SIBaseUnits.
+Exactly one <code>BaseUnit</code> is defined for each category of quantity (e.g. length, mass, time, etc).</p><pre><span class="kw">import</span> com.manyangled.coulomb._
+<span class="kw">import</span> spire.math._
+<span class="cmt">// A base unit for loop iterations</span>
+@UnitDecl(<span class="lit">"iteration"</span>)
+<span class="kw">trait</span> Iteration <span class="kw">extends</span> BaseUnit</pre></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">
