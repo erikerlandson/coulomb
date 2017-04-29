@@ -23,8 +23,38 @@ import scala.annotation.compileTimeOnly
 
 import spire.math._
 
+object CoulombRationalUtils {
+  def relError(x: Rational, y: Rational) = (((x - y).abs) / x).toDouble
+
+  implicit class WithLimitByMethod(rat: Rational) {
+    def limitBy(
+        maxLim: BigInt,
+        relErr: Double = 0.001) = {
+      var p2 = BigInt(128)
+      var lim = p2 - 1
+      var rLim = rat.limitTo(lim)
+      var rErr = relError(rat, rLim)
+      var found = false
+      while (!found && (lim <= maxLim)) {
+        val rt = rat.limitTo(lim)
+        val e = relError(rat, rt)
+        if (e < rErr) {
+          rLim = rt
+          rErr = e
+          if (e <= relErr) found = true
+        }
+        p2 *= 2
+        lim = p2 - 1
+      }
+      (rLim, rErr)
+    }
+  }
+}
+
 private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0) {
   import c.universe._
+
+  import CoulombRationalUtils._
 
   // the tree this produces may also be read by the cuCoef method below, so
   // if you change this, make sure cuCoef can read the new tree patterns
@@ -347,13 +377,11 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
   }
 
   def coefLimit(coef: Rational, lim: BigInt): Rational = {
-    val clim = coef.limitTo(lim)
-    // I don't feel sure about a policy here, and my attempts to make it configurable
-    // at compile time have been failing, see:
+    // I'd like to make these configurable, but can't due to:
     // https://github.com/scala/scala-dev/issues/353
-    //val pdif = ((clim - coef).abs / coef).toDouble * 100.0
-    //if (pdif > 0.01) c.info(c.enclosingPosition,
-    //  s"WARNING: approximated coefficient $coef with $clim, with $pdif percent error", false)
+    val reMax = 0.001
+    val (clim, cerr) = coef.limitBy(lim, relErr = reMax)
+    if (cerr > reMax) warn(s"Coefficient approximation deviates by $cerr relative error")
     clim
   }
 
@@ -415,11 +443,15 @@ private [coulomb] class UnitMacros(c0: whitebox.Context) extends MacroCommon(c0)
         // Byte and Short appear to be cast to Int for '*' and '/' anyway
         val cx = coefLimit(coef, Int.MaxValue)
         val (n, d) = (cx.numerator.toInt, cx.denominator.toInt)
+        val nt = Int.MaxValue / n
+        if (nt < 65536) warn(s"Maximum safe value is $nt")
         (q"$n", q"$d")
       }
       case t if (t =:= typeOf[Long]) => {
         val cx = coefLimit(coef, Long.MaxValue)
         val (n, d) = (cx.numerator.toLong, cx.denominator.toLong)
+        val nt = Long.MaxValue / n
+        if (nt < 2147483648L) warn(s"Maximum safe value is $nt")
         (q"$n", q"$d")
       }
       case t if (t =:= typeOf[BigInt]) => {

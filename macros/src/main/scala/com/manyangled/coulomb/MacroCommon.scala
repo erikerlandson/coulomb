@@ -30,6 +30,8 @@ private [coulomb] class MacroCommon(val c: whitebox.Context) {
 
   def abort(msg: String) = c.abort(c.enclosingPosition, msg)
 
+  def warn(msg: String) = c.warning(c.enclosingPosition, msg)
+
   def typeName(tpe: Type): String = tpe.typeSymbol.fullName
 
   def evalTree[T](tree: Tree) = c.eval(c.Expr[T](c.untypecheck(tree.duplicate)))
