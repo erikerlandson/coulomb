@@ -47,17 +47,21 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">Temperature</span><span class="tparams">[<span name="U">U &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Temperature</span><span class="tparams">[<span name="N">N</span>, <span name="U">U &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A temperature value.</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>a temperature unit, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
-or USCustomaryUnits.Fahrenheit</p><pre><span class="cmt">// a Temperature takes temperature baseline offsets into account during conversion</span>
-<span class="kw">val</span> c = Temperature[Celsius](<span class="num">1</span>)
-<span class="kw">val</span> f = c.as[Fahrenheit]        <span class="cmt">// == Temperature[Fahrenheit](33.8)</span>
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A temperature value.</p></div><dl class="paramcmts block"><dt class="tparam">N</dt><dd class="cmt"><p>The numeric representation type for a temperature value</p></dd><dt class="tparam">U</dt><dd class="cmt"><p>a temperature unit, e.g. SIBaseUnits.Kelvin, SIAcceptedUnits.Celsius,
+or USCustomaryUnits.Fahrenheit</p><pre><span class="kw">import</span> com.manyangled.coulomb._
+<span class="kw">import</span> SIBaseUnits._
+<span class="kw">import</span> SIAcceptedUnits._
+<span class="kw">import</span> USCustomaryUnits._
+<span class="cmt">// a Temperature takes temperature baseline offsets into account during conversion</span>
+<span class="kw">val</span> c = (<span class="num">1.0</span>).withTemperature[Celsius]
+<span class="kw">val</span> f = c.toUnit[Fahrenheit]       <span class="cmt">// f = Temperature[Double, Fahrenheit](33.8)</span>
 <span class="cmt">// a Quantity of temperature only considers amounts of unit</span>
-<span class="kw">val</span> cq = Quantity[Celsius](<span class="num">1</span>)
-<span class="kw">val</span> fq = cq.as[Fahrenheit]      <span class="cmt">// == Quantity[Fahrenheit](1.8)</span></pre></dd></dl><div class="toggleContainer block">
+<span class="kw">val</span> cq = (<span class="num">1.0</span>).withUnit[Celsius]
+<span class="kw">val</span> fq = cq.toUnit[Fahrenheit]     <span class="cmt">// fq = Quantity[Double, Fahrenheit](1.8)</span></pre></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyVal">AnyVal</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -97,18 +101,18 @@ or USCustomaryUnits.Fahrenheit</p><pre><span class="cmt">// a Temperature takes 
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.manyangled.coulomb.Temperature#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(value:Double):com.manyangled.coulomb.Temperature[U]"></a>
-      <a id="&lt;init&gt;:Temperature[U]"></a>
+      <a id="&lt;init&gt;(value:N):com.manyangled.coulomb.Temperature[N,U]"></a>
+      <a id="&lt;init&gt;:Temperature[N,U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Temperature</span><span class="params">(<span name="value">value: <span class="extype" name="scala.Double">Double</span></span>)</span>
+        <span class="name">Temperature</span><span class="params">(<span name="value">value: <span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@&lt;init&gt;(value:Double):com.manyangled.coulomb.Temperature[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@&lt;init&gt;(value:N):com.manyangled.coulomb.Temperature[N,U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -157,58 +161,109 @@ or USCustomaryUnits.Fahrenheit</p><pre><span class="cmt">// a Temperature takes 
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.manyangled.coulomb.Temperature#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Temperature[U]"></a>
-      <a id="+[U2&lt;:UnitExpr](Quantity[U2])(CompatUnits[U2,U]):Temperature[U]"></a>
+      <a id="+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Temperature[N,U]"></a>
+      <a id="+[U2&lt;:UnitExpr](Quantity[N,U2]):Temperature[N,U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">macro </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $plus" class="name">+</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.+.U2">U2</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="cu">cu: <a href="CompatUnits.html" class="extype" name="com.manyangled.coulomb.CompatUnits">CompatUnits</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.+.U2">U2</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>
+        <span title="gt4s: $plus" class="name">+</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.+.U2">U2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Temperature[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Temperature[N,U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Add a Quantity of temperature units to a temperature to get a new temperature</p><div class="fullcomment"><div class="comment cmt"><p>Add a Quantity of temperature units to a temperature to get a new temperature</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the temperature unit of right side.  If U2 is not a compatible unit (temperature)
+      <p class="shortcomment cmt">Add a Quantity of temperature units to a temperature to get a new temperature</p><div class="fullcomment"><div class="comment cmt"><p>Add a Quantity of temperature units to a temperature to get a new temperature</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the temperature unit of right side.  If U2 is not a convertable unit (temperature)
 a compile-time error will ocurr.</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right hand side of sum</p></dd><dt>returns</dt><dd class="cmt"><p>a new temperature that is sum of left-hand temp plus right-hand temp quantity</p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.Temperature#-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="-[U2&lt;:com.manyangled.coulomb.TemperatureExpr](that:com.manyangled.coulomb.Temperature[U2])(implicitct:com.manyangled.coulomb.CompatTemps[U2,U]):com.manyangled.coulomb.Quantity[U]"></a>
-      <a id="-[U2&lt;:TemperatureExpr](Temperature[U2])(CompatTemps[U2,U]):Quantity[U]"></a>
+      <a id="-[U2&lt;:com.manyangled.coulomb.TemperatureExpr](that:com.manyangled.coulomb.Temperature[N,U2]):com.manyangled.coulomb.Quantity[N,U]"></a>
+      <a id="-[U2&lt;:TemperatureExpr](Temperature[N,U2]):Quantity[N,U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">macro </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $minus" class="name">-</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.-.U2">U2</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="ct">ct: <a href="CompatTemps.html" class="extype" name="com.manyangled.coulomb.CompatTemps">CompatTemps</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.-.U2">U2</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>
+        <span title="gt4s: $minus" class="name">-</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.-.U2">U2</span>]</span>)</span><span class="result">: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@-[U2&lt;:com.manyangled.coulomb.TemperatureExpr](that:com.manyangled.coulomb.Temperature[U2])(implicitct:com.manyangled.coulomb.CompatTemps[U2,U]):com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@-[U2&lt;:com.manyangled.coulomb.TemperatureExpr](that:com.manyangled.coulomb.Temperature[N,U2]):com.manyangled.coulomb.Quantity[N,U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Subtract two temperatures to get a Quantity of temperature units</p><div class="fullcomment"><div class="comment cmt"><p>Subtract two temperatures to get a Quantity of temperature units</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the temperature unit of right side.</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right hand side of difference</p></dd><dt>returns</dt><dd class="cmt"><p>a new unit Quantity equal to <code>this</code> - <code>that</code></p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.Temperature#-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Temperature[U]"></a>
-      <a id="-[U2&lt;:UnitExpr](Quantity[U2])(CompatUnits[U2,U]):Temperature[U]"></a>
+      <a id="-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Temperature[N,U]"></a>
+      <a id="-[U2&lt;:UnitExpr](Quantity[N,U2]):Temperature[N,U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">macro </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $minus" class="name">-</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.-.U2">U2</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="cu">cu: <a href="CompatUnits.html" class="extype" name="com.manyangled.coulomb.CompatUnits">CompatUnits</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.-.U2">U2</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>
+        <span title="gt4s: $minus" class="name">-</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.-.U2">U2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Temperature[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Temperature[N,U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Subtract a Quantity of temperature units from a temperature to get a new temperature</p><div class="fullcomment"><div class="comment cmt"><p>Subtract a Quantity of temperature units from a temperature to get a new temperature</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the temperature unit of right side.  If U2 is not a compatible unit (temperature)
+      <p class="shortcomment cmt">Subtract a Quantity of temperature units from a temperature to get a new temperature</p><div class="fullcomment"><div class="comment cmt"><p>Subtract a Quantity of temperature units from a temperature to get a new temperature</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the temperature unit of right side.  If U2 is not a convertable unit (temperature)
 a compile-time error will ocurr.</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right hand side of difference</p></dd><dt>returns</dt><dd class="cmt"><p>a new temperature that is the left-hand temp minus right-hand temp quantity</p></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.Temperature#&lt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;(that:com.manyangled.coulomb.Temperature[N,U]):Boolean"></a>
+      <a id="&lt;(Temperature[N,U]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $less" class="name">&lt;</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@&lt;(that:com.manyangled.coulomb.Temperature[N,U]):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> &lt; <code>that.value</code></p>
+    </li><li name="com.manyangled.coulomb.Temperature#&lt;=" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;=(that:com.manyangled.coulomb.Temperature[N,U]):Boolean"></a>
+      <a id="&lt;=(Temperature[N,U]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $less$eq" class="name">&lt;=</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@&lt;=(that:com.manyangled.coulomb.Temperature[N,U]):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> &lt;= <code>that.value</code></p>
+    </li><li name="com.manyangled.coulomb.Temperature#=!=" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="=!=(that:com.manyangled.coulomb.Temperature[N,U]):Boolean"></a>
+      <a id="=!=(Temperature[N,U]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$bang$eq" class="name">=!=</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@=!=(that:com.manyangled.coulomb.Temperature[N,U]):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> != <code>that.value</code></p>
     </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a>
       <a id="==(Any):Boolean"></a>
@@ -226,23 +281,57 @@ a compile-time error will ocurr.</p></dd><dt class="param">that</dt><dd class="c
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Temperature#as" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="as[U2&lt;:com.manyangled.coulomb.TemperatureExpr](implicitct:com.manyangled.coulomb.CompatTemps[U,U2]):com.manyangled.coulomb.Temperature[U2]"></a>
-      <a id="as[U2&lt;:TemperatureExpr](CompatTemps[U,U2]):Temperature[U2]"></a>
+    </li><li name="com.manyangled.coulomb.Temperature#===" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="===(that:com.manyangled.coulomb.Temperature[N,U]):Boolean"></a>
+      <a id="===(Temperature[N,U]):Boolean"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">macro </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">as</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="ct">ct: <a href="CompatTemps.html" class="extype" name="com.manyangled.coulomb.CompatTemps">CompatTemps</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.as.U2">U2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.as.U2">U2</span>]</span>
+        <span title="gt4s: $eq$eq$eq" class="name">===</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@as[U2&lt;:com.manyangled.coulomb.TemperatureExpr](implicitct:com.manyangled.coulomb.CompatTemps[U,U2]):com.manyangled.coulomb.Temperature[U2]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@===(that:com.manyangled.coulomb.Temperature[N,U]):Boolean" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Convert a temperature into a new unit of temperature.</p><div class="fullcomment"><div class="comment cmt"><p>Convert a temperature into a new unit of temperature.</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the new temperature unit expression to convert to.</p></dd><dt>returns</dt><dd class="cmt"><p>a new value of type Temperature[U2], equivalent to <code>this</code></p></dd></dl></div>
+      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> == <code>that.value</code></p>
+    </li><li name="com.manyangled.coulomb.Temperature#&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&gt;(that:com.manyangled.coulomb.Temperature[N,U]):Boolean"></a>
+      <a id="&gt;(Temperature[N,U]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $greater" class="name">&gt;</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@&gt;(that:com.manyangled.coulomb.Temperature[N,U]):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> &gt; <code>that.value</code></p>
+    </li><li name="com.manyangled.coulomb.Temperature#&gt;=" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&gt;=(that:com.manyangled.coulomb.Temperature[N,U]):Boolean"></a>
+      <a id="&gt;=(Temperature[N,U]):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $greater$eq" class="name">&gt;=</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@&gt;=(that:com.manyangled.coulomb.Temperature[N,U]):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> &gt;= <code>that.value</code></p>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -294,92 +383,60 @@ a compile-time error will ocurr.</p></dd><dt class="param">that</dt><dd class="c
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Temperature#str" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="str(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String"></a>
-      <a id="str(UnitExprString[U]):String"></a>
+    </li><li name="com.manyangled.coulomb.Temperature#toRep" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toRep[N2](implicitcfN:spire.math.ConvertableFrom[N],implicitctN2:spire.math.ConvertableTo[N2]):com.manyangled.coulomb.Temperature[N2,U]"></a>
+      <a id="toRep[N2](ConvertableFrom[N],ConvertableTo[N2]):Temperature[N2,U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">str</span><span class="params">(<span class="implicit">implicit </span><span name="uesU">uesU: <a href="UnitExprString.html" class="extype" name="com.manyangled.coulomb.UnitExprString">UnitExprString</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">toRep</span><span class="tparams">[<span name="N2">N2</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="cfN">cfN: <span class="extype" name="spire.math.ConvertableFrom">ConvertableFrom</span>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>]</span>, <span name="ctN2">ctN2: <span class="extype" name="spire.math.ConvertableTo">ConvertableTo</span>[<span class="extype" name="com.manyangled.coulomb.Temperature.toRep.N2">N2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.toRep.N2">N2</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@str(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@toRep[N2](implicitcfN:spire.math.ConvertableFrom[N],implicitctN2:spire.math.ConvertableTo[N2]):com.manyangled.coulomb.Temperature[N2,U]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Convert a quantity of representation type N to a new quantity of type N2, with same units</p>
+    </li><li name="com.manyangled.coulomb.Temperature#toStr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toStr:String"></a>
+      <a id="toStr:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toStr</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@toStr:String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">A human-readable string representing the temperature with its associated unit type</p>
-    </li><li name="com.manyangled.coulomb.Temperature#toDouble" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="toDouble:Double"></a>
-      <a id="toDouble:Double"></a>
+    </li><li name="com.manyangled.coulomb.Temperature#toStrFull" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toStrFull:String"></a>
+      <a id="toStrFull:String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">macro </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toDouble</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
+        <span class="name">toStrFull</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@toDouble:Double" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@toStrFull:String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">The raw value of the temperature, rounded to nearest integer and returned as a Double</p>
-    </li><li name="com.manyangled.coulomb.Temperature#toFloat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="toFloat:Float"></a>
-      <a id="toFloat:Float"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toFloat</span><span class="result">: <span class="extype" name="scala.Float">Float</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@toFloat:Float" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">The raw value of the temperature, rounded to nearest integer and returned as a Float</p>
-    </li><li name="com.manyangled.coulomb.Temperature#toInt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="toInt:Int"></a>
-      <a id="toInt:Int"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toInt</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@toInt:Int" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">The raw value of the temperature, rounded to nearest integer and returned as an Int</p>
-    </li><li name="com.manyangled.coulomb.Temperature#toLong" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="toLong:Long"></a>
-      <a id="toLong:Long"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toLong</span><span class="result">: <span class="extype" name="scala.Long">Long</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@toLong:Long" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">The raw value of the temperature, rounded to nearest integer and returned as a Long</p>
-    </li><li name="scala.Any#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <p class="shortcomment cmt">A human-readable string representing the value and unit type of this quantity,
+using the full unit names
+</p>
+    </li><li name="com.manyangled.coulomb.Temperature#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <a id="toString():String"></a>
       <h4 class="signature">
@@ -388,31 +445,82 @@ a compile-time error will ocurr.</p></dd><dt class="param">that</dt><dd class="c
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#com.manyangled.coulomb.Temperature@toString():String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Temperature#unitStr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="unitStr(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String"></a>
-      <a id="unitStr(UnitExprString[U]):String"></a>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a> → Any</dd></dl></div>
+    </li><li name="com.manyangled.coulomb.Temperature#toUnit" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toUnit[U2&lt;:com.manyangled.coulomb.TemperatureExpr]:com.manyangled.coulomb.Temperature[N,U2]"></a>
+      <a id="toUnit[U2&lt;:TemperatureExpr]:Temperature[N,U2]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier"></span>
+        <span class="modifier">macro </span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">unitStr</span><span class="params">(<span class="implicit">implicit </span><span name="uesU">uesU: <a href="UnitExprString.html" class="extype" name="com.manyangled.coulomb.UnitExprString">UnitExprString</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">toUnit</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="TemperatureExpr.html" class="extype" name="com.manyangled.coulomb.TemperatureExpr">TemperatureExpr</a></span>]</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Temperature">Temperature</a>[<span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Temperature.toUnit.U2">U2</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Temperature@unitStr(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@toUnit[U2&lt;:com.manyangled.coulomb.TemperatureExpr]:com.manyangled.coulomb.Temperature[N,U2]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">A human-readable string representing the unit type of this temperature</p>
+      <p class="shortcomment cmt">Convert a temperature into a new unit of temperature.</p><div class="fullcomment"><div class="comment cmt"><p>Convert a temperature into a new unit of temperature.</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the new temperature unit expression to convert to.</p></dd><dt>returns</dt><dd class="cmt"><p>a new value of type Temperature[U2], equivalent to <code>this</code></p></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.Temperature#unitStr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="unitStr:String"></a>
+      <a id="unitStr:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unitStr</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@unitStr:String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A human-readable string representing the unit type of this quantity</p>
+    </li><li name="com.manyangled.coulomb.Temperature#unitStrFull" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="unitStrFull:String"></a>
+      <a id="unitStrFull:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">macro </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unitStrFull</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@unitStrFull:String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">A human-readable string representing the unit type of this quantity, using full unit names</p>
+    </li><li name="com.manyangled.coulomb.Temperature#value" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="value:N"></a>
+      <a id="value:N"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">value</span><span class="result">: <span class="extype" name="com.manyangled.coulomb.Temperature.N">N</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Temperature@value:N" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      
     </li></ol>
             </div>
 

@@ -52,13 +52,13 @@
       </h4>
       
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A run-time parser for string expressions that evaluate to <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a> objects.
-Parsing returns a compatible unit Quantity type, or failure.</p></div><dl class="attributes block"> <dt>Note</dt><dd><span class="cmt"><p><code>QuantityParser</code> always imports <code>com.manyangled.coulomb._</code>, <code>extensions._</code> and <code>ChurchInt._</code></p><pre><span class="kw">import</span> SIBaseUnits._
+Parsing returns a convertable unit Quantity type, or failure.</p></div><dl class="attributes block"> <dt>Note</dt><dd><span class="cmt"><p><code>QuantityParser</code> always imports <code>com.manyangled.coulomb._</code>, <code>ChurchInt._</code> &amp; <code>spire.math._</code></p><pre><span class="kw">import</span> SIBaseUnits._
 <span class="cmt">// create a parser that knows about all SIBaseUnit units, Mile and Hour</span>
 <span class="kw">val</span> qp = QuantityParser(
   unitDeclarationObjects = <span class="std">Seq</span>(SIBaseUnits),
   unitCompanionObjects = <span class="std">Seq</span>(USCustomaryUnits.Mile, SIAcceptedUnits.Hour))
 <span class="cmt">// parse an expression in miles per hour, return as meters per second</span>
-<span class="kw">val</span> mps = qp[Meter &lt;/&gt; Second](<span class="lit">"60.withUnit[Mile &lt;/&gt; Hour]"</span>)</pre></span></dd></dl><div class="toggleContainer block">
+<span class="kw">val</span> mps = qp[<span class="std">Float</span>, Meter %/ Second](<span class="lit">"60f.withUnit[Mile %/ Hour]"</span>)</pre></span></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -179,23 +179,23 @@ prior to attempting to parse each input string.</p></dd></dl></div>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.manyangled.coulomb.QuantityParser#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply[U&lt;:com.manyangled.coulomb.UnitExpr](quantityExpr:String)(implicitevidence$1:reflect.runtime.universe.TypeTag[U]):scala.util.Try[com.manyangled.coulomb.Quantity[U]]"></a>
-      <a id="apply[U&lt;:UnitExpr](String)(scala.reflect.api.JavaUniverse.TypeTag[U]):Try[Quantity[U]]"></a>
+      <a id="apply[N,U&lt;:com.manyangled.coulomb.UnitExpr](quantityExpr:String)(implicitevidence$1:reflect.runtime.universe.TypeTag[N],implicitevidence$2:reflect.runtime.universe.TypeTag[U]):scala.util.Try[com.manyangled.coulomb.Quantity[N,U]]"></a>
+      <a id="apply[N,U&lt;:UnitExpr](String)(scala.reflect.api.JavaUniverse.TypeTag[N],scala.reflect.api.JavaUniverse.TypeTag[U]):Try[Quantity[N,U]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="tparams">[<span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="quantityExpr">quantityExpr: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.JavaUniverse.TypeTag</span>[<span class="extype" name="com.manyangled.coulomb.QuantityParser.apply.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.util.Try">Try</span>[<a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.QuantityParser.apply.U">U</span>]]</span>
+        <span class="name">apply</span><span class="tparams">[<span name="N">N</span>, <span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="quantityExpr">quantityExpr: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="arg0">arg0: <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.JavaUniverse.TypeTag</span>[<span class="extype" name="com.manyangled.coulomb.QuantityParser.apply.N">N</span>]</span>, <span name="arg1">arg1: <span class="extype" name="scala.reflect.api.TypeTags.TypeTag">scala.reflect.api.JavaUniverse.TypeTag</span>[<span class="extype" name="com.manyangled.coulomb.QuantityParser.apply.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.util.Try">Try</span>[<a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.QuantityParser.apply.N">N</span>, <span class="extype" name="com.manyangled.coulomb.QuantityParser.apply.U">U</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@apply[U&lt;:com.manyangled.coulomb.UnitExpr](quantityExpr:String)(implicitevidence$1:reflect.runtime.universe.TypeTag[U]):scala.util.Try[com.manyangled.coulomb.Quantity[U]]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.QuantityParser@apply[N,U&lt;:com.manyangled.coulomb.UnitExpr](quantityExpr:String)(implicitevidence$1:reflect.runtime.universe.TypeTag[N],implicitevidence$2:reflect.runtime.universe.TypeTag[U]):scala.util.Try[com.manyangled.coulomb.Quantity[N,U]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Parse a string containing an expression that evaluates to a unit Quantity object.</p><div class="fullcomment"><div class="comment cmt"><p>Parse a string containing an expression that evaluates to a unit Quantity object.</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>a <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a> type that specifies a <code>Quantity[U]</code> to return.  <code>U</code> is expected to
-be compatible with the unit type of the expression in the string, or parsing will fail.</p></dd><dt class="param">quantityExpr</dt><dd class="cmt"><p>a string containing an expression that evaluates to a <code>Quantity</code> object.</p></dd><dt>returns</dt><dd class="cmt"><p>the Quantity object created by run-time parsing, converted to compatible <code>Quantity[U]</code>,
+      <p class="shortcomment cmt">Parse a string containing an expression that evaluates to a unit Quantity object.</p><div class="fullcomment"><div class="comment cmt"><p>Parse a string containing an expression that evaluates to a unit Quantity object.</p></div><dl class="paramcmts block"><dt class="tparam">N</dt><dd class="cmt"><p>the numeric representation type</p></dd><dt class="tparam">U</dt><dd class="cmt"><p>a <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a> type that specifies a <code>Quantity[U]</code> to return.  <code>U</code> is expected to
+be convertable to the unit type of the expression in the string, or parsing will fail.</p></dd><dt class="param">quantityExpr</dt><dd class="cmt"><p>a string containing an expression that evaluates to a <code>Quantity</code> object.</p></dd><dt>returns</dt><dd class="cmt"><p>the Quantity object created by run-time parsing, converted to convertable <code>Quantity[U]</code>,
 or failure if any stage of the run-time parsing and unit conversion was unsuccessful.</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>

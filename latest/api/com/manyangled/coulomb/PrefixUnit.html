@@ -49,10 +49,10 @@
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Prefix units represent standard unitless multipliers applied to units, e.g. <a href="SIPrefixes$.html" class="extype" name="com.manyangled.coulomb.SIPrefixes">SIPrefixes</a>
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Prefix units represent standard unitless multipliers applied to units, e.g. SIPrefixes
 defines units <code>Kilo</code> (10<sup>3), <code>Mega</code> (10</sup>6), etc.</p><pre><span class="cmt">// define a new prefix Dozen, representing multiplier of 12</span>
-<span class="kw">trait</span> Dozen <span class="kw">extends</span> PrefixUnit
-<span class="kw">object</span> Dozen <span class="kw">extends</span> UnitCompanion[Dozen](<span class="lit">"dozen"</span>, <span class="num">12.0</span>)</pre></div><div class="toggleContainer block">
+@UnitDecl(<span class="lit">"dozen"</span>, <span class="num">12</span>)
+<span class="kw">trait</span> Dozen <span class="kw">extends</span> PrefixUnit</pre></div><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="DerivedUnit.html" class="extype" name="com.manyangled.coulomb.DerivedUnit">DerivedUnit</a>[<a href="Unitless.html" class="extype" name="com.manyangled.coulomb.Unitless">Unitless</a>], <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div><div class="toggleContainer block">

@@ -52,10 +52,7 @@
           <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><a href="UnitCompanion.html" class="extype" name="com.manyangled.coulomb.UnitCompanion">UnitCompanion</a>[<span class="extype" name="com.manyangled.coulomb.TempUnitCompanion.U">U</span>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div><div class="toggleContainer block">
-            <span class="toggle">Known Subclasses</span>
-            <div class="subClasses hiddenContent"><a href="SIAcceptedUnits$$Celsius$.html" class="extype" name="com.manyangled.coulomb.SIAcceptedUnits.Celsius">Celsius</a>, <a href="USCustomaryUnits$$Fahrenheit$.html" class="extype" name="com.manyangled.coulomb.USCustomaryUnits.Fahrenheit">Fahrenheit</a>, <a href="SIBaseUnits$$Kelvin$.html" class="extype" name="com.manyangled.coulomb.SIBaseUnits.Kelvin">Kelvin</a></div>
-          </div></div>
+        </div></div>
         
 
       <div id="mbrsel">
@@ -92,7 +89,7 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.manyangled.coulomb.TempUnitCompanion#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(uname:String,ucoef:Double,uoffset:Double):com.manyangled.coulomb.TempUnitCompanion[U]"></a>
+      <a id="&lt;init&gt;(uname:String,ucoef:spire.math.Rational,uoffset:spire.math.Rational,abbv:String):com.manyangled.coulomb.TempUnitCompanion[U]"></a>
       <a id="&lt;init&gt;:TempUnitCompanion[U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
@@ -100,10 +97,10 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">TempUnitCompanion</span><span class="params">(<span name="uname">uname: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="ucoef">ucoef: <span class="extype" name="scala.Double">Double</span></span>, <span name="uoffset">uoffset: <span class="extype" name="scala.Double">Double</span></span>)</span>
+        <span class="name">TempUnitCompanion</span><span class="params">(<span name="uname">uname: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="ucoef">ucoef: <span class="extype" name="spire.math.Rational">Rational</span></span>, <span name="uoffset">uoffset: <span class="extype" name="spire.math.Rational">Rational</span></span>, <span name="abbv">abbv: <span class="extype" name="scala.Predef.String">String</span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@&lt;init&gt;(uname:String,ucoef:Double,uoffset:Double):com.manyangled.coulomb.TempUnitCompanion[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@&lt;init&gt;(uname:String,ucoef:spire.math.Rational,uoffset:spire.math.Rational,abbv:String):com.manyangled.coulomb.TempUnitCompanion[U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -168,36 +165,36 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.UnitCompanion#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply():com.manyangled.coulomb.Quantity[U]"></a>
-      <a id="apply():Quantity[U]"></a>
+    </li><li name="com.manyangled.coulomb.UnitCompanion#abbv" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="abbv:String"></a>
+      <a id="abbv:String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">def</span>
+        <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="params">()</span><span class="result">: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.TempUnitCompanion.U">U</span>]</span>
+        <span class="name">abbv</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@apply():com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@abbv:String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="UnitCompanion.html" class="extype" name="com.manyangled.coulomb.UnitCompanion">UnitCompanion</a></dd></dl></div>
     </li><li name="com.manyangled.coulomb.UnitCompanion#apply" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply[N](v:N)(implicitnum:Numeric[N]):com.manyangled.coulomb.Quantity[U]"></a>
-      <a id="apply[N](N)(Numeric[N]):Quantity[U]"></a>
+      <a id="apply[N](v:N)(implicitnum:spire.math.ConvertableTo[N]):com.manyangled.coulomb.Quantity[N,U]"></a>
+      <a id="apply[N](N)(ConvertableTo[N]):Quantity[N,U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">apply</span><span class="tparams">[<span name="N">N</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="com.manyangled.coulomb.UnitCompanion.apply.N">N</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="num">num: <span class="extype" name="scala.Numeric">Numeric</span>[<span class="extype" name="com.manyangled.coulomb.UnitCompanion.apply.N">N</span>]</span>)</span><span class="result">: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.TempUnitCompanion.U">U</span>]</span>
+        <span class="name">apply</span><span class="tparams">[<span name="N">N</span>]</span><span class="params">(<span name="v">v: <span class="extype" name="com.manyangled.coulomb.UnitCompanion.apply.N">N</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="num">num: <span class="extype" name="spire.math.ConvertableTo">ConvertableTo</span>[<span class="extype" name="com.manyangled.coulomb.UnitCompanion.apply.N">N</span>]</span>)</span><span class="result">: <a href="Quantity.html" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.UnitCompanion.apply.N">N</span>, <span class="extype" name="com.manyangled.coulomb.TempUnitCompanion.U">U</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@apply[N](v:N)(implicitnum:Numeric[N]):com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@apply[N](v:N)(implicitnum:spire.math.ConvertableTo[N]):com.manyangled.coulomb.Quantity[N,U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
@@ -242,6 +239,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.manyangled.coulomb.UnitCompanion#coef" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="coef:spire.math.Rational"></a>
+      <a id="coef:Rational"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">coef</span><span class="result">: <span class="extype" name="spire.math.Rational">Rational</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@coef:spire.math.Rational" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="UnitCompanion.html" class="extype" name="com.manyangled.coulomb.UnitCompanion">UnitCompanion</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a>
       <a id="eq(AnyRef):Boolean"></a>
@@ -367,6 +381,23 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.manyangled.coulomb.UnitCompanion#name" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="name:String"></a>
+      <a id="name:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">name</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@name:String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="UnitCompanion.html" class="extype" name="com.manyangled.coulomb.UnitCompanion">UnitCompanion</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a>
       <a id="ne(AnyRef):Boolean"></a>
@@ -435,7 +466,7 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.manyangled.coulomb.UnitCompanion#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <a id="toString():String"></a>
       <h4 class="signature">
@@ -444,14 +475,14 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#com.manyangled.coulomb.TempUnitCompanion@toString():String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="UnitCompanion.html" class="extype" name="com.manyangled.coulomb.UnitCompanion">UnitCompanion</a> → AnyRef → Any</dd></dl></div>
     </li><li name="com.manyangled.coulomb.TempUnitCompanion#turec" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="turec:com.manyangled.coulomb.TempUnitRec[U]"></a>
       <a id="turec:TempUnitRec[U]"></a>
