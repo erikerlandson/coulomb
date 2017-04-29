@@ -47,11 +47,17 @@
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">Quantity</span><span class="tparams">[<span name="N">N</span>, <span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Quantity</span><span class="tparams">[<span name="U">U &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result"> extends <span class="extype" name="scala.AnyVal">AnyVal</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
       
-          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A value (quantity) having an associated static unit type</p></div><dl class="paramcmts block"><dt class="tparam">N</dt><dd class="cmt"><p>The numeric representation type for a quantity value</p></dd><dt class="tparam">U</dt><dd class="cmt"><p>The unit expression representing the associated unit</p></dd></dl><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A value (quantity) having an associated static unit type</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>The unit expression representing the associated unit</p><pre><span class="kw">import</span> MKSUnits._
+<span class="cmt">// a length of 5 meters</span>
+<span class="kw">val</span> length = Quantity[Meter](<span class="num">5</span>)
+<span class="cmt">// a velocity in meters per second</span>
+<span class="kw">val</span> speed = Quantity[Meter &lt;/&gt; Second](<span class="num">10</span>)
+<span class="cmt">// an acceleration in meters per second-squared</span>
+<span class="kw">val</span> acceleration = Quantity[Meter &lt;/&gt; (Second &lt;^&gt; _2)](<span class="num">9.8</span>)</pre></dd></dl><div class="toggleContainer block">
           <span class="toggle">Linear Supertypes</span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.Serializable">Serializable</span>, <span class="extype" name="java.io.Serializable">Serializable</span>, <span class="extype" name="scala.AnyVal">AnyVal</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
@@ -90,31 +96,23 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.manyangled.coulomb.Quantity#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="&lt;init&gt;(value:N):com.manyangled.coulomb.Quantity[N,U]"></a>
-      <a id="&lt;init&gt;:Quantity[N,U]"></a>
+              <ol><li name="com.manyangled.coulomb.Quantity#&lt;init&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(value:Double):com.manyangled.coulomb.Quantity[U]"></a>
+      <a id="&lt;init&gt;:Quantity[U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Quantity</span><span class="params">(<span name="value">value: <span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span></span>)</span>
+        <span class="name">Quantity</span><span class="params">(<span name="value">value: <span class="extype" name="scala.Double">Double</span></span>)</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@&lt;init&gt;(value:N):com.manyangled.coulomb.Quantity[N,U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@&lt;init&gt;(value:Double):com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">value</dt><dd class="cmt"><p>The quantity value</p><pre><span class="kw">import</span> com.manyangled.coulomb._
-<span class="kw">import</span> ChurchInt._
-<span class="kw">import</span> SIBaseUnits._
-<span class="cmt">// a length of 5 meters</span>
-<span class="kw">val</span> length = Meter(<span class="num">5.0</span>)
-<span class="cmt">// a velocity in meters per second</span>
-<span class="kw">val</span> speed = <span class="num">10.</span>withUnit[Meter %/ Second]
-<span class="cmt">// an acceleration in meters per second-squared</span>
-<span class="kw">val</span> acceleration = <span class="num">9.8</span>f.withUnit[Meter %/ (Second %^ _2)]</pre></dd></dl></div>
+      <p class="shortcomment cmt"></p>
     </li></ol>
             </div>
 
@@ -159,126 +157,75 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#*" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="*[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Quantity[N,_]"></a>
-      <a id="*[U2&lt;:UnitExpr](Quantity[N,U2]):Quantity[N,_]"></a>
+      <a id="*[U2&lt;:com.manyangled.coulomb.UnitExpr,RU&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicituer:com.manyangled.coulomb.UnitExprMul[U,U2]{typeU=RU}):com.manyangled.coulomb.Quantity[RU]"></a>
+      <a id="*[U2&lt;:UnitExpr,RU&lt;:UnitExpr](Quantity[U2])(UnitExprMul[U,U2]{typeU=RU}):Quantity[RU]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $times" class="name">*</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.*.U2">U2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, _]</span>
+        <span title="gt4s: $times" class="name">*</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="RU">RU &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.*.U2">U2</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="uer">uer: <a href="UnitExprMul.html" class="extype" name="com.manyangled.coulomb.UnitExprMul">UnitExprMul</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.*.U2">U2</span>] { type U = RU }</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.*.RU">RU</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@*[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Quantity[N,_]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@*[U2&lt;:com.manyangled.coulomb.UnitExpr,RU&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicituer:com.manyangled.coulomb.UnitExprMul[U,U2]{typeU=RU}):com.manyangled.coulomb.Quantity[RU]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">The product of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The product of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the product</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> * <code>that</code>, with units convertable to <code>U %* U2</code></p></dd></dl></div>
+      <p class="shortcomment cmt">The product of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The product of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity</p></dd><dt class="tparam">RU</dt><dd class="cmt"><p>the unit type of the result quantity, is compatible with <code>U &lt;*&gt; U2</code></p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the product</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> * <code>that</code>, with units of RU</p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#+" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Quantity[N,U]"></a>
-      <a id="+[U2&lt;:UnitExpr](Quantity[N,U2]):Quantity[N,U]"></a>
+      <a id="+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Quantity[U]"></a>
+      <a id="+[U2&lt;:UnitExpr](Quantity[U2])(CompatUnits[U2,U]):Quantity[U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $plus" class="name">+</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.+.U2">U2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>
+        <span title="gt4s: $plus" class="name">+</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.+.U2">U2</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="cu">cu: <a href="CompatUnits.html" class="extype" name="com.manyangled.coulomb.CompatUnits">CompatUnits</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.+.U2">U2</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Quantity[N,U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@+[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">The sum of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The sum of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity.  U2 must be convertable to U, or
+      <p class="shortcomment cmt">The sum of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The sum of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity.  U2 must be compatible with U, or
 a compile-time error will occur</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the quantity sum</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> + <code>that</code>, with units of left-hand side <code>this</code></p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Quantity[N,U]"></a>
-      <a id="-[U2&lt;:UnitExpr](Quantity[N,U2]):Quantity[N,U]"></a>
+      <a id="-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Quantity[U]"></a>
+      <a id="-[U2&lt;:UnitExpr](Quantity[U2])(CompatUnits[U2,U]):Quantity[U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $minus" class="name">-</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.-.U2">U2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>
+        <span title="gt4s: $minus" class="name">-</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.-.U2">U2</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="cu">cu: <a href="CompatUnits.html" class="extype" name="com.manyangled.coulomb.CompatUnits">CompatUnits</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.-.U2">U2</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Quantity[N,U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@-[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicitcu:com.manyangled.coulomb.CompatUnits[U2,U]):com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">The difference of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The difference of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity.  U2 must be convertable to U, or
+      <p class="shortcomment cmt">The difference of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The difference of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity.  U2 must be compatible with U, or
 a compile-time error will occur</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the difference</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> - <code>that</code>, with units of left-hand side <code>this</code></p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#/" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="/[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Quantity[N,_]"></a>
-      <a id="/[U2&lt;:UnitExpr](Quantity[N,U2]):Quantity[N,_]"></a>
+      <a id="/[U2&lt;:com.manyangled.coulomb.UnitExpr,RU&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicituer:com.manyangled.coulomb.UnitExprDiv[U,U2]{typeU=RU}):com.manyangled.coulomb.Quantity[RU]"></a>
+      <a id="/[U2&lt;:UnitExpr,RU&lt;:UnitExpr](Quantity[U2])(UnitExprDiv[U,U2]{typeU=RU}):Quantity[RU]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $div" class="name">/</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity./.U2">U2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, _]</span>
+        <span title="gt4s: $div" class="name">/</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>, <span name="RU">RU &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity./.U2">U2</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="uer">uer: <a href="UnitExprDiv.html" class="extype" name="com.manyangled.coulomb.UnitExprDiv">UnitExprDiv</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>, <span class="extype" name="com.manyangled.coulomb.Quantity./.U2">U2</span>] { type U = RU }</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity./.RU">RU</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@/[U2&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[N,U2]):com.manyangled.coulomb.Quantity[N,_]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@/[U2&lt;:com.manyangled.coulomb.UnitExpr,RU&lt;:com.manyangled.coulomb.UnitExpr](that:com.manyangled.coulomb.Quantity[U2])(implicituer:com.manyangled.coulomb.UnitExprDiv[U,U2]{typeU=RU}):com.manyangled.coulomb.Quantity[RU]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">The quotient, or ratio, of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The quotient, or ratio, of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity</p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the ratio</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> / <code>that</code>, with units convertable to <code>U %/ U2</code></p></dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#&lt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;(that:com.manyangled.coulomb.Quantity[N,U]):Boolean"></a>
-      <a id="&lt;(Quantity[N,U]):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">macro </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span title="gt4s: $less" class="name">&lt;</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@&lt;(that:com.manyangled.coulomb.Quantity[N,U]):Boolean" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> &lt; <code>that.value</code></p>
-    </li><li name="com.manyangled.coulomb.Quantity#&lt;=" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;=(that:com.manyangled.coulomb.Quantity[N,U]):Boolean"></a>
-      <a id="&lt;=(Quantity[N,U]):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">macro </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span title="gt4s: $less$eq" class="name">&lt;=</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@&lt;=(that:com.manyangled.coulomb.Quantity[N,U]):Boolean" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> &lt;= <code>that.value</code></p>
-    </li><li name="com.manyangled.coulomb.Quantity#=!=" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="=!=(that:com.manyangled.coulomb.Quantity[N,U]):Boolean"></a>
-      <a id="=!=(Quantity[N,U]):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">macro </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span title="gt4s: $eq$bang$eq" class="name">=!=</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@=!=(that:com.manyangled.coulomb.Quantity[N,U]):Boolean" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> != <code>that.value</code></p>
+      <p class="shortcomment cmt">The quotient, or ratio, of two unit quantities</p><div class="fullcomment"><div class="comment cmt"><p>The quotient, or ratio, of two unit quantities</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the unit type of the right-hand quantity</p></dd><dt class="tparam">RU</dt><dd class="cmt"><p>the unit type of the result quantity, is compatible with <code>U &lt;/&gt; U2</code></p></dd><dt class="param">that</dt><dd class="cmt"><p>the right-hand side of the ratio</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> / <code>that</code>, with units of RU</p></dd></dl></div>
     </li><li name="scala.Any#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a>
       <a id="==(Any):Boolean"></a>
@@ -296,57 +243,24 @@ a compile-time error will occur</p></dd><dt class="param">that</dt><dd class="cm
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#===" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="===(that:com.manyangled.coulomb.Quantity[N,U]):Boolean"></a>
-      <a id="===(Quantity[N,U]):Boolean"></a>
+    </li><li name="com.manyangled.coulomb.Quantity#as" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="as[U2&lt;:com.manyangled.coulomb.UnitExpr](implicitcu:com.manyangled.coulomb.CompatUnits[U,U2]):com.manyangled.coulomb.Quantity[U2]"></a>
+      <a id="as[U2&lt;:UnitExpr](CompatUnits[U,U2]):Quantity[U2]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: $eq$eq$eq" class="name">===</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+        <span class="name">as</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="cu">cu: <a href="CompatUnits.html" class="extype" name="com.manyangled.coulomb.CompatUnits">CompatUnits</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.as.U2">U2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.as.U2">U2</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@===(that:com.manyangled.coulomb.Quantity[N,U]):Boolean" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@as[U2&lt;:com.manyangled.coulomb.UnitExpr](implicitcu:com.manyangled.coulomb.CompatUnits[U,U2]):com.manyangled.coulomb.Quantity[U2]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> == <code>that.value</code></p>
-    </li><li name="com.manyangled.coulomb.Quantity#&gt;" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&gt;(that:com.manyangled.coulomb.Quantity[N,U]):Boolean"></a>
-      <a id="&gt;(Quantity[N,U]):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">macro </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span title="gt4s: $greater" class="name">&gt;</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@&gt;(that:com.manyangled.coulomb.Quantity[N,U]):Boolean" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> &gt; <code>that.value</code></p>
-    </li><li name="com.manyangled.coulomb.Quantity#&gt;=" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&gt;=(that:com.manyangled.coulomb.Quantity[N,U]):Boolean"></a>
-      <a id="&gt;=(Quantity[N,U]):Boolean"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">macro </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span title="gt4s: $greater$eq" class="name">&gt;=</span><span class="params">(<span name="that">that: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@&gt;=(that:com.manyangled.coulomb.Quantity[N,U]):Boolean" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Returns <code>true</code> if and only if <code>this.value</code> &gt;= <code>that.value</code></p>
+      <p class="shortcomment cmt">Convert a quantity into new units.</p><div class="fullcomment"><div class="comment cmt"><p>Convert a quantity into new units.</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the new unit expression to convert to. If U2 is not a compatible unit
+then a compile-time error will occur</p></dd><dt>returns</dt><dd class="cmt"><p>a new value of type Quantity[U2], equivalent to <code>this</code> quantity</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -399,76 +313,108 @@ a compile-time error will occur</p></dd><dt class="param">that</dt><dd class="cm
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#pow" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="pow[E&lt;:com.manyangled.coulomb.ChurchInt]:com.manyangled.coulomb.Quantity[N,_]"></a>
-      <a id="pow[E&lt;:ChurchInt]:Quantity[N,_]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">macro </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">pow</span><span class="tparams">[<span name="E">E &lt;: <a href="ChurchInt.html" class="extype" name="com.manyangled.coulomb.ChurchInt">ChurchInt</a></span>]</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, _]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@pow[E&lt;:com.manyangled.coulomb.ChurchInt]:com.manyangled.coulomb.Quantity[N,_]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Raise a unit quantity to a power</p><div class="fullcomment"><div class="comment cmt"><p>Raise a unit quantity to a power</p></div><dl class="paramcmts block"><dt class="tparam">E</dt><dd class="cmt"><p>the church integer type representing the exponent</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> ^ E, in units convertable to <code>U %^ E<code></code></code></p></dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#toRep" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="toRep[N2](implicitcfN:spire.math.ConvertableFrom[N],implicitctN2:spire.math.ConvertableTo[N2]):com.manyangled.coulomb.Quantity[N2,U]"></a>
-      <a id="toRep[N2](ConvertableFrom[N],ConvertableTo[N2]):Quantity[N2,U]"></a>
+      <a id="pow[E&lt;:com.manyangled.coulomb.ChurchInt](implicitexp:com.manyangled.coulomb.ChurchIntValue[E]):com.manyangled.coulomb.Quantity[com.manyangled.coulomb.&lt;^&gt;[U,E]]"></a>
+      <a id="pow[E&lt;:ChurchInt](ChurchIntValue[E]):Quantity[&lt;^&gt;[U,E]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toRep</span><span class="tparams">[<span name="N2">N2</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="cfN">cfN: <span class="extype" name="spire.math.ConvertableFrom">ConvertableFrom</span>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>]</span>, <span name="ctN2">ctN2: <span class="extype" name="spire.math.ConvertableTo">ConvertableTo</span>[<span class="extype" name="com.manyangled.coulomb.Quantity.toRep.N2">N2</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.toRep.N2">N2</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>
+        <span class="name">pow</span><span class="tparams">[<span name="E">E &lt;: <a href="ChurchInt.html" class="extype" name="com.manyangled.coulomb.ChurchInt">ChurchInt</a></span>]</span><span class="params">(<span class="implicit">implicit </span><span name="exp">exp: <a href="ChurchIntValue.html" class="extype" name="com.manyangled.coulomb.ChurchIntValue">ChurchIntValue</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.pow.E">E</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<a href="$less$up$greater.html" class="extype" name="com.manyangled.coulomb.&lt;^&gt;">&lt;^&gt;</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.pow.E">E</span>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@toRep[N2](implicitcfN:spire.math.ConvertableFrom[N],implicitctN2:spire.math.ConvertableTo[N2]):com.manyangled.coulomb.Quantity[N2,U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@pow[E&lt;:com.manyangled.coulomb.ChurchInt](implicitexp:com.manyangled.coulomb.ChurchIntValue[E]):com.manyangled.coulomb.Quantity[com.manyangled.coulomb.&lt;^&gt;[U,E]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">Convert a quantity of numeric type N to a new quantity of type N2, with same units</p>
-    </li><li name="com.manyangled.coulomb.Quantity#toStr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="toStr:String"></a>
-      <a id="toStr:String"></a>
+      <p class="shortcomment cmt">Raise a unit quantity to a power</p><div class="fullcomment"><div class="comment cmt"><p>Raise a unit quantity to a power</p></div><dl class="paramcmts block"><dt class="tparam">E</dt><dd class="cmt"><p>the church integer type representing the exponent</p></dd><dt>returns</dt><dd class="cmt"><p><code>this</code> ^ E, in units compatible with <code>U &lt;^&gt; E<code></code></code></p></dd></dl></div>
+    </li><li name="com.manyangled.coulomb.Quantity#str" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="str(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String"></a>
+      <a id="str(UnitExprString[U]):String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toStr</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">str</span><span class="params">(<span class="implicit">implicit </span><span name="uesU">uesU: <a href="UnitExprString.html" class="extype" name="com.manyangled.coulomb.UnitExprString">UnitExprString</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@toStr:String" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@str(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">A human-readable string representing the value and unit type of this quantity</p>
-    </li><li name="com.manyangled.coulomb.Quantity#toStrFull" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="toStrFull:String"></a>
-      <a id="toStrFull:String"></a>
+      <p class="shortcomment cmt">A human-readable string representing the unit quantity with its associated type</p>
+    </li><li name="com.manyangled.coulomb.Quantity#toDouble" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toDouble:Double"></a>
+      <a id="toDouble:Double"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toStrFull</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">toDouble</span><span class="result">: <span class="extype" name="scala.Double">Double</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@toStrFull:String" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@toDouble:Double" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <p class="shortcomment cmt">A human-readable string representing the value and unit type of this quantity,
-using the full unit names
-</p>
-    </li><li name="com.manyangled.coulomb.Quantity#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <p class="shortcomment cmt">The raw value of the unit quantity returned as a Double</p>
+    </li><li name="com.manyangled.coulomb.Quantity#toFloat" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toFloat:Float"></a>
+      <a id="toFloat:Float"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toFloat</span><span class="result">: <span class="extype" name="scala.Float">Float</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@toFloat:Float" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The raw value of the unit quantity returned as a Float</p>
+    </li><li name="com.manyangled.coulomb.Quantity#toInt" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toInt:Int"></a>
+      <a id="toInt:Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toInt</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@toInt:Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The raw value of the unit quantity, rounded to nearest integer and returned as an Int</p>
+    </li><li name="com.manyangled.coulomb.Quantity#toLong" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="toLong:Long"></a>
+      <a id="toLong:Long"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toLong</span><span class="result">: <span class="extype" name="scala.Long">Long</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@toLong:Long" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" alt="Permalink" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The raw value of the unit quantity, rounded to nearest integer and return as a Long</p>
+    </li><li name="scala.Any#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <a id="toString():String"></a>
       <h4 class="signature">
@@ -477,108 +423,48 @@ using the full unit names
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
       </span>
       </h4><span class="permalink">
       <a href="../../../index.html#com.manyangled.coulomb.Quantity@toString():String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a> → Any</dd></dl></div>
-    </li><li name="com.manyangled.coulomb.Quantity#toUnit" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="toUnit[U2&lt;:com.manyangled.coulomb.UnitExpr]:com.manyangled.coulomb.Quantity[N,U2]"></a>
-      <a id="toUnit[U2&lt;:UnitExpr]:Quantity[N,U2]"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">macro </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">toUnit</span><span class="tparams">[<span name="U2">U2 &lt;: <a href="UnitExpr.html" class="extype" name="com.manyangled.coulomb.UnitExpr">UnitExpr</a></span>]</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.toUnit.U2">U2</span>]</span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@toUnit[U2&lt;:com.manyangled.coulomb.UnitExpr]:com.manyangled.coulomb.Quantity[N,U2]" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">Convert a quantity into new units.</p><div class="fullcomment"><div class="comment cmt"><p>Convert a quantity into new units.</p></div><dl class="paramcmts block"><dt class="tparam">U2</dt><dd class="cmt"><p>the new unit expression to convert to. If U2 is not a convertable unit
-then a compile-time error will occur</p></dd><dt>returns</dt><dd class="cmt"><p>a new value of type Quantity[N, U2], equivalent to <code>this</code> quantity</p></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#unary_-" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="unary_-:com.manyangled.coulomb.Quantity[N,U]"></a>
-      <a id="unary_-:Quantity[N,U]"></a>
+      <a id="unary_-:com.manyangled.coulomb.Quantity[U]"></a>
+      <a id="unary_-:Quantity[U]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span title="gt4s: unary_$minus" class="name">unary_-</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span>, <span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>
+        <span title="gt4s: unary_$minus" class="name">unary_-</span><span class="result">: <a href="" class="extype" name="com.manyangled.coulomb.Quantity">Quantity</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@unary_-:com.manyangled.coulomb.Quantity[N,U]" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@unary_-:com.manyangled.coulomb.Quantity[U]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">Obtain a new quantity with same units, but negated value</p><div class="fullcomment"><div class="comment cmt"><p>Obtain a new quantity with same units, but negated value</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>negated unit quantity</p></dd></dl></div>
     </li><li name="com.manyangled.coulomb.Quantity#unitStr" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="unitStr:String"></a>
-      <a id="unitStr:String"></a>
+      <a id="unitStr(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String"></a>
+      <a id="unitStr(UnitExprString[U]):String"></a>
       <h4 class="signature">
       <span class="modifier_kind">
-        <span class="modifier">macro </span>
+        <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">unitStr</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+        <span class="name">unitStr</span><span class="params">(<span class="implicit">implicit </span><span name="uesU">uesU: <a href="UnitExprString.html" class="extype" name="com.manyangled.coulomb.UnitExprString">UnitExprString</a>[<span class="extype" name="com.manyangled.coulomb.Quantity.U">U</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@unitStr:String" title="Permalink" target="_top">
+      <a href="../../../index.html#com.manyangled.coulomb.Quantity@unitStr(implicituesU:com.manyangled.coulomb.UnitExprString[U]):String" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" alt="Permalink" />
       </a>
     </span>
       <p class="shortcomment cmt">A human-readable string representing the unit type of this quantity</p>
-    </li><li name="com.manyangled.coulomb.Quantity#unitStrFull" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="unitStrFull:String"></a>
-      <a id="unitStrFull:String"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier">macro </span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">unitStrFull</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@unitStrFull:String" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">A human-readable string representing the unit type of this quantity, using full unit names</p>
-    </li><li name="com.manyangled.coulomb.Quantity#value" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="value:N"></a>
-      <a id="value:N"></a>
-      <h4 class="signature">
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">value</span><span class="result">: <span class="extype" name="com.manyangled.coulomb.Quantity.N">N</span></span>
-      </span>
-      </h4><span class="permalink">
-      <a href="../../../index.html#com.manyangled.coulomb.Quantity@value:N" title="Permalink" target="_top">
-        <img src="../../../lib/permalink.png" alt="Permalink" />
-      </a>
-    </span>
-      <p class="shortcomment cmt">The quantity value</p><div class="fullcomment"><div class="comment cmt"><p>The quantity value</p><pre><span class="kw">import</span> com.manyangled.coulomb._
-<span class="kw">import</span> ChurchInt._
-<span class="kw">import</span> SIBaseUnits._
-<span class="cmt">// a length of 5 meters</span>
-<span class="kw">val</span> length = Meter(<span class="num">5.0</span>)
-<span class="cmt">// a velocity in meters per second</span>
-<span class="kw">val</span> speed = <span class="num">10.</span>withUnit[Meter %/ Second]
-<span class="cmt">// an acceleration in meters per second-squared</span>
-<span class="kw">val</span> acceleration = <span class="num">9.8</span>f.withUnit[Meter %/ (Second %^ _2)]</pre></div></div>
     </li></ol>
             </div>
 
