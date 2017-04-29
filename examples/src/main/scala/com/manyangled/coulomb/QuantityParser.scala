@@ -73,7 +73,7 @@ class QuantityParser(
     val tpeU = typeOf[U]
     val tpeN = typeOf[N]
     for {
-      qeTree <- Try { toolbox.parse(s"${importStr}($quantityExpr).toRep[$tpeN].toUnit[$tpeU]") }
+      qeTree <- Try { toolbox.parse(s"${importStr}($quantityExpr).toUnit[$tpeU].toRep[$tpeN]") }
       qeEval <- Try { toolbox.eval(qeTree) }
       qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
     } yield {
@@ -138,7 +138,7 @@ object DemoQP {
           val tok = raw.split(" ")
           (tok.head, tok.tail.mkString(" "))
         }
-        qv <- qp[N, U](s"($v).withUnit[$u]")
+        qv <- qp[N, U](s"spire.math.Rational($v).withUnit[$u]")
       } yield { qv }
     }
   }
