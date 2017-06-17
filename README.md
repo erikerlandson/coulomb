@@ -21,6 +21,11 @@ libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb-macros" % "0.2.0")
 ```
 
+### Code of Conduct
+The `coulomb` project supports the [typelevel code of conduct](http://typelevel.org/conduct.html);
+all contributors are expected to respect this code.
+Any violations of this code of conduct should be reported to [the author](https://github.com/erikerlandson/).
+
 ### Tutorial
 
 #### Table of Contents
