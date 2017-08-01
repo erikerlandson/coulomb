@@ -50,7 +50,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 
 The `coulomb` provides the following features:
 
-Allow a programmer to assocate unit analysis with values, in the form of static types
+Allow a programmer to associate unit analysis with values, in the form of static types
 ```scala
 val length = 10.withUnit[Meter]
 val duration = Second(30.0)
@@ -62,7 +62,7 @@ val speed = (100.0).withUnit[(Kilo %* Meter) %/ Hour]
 val acceleration = (9.8).withUnit[Meter %/ (Second %^ _2)]
 ```
 Let the compiler determine which unit expressions are equivalent (aka _convertable_)
-and transparently convert beween them
+and transparently convert between them
 ```scala
 val mps: Quantity[Double, Meter %/ Second] = (60.0).withUnit[Mile %/ Hour]
 ```
@@ -274,7 +274,7 @@ scala> (Foot(4) - Yard(1)).toStr
 res13: String = 1 ft
 ```
 
-Quantities of any unit types may be multipied or divided.
+Quantities of any unit types may be multiplied or divided.
 Result types are different than either argument:
 ```scala
 scala> (Mile(60) / Hour(1)).toStr
@@ -352,7 +352,7 @@ configured to compile before the calling code.
 
 #### Unitless Quantities
 
-When units in an expression all cancel out -- for example, a ratio of quanties with convertable units -- the value is said to be "unitless."
+When units in an expression all cancel out -- for example, a ratio of quantities with convertable units -- the value is said to be "unitless."
 In `coulomb` the unit expression subtype `Unitless` represents this particular state.
 Here are a few examples of situations when `Unitless` values arise:
 ```scala
@@ -476,7 +476,7 @@ non-convertable unit types...
 In `coulomb` you can also work with [`Temperature` values](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.Temperature).
 A temperature object has a unit type like `Quantity`, but it is constrained to be a unit of temperature, for example
 Kelvin, Celsius or Fahrenheit.
-Another difference is that `Temperature` values convert between temperature units using the temperature scale offests.
+Another difference is that `Temperature` values convert between temperature units using the temperature scale offsets.
 They are not just quantities of temperature, but temperature values:
 ```scala
 import SIAcceptedUnits.Celsius; import USCustomaryUnits.Fahrenheit
