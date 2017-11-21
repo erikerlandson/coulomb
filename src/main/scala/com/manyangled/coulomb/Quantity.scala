@@ -323,7 +323,7 @@ object recursive {
 
   trait Unitless
 
-  type CUMapType = Map[String, Int]
+  type CUMapType = Map[BaseUnit[_], Int]
 
   case class CUMap[U](coef: Rational, map: CUMapType)
 
@@ -366,11 +366,11 @@ object recursive {
   trait %/[L, R]
 
   implicit def witnessUnitlessCM: CUMap[Unitless] = {
-    CUMap[Unitless](Rational(1), Map.empty[String, Int])
+    CUMap[Unitless](Rational(1), Map.empty[BaseUnit[_], Int])
   }
 
-  implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U], ttU: WeakTypeTag[U]): CUMap[U] = {
-    CUMap[U](Rational(1), Map(ttU.tpe.typeSymbol.fullName -> 1))
+  implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U]): CUMap[U] = {
+    CUMap[U](Rational(1), Map(buU -> 1))
   }
 
   implicit def witnessDerivedUnitCM[U, D](implicit du: DerivedUnit[U, D], dm: CUMap[D]): CUMap[U] = {
@@ -384,6 +384,15 @@ object recursive {
   implicit def witnessDivCM[L, R](implicit l: CUMap[L], r: CUMap[R]): CUMap[%/[L, R]] = {
     CUMap.div(l, r)
   }
+
+  case class ConvertableUnits[L, R](coef: Rational)
+
+  implicit def witnessConvertableUnits[L, R](implicit l: CUMap[L], r: CUMap[R]): ConvertableUnits[L, R] = {
+    if (l.map != r.map) null
+    else ConvertableUnits[L, R](l.coef / r.coef)
+  }
+
+  def coefficient[L, R](implicit cu: ConvertableUnits[L, R]): Rational = cu.coef
 
   trait Meter
   implicit val buMeter = BaseUnit[Meter]()
