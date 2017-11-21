@@ -316,3 +316,62 @@ object Temperature {
       t: Temperature[N, U1]): Temperature[N, U2] =
     macro UnitMacros.unitConvertTempImpl[N, U1, U2]
 }
+
+object recursive {
+  import scala.reflect.runtime.universe._
+  import spire.math._
+
+  trait Unitless
+
+  type CUMapType = Map[String, Int]
+
+  case class CUMap[U](coef: Rational, map: CUMapType)
+
+  object CUMap {
+    def mul[L, R](l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] =
+      CUMap[%*[L, R]](l.coef * r.coef, mapMul(l.map, r.map))
+
+    def mapMul(lmap: CUMapType, rmap: CUMapType): CUMapType = {
+      rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
+        if (m.contains(t)) {
+          val ne = m(t) + e
+          if (ne == 0) (m - t) else m + ((t, ne))
+        } else {
+          m + ((t, e))
+        }
+      }
+    }
+  }
+
+  case class BaseUnit[U]()
+  case class UnitName[U](name: String)
+  case class UnitAbbv[U](abbv: String)
+  case class DerivedUnit[U, D](coef: Rational)
+
+  trait %*[L, R]
+
+  implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U], ttU: WeakTypeTag[U]): CUMap[U] = {
+    CUMap[U](Rational(1), Map(ttU.tpe.typeSymbol.fullName -> 1))
+  }
+
+  implicit def witnessUnitlessCM: CUMap[Unitless] = {
+    CUMap[Unitless](Rational(1), Map.empty[String, Int])
+  }
+
+  implicit def witnessMulCM[L, R](implicit l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] = {
+    CUMap.mul(l, r)
+  }
+
+  implicit def witnessDerivedUnitCM[U, D](implicit du: DerivedUnit[U, D], dm: CUMap[D]): CUMap[U] = {
+    CUMap[U](du.coef * dm.coef, dm.map)
+  }
+
+  trait Meter
+  implicit val buMeter = BaseUnit[Meter]()
+
+  trait Second
+  implicit val buSecond = BaseUnit[Second]()
+
+  trait Minute
+  implicit val duMinute = DerivedUnit[Minute, Second](Rational(60))
+}
