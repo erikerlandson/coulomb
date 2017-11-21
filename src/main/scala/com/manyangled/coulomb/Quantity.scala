@@ -331,6 +331,9 @@ object recursive {
     def mul[L, R](l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] =
       CUMap[%*[L, R]](l.coef * r.coef, mapMul(l.map, r.map))
 
+    def div[L, R](l: CUMap[L], r: CUMap[R]): CUMap[%/[L, R]] =
+      CUMap[%/[L, R]](l.coef / r.coef, mapDiv(l.map, r.map))
+
     def mapMul(lmap: CUMapType, rmap: CUMapType): CUMapType = {
       rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
         if (m.contains(t)) {
@@ -338,6 +341,17 @@ object recursive {
           if (ne == 0) (m - t) else m + ((t, ne))
         } else {
           m + ((t, e))
+        }
+      }
+    }
+
+    def mapDiv(lmap: CUMapType, rmap: CUMapType): CUMapType = {
+      rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
+        if (m.contains(t)) {
+          val ne = m(t) - e
+          if (ne == 0) (m - t) else m + ((t, ne))
+        } else {
+          m + ((t, -e))
         }
       }
     }
@@ -349,21 +363,26 @@ object recursive {
   case class DerivedUnit[U, D](coef: Rational)
 
   trait %*[L, R]
+  trait %/[L, R]
+
+  implicit def witnessUnitlessCM: CUMap[Unitless] = {
+    CUMap[Unitless](Rational(1), Map.empty[String, Int])
+  }
 
   implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U], ttU: WeakTypeTag[U]): CUMap[U] = {
     CUMap[U](Rational(1), Map(ttU.tpe.typeSymbol.fullName -> 1))
   }
 
-  implicit def witnessUnitlessCM: CUMap[Unitless] = {
-    CUMap[Unitless](Rational(1), Map.empty[String, Int])
+  implicit def witnessDerivedUnitCM[U, D](implicit du: DerivedUnit[U, D], dm: CUMap[D]): CUMap[U] = {
+    CUMap[U](du.coef * dm.coef, dm.map)
   }
 
   implicit def witnessMulCM[L, R](implicit l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] = {
     CUMap.mul(l, r)
   }
 
-  implicit def witnessDerivedUnitCM[U, D](implicit du: DerivedUnit[U, D], dm: CUMap[D]): CUMap[U] = {
-    CUMap[U](du.coef * dm.coef, dm.map)
+  implicit def witnessDivCM[L, R](implicit l: CUMap[L], r: CUMap[R]): CUMap[%/[L, R]] = {
+    CUMap.div(l, r)
   }
 
   trait Meter
