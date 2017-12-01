@@ -318,15 +318,18 @@ object Temperature {
 }
 
 object recursive {
-  import scala.reflect.runtime.universe._
+  import scala.language.experimental.macros
+  import scala.reflect.macros.whitebox
+  //import scala.reflect.runtime.universe._
   import spire.math._
+  import shapeless._
+  import shapeless.syntax.singleton._
+  import shapeless.record._
+  import singleton.ops._
 
-  trait Unitless
+  //type CUMapType = Map[BaseUnit[_], Int]
 
-  type CUMapType = Map[BaseUnit[_], Int]
-
-  case class CUMap[U](coef: Rational, map: CUMapType)
-
+/*
   object CUMap {
     def mul[L, R](l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] =
       CUMap[%*[L, R]](l.coef * r.coef, mapMul(l.map, r.map))
@@ -356,27 +359,80 @@ object recursive {
       }
     }
   }
+*/
 
   case class BaseUnit[U]()
   case class UnitName[U](name: String)
   case class UnitAbbv[U](abbv: String)
   case class DerivedUnit[U, D](coef: Rational)
 
+  trait Unitless
   trait %*[L, R]
   trait %/[L, R]
 
-  implicit def witnessUnitlessCM: CUMap[Unitless] = {
-    CUMap[Unitless](Rational(1), Map.empty[BaseUnit[_], Int])
+  trait CUMap[U, C <: HList] {
+    def coef: Rational
   }
 
-  implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U]): CUMap[U] = {
-    CUMap[U](Rational(1), Map(buU -> 1))
+  implicit def witnessUnitlessCM: CUMap[Unitless, HNil] = {
+    new CUMap[Unitless, HNil] {
+      val coef = Rational(1)
+    }
   }
 
-  implicit def witnessDerivedUnitCM[U, D](implicit du: DerivedUnit[U, D], dm: CUMap[D]): CUMap[U] = {
-    CUMap[U](du.coef * dm.coef, dm.map)
+  implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U]): CUMap[U, (U, Witness.`1`.T) :: HNil] = {
+    new CUMap[U, (U, Witness.`1`.T) :: HNil] {
+      val coef = Rational(1)
+    }
   }
 
+  implicit def witnessDerivedUnitCM[U, D, DC <: HList](implicit du: DerivedUnit[U, D], dm: CUMap[D, DC]): CUMap[U, DC] = {
+    new CUMap[U, DC] {
+      val coef = du.coef * dm.coef
+    }
+  }
+
+/*
+  trait AppendHList[L <: HList, R <: HList] {
+    type Out <: HList
+  }
+
+  implicit def witnessAppendLR[L <: HList, R <: HList](implicit nil: R =:= HNil): AppendHList[L, R] {
+*/
+
+  trait HListLength[L <: HList] {
+    type Out
+  }
+  object HListLength {
+    type Aux[L <: HList, O] = HListLength[L] { type Out = O }
+  }
+
+  trait HLL[L <: HList] {
+    def value: Int
+    override def toString = s"HLL($value)"
+  }
+  implicit def witnessHLL[L <: HList, O](implicit aux: HListLength.Aux[L, O], so: SafeInt[O]): HLL[L] = {
+    new HLL[L] {
+      val value = so : Int
+    }
+  }
+
+  implicit object HListLengthHNil extends HListLength[HNil] {
+    type Out = Witness.`0`.T
+  }
+
+  implicit def witnessHListLength[Head, Tail <: HList, Len](implicit tl: HListLength.Aux[Tail, Len], inc: +[Len, Witness.`1`.T]): HListLength.Aux[Head :: Tail, inc.Out] = {
+    new HListLength[Head :: Tail] {
+      type Out = inc.Out
+    }
+  }
+
+
+//  implicit def witnessMulCM[L, LC <: HList, R, RC <: HList](implicit l: CUMap[L, LC], r: CUMap[R, RC]): CUMap[%*[L, R]] = {
+//    CUMap.mul(l, r)
+//  }
+
+/*
   implicit def witnessMulCM[L, R](implicit l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] = {
     CUMap.mul(l, r)
   }
@@ -385,14 +441,22 @@ object recursive {
     CUMap.div(l, r)
   }
 
-  case class ConvertableUnits[L, R](coef: Rational)
-
-  implicit def witnessConvertableUnits[L, R](implicit l: CUMap[L], r: CUMap[R]): ConvertableUnits[L, R] = {
-    if (l.map != r.map) null
-    else ConvertableUnits[L, R](l.coef / r.coef)
-  }
+  case class ConvertableUnits[U1, U2](coef: Rational)
 
   def coefficient[L, R](implicit cu: ConvertableUnits[L, R]): Rational = cu.coef
+*/
+
+/*
+  implicit def witnessConvertableUnits[U1, U2](implicit u1: CUMap[U1], u2: CUMap[U2]): ConvertableUnits[U1, U2] =
+    macro Macros.test
+
+  object Macros {
+    def test(c: whitebox.Context)(implicit u1: c.Tree, u2: c.Tree): c.Tree = {
+      import c.universe._
+      q""
+    }
+  }
+*/
 
   trait Meter
   implicit val buMeter = BaseUnit[Meter]()

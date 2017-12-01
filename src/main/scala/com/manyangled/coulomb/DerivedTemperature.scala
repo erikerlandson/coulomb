@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.manyangled.coulomb
 
+/*
 /**
  * Define a derived unit of temperature. By definition, all derived temperatures are defined in
  * terms of [[SIBaseUnits.Kelvin]].
@@ -28,3 +29,4 @@ package com.manyangled.coulomb
  * }}}
  */
 trait DerivedTemperature extends DerivedUnit[SIBaseUnits.Kelvin] with TemperatureExpr
+*/

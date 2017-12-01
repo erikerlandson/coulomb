@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 package com.manyangled.coulomb
-
+/*
 object SIPrefixes {
   import spire.math.Rational
 
@@ -79,3 +79,4 @@ object SIPrefixes {
   @UnitDecl("yocto", Rational(10).pow(-24), "y")
   trait Yocto extends PrefixUnit
 }
+*/

@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 package com.manyangled.coulomb
-
+/*
 object MKSUnits {
   import spire.math.Rational
   import ChurchInt._
@@ -60,3 +60,4 @@ object MKSUnits {
   @UnitDecl("henry", 1, "H")
   trait Henry extends DerivedUnit[Weber %/ Ampere]
 }
+*/
