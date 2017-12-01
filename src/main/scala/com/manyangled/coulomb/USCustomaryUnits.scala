@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.manyangled.coulomb
 
+/*
 // United States Customary Units
 // https://en.wikipedia.org/wiki/United_States_customary_units
 object USCustomaryUnits {
@@ -88,3 +89,4 @@ object USCustomaryUnits {
   @UnitDecl("gallon", 16, "gal")
   trait Gallon extends DerivedUnit[Cup]
 }
+*/

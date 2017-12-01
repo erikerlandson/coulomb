@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 package com.manyangled.coulomb
-
+/*
 object SIBaseUnits {
   @UnitDecl("meter", abbv = "m")
   trait Meter extends BaseUnit
@@ -38,3 +38,4 @@ object SIBaseUnits {
   @TempUnitDecl("kelvin", 1, 0, "K")
   trait Kelvin extends BaseTemperature
 }
+*/

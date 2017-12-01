@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.manyangled.coulomb
 
+/*
 object SIAcceptedUnits {
   import spire.math.Rational
   import ChurchInt._
@@ -76,3 +77,4 @@ object SIAcceptedUnits {
   @UnitDecl("gram", Rational(1, 1000), "g")
   trait Gram extends DerivedUnit[Kilogram]
 }
+*/

@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.manyangled.coulomb
 
+/*
 object BinaryPrefixes {
   import spire.math.Rational
 
@@ -43,3 +44,4 @@ object BinaryPrefixes {
   @UnitDecl("yobi", Rational(1024).pow(8), "Yi")
   trait Yobi extends PrefixUnit
 }
+*/

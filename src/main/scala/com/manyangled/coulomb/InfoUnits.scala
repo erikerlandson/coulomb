@@ -16,6 +16,7 @@ limitations under the License.
 
 package com.manyangled.coulomb
 
+/*
 object InfoUnits {
   import spire.math.Rational
 
@@ -28,3 +29,4 @@ object InfoUnits {
   @UnitDecl("nat", 1.4426950409)
   trait Nat extends DerivedUnit[Bit]
 }
+*/
