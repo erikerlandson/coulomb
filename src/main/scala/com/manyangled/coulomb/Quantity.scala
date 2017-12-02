@@ -349,6 +349,39 @@ object recursive {
   // typeString(2) returns "Int"
   def typeString[T :TypeTag](x: T): String = typeString[T]
 
+  case class TestResult[O]()
+  def test1[X](implicit r: Length[X]): TestResult[r.Out] = TestResult[r.Out]()
+  def test2[X, Y](implicit r: Concat[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
+
+  trait Length[L] {
+    type Out
+  }
+  object Length {
+    type Aux[L, O] = Length[L] { type Out = O }
+    implicit def length0: Aux[HNil, Witness.`0`.T] = new Length[HNil] { type Out = Witness.`0`.T }
+
+    implicit def length1[H, T <: HList, O](implicit tl: Aux[T, O], inc: +[O, Witness.`1`.T]): Aux[H :: T, inc.Out] = {
+      new Length[H :: T] { type Out = inc.Out }
+    }
+  }
+
+  trait Concat[L, R] {
+    type Out
+  }
+  object Concat {
+    type Aux[L, R, O] = Concat[L, R] { type Out = O }
+    implicit def concat0[R]: Aux[HNil, R, R] = {
+      new Concat[HNil, R] {
+        type Out = R
+      }
+    }
+    implicit def concat1[H, T <: HList, R, O <: HList](implicit rc: Aux[T, R, O]): Aux[H :: T, R, H :: O] = {
+      new Concat[H :: T, R] {
+        type Out = H :: O
+      }
+    }
+  }
+
   //type CUMapType = Map[BaseUnit[_], Int]
 
 /*
@@ -414,57 +447,6 @@ object recursive {
     }
   }
 
-/*
-  trait AppendHList[L <: HList, R <: HList] {
-    type Out <: HList
-  }
-
-  implicit def witnessAppendLR[L <: HList, R <: HList](implicit nil: R =:= HNil): AppendHList[L, R] {
-*/
-
-  trait HListLength[L <: HList] {
-    type Out
-  }
-  object HListLength {
-    type Aux[L <: HList, O] = HListLength[L] { type Out = O }
-  }
-
-  trait HLL[L <: HList] {
-    def value: Int
-    override def toString = s"HLL($value)"
-  }
-  implicit def witnessHLL[L <: HList, O](implicit aux: HListLength.Aux[L, O], so: SafeInt[O]): HLL[L] = {
-    new HLL[L] {
-      val value = so : Int
-    }
-  }
-
-  implicit object HListLengthHNil extends HListLength[HNil] {
-    type Out = Witness.`0`.T
-  }
-
-  implicit def witnessHListLength[Head, Tail <: HList, Len](implicit tl: HListLength.Aux[Tail, Len], inc: +[Len, Witness.`1`.T]): HListLength.Aux[Head :: Tail, inc.Out] = {
-    new HListLength[Head :: Tail] {
-      type Out = inc.Out
-    }
-  }
-
-  trait HListConcat[L <: HList, R <: HList] {
-    type Out <: HList
-  }
-  object HListConcat {
-    type Aux[L <: HList, R <: HList, O <: HList] = HListConcat[L, R] { type Out = O }
-    implicit def concat0[R <: HList]: Aux[HNil, R, R] = {
-      new HListConcat[HNil, R] {
-        type Out = R
-      }
-    }
-    implicit def concat1[H, T <: HList, R <: HList, O <: HList](implicit rc: Aux[T, R, O]): Aux[H :: T, R, H :: rc.Out] = {
-      new HListConcat[H :: T, R] {
-        type Out = H :: rc.Out
-      }
-    }
-  }
 
 //  implicit def witnessMulCM[L, LC <: HList, R, RC <: HList](implicit l: CUMap[L, LC], r: CUMap[R, RC]): CUMap[%*[L, R]] = {
 //    CUMap.mul(l, r)
