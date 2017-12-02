@@ -351,7 +351,7 @@ object recursive {
 
   case class TestResult[O]()
   def test1[X](implicit r: Length[X]): TestResult[r.Out] = TestResult[r.Out]()
-  def test2[X, Y](implicit r: DeleteKey[X, Y]): TestResult[(r.KV, r.MD)] = TestResult[(r.KV, r.MD)]()
+  def test2[X, Y](implicit r: SetEqual[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
 
   trait Length[L] {
     type Out
@@ -408,6 +408,48 @@ object recursive {
         type MD = (K0, V0) :: MD0
       }
     }
+  }
+
+  type True = Witness.`true`.T
+  type False = Witness.`false`.T
+
+  trait IsMember[E, L] {
+    type Out
+  }
+  object IsMember {
+    type Aux[E, L, O] = IsMember[E, L] { type Out = O }
+    implicit def ismember0[E]: Aux[E, HNil, False] = new IsMember[E, HNil] { type Out = False }
+    implicit def ismember1[E, T <: HList]: Aux[E, E :: T, True] = new IsMember[E, E :: T] { type Out = True }
+    implicit def ismember2[E, E0, T <: HList, O](implicit ne: E =:!= E0, r: Aux[E, T, O]): Aux[E, E0 :: T, O] = {
+      new IsMember[E, E0 :: T] { type Out = O }
+    }
+  }
+
+  trait Subset[S1, S2] {
+    type Out
+  }
+  object Subset {
+    type Aux[S1, S2, O] = Subset[S1, S2] { type Out = O }
+    implicit def subset0[S]: Aux[HNil, S, True] = new Subset[HNil, S] { type Out = True }
+    implicit def subset1[E, T <: HList, S2](implicit m: IsMember.Aux[E, S2, False]): Aux[E :: T, S2, False] =
+      new Subset[E :: T, S2] { type Out = False }
+    implicit def subset2[E, T <: HList, S2, O](implicit m: IsMember.Aux[E, S2, True], s: Aux[T, S2, O]): Aux[E :: T, S2, O] =
+      new Subset[E :: T, S2] { type Out = O }
+  }
+
+  trait SetEqual[S1, S2] {
+    type Out
+  }
+  object SetEqual {
+    type Aux[S1, S2, O] = SetEqual[S1, S2] { type Out = O }
+    implicit def equal0[S1, S2](implicit s1: Subset.Aux[S1, S2, True], s2: Subset.Aux[S2, S1, True]): Aux[S1, S2, True] =
+      new SetEqual[S1, S2] { type Out = True }
+    implicit def equal1[S1, S2](implicit s1: Subset.Aux[S1, S2, True], s2: Subset.Aux[S2, S1, False]): Aux[S1, S2, False] =
+      new SetEqual[S1, S2] { type Out = False }
+    implicit def equal2[S1, S2](implicit s1: Subset.Aux[S1, S2, False], s2: Subset.Aux[S2, S1, True]): Aux[S1, S2, False] =
+      new SetEqual[S1, S2] { type Out = False }
+    implicit def equal3[S1, S2](implicit s1: Subset.Aux[S1, S2, False], s2: Subset.Aux[S2, S1, False]): Aux[S1, S2, False] =
+      new SetEqual[S1, S2] { type Out = False }
   }
 
   //type CUMapType = Map[BaseUnit[_], Int]
