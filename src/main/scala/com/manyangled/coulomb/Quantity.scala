@@ -320,12 +320,34 @@ object Temperature {
 object recursive {
   import scala.language.experimental.macros
   import scala.reflect.macros.whitebox
-  //import scala.reflect.runtime.universe._
+  import scala.reflect.runtime.universe._
   import spire.math._
   import shapeless._
   import shapeless.syntax.singleton._
   import shapeless.record._
   import singleton.ops._
+
+  // return a human-readable type string for type argument 'T'
+  // typeString[Int] returns "Int"
+  def typeString[T :TypeTag]: String = {
+    def work(t: Type): String = {
+      t match { case TypeRef(pre, sym, args) =>
+        val ss = sym.toString.stripPrefix("trait ").stripPrefix("class ").stripPrefix("type ")
+        val as = args.map(work)
+        if (ss.startsWith("Function")) {
+          val arity = args.length - 1
+          "(" + (as.take(arity).mkString(",")) + ")" + "=>" + as.drop(arity).head
+        } else {
+          if (args.length <= 0) ss else (ss + "[" + as.mkString(",") + "]")
+        }
+      }
+    }
+    work(typeOf[T])
+  }
+
+  // get the type string of an argument:
+  // typeString(2) returns "Int"
+  def typeString[T :TypeTag](x: T): String = typeString[T]
 
   //type CUMapType = Map[BaseUnit[_], Int]
 
@@ -427,6 +449,22 @@ object recursive {
     }
   }
 
+  trait HListConcat[L <: HList, R <: HList] {
+    type Out <: HList
+  }
+  object HListConcat {
+    type Aux[L <: HList, R <: HList, O <: HList] = HListConcat[L, R] { type Out = O }
+    implicit def concat0[R <: HList]: Aux[HNil, R, R] = {
+      new HListConcat[HNil, R] {
+        type Out = R
+      }
+    }
+    implicit def concat1[H, T <: HList, R <: HList, O <: HList](implicit rc: Aux[T, R, O]): Aux[H :: T, R, H :: rc.Out] = {
+      new HListConcat[H :: T, R] {
+        type Out = H :: rc.Out
+      }
+    }
+  }
 
 //  implicit def witnessMulCM[L, LC <: HList, R, RC <: HList](implicit l: CUMap[L, LC], r: CUMap[R, RC]): CUMap[%*[L, R]] = {
 //    CUMap.mul(l, r)
