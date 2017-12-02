@@ -537,15 +537,25 @@ object recursive {
     }
   }
 
-  implicit def witnessDerivedUnitCM[U, D, DC <: HList](implicit du: DerivedUnit[U, D], dm: CUMap[D, DC]): CUMap[U, DC] = {
+  implicit def witnessDerivedUnitCM[U, D, DC](implicit du: DerivedUnit[U, D], dm: CUMap[D, DC]): CUMap[U, DC] = {
     new CUMap[U, DC] {
       val coef = du.coef * dm.coef
     }
   }
 
-//  implicit def witnessMulCM[L, LC <: HList, R, RC <: HList](implicit l: CUMap[L, LC], r: CUMap[R, RC]): CUMap[%*[L, R]] = {
-//    CUMap.mul(l, r)
-//  }
+  implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: CUMap[L, LC], r: CUMap[R, RC], u: UnifyKVPlus.Aux[LC, RC, OC]): CUMap[%*[L, R], OC] = {
+    new CUMap[%*[L, R], OC] {
+      val coef = l.coef * r.coef
+    }
+  }
+
+  case class ConvertableUnits[U1, U2](coef: Rational)
+  object ConvertableUnits {
+    implicit def witnessCU[U1, U2, C1, C2](implicit u1: CUMap[U1, C1], u2: CUMap[U2, C2], eq: SetEqual[C1, C2]): ConvertableUnits[U1, U2] =
+      ConvertableUnits[U1, U2](u1.coef / u2.coef)
+  }
+
+  def coefficient[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Rational = cu.coef
 
 /*
   implicit def witnessMulCM[L, R](implicit l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] = {
@@ -556,21 +566,6 @@ object recursive {
     CUMap.div(l, r)
   }
 
-  case class ConvertableUnits[U1, U2](coef: Rational)
-
-  def coefficient[L, R](implicit cu: ConvertableUnits[L, R]): Rational = cu.coef
-*/
-
-/*
-  implicit def witnessConvertableUnits[U1, U2](implicit u1: CUMap[U1], u2: CUMap[U2]): ConvertableUnits[U1, U2] =
-    macro Macros.test
-
-  object Macros {
-    def test(c: whitebox.Context)(implicit u1: c.Tree, u2: c.Tree): c.Tree = {
-      import c.universe._
-      q""
-    }
-  }
 */
 
   trait Meter
