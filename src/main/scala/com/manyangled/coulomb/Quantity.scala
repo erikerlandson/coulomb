@@ -350,8 +350,9 @@ object recursive {
   def typeString[T :TypeTag](x: T): String = typeString[T]
 
   case class TestResult[O]()
-  def test1[X](implicit r: Length[X]): TestResult[r.Out] = TestResult[r.Out]()
-  def test2[X, Y](implicit r: SetEqual[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
+  //def test1[X](implicit r: CollectTerms[X]): TestResult[r.Out] = TestResult[r.Out]()
+  def test2[X, Y](implicit r: UnifyKVPlus[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
+  def test3[X, Y, Z](implicit r: InsertKVPlus[X, Y, Z]): TestResult[r.Out] = TestResult[r.Out]()
 
   trait Length[L] {
     type Out
@@ -452,6 +453,31 @@ object recursive {
       new SetEqual[S1, S2] { type Out = False }
   }
 
+  trait InsertKVPlus[K, V, M] {
+    type Out
+  }
+  object InsertKVPlus {
+    type Aux[K, V, M, O] = InsertKVPlus[K, V, M] { type Out = O }
+    implicit def insert0[K, V]: Aux[K, V, HNil, (K, V) :: HNil] =
+      new InsertKVPlus[K, V, HNil] { type Out = (K, V) :: HNil }
+    implicit def insert1[K, V, V0, MT <: HList](implicit sum: +[V0, V]): Aux[K, V, (K, V0) :: MT, (K, sum.Out) :: MT] =
+      new InsertKVPlus[K, V, (K, V0) :: MT] { type Out = (K, sum.Out) :: MT }
+    implicit def insert2[K, V, K0, V0, MT <: HList, O <: HList](implicit ne: K =:!= K0, rc: Aux[K, V, MT, O]): Aux[K, V, (K0, V0) :: MT, (K0, V0) :: O] =
+      new InsertKVPlus[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
+  }
+
+  trait UnifyKVPlus[M1, M2] {
+    type Out
+  }
+  object UnifyKVPlus {
+    type Aux[M1, M2, O] = UnifyKVPlus[M1, M2] { type Out = O }
+    implicit def unify0[M2]: Aux[HNil, M2, M2] =
+      new UnifyKVPlus[HNil, M2] { type Out = M2 }
+    implicit def unify1[K, V, MT <: HList, M2, O, O2](implicit ui: InsertKVPlus.Aux[K, V, M2, O], rc: Aux[MT, O, O2]): Aux[(K, V) :: MT, M2, O2] =
+      new UnifyKVPlus[(K, V) :: MT, M2] { type Out = O2 }
+  }
+
+
   //type CUMapType = Map[BaseUnit[_], Int]
 
 /*
@@ -495,7 +521,7 @@ object recursive {
   trait %*[L, R]
   trait %/[L, R]
 
-  trait CUMap[U, C <: HList] {
+  trait CUMap[U, C] {
     def coef: Rational
   }
 
@@ -516,7 +542,6 @@ object recursive {
       val coef = du.coef * dm.coef
     }
   }
-
 
 //  implicit def witnessMulCM[L, LC <: HList, R, RC <: HList](implicit l: CUMap[L, LC], r: CUMap[R, RC]): CUMap[%*[L, R]] = {
 //    CUMap.mul(l, r)
