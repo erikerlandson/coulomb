@@ -433,31 +433,34 @@ object recursive {
     def coef: Rational
   }
 
-  implicit def witnessUnitlessCM: CUMap[Unitless, HNil] = {
-    new CUMap[Unitless, HNil] {
-      val coef = Rational(1)
+  object CUMap {
+    implicit def witnessUnitlessCM: CUMap[Unitless, HNil] = {
+      new CUMap[Unitless, HNil] {
+        val coef = Rational(1)
+      }
     }
-  }
 
-  implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U]): CUMap[U, (U, Witness.`1`.T) :: HNil] = {
-    new CUMap[U, (U, Witness.`1`.T) :: HNil] {
-      val coef = Rational(1)
+    implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U]): CUMap[U, (U, Witness.`1`.T) :: HNil] = {
+      new CUMap[U, (U, Witness.`1`.T) :: HNil] {
+        val coef = Rational(1)
+      }
     }
-  }
 
-  implicit def witnessDerivedUnitCM[U, D, DC](implicit du: DerivedUnit[U, D], dm: CUMap[D, DC]): CUMap[U, DC] = {
-    new CUMap[U, DC] {
-      val coef = du.coef * dm.coef
+    implicit def witnessDerivedUnitCM[U, D, DC](implicit du: DerivedUnit[U, D], dm: CUMap[D, DC]): CUMap[U, DC] = {
+      new CUMap[U, DC] {
+        val coef = du.coef * dm.coef
+      }
     }
-  }
 
-  implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: CUMap[L, LC], r: CUMap[R, RC], u: UnifyKVPlus.Aux[LC, RC, OC]): CUMap[%*[L, R], OC] = {
-    new CUMap[%*[L, R], OC] {
-      val coef = l.coef * r.coef
+    implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: CUMap[L, LC], r: CUMap[R, RC], u: UnifyKVPlus.Aux[LC, RC, OC]): CUMap[%*[L, R], OC] = {
+      new CUMap[%*[L, R], OC] {
+        val coef = l.coef * r.coef
+      }
     }
   }
 
   case class ConvertableUnits[U1, U2](coef: Rational)
+
   object ConvertableUnits {
     implicit def witnessCU[U1, U2, C1, C2](implicit u1: CUMap[U1, C1], u2: CUMap[U2, C2], eq: SetEqual[C1, C2]): ConvertableUnits[U1, U2] =
       ConvertableUnits[U1, U2](u1.coef / u2.coef)
