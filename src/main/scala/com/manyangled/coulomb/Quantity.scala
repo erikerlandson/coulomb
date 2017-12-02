@@ -351,7 +351,7 @@ object recursive {
 
   case class TestResult[O]()
   def test1[X](implicit r: Length[X]): TestResult[r.Out] = TestResult[r.Out]()
-  def test2[X, Y](implicit r: Concat[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
+  def test2[X, Y](implicit r: DeleteKey[X, Y]): TestResult[(r.KV, r.MD)] = TestResult[(r.KV, r.MD)]()
 
   trait Length[L] {
     type Out
@@ -378,6 +378,34 @@ object recursive {
     implicit def concat1[H, T <: HList, R, O <: HList](implicit rc: Aux[T, R, O]): Aux[H :: T, R, H :: O] = {
       new Concat[H :: T, R] {
         type Out = H :: O
+      }
+    }
+  }
+
+  // M is of form (K1, V1) :: (K2, V2) :: ...
+  // deletes first occurrence of (K, _) in the list, if present
+  trait DeleteKey[K, M] {
+    type KV // (K, V) or HNil
+    type MD // M with (K, V) removed (if K found)
+  }
+  object DeleteKey {
+    type Aux[K, M, KVO, MDO] = DeleteKey[K, M] { type KV = KVO; type MD = MDO }
+    implicit def deletekey0[K]: Aux[K, HNil, HNil, HNil] = {
+      new DeleteKey[K, HNil] {
+        type KV = HNil
+        type MD = HNil
+      }
+    }
+    implicit def deletekey1[K, V, MT <: HList]: Aux[K, (K, V) :: MT, (K, V), MT] = {
+      new DeleteKey[K, (K, V) :: MT] {
+        type KV = (K, V)
+        type MD = MT
+      }
+    }
+    implicit def deletekey2[K, MT <: HList, K0, V0, KV0, MD0 <: HList](implicit kne: K =:!= K0, dkr: Aux[K, MT, KV0, MD0]): Aux[K, (K0, V0) :: MT, KV0, (K0, V0) :: MD0] = {
+      new DeleteKey[K, (K0, V0) :: MT] {
+        type KV = KV0
+        type MD = (K0, V0) :: MD0
       }
     }
   }
