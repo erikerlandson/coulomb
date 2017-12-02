@@ -354,63 +354,6 @@ object recursive {
   def test2[X, Y](implicit r: UnifyKVPlus[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
   def test3[X, Y, Z](implicit r: InsertKVPlus[X, Y, Z]): TestResult[r.Out] = TestResult[r.Out]()
 
-  trait Length[L] {
-    type Out
-  }
-  object Length {
-    type Aux[L, O] = Length[L] { type Out = O }
-    implicit def length0: Aux[HNil, Witness.`0`.T] = new Length[HNil] { type Out = Witness.`0`.T }
-
-    implicit def length1[H, T <: HList, O](implicit tl: Aux[T, O], inc: +[O, Witness.`1`.T]): Aux[H :: T, inc.Out] = {
-      new Length[H :: T] { type Out = inc.Out }
-    }
-  }
-
-  trait Concat[L, R] {
-    type Out
-  }
-  object Concat {
-    type Aux[L, R, O] = Concat[L, R] { type Out = O }
-    implicit def concat0[R]: Aux[HNil, R, R] = {
-      new Concat[HNil, R] {
-        type Out = R
-      }
-    }
-    implicit def concat1[H, T <: HList, R, O <: HList](implicit rc: Aux[T, R, O]): Aux[H :: T, R, H :: O] = {
-      new Concat[H :: T, R] {
-        type Out = H :: O
-      }
-    }
-  }
-
-  // M is of form (K1, V1) :: (K2, V2) :: ...
-  // deletes first occurrence of (K, _) in the list, if present
-  trait DeleteKey[K, M] {
-    type KV // (K, V) or HNil
-    type MD // M with (K, V) removed (if K found)
-  }
-  object DeleteKey {
-    type Aux[K, M, KVO, MDO] = DeleteKey[K, M] { type KV = KVO; type MD = MDO }
-    implicit def deletekey0[K]: Aux[K, HNil, HNil, HNil] = {
-      new DeleteKey[K, HNil] {
-        type KV = HNil
-        type MD = HNil
-      }
-    }
-    implicit def deletekey1[K, V, MT <: HList]: Aux[K, (K, V) :: MT, (K, V), MT] = {
-      new DeleteKey[K, (K, V) :: MT] {
-        type KV = (K, V)
-        type MD = MT
-      }
-    }
-    implicit def deletekey2[K, MT <: HList, K0, V0, KV0, MD0 <: HList](implicit kne: K =:!= K0, dkr: Aux[K, MT, KV0, MD0]): Aux[K, (K0, V0) :: MT, KV0, (K0, V0) :: MD0] = {
-      new DeleteKey[K, (K0, V0) :: MT] {
-        type KV = KV0
-        type MD = (K0, V0) :: MD0
-      }
-    }
-  }
-
   type True = Witness.`true`.T
   type False = Witness.`false`.T
 
@@ -477,41 +420,6 @@ object recursive {
       new UnifyKVPlus[(K, V) :: MT, M2] { type Out = O2 }
   }
 
-
-  //type CUMapType = Map[BaseUnit[_], Int]
-
-/*
-  object CUMap {
-    def mul[L, R](l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] =
-      CUMap[%*[L, R]](l.coef * r.coef, mapMul(l.map, r.map))
-
-    def div[L, R](l: CUMap[L], r: CUMap[R]): CUMap[%/[L, R]] =
-      CUMap[%/[L, R]](l.coef / r.coef, mapDiv(l.map, r.map))
-
-    def mapMul(lmap: CUMapType, rmap: CUMapType): CUMapType = {
-      rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
-        if (m.contains(t)) {
-          val ne = m(t) + e
-          if (ne == 0) (m - t) else m + ((t, ne))
-        } else {
-          m + ((t, e))
-        }
-      }
-    }
-
-    def mapDiv(lmap: CUMapType, rmap: CUMapType): CUMapType = {
-      rmap.iterator.foldLeft(lmap) { case (m, (t, e)) =>
-        if (m.contains(t)) {
-          val ne = m(t) - e
-          if (ne == 0) (m - t) else m + ((t, ne))
-        } else {
-          m + ((t, -e))
-        }
-      }
-    }
-  }
-*/
-
   case class BaseUnit[U]()
   case class UnitName[U](name: String)
   case class UnitAbbv[U](abbv: String)
@@ -556,17 +464,6 @@ object recursive {
   }
 
   def coefficient[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Rational = cu.coef
-
-/*
-  implicit def witnessMulCM[L, R](implicit l: CUMap[L], r: CUMap[R]): CUMap[%*[L, R]] = {
-    CUMap.mul(l, r)
-  }
-
-  implicit def witnessDivCM[L, R](implicit l: CUMap[L], r: CUMap[R]): CUMap[%/[L, R]] = {
-    CUMap.div(l, r)
-  }
-
-*/
 
   trait Meter
   implicit val buMeter = BaseUnit[Meter]()
