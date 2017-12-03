@@ -351,11 +351,41 @@ object recursive {
 
   case class TestResult[O]()
   //def test1[X](implicit r: CollectTerms[X]): TestResult[r.Out] = TestResult[r.Out]()
-  def test2[X, Y](implicit r: UnifyKVPlus[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
-  def test3[X, Y, Z](implicit r: InsertKVPlus[X, Y, Z]): TestResult[r.Out] = TestResult[r.Out]()
+  //def test2[X, Y](implicit r: InsertKVSub[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
+  //def test3[X, Y, Z](implicit r: InsertKVSub[X, Y, Z]): TestResult[r.Out] = TestResult[r.Out]()
 
   type True = Witness.`true`.T
   type False = Witness.`false`.T
+
+  type XInt0 = Witness.`0`.T
+  type XInt1 = Witness.`1`.T
+
+  trait XIntAdd[L, R] {
+    type Out
+  }
+
+  object XIntAdd {
+    type Aux[L, R, O] = XIntAdd[L, R] { type Out = O }
+    implicit def witness[L, R](implicit op: +[L, R]): Aux[L, R, op.Out] = new XIntAdd[L, R] { type Out = op.Out }
+  }
+
+  trait XIntSub[L, R] {
+    type Out
+  }
+
+  object XIntSub {
+    type Aux[L, R, O] = XIntSub[L, R] { type Out = O }
+    implicit def witness[L, R](implicit op: -[L, R]): Aux[L, R, op.Out] = new XIntSub[L, R] { type Out = op.Out }
+  }
+
+  trait XIntMul[L, R] {
+    type Out
+  }
+
+  object XIntMul {
+    type Aux[L, R, O] = XIntMul[L, R] { type Out = O }
+    implicit def witness[L, R](implicit op: *[L, R]): Aux[L, R, op.Out] = new XIntMul[L, R] { type Out = op.Out }
+  }
 
   trait IsMember[E, L] {
     type Out
@@ -396,28 +426,65 @@ object recursive {
       new SetEqual[S1, S2] { type Out = False }
   }
 
-  trait InsertKVPlus[K, V, M] {
+  trait InsertKVMul[K, V, M] {
     type Out
   }
-  object InsertKVPlus {
-    type Aux[K, V, M, O] = InsertKVPlus[K, V, M] { type Out = O }
+  object InsertKVMul {
+    type Aux[K, V, M, O] = InsertKVMul[K, V, M] { type Out = O }
+
     implicit def insert0[K, V]: Aux[K, V, HNil, (K, V) :: HNil] =
-      new InsertKVPlus[K, V, HNil] { type Out = (K, V) :: HNil }
-    implicit def insert1[K, V, V0, MT <: HList](implicit sum: +[V0, V]): Aux[K, V, (K, V0) :: MT, (K, sum.Out) :: MT] =
-      new InsertKVPlus[K, V, (K, V0) :: MT] { type Out = (K, sum.Out) :: MT }
+      new InsertKVMul[K, V, HNil] { type Out = (K, V) :: HNil }
+
+    implicit def insert1[K, V, V0, MT <: HList, P](implicit op: XIntAdd.Aux[V0, V, P], nz: P =:!= XInt0): Aux[K, V, (K, V0) :: MT, (K, P) :: MT] =
+      new InsertKVMul[K, V, (K, V0) :: MT] { type Out = (K, P) :: MT }
+ 
+    implicit def insert1z[K, V, V0, MT <: HList](implicit op: XIntAdd.Aux[V0, V, XInt0]): Aux[K, V, (K, V0) :: MT, MT] =
+      new InsertKVMul[K, V, (K, V0) :: MT] { type Out = MT }
+ 
     implicit def insert2[K, V, K0, V0, MT <: HList, O <: HList](implicit ne: K =:!= K0, rc: Aux[K, V, MT, O]): Aux[K, V, (K0, V0) :: MT, (K0, V0) :: O] =
-      new InsertKVPlus[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
+      new InsertKVMul[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
   }
 
-  trait UnifyKVPlus[M1, M2] {
+  trait InsertKVDiv[K, V, M] {
     type Out
   }
-  object UnifyKVPlus {
-    type Aux[M1, M2, O] = UnifyKVPlus[M1, M2] { type Out = O }
+  object InsertKVDiv {
+    type Aux[K, V, M, O] = InsertKVDiv[K, V, M] { type Out = O }
+
+    implicit def insert0[K, V](implicit n: Negate[V]): Aux[K, V, HNil, (K, n.Out) :: HNil] =
+      new InsertKVDiv[K, V, HNil] { type Out = (K, n.Out) :: HNil }
+
+    implicit def insert1[K, V, V0, MT <: HList, P](implicit op: XIntSub.Aux[V0, V, P], nz: P =:!= XInt0): Aux[K, V, (K, V0) :: MT, (K, P) :: MT] =
+      new InsertKVDiv[K, V, (K, V0) :: MT] { type Out = (K, P) :: MT }
+
+    implicit def insert1z[K, V, V0, MT <: HList](implicit op: XIntSub.Aux[V0, V, XInt0]): Aux[K, V, (K, V0) :: MT, MT] =
+      new InsertKVDiv[K, V, (K, V0) :: MT] { type Out = MT }
+
+    implicit def insert2[K, V, K0, V0, MT <: HList, O <: HList](implicit ne: K =:!= K0, rc: Aux[K, V, MT, O]): Aux[K, V, (K0, V0) :: MT, (K0, V0) :: O] =
+      new InsertKVDiv[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
+  }
+
+  trait UnifyKVMul[M1, M2] {
+    type Out
+  }
+  object UnifyKVMul {
+    type Aux[M1, M2, O] = UnifyKVMul[M1, M2] { type Out = O }
     implicit def unify0[M2]: Aux[HNil, M2, M2] =
-      new UnifyKVPlus[HNil, M2] { type Out = M2 }
-    implicit def unify1[K, V, MT <: HList, M2, O, O2](implicit ui: InsertKVPlus.Aux[K, V, M2, O], rc: Aux[MT, O, O2]): Aux[(K, V) :: MT, M2, O2] =
-      new UnifyKVPlus[(K, V) :: MT, M2] { type Out = O2 }
+      new UnifyKVMul[HNil, M2] { type Out = M2 }
+    implicit def unify1[K, V, MT <: HList, M2, O, O2](implicit ui: InsertKVMul.Aux[K, V, M2, O], rc: Aux[MT, O, O2]): Aux[(K, V) :: MT, M2, O2] =
+      new UnifyKVMul[(K, V) :: MT, M2] { type Out = O2 }
+  }
+
+  // Note, this is like "M2 / M1" so careful with type argument order
+  trait UnifyKVDiv[M1, M2] {
+    type Out
+  }
+  object UnifyKVDiv {
+    type Aux[M1, M2, O] = UnifyKVDiv[M1, M2] { type Out = O }
+    implicit def unify0[M2]: Aux[HNil, M2, M2] =
+      new UnifyKVDiv[HNil, M2] { type Out = M2 }
+    implicit def unify1[K, V, MT <: HList, M2, O, O2](implicit ui: InsertKVDiv.Aux[K, V, M2, O], rc: Aux[MT, O, O2]): Aux[(K, V) :: MT, M2, O2] =
+      new UnifyKVDiv[(K, V) :: MT, M2] { type Out = O2 }
   }
 
   case class BaseUnit[U]()
@@ -429,40 +496,56 @@ object recursive {
   trait %*[L, R]
   trait %/[L, R]
 
-  trait CUMap[U, C] {
+  trait Canonical[U] {
+    type Out
     def coef: Rational
   }
 
-  object CUMap {
-    implicit def witnessUnitlessCM: CUMap[Unitless, HNil] = {
-      new CUMap[Unitless, HNil] {
+  object Canonical {
+    type Aux[U, O] = Canonical[U] { type Out = O }
+
+    implicit def witnessUnitlessCM: Aux[Unitless, HNil] = {
+      new Canonical[Unitless] {
+        type Out = HNil
         val coef = Rational(1)
       }
     }
 
-    implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U]): CUMap[U, (U, Witness.`1`.T) :: HNil] = {
-      new CUMap[U, (U, Witness.`1`.T) :: HNil] {
+    implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U]): Aux[U, (U, XInt1) :: HNil] = {
+      new Canonical[U] {
+        type Out = (U, XInt1) :: HNil
         val coef = Rational(1)
       }
     }
 
-    implicit def witnessDerivedUnitCM[U, D, DC](implicit du: DerivedUnit[U, D], dm: CUMap[D, DC]): CUMap[U, DC] = {
-      new CUMap[U, DC] {
+    implicit def witnessDerivedUnitCM[U, D, DC](implicit du: DerivedUnit[U, D], dm: Aux[D, DC]): Aux[U, DC] = {
+      new Canonical[U] {
+        type Out = DC
         val coef = du.coef * dm.coef
       }
     }
 
-    implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: CUMap[L, LC], r: CUMap[R, RC], u: UnifyKVPlus.Aux[LC, RC, OC]): CUMap[%*[L, R], OC] = {
-      new CUMap[%*[L, R], OC] {
+    implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifyKVMul.Aux[LC, RC, OC]): Aux[%*[L, R], OC] = {
+      new Canonical[%*[L, R]] {
+        type Out = OC
         val coef = l.coef * r.coef
+      }
+    }
+
+    implicit def witnessDivCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifyKVDiv.Aux[RC, LC, OC]): Aux[%/[L, R], OC] = {
+      new Canonical[%/[L, R]] {
+        type Out = OC
+        val coef = l.coef / r.coef
       }
     }
   }
 
+  def ctest[U](implicit u: Canonical[U]): TestResult[u.Out] = TestResult[u.Out]()
+
   case class ConvertableUnits[U1, U2](coef: Rational)
 
   object ConvertableUnits {
-    implicit def witnessCU[U1, U2, C1, C2](implicit u1: CUMap[U1, C1], u2: CUMap[U2, C2], eq: SetEqual[C1, C2]): ConvertableUnits[U1, U2] =
+    implicit def witnessCU[U1, U2, C1, C2](implicit u1: Canonical.Aux[U1, C1], u2: Canonical.Aux[U2, C2], eq: SetEqual.Aux[C1, C2, True]): ConvertableUnits[U1, U2] =
       ConvertableUnits[U1, U2](u1.coef / u2.coef)
   }
 
