@@ -351,7 +351,7 @@ object recursive {
 
   case class TestResult[O]()
   //def test1[X](implicit r: CollectTerms[X]): TestResult[r.Out] = TestResult[r.Out]()
-  //def test2[X, Y](implicit r: InsertKVSub[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
+  def test2[X, Y](implicit r: ApplyKVPow[X, Y]): TestResult[r.Out] = TestResult[r.Out]()
   //def test3[X, Y, Z](implicit r: InsertKVSub[X, Y, Z]): TestResult[r.Out] = TestResult[r.Out]()
 
   type True = Witness.`true`.T
@@ -416,14 +416,8 @@ object recursive {
   }
   object SetEqual {
     type Aux[S1, S2, O] = SetEqual[S1, S2] { type Out = O }
-    implicit def equal0[S1, S2](implicit s1: Subset.Aux[S1, S2, True], s2: Subset.Aux[S2, S1, True]): Aux[S1, S2, True] =
-      new SetEqual[S1, S2] { type Out = True }
-    implicit def equal1[S1, S2](implicit s1: Subset.Aux[S1, S2, True], s2: Subset.Aux[S2, S1, False]): Aux[S1, S2, False] =
-      new SetEqual[S1, S2] { type Out = False }
-    implicit def equal2[S1, S2](implicit s1: Subset.Aux[S1, S2, False], s2: Subset.Aux[S2, S1, True]): Aux[S1, S2, False] =
-      new SetEqual[S1, S2] { type Out = False }
-    implicit def equal3[S1, S2](implicit s1: Subset.Aux[S1, S2, False], s2: Subset.Aux[S2, S1, False]): Aux[S1, S2, False] =
-      new SetEqual[S1, S2] { type Out = False }
+    implicit def equal0[S1, S2, O1, O2](implicit s1: Subset.Aux[S1, S2, O1], s2: Subset.Aux[S2, S1, O2], a: &&[O1, O2]): Aux[S1, S2, a.Out] =
+      new SetEqual[S1, S2] { type Out = a.Out }
   }
 
   trait InsertKVMul[K, V, M] {
@@ -487,14 +481,32 @@ object recursive {
       new UnifyKVDiv[(K, V) :: MT, M2] { type Out = O2 }
   }
 
-  case class BaseUnit[U]()
-  case class UnitName[U](name: String)
-  case class UnitAbbv[U](abbv: String)
+  trait ApplyKVPow[P, M] {
+    type Out
+  }
+  object ApplyKVPow {
+    type Aux[P, M, O] = ApplyKVPow[P, M] { type Out = O }
+    implicit def apply0[P](implicit nz: P =:!= XInt0): Aux[P, HNil, HNil] = new ApplyKVPow[P, HNil] { type Out = HNil }
+    implicit def apply1[P, K, V, MT <: HList, O <: HList, Q](implicit nz: P =:!= XInt0, rc: Aux[P, MT, O], op: XIntMul.Aux[V, P, Q]): Aux[P, (K, V) :: MT, (K, Q) :: O] =
+      new ApplyKVPow[P, (K, V) :: MT] { type Out = (K, Q) :: O }
+    implicit def apply1z[M]: Aux[XInt0, M, HNil] = new ApplyKVPow[XInt0, M] { type Out = HNil }
+  }
+
+  class BaseUnit[U](val name: String, val abbv: String)
+  object BaseUnit {
+    def apply[U](name: String = null, abbv: String = null)(implicit ut: TypeTag[U]): BaseUnit[U] = {
+      val n = Option(name).getOrElse(ut.tpe.typeSymbol.name.toString)
+      val a = Option(abbv).getOrElse(n.take(1))
+      new BaseUnit[U](n, a)
+    }
+  }
+
   case class DerivedUnit[U, D](coef: Rational)
 
   trait Unitless
   trait %*[L, R]
   trait %/[L, R]
+  trait %^[B, E]
 
   trait Canonical[U] {
     type Out
@@ -538,6 +550,14 @@ object recursive {
         val coef = l.coef / r.coef
       }
     }
+
+    implicit def witnessPowCM[B, BC, E, OC](implicit b: Aux[B, BC], u: ApplyKVPow.Aux[E, BC, OC], e: singleton.ops.Id[E]): Aux[%^[B, E], OC] = {
+      new Canonical[%^[B, E]] {
+        type Out = OC
+        val coef = b.coef.pow(e.value.asInstanceOf[Int])
+      }
+    }
+
   }
 
   def ctest[U](implicit u: Canonical[U]): TestResult[u.Out] = TestResult[u.Out]()
