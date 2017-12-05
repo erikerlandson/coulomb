@@ -495,14 +495,27 @@ object recursive {
 
   class BaseUnit[U](val name: String, val abbv: String)
   object BaseUnit {
-    def apply[U](name: String = null, abbv: String = null)(implicit ut: TypeTag[U]): BaseUnit[U] = {
-      val n = Option(name).getOrElse(ut.tpe.typeSymbol.name.toString)
-      val a = Option(abbv).getOrElse(n.take(1))
+    def apply[U](name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): BaseUnit[U] = {
+      val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
+      val a = if (abbv != "") abbv else n.take(1)
       new BaseUnit[U](n, a)
     }
   }
 
-  case class DerivedUnit[U, D](coef: Rational)
+  class DerivedUnit[U, D](val coef: Rational, val name: String, val abbv: String)
+  object DerivedUnit {
+    def apply[U, D](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): DerivedUnit[U, D] = {
+      require(coef > 0, "Unit coefficients must be strictly > 0")
+      val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
+      val a = if (abbv != "") abbv else n.take(1)
+      new DerivedUnit[U, D](coef, n, a)
+    }
+  }
+
+  object PrefixUnit {
+    def apply[U](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): DerivedUnit[U, Unitless] =
+      DerivedUnit[U, Unitless](coef, name, abbv)
+  }
 
   trait Unitless
   trait %*[L, R]
@@ -584,18 +597,6 @@ object recursive {
   }
   object Converter extends ConverterDefaultPriority {
     implicit def witnessDouble[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Converter[Double, U1, Double, U2] = {
-      println(s"doing specialization for Double")
-      val coef = cu.coef.toDouble
-      new Converter[Double, U1, Double, U2] {
-        def apply(v: Double): Double = v * coef
-      }
-    }
-  }
-
-  // test custom override for conversion policies
-  object policy {
-    implicit def witnessDoublePolicy[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Converter[Double, U1, Double, U2] = {
-      println(s"doing specialization for custom Double policy")
       val coef = cu.coef.toDouble
       new Converter[Double, U1, Double, U2] {
         def apply(v: Double): Double = v * coef
@@ -628,5 +629,8 @@ object recursive {
   implicit val duMinute = DerivedUnit[Minute, Second](Rational(60))
 
   trait Kilo
-  implicit val defineUnitKilo = DerivedUnit[Kilo, Unitless](Rational(1000))
+  implicit val defineUnitKilo = PrefixUnit[Kilo](Rational(1000))
+
+  trait Mega
+  implicit val defineUnitMega = PrefixUnit[Mega](Rational(10).pow(6))
 }
