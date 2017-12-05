@@ -322,6 +322,7 @@ object recursive {
   import scala.reflect.macros.whitebox
   import scala.reflect.runtime.universe._
   import spire.math._
+  import spire.syntax._
   import shapeless._
   import shapeless.syntax.singleton._
   import shapeless.record._
@@ -562,14 +563,60 @@ object recursive {
 
   def ctest[U](implicit u: Canonical[U]): TestResult[u.Out] = TestResult[u.Out]()
 
-  case class ConvertableUnits[U1, U2](coef: Rational)
+  class ConvertableUnits[U1, U2](val coef: Rational)
 
   object ConvertableUnits {
     implicit def witnessCU[U1, U2, C1, C2](implicit u1: Canonical.Aux[U1, C1], u2: Canonical.Aux[U2, C2], eq: SetEqual.Aux[C1, C2, True]): ConvertableUnits[U1, U2] =
-      ConvertableUnits[U1, U2](u1.coef / u2.coef)
+      new ConvertableUnits[U1, U2](u1.coef / u2.coef)
   }
 
   def coefficient[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Rational = cu.coef
+
+  trait Converter[N1, U1, N2, U2] {
+    def apply(v: N1): N2
+  }
+  trait ConverterDefaultPriority {
+    // This should be specialized for efficiency, however this rule would give an accurate conversion for any type
+    implicit def witness[N1, U1, N2, U2](implicit cu: ConvertableUnits[U1, U2], cfN1: Numeric[N1], ctN2: Numeric[N2]): Converter[N1, U1, N2, U2] =
+      new Converter[N1, U1, N2, U2] {
+        def apply(v: N1): N2 = ctN2.fromType[Rational](cfN1.toType[Rational](v) * cu.coef)
+      }
+  }
+  object Converter extends ConverterDefaultPriority {
+    implicit def witnessDouble[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Converter[Double, U1, Double, U2] = {
+      println(s"doing specialization for Double")
+      val coef = cu.coef.toDouble
+      new Converter[Double, U1, Double, U2] {
+        def apply(v: Double): Double = v * coef
+      }
+    }
+  }
+
+  // test custom override for conversion policies
+  object policy {
+    implicit def witnessDoublePolicy[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Converter[Double, U1, Double, U2] = {
+      println(s"doing specialization for custom Double policy")
+      val coef = cu.coef.toDouble
+      new Converter[Double, U1, Double, U2] {
+        def apply(v: Double): Double = v * coef
+      }
+    }
+  }
+
+  class Quantity[N, U](val value: N)
+    extends AnyVal with Serializable {
+      override def toString = s"Quantity($value)"
+      def unary_-() (implicit n: Numeric[N]): Quantity[N, U] =
+        new Quantity[N, U](n.negate(value))
+      def +[N2, U2](rhs: Quantity[N2, U2])(implicit cv: Converter[N2, U2, N, U], n: Numeric[N], n2: Numeric[N2]): Quantity[N, U] =
+        new Quantity[N, U](n.plus(value, cv(rhs.value)))
+      def -[N2, U2](rhs: Quantity[N2, U2])(implicit cv: Converter[N2, U2, N, U], n: Numeric[N], n2: Numeric[N2]): Quantity[N, U] =
+        new Quantity[N, U](n.minus(value, cv(rhs.value)))
+  }
+
+  implicit class WithUnit[N](v: N) {
+    def withUnit[U]: Quantity[N, U] = new Quantity[N, U](v)
+  }
 
   trait Meter
   implicit val buMeter = BaseUnit[Meter]()
@@ -579,4 +626,7 @@ object recursive {
 
   trait Minute
   implicit val duMinute = DerivedUnit[Minute, Second](Rational(60))
+
+  trait Kilo
+  implicit val defineUnitKilo = DerivedUnit[Kilo, Unitless](Rational(1000))
 }
