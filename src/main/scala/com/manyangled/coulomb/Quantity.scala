@@ -388,6 +388,30 @@ object recursive {
     implicit def witness[L, R](implicit op: *[L, R]): Aux[L, R, op.Out] = new XIntMul[L, R] { type Out = op.Out }
   }
 
+  trait XIntNeg[N] {
+    type Out
+  }
+  object XIntNeg {
+    type Aux[N, O] = XIntNeg[N] { type Out = O }
+    implicit def witness[N](implicit op: Negate[N]): Aux[N, op.Out] = new XIntNeg[N] { type Out = op.Out }
+  }
+
+  trait XIntLT[L, R] {
+    type Out
+  }
+  object XIntLT {
+    type Aux[L, R, O] = XIntLT[L, R] { type Out = O }
+    implicit def witness[L, R](implicit op: <[L, R]): Aux[L, R, op.Out] = new XIntLT[L, R] { type Out = op.Out }
+  }
+
+  trait XIntGT[L, R] {
+    type Out
+  }
+  object XIntGT {
+    type Aux[L, R, O] = XIntGT[L, R] { type Out = O }
+    implicit def witness[L, R](implicit op: >[L, R]): Aux[L, R, op.Out] = new XIntGT[L, R] { type Out = op.Out }
+  }
+
   trait IsMember[E, L] {
     type Out
   }
@@ -571,7 +595,89 @@ object recursive {
         val coef = b.coef.pow(e.value.asInstanceOf[Int])
       }
     }
+  }
 
+  trait CanonicalNamed[U] {
+    type Out
+  }
+  object CanonicalNamed {
+    type Aux[U, O] = CanonicalNamed[U] { type Out = O }
+
+    implicit def witnessUnitlessCM: Aux[Unitless, HNil] =
+      new CanonicalNamed[Unitless] { type Out = HNil }
+
+    implicit def witnessBaseUnitCM[U](implicit buU: BaseUnit[U]): Aux[U, (U, XInt1) :: HNil] =
+      new CanonicalNamed[U] { type Out = (U, XInt1) :: HNil }
+
+    implicit def witnessDerivedUnitCM[U](implicit du: DerivedUnit[U, _]): Aux[U, (U, XInt1) :: HNil] =
+      new CanonicalNamed[U] { type Out = (U, XInt1) :: HNil }
+
+    implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifyKVMul.Aux[LC, RC, OC]): Aux[%*[L, R], OC] =
+      new CanonicalNamed[%*[L, R]] { type Out = OC }
+
+    implicit def witnessDivCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifyKVDiv.Aux[RC, LC, OC]): Aux[%/[L, R], OC] =
+      new CanonicalNamed[%/[L, R]] { type Out = OC }
+
+    implicit def witnessPowCM[B, BC, E, OC](implicit b: Aux[B, BC], u: ApplyKVPow.Aux[E, BC, OC], e: singleton.ops.Id[E]): Aux[%^[B, E], OC] =
+      new CanonicalNamed[%^[B, E]] { type Out = OC }
+  }
+
+  // assuming inputs (U, P) are already from some canonical sig; so a type U will never pre-exist in M
+  trait InsertSortedUnitSig[U, P, M] {
+    type Out
+  }
+  object InsertSortedUnitSig {
+    type Aux[U, P, M, O] = InsertSortedUnitSig[U, P, M] { type Out = O }
+
+    implicit def evidence0[U, P]: Aux[U, P, HNil, (U, P) :: HNil] =
+      new InsertSortedUnitSig[U, P, HNil] { type Out = (U, P) :: HNil }
+
+    implicit def evidence1[U, P, U0, P0, MT <: HList](implicit lte: XIntGT.Aux[P, P0, False]): Aux[U, P, (U0, P0) :: MT, (U, P) :: (U0, P0) :: MT] =
+      new InsertSortedUnitSig[U, P, (U0, P0) :: MT] { type Out = (U, P) :: (U0, P0) :: MT }
+
+    implicit def evidence2[U, P, U0, P0, MT <: HList, O <: HList](implicit gt: XIntGT.Aux[P, P0, True], rc: Aux[U, P, MT, O]): Aux[U, P, (U0, P0) :: MT, (U0, P0) :: O] =
+      new InsertSortedUnitSig[U, P, (U0, P0) :: MT] { type Out = (U0, P0) :: O }
+
+  }
+
+  trait SortUnitSig[M, N, D] {
+    type OutN
+    type OutD
+  }
+
+  object SortUnitSig {
+    type Aux[M, N, D, ON, OD] = SortUnitSig[M, N, D] { type OutN = ON; type OutD = OD }
+
+    implicit def evidence0[N, D]: Aux[HNil, N, D, N, D] =
+      new SortUnitSig[HNil, N, D] { type OutN = N; type OutD = D }
+
+    implicit def evidence1[U, P, MT <: HList, N, D, NO, NF, DF](implicit pos: XIntGT.Aux[P, XInt0, True], ins: InsertSortedUnitSig.Aux[U, P, N, NO], rc: Aux[MT, NO, D, NF, DF]): Aux[(U, P) :: MT, N, D, NF, DF] =
+      new SortUnitSig[(U, P) :: MT, N, D] { type OutN = NF; type OutD = DF }
+
+    implicit def evidence2[U, P, MT <: HList, N, D, NP, DO, NF, DF](implicit neg: XIntLT.Aux[P, XInt0, True], n: XIntNeg.Aux[P, NP], ins: InsertSortedUnitSig.Aux[U, NP, D, DO], rc: Aux[MT, N, DO, NF, DF]): Aux[(U, P) :: MT, N, D, NF, DF] =
+      new SortUnitSig[(U, P) :: MT, N, D] { type OutN = NF; type OutD = DF }
+  }
+
+  def testsus[M](implicit s: SortUnitSig[M, HNil, HNil]): TestResult[(s.OutN, s.OutD)] = TestResult[(s.OutN, s.OutD)]()
+
+  trait MulResultType[LU, RU] {
+    type Out
+  }
+  object MulResultType {
+    type Aux[LU, RU, O] = MulResultType[LU, RU] { type Out = O }
+
+    implicit def result[LU, RU, OL, OR, RT](implicit cnL: CanonicalNamed.Aux[LU, OL], cnR: CanonicalNamed.Aux[RU, OR], mu: UnifyKVMul.Aux[OL, OR, RT]): Aux[LU, RU, RT] =
+      new MulResultType[LU, RU] { type Out = RT }
+  }
+
+  trait DivResultType[LU, RU] {
+    type Out
+  }
+  object DivResultType {
+    type Aux[LU, RU, O] = DivResultType[LU, RU] { type Out = O }
+
+    implicit def result[LU, RU, OL, OR, RT](implicit cnL: CanonicalNamed.Aux[LU, OL], cnR: CanonicalNamed.Aux[RU, OR], mu: UnifyKVDiv.Aux[OR, OL, RT]): Aux[LU, RU, RT] =
+      new DivResultType[LU, RU] { type Out = RT }
   }
 
   def ctest[U](implicit u: Canonical[U]): TestResult[u.Out] = TestResult[u.Out]()
@@ -613,6 +719,10 @@ object recursive {
         new Quantity[N, U](n.plus(value, cv(rhs.value)))
       def -[N2, U2](rhs: Quantity[N2, U2])(implicit cv: Converter[N2, U2, N, U], n: Numeric[N], n2: Numeric[N2]): Quantity[N, U] =
         new Quantity[N, U](n.minus(value, cv(rhs.value)))
+      def *[N2, U2](rhs: Quantity[N2, U2])(implicit n: Numeric[N], n2: Numeric[N2], rt: MulResultType[U, U2]): Quantity[N, rt.Out] =
+        new Quantity[N, rt.Out](n.times(value, n2.toType[N](rhs.value)))
+      def /[N2, U2](rhs: Quantity[N2, U2])(implicit n: Numeric[N], n2: Numeric[N2], rt: DivResultType[U, U2]): Quantity[N, rt.Out] =
+        new Quantity[N, rt.Out](n.div(value, n2.toType[N](rhs.value)))
   }
 
   implicit class WithUnit[N](v: N) {
