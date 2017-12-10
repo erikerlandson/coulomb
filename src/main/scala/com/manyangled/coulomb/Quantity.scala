@@ -724,7 +724,7 @@ object recursive {
   object DivResultType {
     type Aux[LU, RU, O] = DivResultType[LU, RU] { type Out = O }
 
-    implicit def result[LU, RU, OL, OR, RT](implicit cnL: StandardSig.Aux[LU, OL], cnR: StandardSig.Aux[RU, OR], mu: UnifyKVDiv.Aux[OR, OL, RT]): Aux[LU, RU, RT] =
+    implicit def result[LU, RU, OL, OR, OU, RT](implicit cnL: StandardSig.Aux[LU, OL], cnR: StandardSig.Aux[RU, OR], mu: UnifyKVDiv.Aux[OR, OL, OU], rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
       new DivResultType[LU, RU] { type Out = RT }
   }
 
@@ -758,19 +758,78 @@ object recursive {
     }
   }
 
+  trait UnitOps[N, U] {
+    def n: Numeric[N]
+  }
+  object UnitOps {
+    implicit def evidence[N, U](implicit nn: Numeric[N]): UnitOps[N, U] =
+      new UnitOps[N, U] {
+        val n = nn
+      }
+  }
+
+  trait UnitBinaryOps[N1, U1, N2, U2] {
+    def n1: Numeric[N1]
+    def n2: Numeric[N2]
+    def cv12: Converter[N1, U1, N2, U2]
+    def cv21: Converter[N2, U2, N1, U1]
+    def cn12(x: N1): N2
+    def cn21(x: N2): N1
+    type MulRT12
+    type MulRT21
+    type DivRT12
+    type DivRT21
+  }
+
+  object UnitBinaryOps {
+    type Aux[N1, U1, N2, U2, MR12, MR21, DR12, DR21] = UnitBinaryOps[N1, U1, N2, U2] {
+      type MulRT12 = MR12
+      type MulRT21 = MR21
+      type DivRT12 = DR12
+      type DivRT21 = DR21      
+    }
+    implicit def evidence[N1, U1, N2, U2](implicit
+        nn1: Numeric[N1],
+        nn2: Numeric[N2],
+        cvv12: Converter[N1, U1, N2, U2],
+        cvv21: Converter[N2, U2, N1, U1],
+        mrt12: MulResultType[U1, U2],
+        mrt21: MulResultType[U2, U1],
+        drt12: DivResultType[U1, U2],
+        drt21: DivResultType[U2, U1]): Aux[N1, U1, N2, U2, mrt12.Out, mrt21.Out, drt12.Out, drt21.Out] =
+      new UnitBinaryOps[N1, U1, N2, U2] {
+        val n1 = nn1
+        val n2 = nn2
+        val cv12 = cvv12
+        val cv21 = cvv21
+        def cn12(x: N1): N2 = nn1.toType[N2](x)
+        def cn21(x: N2): N1 = nn2.toType[N1](x)
+        type MulRT12 = mrt12.Out
+        type MulRT21 = mrt21.Out
+        type DivRT12 = drt12.Out
+        type DivRT21 = drt21.Out
+      }
+  }
+
   class Quantity[N, U](val value: N)
     extends AnyVal with Serializable {
+
       override def toString = s"Quantity($value)"
-      def unary_-() (implicit n: Numeric[N]): Quantity[N, U] =
-        new Quantity[N, U](n.negate(value))
-      def +[N2, U2](rhs: Quantity[N2, U2])(implicit cv: Converter[N2, U2, N, U], n: Numeric[N], n2: Numeric[N2]): Quantity[N, U] =
-        new Quantity[N, U](n.plus(value, cv(rhs.value)))
-      def -[N2, U2](rhs: Quantity[N2, U2])(implicit cv: Converter[N2, U2, N, U], n: Numeric[N], n2: Numeric[N2]): Quantity[N, U] =
-        new Quantity[N, U](n.minus(value, cv(rhs.value)))
-      def *[N2, U2](rhs: Quantity[N2, U2])(implicit n: Numeric[N], n2: Numeric[N2], rt: MulResultType[U, U2]): Quantity[N, rt.Out] =
-        new Quantity[N, rt.Out](n.times(value, n2.toType[N](rhs.value)))
-      def /[N2, U2](rhs: Quantity[N2, U2])(implicit n: Numeric[N], n2: Numeric[N2], rt: DivResultType[U, U2]): Quantity[N, rt.Out] =
-        new Quantity[N, rt.Out](n.div(value, n2.toType[N](rhs.value)))
+
+      def unary_-() (implicit uo: UnitOps[N, U]): Quantity[N, U] =
+        new Quantity[N, U](uo.n.negate(value))
+
+      def +[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Quantity[N, U] =
+        new Quantity[N, U](ubo.n1.plus(value, ubo.cv21(rhs.value)))
+
+      def -[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Quantity[N, U] =
+        new Quantity[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
+
+      def *[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Quantity[N, ubo.MulRT12] =
+        new Quantity[N, ubo.MulRT12](ubo.n1.times(value, ubo.cn21(rhs.value)))
+
+      def /[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Quantity[N, ubo.DivRT12] =
+        new Quantity[N, ubo.DivRT12](ubo.n1.div(value, ubo.cn21(rhs.value)))
   }
 
   implicit class WithUnit[N](v: N) {
