@@ -850,4 +850,7 @@ object recursive {
 
   trait Mega
   implicit val defineUnitMega = PrefixUnit[Mega](Rational(10).pow(6))
+
+  def foo[N, U, RT](x: Quantity[N, U])(implicit ubo: UnitBinaryOps.Aux[N, U, N, U, RT, _, _, _], uot: UnitOps[N, RT]) = -(x * x)
+  def goo(x: Quantity[Int, Second]) = -(x * x)
 }
