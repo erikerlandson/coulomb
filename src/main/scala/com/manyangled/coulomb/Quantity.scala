@@ -361,6 +361,16 @@ object recursive {
   type XInt0 = Witness.`0`.T
   type XInt1 = Witness.`1`.T
 
+  trait XIntValue[I] {
+    def value: Int
+  }
+  object XIntValue {
+    implicit def evidence[I](implicit i: singleton.ops.Id[I]): XIntValue[I] =
+      new XIntValue[I] {
+        val value = i.value.asInstanceOf[Int]
+      }
+  }
+
   trait XIntAdd[L, R] {
     type Out
   }
@@ -724,11 +734,27 @@ object recursive {
   object DivResultType {
     type Aux[LU, RU, O] = DivResultType[LU, RU] { type Out = O }
 
-    implicit def result[LU, RU, OL, OR, OU, RT](implicit cnL: StandardSig.Aux[LU, OL], cnR: StandardSig.Aux[RU, OR], mu: UnifyKVDiv.Aux[OR, OL, OU], rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
+    implicit def result[LU, RU, OL, OR, OU, RT](implicit
+        cnL: StandardSig.Aux[LU, OL],
+        cnR: StandardSig.Aux[RU, OR],
+        mu: UnifyKVDiv.Aux[OR, OL, OU],
+        rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
       new DivResultType[LU, RU] { type Out = RT }
   }
 
   def ctest[U](implicit u: CanonicalSig[U]): TestResult[u.Out] = TestResult[u.Out]()
+
+  trait PowResultType[U, P] {
+    type Out
+  }
+  object PowResultType {
+    type Aux[U, P, O] = PowResultType[U, P] { type Out = O }
+    implicit def evidence[U, P, SS, AP, RT](implicit
+        ss: StandardSig.Aux[U, SS],
+        ap: ApplyKVPow.Aux[P, SS, AP],
+        rt: SigToUnit.Aux[AP, RT]): Aux[U, P, RT] =
+      new PowResultType[U, P] { type Out = RT }
+  }
 
   class ConvertableUnits[U1, U2](val coef: Rational)
 
@@ -764,6 +790,21 @@ object recursive {
   object UnitOps {
     implicit def evidence[N, U](implicit nn: Numeric[N]): UnitOps[N, U] =
       new UnitOps[N, U] {
+        val n = nn
+      }
+  }
+
+  trait UnitPowerOps[N, U, P] {
+    def n: Numeric[N]
+    type PowRT
+  }
+  object UnitPowerOps {
+    type Aux[N, U, P, PRT] = UnitPowerOps[N, U, P] { type PowRT = PRT }
+    implicit def evidence[N, U, P](implicit
+        nn: Numeric[N],
+        prt: PowResultType[U, P]): Aux[N, U, P, prt.Out] =
+      new UnitPowerOps[N, U, P] {
+        type PowRT = prt.Out
         val n = nn
       }
   }
@@ -830,6 +871,9 @@ object recursive {
 
       def /[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Quantity[N, ubo.DivRT12] =
         new Quantity[N, ubo.DivRT12](ubo.n1.div(value, ubo.cn21(rhs.value)))
+
+      def pow[P](implicit upo: UnitPowerOps[N, U, P], p: XIntValue[P]): Quantity[N, upo.PowRT] =
+        new Quantity[N, upo.PowRT](upo.n.pow(value, p.value))
   }
 
   implicit class WithUnit[N](v: N) {
