@@ -552,7 +552,14 @@ object recursive {
     implicit def apply1z[M]: Aux[XInt0, M, HNil] = new ApplyKVPow[XInt0, M] { type Out = HNil }
   }
 
-  class BaseUnit[U](val name: String, val abbv: String)
+  trait UnitDefinition {
+    def name: String
+    def abbv: String
+  }
+
+  class BaseUnit[U](val name: String, val abbv: String) extends UnitDefinition {
+    override def toString = s"BaseUnit($name, $abbv)"
+  }
   object BaseUnit {
     def apply[U](name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): BaseUnit[U] = {
       val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
@@ -561,7 +568,9 @@ object recursive {
     }
   }
 
-  class DerivedUnit[U, D](val coef: Rational, val name: String, val abbv: String)
+  class DerivedUnit[U, D](val coef: Rational, val name: String, val abbv: String) extends UnitDefinition {
+    override def toString = s"DerivedUnit($coef, $name, $abbv)"
+  }
   object DerivedUnit {
     def apply[U, D](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): DerivedUnit[U, D] = {
       require(coef > 0, "Unit coefficients must be strictly > 0")
@@ -724,7 +733,11 @@ object recursive {
   object MulResultType {
     type Aux[LU, RU, O] = MulResultType[LU, RU] { type Out = O }
 
-    implicit def result[LU, RU, OL, OR, OU, RT](implicit cnL: StandardSig.Aux[LU, OL], cnR: StandardSig.Aux[RU, OR], mu: UnifyKVMul.Aux[OL, OR, OU], rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
+    implicit def result[LU, RU, OL, OR, OU, RT](implicit
+      cnL: StandardSig.Aux[LU, OL],
+      cnR: StandardSig.Aux[RU, OR],
+      mu: UnifyKVMul.Aux[OL, OR, OU],
+      rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
       new MulResultType[LU, RU] { type Out = RT }
   }
 
@@ -784,13 +797,125 @@ object recursive {
     }
   }
 
+  trait UnitStringAST
+  object UnitStringAST {
+    case object Uni extends UnitStringAST
+    case class Def(d: UnitDefinition) extends UnitStringAST
+    case class Pre(p: UnitDefinition) extends UnitStringAST
+    case class Mul(l: UnitStringAST, r: UnitStringAST) extends UnitStringAST
+    case class Div(n: UnitStringAST, d: UnitStringAST) extends UnitStringAST
+    case class Pow(b: UnitStringAST, e: Int) extends UnitStringAST
+  }
+
+  trait HasUnitStringAST[U] {
+    def ast: UnitStringAST
+    override def toString = ast.toString
+  }
+  object HasUnitStringAST {
+    import UnitStringAST._
+
+    implicit def evidence0: HasUnitStringAST[Unitless] =
+      new HasUnitStringAST[Unitless] { val ast = Uni }
+
+    implicit def evidence1[P](implicit d: DerivedUnit[P, Unitless]): HasUnitStringAST[P] =
+      new HasUnitStringAST[P] { val ast = Pre(d) }
+
+    implicit def evidence2[U, D](implicit d: DerivedUnit[U, D], nu: D =:!= Unitless): HasUnitStringAST[U] =
+      new HasUnitStringAST[U] { val ast = Def(d) }
+
+    implicit def evidence3[U](implicit d: BaseUnit[U]): HasUnitStringAST[U] =
+      new HasUnitStringAST[U] { val ast = Def(d) }
+
+    implicit def evidence4[L, R](implicit l: HasUnitStringAST[L], r: HasUnitStringAST[R]): HasUnitStringAST[%*[L, R]] =
+      new HasUnitStringAST[%*[L, R]] { val ast = Mul(l.ast, r.ast) }
+
+    implicit def evidence5[N, D](implicit n: HasUnitStringAST[N], d: HasUnitStringAST[D]): HasUnitStringAST[%/[N, D]] =
+      new HasUnitStringAST[%/[N, D]] { val ast = Div(n.ast, d.ast) }
+
+    implicit def evidence6[B, E](implicit b: HasUnitStringAST[B], e: XIntValue[E]): HasUnitStringAST[%^[B, E]] =
+      new HasUnitStringAST[%^[B, E]] { val ast = Pow(b.ast, e.value) }
+  }
+
+  trait UnitString[U] {
+    def full: String
+    def abbv: String
+  }
+  object UnitString {
+    import UnitStringAST._
+
+    implicit def evidence[U](implicit uast: HasUnitStringAST[U]): UnitString[U] = {
+      val fs = render(uast.ast, (d: UnitDefinition) => d.name)
+      val as = render(uast.ast, (d: UnitDefinition) => d.abbv)
+      new UnitString[U] {
+        val full = fs
+        val abbv = as
+      }
+    }
+
+    def render(ast: UnitStringAST, f: UnitDefinition => String): String = ast match {
+      case FlatMul(t) => termStrings(t, f).mkString(" ")
+      case Div(Uni, d) => s"1/${paren(d, f)}"
+      case Div(n, Uni) => render(n, f)
+      case Div(n, d) => s"${paren(n, f)}/${paren(d, f)}"
+      case Pow(b, e) => {
+        val es = if (e < 0) s"($e)" else s"$e"
+        s"${paren(b, f)}^$es"
+      }
+      case Uni => "unitless"
+      case Def(d) => f(d)
+      case Pre(d) => f(d)
+      case _ => "!!!"
+    }
+
+    def paren(ast: UnitStringAST, f: UnitDefinition => String): String = {
+      val str = render(ast, f)
+      if (isAtomic(ast)) str else s"($str)"
+    }
+
+    object FlatMul {
+      def unapply(ast: UnitStringAST): Option[List[UnitStringAST]] = ast match {
+        case Mul(l, r) => {
+          val lflat = l match {
+            case FlatMul(lf) => lf
+            case _ => List(l)
+          }
+          val rflat = r match {
+            case FlatMul(rf) => rf
+            case _ => List(r)
+          }
+          Option(lflat ++ rflat)
+        }
+        case _ => None
+      }
+    }
+
+    def termStrings(terms: List[UnitStringAST], f: UnitDefinition => String): List[String] = terms match {
+      case Nil => Nil
+      case Pre(p) +: Def(d) +: tail => s"${f(p)}${f(d)}" :: termStrings(tail, f)
+      case term +: tail => s"${paren(term, f)}" :: termStrings(tail, f)
+      case _ => List("!!!")
+    }
+
+    def isAtomic(ast: UnitStringAST): Boolean = ast match {
+      case Uni => true
+      case Pre(_) => true
+      case Def(_) => true
+      case Pow(Def(_), _) => true
+      case Pow(FlatMul(Pre(_) +: Def(_) +: Nil), _) => true
+      case FlatMul(Pre(_) +: Def(_) +: Nil) => true
+      case _ => false
+    }
+  }
+
   trait UnitOps[N, U] {
     def n: Numeric[N]
+    def ustr: UnitString[U]
   }
   object UnitOps {
-    implicit def evidence[N, U](implicit nn: Numeric[N]): UnitOps[N, U] =
+    implicit def evidence[N, U](implicit nn: Numeric[N], us: UnitString[U]): UnitOps[N, U] =
       new UnitOps[N, U] {
         val n = nn
+        val ustr = us
       }
   }
 
@@ -857,6 +982,14 @@ object recursive {
 
       override def toString = s"Quantity($value)"
 
+      def show(implicit uo: UnitOps[N, U]): String = s"$value ${uo.ustr.abbv}"
+
+      def showFull(implicit uo: UnitOps[N, U]): String = s"$value ${uo.ustr.full}"
+
+      def showUnit(implicit uo: UnitOps[N, U]): String = uo.ustr.abbv
+
+      def showUnitFull(implicit uo: UnitOps[N, U]): String = uo.ustr.full
+
       def unary_-() (implicit uo: UnitOps[N, U]): Quantity[N, U] =
         new Quantity[N, U](uo.n.negate(value))
 
@@ -887,7 +1020,7 @@ object recursive {
   implicit val buSecond = BaseUnit[Second]()
 
   trait Minute
-  implicit val duMinute = DerivedUnit[Minute, Second](Rational(60))
+  implicit val duMinute = DerivedUnit[Minute, Second](Rational(60), abbv="min")
 
   trait Kilo
   implicit val defineUnitKilo = PrefixUnit[Kilo](Rational(1000))
