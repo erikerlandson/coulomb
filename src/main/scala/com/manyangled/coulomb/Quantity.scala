@@ -1008,6 +1008,24 @@ object recursive {
       def pow[P](implicit upo: UnitPowerOps[N, U, P], p: XIntValue[P]): Quantity[N, upo.PowRT] =
         new Quantity[N, upo.PowRT](upo.n.pow(value, p.value))
 
+      def ===[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Boolean =
+        ubo.n1.compare(value, ubo.cv21(rhs.value)) == 0
+
+      def =!=[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Boolean =
+        ubo.n1.compare(value, ubo.cv21(rhs.value)) != 0
+
+      def <[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Boolean =
+        ubo.n1.compare(value, ubo.cv21(rhs.value)) < 0
+
+      def <=[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Boolean =
+        ubo.n1.compare(value, ubo.cv21(rhs.value)) <= 0
+
+      def >[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Boolean =
+        ubo.n1.compare(value, ubo.cv21(rhs.value)) > 0
+
+      def >=[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Boolean =
+        ubo.n1.compare(value, ubo.cv21(rhs.value)) >= 0
+
       def toUnit[U2](implicit ubo: UnitBinaryOps[N, U, N, U2]): Quantity[N, U2] =
         new Quantity[N, U2](ubo.cv12(value))
 
@@ -1144,6 +1162,24 @@ object recursive {
 
     def -[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Temperature[N, U] =
       new Temperature[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
+
+    def ===[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+      ubo.n1.compare(value, ubo.cv21(rhs.value)) == 0
+
+    def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+      ubo.n1.compare(value, ubo.cv21(rhs.value)) != 0
+
+    def <[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+      ubo.n1.compare(value, ubo.cv21(rhs.value)) < 0
+
+    def <=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+      ubo.n1.compare(value, ubo.cv21(rhs.value)) <= 0
+
+    def >[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+      ubo.n1.compare(value, ubo.cv21(rhs.value)) > 0
+
+    def >=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+      ubo.n1.compare(value, ubo.cv21(rhs.value)) >= 0
 
     def toUnit[U2](implicit ubo: TempBinaryOps[N, U, N, U2]): Temperature[N, U2] =
       new Temperature[N, U2](ubo.cv12(value))
