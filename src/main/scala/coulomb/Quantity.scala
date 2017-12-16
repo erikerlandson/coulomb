@@ -30,76 +30,76 @@ import infra._
 
 import test._
 
-trait InsertKVMul[K, V, M] {
+trait InsertSigMul[K, V, M] {
   type Out
 }
-object InsertKVMul {
-  type Aux[K, V, M, O] = InsertKVMul[K, V, M] { type Out = O }
+object InsertSigMul {
+  type Aux[K, V, M, O] = InsertSigMul[K, V, M] { type Out = O }
 
   implicit def insert0[K, V]: Aux[K, V, HNil, (K, V) :: HNil] =
-    new InsertKVMul[K, V, HNil] { type Out = (K, V) :: HNil }
+    new InsertSigMul[K, V, HNil] { type Out = (K, V) :: HNil }
 
   implicit def insert1[K, V, V0, MT <: HList, P](implicit op: XIntAdd.Aux[V0, V, P], nz: P =:!= XInt0): Aux[K, V, (K, V0) :: MT, (K, P) :: MT] =
-    new InsertKVMul[K, V, (K, V0) :: MT] { type Out = (K, P) :: MT }
+    new InsertSigMul[K, V, (K, V0) :: MT] { type Out = (K, P) :: MT }
 
   implicit def insert1z[K, V, V0, MT <: HList](implicit op: XIntAdd.Aux[V0, V, XInt0]): Aux[K, V, (K, V0) :: MT, MT] =
-    new InsertKVMul[K, V, (K, V0) :: MT] { type Out = MT }
+    new InsertSigMul[K, V, (K, V0) :: MT] { type Out = MT }
 
   implicit def insert2[K, V, K0, V0, MT <: HList, O <: HList](implicit ne: K =:!= K0, rc: Aux[K, V, MT, O]): Aux[K, V, (K0, V0) :: MT, (K0, V0) :: O] =
-    new InsertKVMul[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
+    new InsertSigMul[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
 }
 
-trait InsertKVDiv[K, V, M] {
+trait InsertSigDiv[K, V, M] {
   type Out
 }
-object InsertKVDiv {
-  type Aux[K, V, M, O] = InsertKVDiv[K, V, M] { type Out = O }
+object InsertSigDiv {
+  type Aux[K, V, M, O] = InsertSigDiv[K, V, M] { type Out = O }
 
   implicit def insert0[K, V](implicit n: Negate[V]): Aux[K, V, HNil, (K, n.Out) :: HNil] =
-    new InsertKVDiv[K, V, HNil] { type Out = (K, n.Out) :: HNil }
+    new InsertSigDiv[K, V, HNil] { type Out = (K, n.Out) :: HNil }
 
   implicit def insert1[K, V, V0, MT <: HList, P](implicit op: XIntSub.Aux[V0, V, P], nz: P =:!= XInt0): Aux[K, V, (K, V0) :: MT, (K, P) :: MT] =
-    new InsertKVDiv[K, V, (K, V0) :: MT] { type Out = (K, P) :: MT }
+    new InsertSigDiv[K, V, (K, V0) :: MT] { type Out = (K, P) :: MT }
 
   implicit def insert1z[K, V, V0, MT <: HList](implicit op: XIntSub.Aux[V0, V, XInt0]): Aux[K, V, (K, V0) :: MT, MT] =
-    new InsertKVDiv[K, V, (K, V0) :: MT] { type Out = MT }
+    new InsertSigDiv[K, V, (K, V0) :: MT] { type Out = MT }
 
   implicit def insert2[K, V, K0, V0, MT <: HList, O <: HList](implicit ne: K =:!= K0, rc: Aux[K, V, MT, O]): Aux[K, V, (K0, V0) :: MT, (K0, V0) :: O] =
-    new InsertKVDiv[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
+    new InsertSigDiv[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
 }
 
-trait UnifyKVMul[M1, M2] {
+trait UnifySigMul[M1, M2] {
   type Out
 }
-object UnifyKVMul {
-  type Aux[M1, M2, O] = UnifyKVMul[M1, M2] { type Out = O }
+object UnifySigMul {
+  type Aux[M1, M2, O] = UnifySigMul[M1, M2] { type Out = O }
   implicit def unify0[M2]: Aux[HNil, M2, M2] =
-    new UnifyKVMul[HNil, M2] { type Out = M2 }
-  implicit def unify1[K, V, MT <: HList, M2, O, O2](implicit ui: InsertKVMul.Aux[K, V, M2, O], rc: Aux[MT, O, O2]): Aux[(K, V) :: MT, M2, O2] =
-    new UnifyKVMul[(K, V) :: MT, M2] { type Out = O2 }
+    new UnifySigMul[HNil, M2] { type Out = M2 }
+  implicit def unify1[K, V, MT <: HList, M2, O, O2](implicit ui: InsertSigMul.Aux[K, V, M2, O], rc: Aux[MT, O, O2]): Aux[(K, V) :: MT, M2, O2] =
+    new UnifySigMul[(K, V) :: MT, M2] { type Out = O2 }
 }
 
 // Note, this is like "M2 / M1" so careful with type argument order
-trait UnifyKVDiv[M1, M2] {
+trait UnifySigDiv[M1, M2] {
   type Out
 }
-object UnifyKVDiv {
-  type Aux[M1, M2, O] = UnifyKVDiv[M1, M2] { type Out = O }
+object UnifySigDiv {
+  type Aux[M1, M2, O] = UnifySigDiv[M1, M2] { type Out = O }
   implicit def unify0[M2]: Aux[HNil, M2, M2] =
-    new UnifyKVDiv[HNil, M2] { type Out = M2 }
-  implicit def unify1[K, V, MT <: HList, M2, O, O2](implicit ui: InsertKVDiv.Aux[K, V, M2, O], rc: Aux[MT, O, O2]): Aux[(K, V) :: MT, M2, O2] =
-    new UnifyKVDiv[(K, V) :: MT, M2] { type Out = O2 }
+    new UnifySigDiv[HNil, M2] { type Out = M2 }
+  implicit def unify1[K, V, MT <: HList, M2, O, O2](implicit ui: InsertSigDiv.Aux[K, V, M2, O], rc: Aux[MT, O, O2]): Aux[(K, V) :: MT, M2, O2] =
+    new UnifySigDiv[(K, V) :: MT, M2] { type Out = O2 }
 }
 
-trait ApplyKVPow[P, M] {
+trait ApplySigPow[P, M] {
   type Out
 }
-object ApplyKVPow {
-  type Aux[P, M, O] = ApplyKVPow[P, M] { type Out = O }
-  implicit def apply0[P](implicit nz: P =:!= XInt0): Aux[P, HNil, HNil] = new ApplyKVPow[P, HNil] { type Out = HNil }
+object ApplySigPow {
+  type Aux[P, M, O] = ApplySigPow[P, M] { type Out = O }
+  implicit def apply0[P](implicit nz: P =:!= XInt0): Aux[P, HNil, HNil] = new ApplySigPow[P, HNil] { type Out = HNil }
   implicit def apply1[P, K, V, MT <: HList, O <: HList, Q](implicit nz: P =:!= XInt0, rc: Aux[P, MT, O], op: XIntMul.Aux[V, P, Q]): Aux[P, (K, V) :: MT, (K, Q) :: O] =
-    new ApplyKVPow[P, (K, V) :: MT] { type Out = (K, Q) :: O }
-  implicit def apply1z[M]: Aux[XInt0, M, HNil] = new ApplyKVPow[XInt0, M] { type Out = HNil }
+    new ApplySigPow[P, (K, V) :: MT] { type Out = (K, Q) :: O }
+  implicit def apply1z[M]: Aux[XInt0, M, HNil] = new ApplySigPow[XInt0, M] { type Out = HNil }
 }
 
 trait UnitDefinition {
@@ -169,21 +169,21 @@ object CanonicalSig {
     }
   }
 
-  implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifyKVMul.Aux[LC, RC, OC]): Aux[%*[L, R], OC] = {
+  implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifySigMul.Aux[LC, RC, OC]): Aux[%*[L, R], OC] = {
     new CanonicalSig[%*[L, R]] {
       type Out = OC
       val coef = l.coef * r.coef
     }
   }
 
-  implicit def witnessDivCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifyKVDiv.Aux[RC, LC, OC]): Aux[%/[L, R], OC] = {
+  implicit def witnessDivCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifySigDiv.Aux[RC, LC, OC]): Aux[%/[L, R], OC] = {
     new CanonicalSig[%/[L, R]] {
       type Out = OC
       val coef = l.coef / r.coef
     }
   }
 
-  implicit def witnessPowCM[B, BC, E, OC](implicit b: Aux[B, BC], u: ApplyKVPow.Aux[E, BC, OC], e: singleton.ops.Id[E]): Aux[%^[B, E], OC] = {
+  implicit def witnessPowCM[B, BC, E, OC](implicit b: Aux[B, BC], u: ApplySigPow.Aux[E, BC, OC], e: singleton.ops.Id[E]): Aux[%^[B, E], OC] = {
     new CanonicalSig[%^[B, E]] {
       type Out = OC
       val coef = b.coef.pow(e.value.asInstanceOf[Int])
@@ -206,13 +206,13 @@ object StandardSig {
   implicit def witnessDerivedUnitCM[U](implicit du: DerivedUnit[U, _]): Aux[U, (U, XInt1) :: HNil] =
     new StandardSig[U] { type Out = (U, XInt1) :: HNil }
 
-  implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifyKVMul.Aux[LC, RC, OC]): Aux[%*[L, R], OC] =
+  implicit def witnessMulCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifySigMul.Aux[LC, RC, OC]): Aux[%*[L, R], OC] =
     new StandardSig[%*[L, R]] { type Out = OC }
 
-  implicit def witnessDivCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifyKVDiv.Aux[RC, LC, OC]): Aux[%/[L, R], OC] =
+  implicit def witnessDivCM[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifySigDiv.Aux[RC, LC, OC]): Aux[%/[L, R], OC] =
     new StandardSig[%/[L, R]] { type Out = OC }
 
-  implicit def witnessPowCM[B, BC, E, OC](implicit b: Aux[B, BC], u: ApplyKVPow.Aux[E, BC, OC], e: singleton.ops.Id[E]): Aux[%^[B, E], OC] =
+  implicit def witnessPowCM[B, BC, E, OC](implicit b: Aux[B, BC], u: ApplySigPow.Aux[E, BC, OC], e: singleton.ops.Id[E]): Aux[%^[B, E], OC] =
     new StandardSig[%^[B, E]] { type Out = OC }
 }
 
@@ -284,7 +284,7 @@ object MulResultType {
   implicit def result[LU, RU, OL, OR, OU, RT](implicit
     cnL: StandardSig.Aux[LU, OL],
     cnR: StandardSig.Aux[RU, OR],
-    mu: UnifyKVMul.Aux[OL, OR, OU],
+    mu: UnifySigMul.Aux[OL, OR, OU],
     rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
     new MulResultType[LU, RU] { type Out = RT }
 }
@@ -298,7 +298,7 @@ object DivResultType {
   implicit def result[LU, RU, OL, OR, OU, RT](implicit
       cnL: StandardSig.Aux[LU, OL],
       cnR: StandardSig.Aux[RU, OR],
-      mu: UnifyKVDiv.Aux[OR, OL, OU],
+      mu: UnifySigDiv.Aux[OR, OL, OU],
       rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
     new DivResultType[LU, RU] { type Out = RT }
 }
@@ -310,7 +310,7 @@ object PowResultType {
   type Aux[U, P, O] = PowResultType[U, P] { type Out = O }
   implicit def evidence[U, P, SS, AP, RT](implicit
       ss: StandardSig.Aux[U, SS],
-      ap: ApplyKVPow.Aux[P, SS, AP],
+      ap: ApplySigPow.Aux[P, SS, AP],
       rt: SigToUnit.Aux[AP, RT]): Aux[U, P, RT] =
     new PowResultType[U, P] { type Out = RT }
 }
