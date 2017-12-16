@@ -27,46 +27,11 @@ import shapeless.syntax.singleton._
 import singleton.ops._
 
 import infra._
+import define._
 
 import test._
 
-trait UnitDefinition {
-  def name: String
-  def abbv: String
-}
 
-class BaseUnit[U](val name: String, val abbv: String) extends UnitDefinition {
-  override def toString = s"BaseUnit($name, $abbv)"
-}
-object BaseUnit {
-  def apply[U](name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): BaseUnit[U] = {
-    val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
-    val a = if (abbv != "") abbv else n.take(1)
-    new BaseUnit[U](n, a)
-  }
-}
-
-class DerivedUnit[U, D](val coef: Rational, val name: String, val abbv: String) extends UnitDefinition {
-  override def toString = s"DerivedUnit($coef, $name, $abbv)"
-}
-object DerivedUnit {
-  def apply[U, D](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): DerivedUnit[U, D] = {
-    require(coef > 0, "Unit coefficients must be strictly > 0")
-    val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
-    val a = if (abbv != "") abbv else n.take(1)
-    new DerivedUnit[U, D](coef, n, a)
-  }
-}
-
-object PrefixUnit {
-  def apply[U](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): DerivedUnit[U, Unitless] =
-    DerivedUnit[U, Unitless](coef, name, abbv)
-}
-
-trait Unitless
-trait %*[L, R]
-trait %/[L, R]
-trait %^[B, E]
 
 trait CanonicalSig[U] {
   type Out
