@@ -32,32 +32,6 @@ import define._
 import test._
 
 
-class ConvertableUnits[U1, U2](val coef: Rational)
-
-object ConvertableUnits {
-  implicit def witnessCU[U1, U2, C1, C2](implicit u1: CanonicalSig.Aux[U1, C1], u2: CanonicalSig.Aux[U2, C2], eq: SetEqual.Aux[C1, C2, True]): ConvertableUnits[U1, U2] =
-    new ConvertableUnits[U1, U2](u1.coef / u2.coef)
-}
-
-trait Converter[N1, U1, N2, U2] {
-  def apply(v: N1): N2
-}
-trait ConverterDefaultPriority {
-  // This should be specialized for efficiency, however this rule would give an accurate conversion for any type
-  implicit def witness[N1, U1, N2, U2](implicit cu: ConvertableUnits[U1, U2], cfN1: Numeric[N1], ctN2: Numeric[N2]): Converter[N1, U1, N2, U2] =
-    new Converter[N1, U1, N2, U2] {
-      def apply(v: N1): N2 = ctN2.fromType[Rational](cfN1.toType[Rational](v) * cu.coef)
-    }
-}
-object Converter extends ConverterDefaultPriority {
-  implicit def witnessDouble[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Converter[Double, U1, Double, U2] = {
-    val coef = cu.coef.toDouble
-    new Converter[Double, U1, Double, U2] {
-      def apply(v: Double): Double = v * coef
-    }
-  }
-}
-
 trait UnitStringAST
 object UnitStringAST {
   case object Uni extends UnitStringAST
