@@ -24,29 +24,10 @@ def commonSettings = Seq(
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
 
 lazy val coulomb = (project in file("."))
-  .aggregate(unitexpr, macros)
-  .dependsOn(unitexpr, macros)
+  //.aggregate(unitexpr, macros)
+  //.dependsOn(unitexpr, macros)
   .settings(name := "coulomb")
   .settings(commonSettings :_*)
-
-lazy val macros = (project in file("macros"))
-  .dependsOn(unitexpr)
-  .settings(name := "coulomb-macros",
-            test := {},
-            testOnly := {})
-  .settings(commonSettings :_*)
-
-lazy val unitexpr = (project in file("unitexpr"))
-  .settings(name := "coulomb-unitexpr",
-            test := {},
-            testOnly := {})
-  .settings(commonSettings :_*)
-
-lazy val examples = (project in file("examples"))
-  .dependsOn(coulomb)
-  .settings(name := "coulomb-examples")
-  .settings(commonSettings :_*)
-  .settings(libraryDependencies += "com.typesafe" % "config" % "1.3.1")
 
 enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
