@@ -14,9 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package com.manyangled
-
-import scala.language.experimental.macros
+import spire.math._
 
 package object coulomb {
   /**
@@ -29,7 +27,7 @@ package object coulomb {
    * def f(v: Double WithUnit (Meter %/ Second)) = v * 60D.withUnit[Second]
    * }}}
    */
-  type WithUnit[N, U <: UnitExpr] = Quantity[N, U]
+  type WithUnit[N, U] = Quantity[N, U]
 
   /**
    * An "infix" type alias for [[Temperature]]
@@ -41,24 +39,17 @@ package object coulomb {
    * def f(t: Double WithTemperature Kelvin) = t + 100D.withUnit[Kelvin]
    * }}}
    */
-  type WithTemperature[N, U <: TemperatureExpr] = Temperature[N, U]
-
-  /** obtain the integer value of a ChurchInt type */
-  def churchToInt[N <: ChurchInt](implicit iv: ChurchIntValue[N]) = iv.value
+  type WithTemperature[N, U] = Temperature[N, U]
 
   /** enhances numeric types with utility methods for `coulomb` */
   implicit class CoulombExtendWithUnits[N](val v: N) extends AnyVal with Serializable {
-    /** create a new unit Quantity of type U with numeric value of `this` */
-    def withUnit[U <: UnitExpr](implicit num: spire.math.ConvertableTo[N]): Quantity[N, U] =
-      new Quantity[N, U](v)
+    /** create a new unit Quantity of type U with the value of `this` */
+    def withUnit[U]: Quantity[N, U] = new Quantity[N, U](v)
 
     /** create a new unit Temperature of type U with numeric value of `this` */
-    def withTemperature[U <: TemperatureExpr](implicit
-        num: spire.math.ConvertableTo[N]): Temperature[N, U] =
+    def withTemperature[U](implicit t2k: DerivedTemp[U]): Temperature[N, U] =
       new Temperature[N, U](v)
   }
 
-  /** implicit factory for standard Scala Ordering typeclass */
-  implicit def coulombQuantityIsOrdering[N, U <: UnitExpr]: Ordering[Quantity[N, U]] =
-    macro UnitMacros.orderingImpl[N, U]
+  def coefficient[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Rational = cu.coef
 }
