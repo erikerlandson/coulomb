@@ -17,6 +17,11 @@ limitations under the License.
 import spire.math._
 
 package object coulomb {
+  trait Unitless
+  trait %*[L, R]
+  trait %/[L, R]
+  trait %^[B, E]
+
   /**
    * An "infix" type alias for [[Quantity]]
    * @tparam N The numeric representation type of the quantity value
