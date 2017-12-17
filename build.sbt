@@ -23,7 +23,7 @@ def commonSettings = Seq(
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
 
-lazy val coulomb = (project in file("."))
+lazy val coulomb = (project in file("coulomb"))
   .settings(name := "coulomb")
   .settings(commonSettings :_*)
 
