@@ -1,6 +1,6 @@
 def commonSettings = Seq(
   organization := "com.manyangled",
-  version := "0.2.0",
+  version := "0.3.0-SNAPSHOT",
   scalaVersion := "2.12.3",
   //scalaOrganization := "org.typelevel",
   //scalaVersion := "2.12.4-bin-typelevel-4",
@@ -24,9 +24,13 @@ def commonSettings = Seq(
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
 
 lazy val coulomb = (project in file("."))
-  //.aggregate(unitexpr, macros)
-  //.dependsOn(unitexpr, macros)
   .settings(name := "coulomb")
+  .settings(commonSettings :_*)
+
+lazy val coulomb_si_units = (project in file("coulomb-si-units"))
+  .aggregate(coulomb)
+  .dependsOn(coulomb)
+  .settings(name := "coulomb-si-units")
   .settings(commonSettings :_*)
 
 enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
