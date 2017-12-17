@@ -91,29 +91,14 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 }
 
 object test {
-trait Meter
-implicit val buMeter = BaseUnit[Meter]()
-
 trait Yard
 implicit val defineUnitYard = DerivedUnit[Yard, Meter](Rational(9144, 10000), abbv = "yd")
 
 trait Foot
 implicit val defineUnitFoot = DerivedUnit[Foot, Yard](Rational(1, 3), abbv = "ft")
 
-trait Second
-implicit val buSecond = BaseUnit[Second]()
-
 trait Minute
 implicit val duMinute = DerivedUnit[Minute, Second](Rational(60), abbv="min")
-
-trait Kilo
-implicit val defineUnitKilo = PrefixUnit[Kilo](Rational(1000))
-
-trait Mega
-implicit val defineUnitMega = PrefixUnit[Mega](Rational(10).pow(6))
-
-trait Kelvin
-implicit val defineUnitKelvin = BaseUnit[Kelvin](name = "Kelvin", abbv = "K")
 
 trait Celsius
 implicit val defineUnitCelsius = DerivedTemp[Celsius](coef = 1, off = Rational(27315, 100), name = "Celsius", abbv = "C")
