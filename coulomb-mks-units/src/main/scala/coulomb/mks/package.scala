@@ -16,8 +16,6 @@ limitations under the License.
 
 package coulomb
 
-import spire.math._
-
 import singleton.ops._
 
 import coulomb.define._
