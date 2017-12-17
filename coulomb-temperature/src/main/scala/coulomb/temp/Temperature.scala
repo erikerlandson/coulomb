@@ -14,13 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package coulomb
+package coulomb.temp
 
 import scala.language.implicitConversions
 
-import infra._
-import define._
-import unitops._
+import coulomb._
+import coulomb.unitops._
 
 class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Serializable {
   override def toString = s"Temperature($value)"
