@@ -39,6 +39,12 @@ lazy val coulomb_temperature = (project in file("coulomb-temperature"))
   .settings(name := "coulomb-temperature")
   .settings(commonSettings :_*)
 
+lazy val coulomb_mks_units = (project in file("coulomb-mks-units"))
+  .aggregate(coulomb, coulomb_si_units)
+  .dependsOn(coulomb, coulomb_si_units)
+  .settings(name := "coulomb-mks-units")
+  .settings(commonSettings :_*)
+
 enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
 siteSubdirName in ScalaUnidoc := "latest/api"
