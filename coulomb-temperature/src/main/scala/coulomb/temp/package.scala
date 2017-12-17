@@ -16,9 +16,9 @@ limitations under the License.
 
 package coulomb
 
-import define._
+import coulomb.define._
 
-object tempsyntax {
+package object temp {
   type WithTemperature[N, U] = Temperature[N, U]
 
   /** enhances numeric types with utility methods for `coulomb` */
