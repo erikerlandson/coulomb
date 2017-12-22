@@ -27,7 +27,7 @@ class DerivedTemp[U](coef: Rational, val off: Rational, name: String, abbv: Stri
 }
 
 object DerivedTemp {
-  def apply[U](coef: Rational = Rational(1), off: Rational = Rational(0), name: String, abbv: String)(implicit
+  def apply[U](coef: Rational = Rational(1), off: Rational = Rational(0), name: String = "", abbv: String = "")(implicit
     ut: TypeTag[U]): DerivedTemp[U] = new DerivedTemp[U](coef, off, name, abbv)
 
   // A slight hack that is used by TempConverter to simplify its rules
