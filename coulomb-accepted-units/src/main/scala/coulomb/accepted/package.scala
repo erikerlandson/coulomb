@@ -24,9 +24,6 @@ import coulomb.define._
 import coulomb.si._
 
 package object accepted {
-  trait Celsius
-  implicit val defineUnitCelsius = DerivedTemp[Celsius](off = Rational(27315, 100), abbv = "°C")
-
   trait Percent
   implicit val defineUnitPercent = DerivedUnit[Percent, Unitless](Rational(1, 100), abbv = "%")
 
