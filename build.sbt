@@ -33,10 +33,10 @@ lazy val coulomb_si_units = (project in file("coulomb-si-units"))
   .settings(name := "coulomb-si-units")
   .settings(commonSettings :_*)
 
-lazy val coulomb_temperature = (project in file("coulomb-temperature"))
+lazy val coulomb_temp_units = (project in file("coulomb-temp-units"))
   .aggregate(coulomb, coulomb_si_units)
   .dependsOn(coulomb, coulomb_si_units)
-  .settings(name := "coulomb-temperature")
+  .settings(name := "coulomb-temp-units")
   .settings(commonSettings :_*)
 
 lazy val coulomb_mks_units = (project in file("coulomb-mks-units"))
@@ -46,8 +46,8 @@ lazy val coulomb_mks_units = (project in file("coulomb-mks-units"))
   .settings(commonSettings :_*)
 
 lazy val coulomb_accepted_units = (project in file("coulomb-accepted-units"))
-  .aggregate(coulomb, coulomb_si_units, coulomb_temperature)
-  .dependsOn(coulomb, coulomb_si_units, coulomb_temperature)
+  .aggregate(coulomb, coulomb_si_units)
+  .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-accepted-units")
   .settings(commonSettings :_*)
 

@@ -16,6 +16,8 @@ limitations under the License.
 
 package coulomb
 
+import spire.math._
+
 import coulomb.define._
 
 package object temp {
