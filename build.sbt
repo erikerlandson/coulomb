@@ -57,6 +57,12 @@ lazy val coulomb_time_units = (project in file("coulomb-time-units"))
   .settings(name := "coulomb-time-units")
   .settings(commonSettings :_*)
 
+lazy val coulomb_info_units = (project in file("coulomb-info-units"))
+  .aggregate(coulomb, coulomb_si_units)
+  .dependsOn(coulomb, coulomb_si_units)
+  .settings(name := "coulomb-info-units")
+  .settings(commonSettings :_*)
+
 enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
 siteSubdirName in ScalaUnidoc := "latest/api"
