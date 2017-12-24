@@ -27,4 +27,10 @@ package object temp {
     def withTemperature[U](implicit t2k: DerivedTemp[U]): Temperature[N, U] =
       new Temperature[N, U](v)
   }
+
+  trait Celsius
+  implicit val defineUnitCelsius = DerivedTemp[Celsius](off = Rational(27315, 100), abbv = "°C")
+
+  trait Fahrenheit
+  implicit val defineUnitFahrenheit = DerivedTemp[Fahrenheit](Rational(5, 9), Rational(45967, 100), "°F")
 }
