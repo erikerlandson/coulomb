@@ -1,4 +1,4 @@
-package com.manyangled.coulomb
+package coulomb
 
 import scala.reflect.runtime.universe._
 
@@ -8,6 +8,8 @@ import org.scalatest.matchers.{Matcher, MatchResult}
 import TripleEquals._
 
 import spire.math._
+
+import coulomb.temp._
 
 object matchers {
   val epsilon = 1e-4
@@ -100,15 +102,15 @@ object matchers {
   case class QTuple(q: Any, tN: Type, tU: Type)
   case class TTuple(t: Any, tN: Type, tU: Type)
 
-  implicit class WithQTupMethod[N :TypeTag, U <: UnitExpr :TypeTag](q: Quantity[N, U]) {
+  implicit class WithQTupMethod[N :TypeTag, U :TypeTag](q: Quantity[N, U]) {
     def qtup = QTuple(q, typeOf[N], typeOf[U])
   }
 
-  implicit class WithTTupMethod[N :TypeTag, U <: TemperatureExpr :TypeTag](t: Temperature[N, U]) {
+  implicit class WithTTupMethod[N :TypeTag, U :TypeTag](t: Temperature[N, U]) {
     def ttup = TTuple(t, typeOf[N], typeOf[U])
   }
 
-  def beQ[N :TypeTag, U <: UnitExpr :TypeTag](tval: Double, f: Int = 1)(implicit
+  def beQ[N :TypeTag, U :TypeTag](tval: Double, f: Int = 1)(implicit
       teq: org.scalactic.Equality[N],
       tct: spire.math.ConvertableTo[N]) =
     Matcher { qtuple: QTuple =>
@@ -129,7 +131,7 @@ object matchers {
       MatchResult(t, msg, "Expected Quantity type and value")
     }
 
-  def beT[N :TypeTag, U <: TemperatureExpr :TypeTag](tval: Double, f: Int = 1)(implicit
+  def beT[N :TypeTag, U :TypeTag](tval: Double, f: Int = 1)(implicit
       teq: org.scalactic.Equality[N],
       tct: spire.math.ConvertableTo[N]) =
     Matcher { ttuple: TTuple =>
@@ -150,7 +152,7 @@ object matchers {
       MatchResult(t, msg, "Expected Temperature type and value")
     }
 
-  def beQXI[N :TypeTag, U <: UnitExpr :TypeTag](tval: Int)(implicit
+  def beQXI[N :TypeTag, U :TypeTag](tval: Int)(implicit
       tcf: spire.math.ConvertableFrom[N]) =
     Matcher { qtuple: QTuple =>
       val QTuple(qA, tN, tU) = qtuple
@@ -175,7 +177,7 @@ object matchers {
       MatchResult(t, msg, "Expected Quantity type and value")
     }
 
-  def beTXI[N :TypeTag, U <: TemperatureExpr :TypeTag](tval: Int)(implicit
+  def beTXI[N :TypeTag, U :TypeTag](tval: Int)(implicit
       tcf: spire.math.ConvertableFrom[N]) =
     Matcher { ttuple: TTuple =>
       val TTuple(qA, tN, tU) = ttuple
