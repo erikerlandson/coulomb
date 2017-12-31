@@ -5,24 +5,29 @@ import org.scalactic._
 import org.scalatest.matchers.{Matcher, MatchResult}
 import TripleEquals._
 
-/*
-import ChurchInt._
-import SIBaseUnits._
-import SIPrefixes._
-import USCustomaryUnits._
-import SIAcceptedUnits._
-*/
-
 import spire.math._
 
-import matchers._
+import coulomb.si._
+import coulomb.siprefix._
+import coulomb.mks._
+import coulomb.accepted._
+import coulomb.time._
+import coulomb.info._
+import coulomb.binprefix._
+import coulomb.us._
+import coulomb.temp._
+
+import org.scalatest.QMatchers._
 
 class QuantitySpec extends FlatSpec with Matchers {
-/*
   it should "allocate a Quantity" in {
     val q = new Quantity[Double, Meter](1.0)
-    q.qtup should beQ[Double, Meter](1)
+    q shouldBeQ[Double, Meter](1.0)
+    //q shouldBeQ[Double, Foot](1.0)
+    //q shouldBeQ[Int, Meter](1.0)
+    //q shouldBeQ[Double, Meter](1.1)
   }
+/*
 
   it should "define the Standard International Base Units" in {
     val m = Meter(1D)

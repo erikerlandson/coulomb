@@ -1,17 +1,21 @@
-package coulomb
+package org.scalatest
 
 import scala.reflect.runtime.universe._
+import scala.language.implicitConversions
 
 import org.scalatest._
 import org.scalactic._
-import org.scalatest.matchers.{Matcher, MatchResult}
 import TripleEquals._
+import MatchersHelper.indicateFailure
+import MatchersHelper.indicateSuccess
 
 import spire.math._
 
+import coulomb._
 import coulomb.temp._
 
-object matchers {
+object QMatchers {
+
   val epsilon = 1e-4
 
   implicit val byteTolerant = new org.scalactic.Equality[Byte] {
@@ -99,17 +103,38 @@ object matchers {
     }
   }
 
-  case class QTuple(q: Any, tN: Type, tU: Type)
-  case class TTuple(t: Any, tN: Type, tU: Type)
-
-  implicit class WithQTupMethod[N :TypeTag, U :TypeTag](q: Quantity[N, U]) {
-    def qtup = QTuple(q, typeOf[N], typeOf[U])
+  implicit class WithQuantityShouldMethods[N, U](q: Quantity[N, U])(implicit
+      ttN: TypeTag[N],
+      ttU: TypeTag[U],
+      prettifier: Prettifier,
+      pos: source.Position) {
+    def shouldBeQ[NR, UR](tval: Double, f: Int = 1)(implicit
+        ttNR: TypeTag[NR],
+        ttUR: TypeTag[UR],
+        teq: org.scalactic.Equality[N],
+        tct: spire.math.ConvertableTo[N]): Assertion = {
+      val (passed, msg) = (typeOf[N], typeOf[U]) match {
+        case (tn, _) if (!(tn =:= typeOf[NR])) =>
+          (false, s"Numeric type $tn did not match target ${typeOf[NR]}")
+        case (_, tu) if (!(tu =:= typeOf[UR])) =>
+          (false, s"Unit type $tu did not match target ${typeOf[UR]}")
+        case _ => {
+          //val q = qA.asInstanceOf[Quantity[N, U]]
+          val tv: N = if (f == 1) tct.fromDouble(tval) else tct.fromInt((tval * f.toDouble).toInt)
+          if (teq.areEqual(q.value, tv)) (true, "") else {
+            (false, s"Value ${q.value} did not match target $tv")
+          }
+        }        
+      }
+      if (passed) {
+        indicateSuccess(true, s"Quantity test passed", "")
+      } else {
+        indicateFailure(msg, None, pos)
+      }
+    }
   }
 
-  implicit class WithTTupMethod[N :TypeTag, U :TypeTag](t: Temperature[N, U]) {
-    def ttup = TTuple(t, typeOf[N], typeOf[U])
-  }
-
+/*
   def beQ[N :TypeTag, U :TypeTag](tval: Double, f: Int = 1)(implicit
       teq: org.scalactic.Equality[N],
       tct: spire.math.ConvertableTo[N]) =
@@ -201,4 +226,5 @@ object matchers {
       }
       MatchResult(t, msg, "Expected Temperature type and value")
     }
+*/
 }
