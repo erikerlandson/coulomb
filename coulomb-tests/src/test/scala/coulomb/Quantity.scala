@@ -23,9 +23,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   it should "allocate a Quantity" in {
     val q = new Quantity[Double, Meter](1.0)
     q shouldBeQ[Double, Meter](1.0)
-    //q shouldBeQ[Double, Foot](1.0)
-    //q shouldBeQ[Int, Meter](1.0)
-    //q shouldBeQ[Double, Meter](1.1)
   }
 /*
 
