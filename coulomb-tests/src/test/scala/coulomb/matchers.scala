@@ -92,39 +92,35 @@ object QMatchers {
     }
   }
 
-  implicit class WithHasType[T :TypeTag](t: T) {
-    val tt = typeOf[T]
-    def hasType[U :TypeTag]: Boolean = {
-      val ut = typeOf[U]
-      if (tt =:= ut) true else {
-        println(s"\n$tt =!= $ut\n")
-        false
-      }
-    }
-  }
-
   implicit class WithQuantityShouldMethods[N, U](q: Quantity[N, U])(implicit
       ttN: TypeTag[N],
       ttU: TypeTag[U],
+      numN: Numeric[N],
       prettifier: Prettifier,
       pos: source.Position) {
-    def shouldBeQ[NR, UR](tval: Double, f: Int = 1)(implicit
+
+    def shouldBeQ[NR, UR](tval: Double, f: Int = 1, tolerant: Boolean = true)(implicit
         ttNR: TypeTag[NR],
         ttUR: TypeTag[UR],
-        teq: org.scalactic.Equality[N],
-        tct: spire.math.ConvertableTo[N]): Assertion = {
+        teq: org.scalactic.Equality[NR],
+        num: spire.math.Numeric[NR]): Assertion = {
       val (passed, msg) = (typeOf[N], typeOf[U]) match {
         case (tn, _) if (!(tn =:= typeOf[NR])) =>
           (false, s"Numeric type $tn did not match target ${typeOf[NR]}")
         case (_, tu) if (!(tu =:= typeOf[UR])) =>
           (false, s"Unit type $tu did not match target ${typeOf[UR]}")
         case _ => {
-          //val q = qA.asInstanceOf[Quantity[N, U]]
-          val tv: N = if (f == 1) tct.fromDouble(tval) else tct.fromInt((tval * f.toDouble).toInt)
-          if (teq.areEqual(q.value, tv)) (true, "") else {
-            (false, s"Value ${q.value} did not match target $tv")
+          val tv: NR = if (f == 1) num.fromDouble(tval) else num.fromInt((tval * f.toDouble).toInt)
+          if (tolerant) {
+            if (teq.areEqual(tv, q.value)) (true, "") else {
+              (false, s"Value ${q.value} did not match target $tv")
+            }
+          } else {
+            if (num.compare(tv, num.fromType[N](q.value)) == 0) (true, "") else {
+              (false, s"Value ${q.value} did not match target $tv")
+            }
           }
-        }        
+        }
       }
       if (passed) {
         indicateSuccess(true, s"Quantity test passed", "")
