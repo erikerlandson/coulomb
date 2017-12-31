@@ -89,3 +89,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
   def to[N2, U2](implicit ubo: UnitBinaryOps[N, U, N2, U2]): Quantity[N2, U2] =
     new Quantity[N2, U2](ubo.cv12(value))
 }
+
+object Quantity {
+  def apply[N, U](v: N) = new Quantity[N, U](v)
+}
