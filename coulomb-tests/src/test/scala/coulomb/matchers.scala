@@ -111,15 +111,9 @@ object QMatchers {
           (false, s"Unit type $tu did not match target ${typeOf[UR]}")
         case _ => {
           val tv: NR = if (f == 1) num.fromDouble(tval) else num.fromInt((tval * f.toDouble).toInt)
-          if (tolerant) {
-            if (teq.areEqual(tv, q.value)) (true, "") else {
-              (false, s"Value ${q.value} did not match target $tv")
-            }
-          } else {
-            if (num.compare(tv, num.fromType[N](q.value)) == 0) (true, "") else {
-              (false, s"Value ${q.value} did not match target $tv")
-            }
-          }
+          val eq =
+            if (tolerant) teq.areEqual(tv, q.value) else (num.compare(tv, num.fromType[N](q.value)) == 0)
+          if (eq) (true, "") else (false, s"Value ${q.value} did not match target $tv")
         }
       }
       if (passed) {
@@ -129,98 +123,4 @@ object QMatchers {
       }
     }
   }
-
-/*
-  def beQ[N :TypeTag, U :TypeTag](tval: Double, f: Int = 1)(implicit
-      teq: org.scalactic.Equality[N],
-      tct: spire.math.ConvertableTo[N]) =
-    Matcher { qtuple: QTuple =>
-      val QTuple(qA, tN, tU) = qtuple
-      val (t, msg) = (tN, tU) match {
-        case (tn, _) if (!(tn =:= typeOf[N])) =>
-          (false, s"Representation type $tn did not match target ${typeOf[N]}")
-        case (_, tu) if (!(tu =:= typeOf[U])) =>
-          (false, s"Unit type $tu did not match target ${typeOf[U]}")
-        case _ => {
-          val q = qA.asInstanceOf[Quantity[N, U]]
-          val tv: N = if (f == 1) tct.fromDouble(tval) else tct.fromInt((tval * f.toDouble).toInt)
-          if (teq.areEqual(q.value, tv)) (true, "") else {
-            (false, s"Value ${q.value} did not match target $tv")
-          }
-        }
-      }
-      MatchResult(t, msg, "Expected Quantity type and value")
-    }
-
-  def beT[N :TypeTag, U :TypeTag](tval: Double, f: Int = 1)(implicit
-      teq: org.scalactic.Equality[N],
-      tct: spire.math.ConvertableTo[N]) =
-    Matcher { ttuple: TTuple =>
-      val TTuple(qA, tN, tU) = ttuple
-      val (t, msg) = (tN, tU) match {
-        case (tn, _) if (!(tn =:= typeOf[N])) =>
-          (false, s"Representation type $tn did not match target ${typeOf[N]}")
-        case (_, tu) if (!(tu =:= typeOf[U])) =>
-          (false, s"Unit type $tu did not match target ${typeOf[U]}")
-        case _ => {
-          val q = qA.asInstanceOf[Temperature[N, U]]
-          val tv: N = if (f == 1) tct.fromDouble(tval) else tct.fromInt((tval * f.toDouble).toInt)
-          if (teq.areEqual(q.value, tv)) (true, "") else {
-            (false, s"Value ${q.value} did not match target $tv")
-          }
-        }
-      }
-      MatchResult(t, msg, "Expected Temperature type and value")
-    }
-
-  def beQXI[N :TypeTag, U :TypeTag](tval: Int)(implicit
-      tcf: spire.math.ConvertableFrom[N]) =
-    Matcher { qtuple: QTuple =>
-      val QTuple(qA, tN, tU) = qtuple
-      val (t, msg) = (tN, tU) match {
-        case (tn, _) if (!(tn =:= typeOf[N])) =>
-          (false, s"Representation type $tn did not match target ${typeOf[N]}")
-        case (_, tu) if (!(tu =:= typeOf[U])) =>
-          (false, s"Unit type $tu did not match target ${typeOf[U]}")
-        case (tn, _) if (
-          !(tn =:= typeOf[Byte]) &&
-          !(tn =:= typeOf[Short]) &&
-          !(tn =:= typeOf[Int]) &&
-          !(tn =:= typeOf[Long]) &&
-          !(tn =:= typeOf[BigInt])) => (false, s"unrecognized integral type $tn")
-        case _ => {
-          val q = qA.asInstanceOf[Quantity[N, U]]
-          if (tcf.toInt(q.value) == tval) (true, "") else {
-            (false, s"Value ${q.value} did not match target $tval")
-          }
-        }
-      }
-      MatchResult(t, msg, "Expected Quantity type and value")
-    }
-
-  def beTXI[N :TypeTag, U :TypeTag](tval: Int)(implicit
-      tcf: spire.math.ConvertableFrom[N]) =
-    Matcher { ttuple: TTuple =>
-      val TTuple(qA, tN, tU) = ttuple
-      val (t, msg) = (tN, tU) match {
-        case (tn, _) if (!(tn =:= typeOf[N])) =>
-          (false, s"Representation type $tn did not match target ${typeOf[N]}")
-        case (_, tu) if (!(tu =:= typeOf[U])) =>
-          (false, s"Unit type $tu did not match target ${typeOf[U]}")
-        case (tn, _) if (
-          !(tn =:= typeOf[Byte]) &&
-          !(tn =:= typeOf[Short]) &&
-          !(tn =:= typeOf[Int]) &&
-          !(tn =:= typeOf[Long]) &&
-          !(tn =:= typeOf[BigInt])) => (false, s"unrecognized integral type $tn")
-        case _ => {
-          val q = qA.asInstanceOf[Temperature[N, U]]
-          if (tcf.toInt(q.value) == tval) (true, "") else {
-            (false, s"Value ${q.value} did not match target $tval")
-          }
-        }
-      }
-      MatchResult(t, msg, "Expected Temperature type and value")
-    }
-*/
 }
