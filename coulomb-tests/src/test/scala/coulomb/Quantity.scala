@@ -131,39 +131,26 @@ class QuantitySpec extends FlatSpec with Matchers {
     (1D.withUnit[Cup] + 1D.withUnit[Cup]) shouldBeQ[Double, Cup](2.0)
   }
 
-/*
   it should "implement -" in {
     val inchToCentimeter = 2.54 // Rational(127 / 50)
 
-    (Centimeter(100.toByte) - Inch(10.toByte)) shouldBeQ[Byte, Centimeter](10.0 - inchToCentimeter, 10)
-    (Centimeter(1000.toShort) - Inch(100.toShort)) shouldBeQ[Short, Centimeter](
-      10.0 - inchToCentimeter, 100)
-    (Centimeter(1000) - Inch(100)) shouldBeQ[Int, Centimeter](10.0 - inchToCentimeter, 100)
-    (Centimeter(1000L) - Inch(100L)) shouldBeQ[Long, Centimeter](10.0 - inchToCentimeter, 100)
-    (Centimeter(BigInt(1000)) - Inch(BigInt(100))) shouldBeQ[BigInt, Centimeter](
-      10.0 - inchToCentimeter, 100)
+    (1000.withUnit[Centimeter] - 100.withUnit[Inch]) shouldBeQ[Int, Centimeter](10.0 - inchToCentimeter, 100)
+    (1000L.withUnit[Centimeter] - 100L.withUnit[Inch]) shouldBeQ[Long, Centimeter](10.0 - inchToCentimeter, 100)
 
-    (Centimeter(10f) - Inch(1f)) shouldBeQ[Float, Centimeter](10.0 - inchToCentimeter)
-    (Centimeter(10D) - Inch(1D)) shouldBeQ[Double, Centimeter](10.0 - inchToCentimeter)
-    (Centimeter(BigDecimal(10)) - Inch(BigDecimal(1))) shouldBeQ[BigDecimal, Centimeter](
-      10.0 - inchToCentimeter)
-    (Centimeter(Rational(10)) - Inch(Rational(1))) shouldBeQ[Rational, Centimeter](
-      10.0 - inchToCentimeter)
-    (Centimeter(Algebraic(10)) - Inch(Algebraic(1))) shouldBeQ[Algebraic, Centimeter](
-      10.0 - inchToCentimeter)
-    (Centimeter(Real(10)) - Inch(Real(1))) shouldBeQ[Real, Centimeter](10.0 - inchToCentimeter)
-    (Centimeter(Number(10)) - Inch(Number(1))) shouldBeQ[Number, Centimeter](10.0 - inchToCentimeter)
+    (10f.withUnit[Centimeter] - 1f.withUnit[Inch]) shouldBeQ[Float, Centimeter](10.0 - inchToCentimeter)
+    (10D.withUnit[Centimeter] - 1D.withUnit[Inch]) shouldBeQ[Double, Centimeter](10.0 - inchToCentimeter)
   }
 
   it should "implement - optimization cases" in {
     // numerator only conversion
-    (Inch(13) - Foot(1)) shouldBeQXI[Int, Inch](1)
+    (13.withUnit[Inch] - 1.withUnit[Foot]) shouldBeQ[Int, Inch](1, tolerant = false)
 
     // identity
-    (Inch(2) - Inch(1)) shouldBeQXI[Int, Inch](1)
-    (Inch(2.0) - Inch(1.0)) shouldBeQ[Double, Inch](1)
+    (2.withUnit[Inch] - 1.withUnit[Inch]) shouldBeQ[Int, Inch](1, tolerant = false)
+    (2D.withUnit[Inch] - 1D.withUnit[Inch]) shouldBeQ[Double, Inch](1)
   }
 
+/*
   it should "implement *" in {
     (Acre(2.toByte) * Foot(3.toByte)) shouldBeQXI[Byte, Acre %* Foot](6)
     (Acre(2.toShort) * Foot(3.toShort)) shouldBeQXI[Short, Acre %* Foot](6)
