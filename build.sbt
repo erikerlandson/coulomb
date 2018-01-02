@@ -20,6 +20,7 @@ def commonSettings = Seq(
     "org.scalatest" %% "scalatest" % "3.0.1" % Test
   ),
   //addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
+  //scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xlog-implicits"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
 
