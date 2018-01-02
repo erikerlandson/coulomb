@@ -112,34 +112,26 @@ class QuantitySpec extends FlatSpec with Matchers {
     -(1.withUnit[Kilogram %/ Mole]) shouldBeQ[Int, Kilogram %/ Mole](-1, tolerant = false)
   }
 
-/*
   it should "implement +" in {
     val literToCup = 4.22675283773 // Rational(2000000000 / 473176473)
 
-    // Full rational numerator multiplication overflows smaller integers.
-    // todo: investigate heuristics on smaller rationals
-    // see: https://github.com/erikerlandson/coulomb/issues/15
-    (Cup(100L) + Liter(100L)) shouldBeQ[Long, Cup](1.0 + literToCup, 100)
-    (Cup(BigInt(100)) + Liter(BigInt(100))) shouldBeQ[BigInt, Cup](1.0 + literToCup, 100)
+    (100.withUnit[Cup] + 100.withUnit[Liter]) shouldBeQ[Int, Cup](1.0 + literToCup, 100)
+    (100L.withUnit[Cup] + 100L.withUnit[Liter]) shouldBeQ[Long, Cup](1.0 + literToCup, 100)
 
-    (Cup(1f) + Liter(1f)) shouldBeQ[Float, Cup](1.0 + literToCup)
-    (Cup(1D) + Liter(1D)) shouldBeQ[Double, Cup](1.0 + literToCup)
-    (Cup(BigDecimal(1)) + Liter(BigDecimal(1))) shouldBeQ[BigDecimal, Cup](1.0 + literToCup)
-    (Cup(Rational(1)) + Liter(Rational(1))) shouldBeQ[Rational, Cup](1.0 + literToCup)
-    (Cup(Algebraic(1)) + Liter(Algebraic(1))) shouldBeQ[Algebraic, Cup](1.0 + literToCup)
-    (Cup(Real(1)) + Liter(Real(1))) shouldBeQ[Real, Cup](1.0 + literToCup)
-    (Cup(Number(1)) + Liter(Number(1))) shouldBeQ[Number, Cup](1.0 + literToCup)
+    (1f.withUnit[Cup] + 1f.withUnit[Liter]) shouldBeQ[Float, Cup](1.0 + literToCup)
+    (1D.withUnit[Cup] + 1D.withUnit[Liter]) shouldBeQ[Double, Cup](1.0 + literToCup)
   }
 
   it should "implement + optimization cases" in {
     // numerator only conversion
-    (Cup(1) + Quart(1)) shouldBeQXI[Int, Cup](5)
+    (1.withUnit[Cup] + 1.withUnit[Quart]) shouldBeQ[Int, Cup](5, tolerant = false)
 
     // identity
-    (Cup(1) + Cup(1)) shouldBeQXI[Int, Cup](2)
-    (Cup(1.0) + Cup(1.0)) shouldBeQ[Double, Cup](2.0)
+    (1.withUnit[Cup] + 1.withUnit[Cup]) shouldBeQ[Int, Cup](2, tolerant = false)
+    (1D.withUnit[Cup] + 1D.withUnit[Cup]) shouldBeQ[Double, Cup](2.0)
   }
 
+/*
   it should "implement -" in {
     val inchToCentimeter = 2.54 // Rational(127 / 50)
 
