@@ -68,24 +68,3 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
   def to[N2, U2](implicit ubo: TempConverterOps[N, U, N2, U2]): Temperature[N2, U2] =
     new Temperature[N2, U2](ubo.cv12(value))
 }
-
-object test {
-import coulomb.si._
-import spire.math._
-import coulomb.define._
-
-trait Yard
-implicit val defineUnitYard = DerivedUnit[Yard, Meter](Rational(9144, 10000), abbv = "yd")
-
-trait Foot
-implicit val defineUnitFoot = DerivedUnit[Foot, Yard](Rational(1, 3), abbv = "ft")
-
-trait Minute
-implicit val duMinute = DerivedUnit[Minute, Second](Rational(60), abbv="min")
-
-trait Celsius
-implicit val defineUnitCelsius = DerivedTemp[Celsius](coef = 1, off = Rational(27315, 100), name = "Celsius", abbv = "C")
-
-trait Fahrenheit
-implicit val defineUnitFahrenheit = DerivedTemp[Fahrenheit](coef = Rational(5, 9), off = Rational(45967, 100), name = "Fahrenheit", abbv = "F")
-}
