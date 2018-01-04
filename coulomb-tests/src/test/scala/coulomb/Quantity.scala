@@ -163,23 +163,15 @@ class QuantitySpec extends FlatSpec with Matchers {
     (2D.withUnit[Mole %/ Liter] * 2D.withUnit[Liter %/ Second] * 2D.withUnit[Second]) shouldBeQ[Double, Mole](8)
   }
 
-/*
   it should "implement /" in {
-    (Meter(10.toByte) / Second(3.toByte)) shouldBeQXI[Byte, Meter %/ Second](3)
-    (Meter(10.toShort) / Second(3.toShort)) shouldBeQXI[Short, Meter %/ Second](3)
-    (Meter(10) / Second(3)) shouldBeQXI[Int, Meter %/ Second](3)
-    (Meter(10L) / Second(3L)) shouldBeQXI[Long, Meter %/ Second](3)
-    (Meter(BigInt(10)) / Second(BigInt(3))) shouldBeQXI[BigInt, Meter %/ Second](3)
+    (10.withUnit[Meter] / 3.withUnit[Second]) shouldBeQ[Int, Meter %/ Second](3, tolerant = false)
+    (10L.withUnit[Meter] / 3L.withUnit[Second]) shouldBeQ[Long, Meter %/ Second](3, tolerant = false)
 
-    (Meter(10f) / Second(3f)) shouldBeQ[Float, Meter %/ Second](3.33333)
-    (Meter(10D) / Second(3D)) shouldBeQ[Double, Meter %/ Second](3.33333)
-    (Meter(BigDecimal(10)) / Second(BigDecimal(3))) shouldBeQ[BigDecimal, Meter %/ Second](3.33333)
-    (Meter(Rational(10)) / Second(Rational(3))) shouldBeQ[Rational, Meter %/ Second](3.33333)
-    (Meter(Algebraic(10)) / Second(Algebraic(3))) shouldBeQ[Algebraic, Meter %/ Second](3.33333)
-    (Meter(Real(10)) / Second(Real(3))) shouldBeQ[Real, Meter %/ Second](3.33333)
-    (Meter(Number(10)) / Second(Number(3))) shouldBeQ[Number, Meter %/ Second](3.33333)
+    (10f.withUnit[Meter] / 3f.withUnit[Second]) shouldBeQ[Float, Meter %/ Second](3.3333)
+    (10D.withUnit[Meter] / 3D.withUnit[Second]) shouldBeQ[Double, Meter %/ Second](3.3333)
   }
 
+/*
   it should "implement pow" in {
     Meter(3.toByte).pow[_2] shouldBeQXI[Byte, Meter %^ _2](9)
     Meter(3.toShort).pow[_2] shouldBeQXI[Short, Meter %^ _2](9)
