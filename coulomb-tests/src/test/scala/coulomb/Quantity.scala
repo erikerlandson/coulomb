@@ -150,29 +150,20 @@ class QuantitySpec extends FlatSpec with Matchers {
     (2D.withUnit[Inch] - 1D.withUnit[Inch]) shouldBeQ[Double, Inch](1)
   }
 
-/*
   it should "implement *" in {
-    (Acre(2.toByte) * Foot(3.toByte)) shouldBeQXI[Byte, Acre %* Foot](6)
-    (Acre(2.toShort) * Foot(3.toShort)) shouldBeQXI[Short, Acre %* Foot](6)
-    (Acre(2) * Foot(3)) shouldBeQXI[Int, Acre %* Foot](6)
-    (Acre(2L) * Foot(3L)) shouldBeQXI[Long, Acre %* Foot](6)
-    (Acre(BigInt(2)) * Foot(BigInt(3))) shouldBeQXI[BigInt, Acre %* Foot](6)
+    (2.withUnit[Acre] * 3.withUnit[Foot]) shouldBeQ[Int, Acre %* Foot](6, tolerant = false)
+    (2L.withUnit[Acre] * 3L.withUnit[Foot]) shouldBeQ[Long, Acre %* Foot](6, tolerant = false)
 
-    (Acre(2f) * Foot(3f)) shouldBeQ[Float, Acre %* Foot](6)
-    (Acre(2D) * Foot(3D)) shouldBeQ[Double, Acre %* Foot](6)
-    (Acre(BigDecimal(2)) * Foot(BigDecimal(3))) shouldBeQ[BigDecimal, Acre %* Foot](6)
-    (Acre(Rational(2)) * Foot(Rational(3))) shouldBeQ[Rational, Acre %* Foot](6)
-    (Acre(Algebraic(2)) * Foot(Algebraic(3))) shouldBeQ[Algebraic, Acre %* Foot](6)
-    (Acre(Real(2)) * Foot(Real(3))) shouldBeQ[Real, Acre %* Foot](6)
-    (Acre(Number(2)) * Foot(Number(3))) shouldBeQ[Number, Acre %* Foot](6)
+    (2f.withUnit[Acre] * 3f.withUnit[Foot]) shouldBeQ[Float, Acre %* Foot](6)
+    (2D.withUnit[Acre] * 3D.withUnit[Foot]) shouldBeQ[Double, Acre %* Foot](6)
   }
 
   it should "implement * miscellaneous" in {
-    (2.withUnit[Meter %/ Second] * Second(3)) shouldBeQXI[Int, Meter](6)
-    (2D.withUnit[Mole %/ Liter] * 2D.withUnit[Liter %/ Second] * 2D.withUnit[Second])
-       shouldBeQ[Double, Mole](8)
+    (2.withUnit[Meter %/ Second] * 3.withUnit[Second]) shouldBeQ[Int, Meter](6, tolerant = false)
+    (2D.withUnit[Mole %/ Liter] * 2D.withUnit[Liter %/ Second] * 2D.withUnit[Second]) shouldBeQ[Double, Mole](8)
   }
 
+/*
   it should "implement /" in {
     (Meter(10.toByte) / Second(3.toByte)) shouldBeQXI[Byte, Meter %/ Second](3)
     (Meter(10.toShort) / Second(3.toShort)) shouldBeQXI[Short, Meter %/ Second](3)
