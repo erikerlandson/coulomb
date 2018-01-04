@@ -32,40 +32,40 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
 
   def showUnitFull(implicit uo: TempOps[N, U]): String = uo.ustr.full
 
-  def -[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Quantity[N, U] =
+  def -[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Quantity[N, U] =
     new Quantity[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
 
-  def +[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Temperature[N, U] =
+  def +[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Temperature[N, U] =
     new Temperature[N, U](ubo.n1.plus(value, ubo.cv21(rhs.value)))
 
-  def -[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitBinaryOps[N, U, N2, U2]): Temperature[N, U] =
+  def -[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Temperature[N, U] =
     new Temperature[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
 
-  def ===[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+  def ===[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
     ubo.n1.compare(value, ubo.cv21(rhs.value)) == 0
 
-  def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+  def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
     ubo.n1.compare(value, ubo.cv21(rhs.value)) != 0
 
-  def <[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+  def <[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
     ubo.n1.compare(value, ubo.cv21(rhs.value)) < 0
 
-  def <=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+  def <=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
     ubo.n1.compare(value, ubo.cv21(rhs.value)) <= 0
 
-  def >[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+  def >[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
     ubo.n1.compare(value, ubo.cv21(rhs.value)) > 0
 
-  def >=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempBinaryOps[N, U, N2, U2]): Boolean =
+  def >=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
     ubo.n1.compare(value, ubo.cv21(rhs.value)) >= 0
 
-  def toUnit[U2](implicit ubo: TempBinaryOps[N, U, N, U2]): Temperature[N, U2] =
+  def toUnit[U2](implicit ubo: TempConverterOps[N, U, N, U2]): Temperature[N, U2] =
     new Temperature[N, U2](ubo.cv12(value))
 
-  def toNumeric[N2](implicit ubo: TempBinaryOps[N, U, N2, U]): Temperature[N2, U] =
+  def toNumeric[N2](implicit ubo: TempConverterOps[N, U, N2, U]): Temperature[N2, U] =
     new Temperature[N2, U](ubo.cn12(value))
 
-  def to[N2, U2](implicit ubo: TempBinaryOps[N, U, N2, U2]): Temperature[N2, U2] =
+  def to[N2, U2](implicit ubo: TempConverterOps[N, U, N2, U2]): Temperature[N2, U2] =
     new Temperature[N2, U2](ubo.cv12(value))
 }
 

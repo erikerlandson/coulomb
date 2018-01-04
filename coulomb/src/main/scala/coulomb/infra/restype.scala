@@ -45,6 +45,45 @@ object SigToUnit {
     new SigToUnit[(U, P) :: ST] { type Out = %^[U, P] }
 }
 
+trait ResTypeCase[NS, DS] {
+  type Out
+}
+object ResTypeCase {
+  type Aux[NS, DS, O] = ResTypeCase[NS, DS] { type Out = O }
+
+  implicit def evidence0: Aux[HNil, HNil, Unitless] =
+    new ResTypeCase[HNil, HNil] { type Out = Unitless }
+
+  implicit def evidence1[NS, NU](implicit
+      nns: NS =:!= HNil,
+      s2u: SigToUnit.Aux[NS, NU]): Aux[NS, HNil, NU] =
+    new ResTypeCase[NS, HNil] { type Out = NU }
+
+  implicit def evidence2[DS, TDS, DU](implicit
+      nnd: DS =:!= HNil,
+      neg: ApplySigPow.Aux[XIntNeg1, DS, TDS],
+      s2u: SigToUnit.Aux[TDS, DU]): Aux[HNil, DS, DU] =
+    new ResTypeCase[HNil, DS] { type Out = DU }
+
+  implicit def evidence3[NS, DS, NU, DU](implicit
+      nns: NS =:!= HNil,
+      nnd: DS =:!= HNil,
+      n2u: SigToUnit.Aux[NS, NU],
+      d2u: SigToUnit.Aux[DS, DU]): Aux[NS, DS, %/[NU, DU]] =
+    new ResTypeCase[NS, DS] { type Out = %/[NU, DU] }
+}
+
+trait ResType[S] {
+  type Out
+}
+object ResType {
+  type Aux[S, O] = ResType[S] { type Out = O }
+  implicit def evidence[S, NS, DS, RT](implicit
+      ss: SortUnitSig.Aux[S, NS, DS],
+      rtc: ResTypeCase.Aux[NS, DS, RT]): Aux[S, RT] =
+    new ResType[S] { type Out = RT }
+}
+
 trait MulResultType[LU, RU] {
   type Out
 }
@@ -55,7 +94,7 @@ object MulResultType {
     cnL: StandardSig.Aux[LU, OL],
     cnR: StandardSig.Aux[RU, OR],
     mu: UnifySigMul.Aux[OL, OR, OU],
-    rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
+    rt: ResType.Aux[OU, RT]): Aux[LU, RU, RT] =
     new MulResultType[LU, RU] { type Out = RT }
 }
 
@@ -69,7 +108,7 @@ object DivResultType {
       cnL: StandardSig.Aux[LU, OL],
       cnR: StandardSig.Aux[RU, OR],
       mu: UnifySigDiv.Aux[OR, OL, OU],
-      rt: SigToUnit.Aux[OU, RT]): Aux[LU, RU, RT] =
+      rt: ResType.Aux[OU, RT]): Aux[LU, RU, RT] =
     new DivResultType[LU, RU] { type Out = RT }
 }
 
@@ -81,6 +120,12 @@ object PowResultType {
   implicit def evidence[U, P, SS, AP, RT](implicit
       ss: StandardSig.Aux[U, SS],
       ap: ApplySigPow.Aux[P, SS, AP],
-      rt: SigToUnit.Aux[AP, RT]): Aux[U, P, RT] =
+      rt: ResType.Aux[AP, RT]): Aux[U, P, RT] =
     new PowResultType[U, P] { type Out = RT }
+}
+
+trait Invoke[O]
+object invoke {
+  def apply[I <: { type Out } ](implicit i: I): Invoke[i.Out] = new Invoke[i.Out] {}
+  def ss[I <: { type OutN; type OutD }](implicit i: I): Invoke[(i.OutN, i.OutD)] = new Invoke[(i.OutN, i.OutD)] {}
 }

@@ -25,5 +25,6 @@ package object infra {
   type False = Witness.`false`.T
 
   type XInt0 = Witness.`0`.T
-  type XInt1 = Witness.`1`.T  
+  type XInt1 = Witness.`1`.T
+  type XIntNeg1 = Witness.`-1`.T
 }

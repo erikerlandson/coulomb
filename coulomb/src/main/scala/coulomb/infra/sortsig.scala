@@ -38,20 +38,38 @@ object InsertSortedUnitSig {
 
 }
 
-trait SortUnitSig[M, N, D] {
+trait SortUnitSigCall[M, N, D] {
   type OutN
   type OutD
 }
 
-object SortUnitSig {
-  type Aux[M, N, D, ON, OD] = SortUnitSig[M, N, D] { type OutN = ON; type OutD = OD }
+object SortUnitSigCall {
+  type Aux[M, N, D, ON, OD] = SortUnitSigCall[M, N, D] { type OutN = ON; type OutD = OD }
 
   implicit def evidence0[N, D]: Aux[HNil, N, D, N, D] =
-    new SortUnitSig[HNil, N, D] { type OutN = N; type OutD = D }
+    new SortUnitSigCall[HNil, N, D] { type OutN = N; type OutD = D }
 
-  implicit def evidence1[U, P, MT <: HList, N, D, NO, NF, DF](implicit pos: XIntGT.Aux[P, XInt0, True], ins: InsertSortedUnitSig.Aux[U, P, N, NO], rc: Aux[MT, NO, D, NF, DF]): Aux[(U, P) :: MT, N, D, NF, DF] =
-    new SortUnitSig[(U, P) :: MT, N, D] { type OutN = NF; type OutD = DF }
+  implicit def evidence1[U, P, MT <: HList, N, D, NO, NF, DF](implicit
+      pos: XIntGT.Aux[P, XInt0, True],
+      ins: InsertSortedUnitSig.Aux[U, P, N, NO],
+      rc: Aux[MT, NO, D, NF, DF]): Aux[(U, P) :: MT, N, D, NF, DF] =
+    new SortUnitSigCall[(U, P) :: MT, N, D] { type OutN = NF; type OutD = DF }
 
-  implicit def evidence2[U, P, MT <: HList, N, D, NP, DO, NF, DF](implicit neg: XIntLT.Aux[P, XInt0, True], n: XIntNeg.Aux[P, NP], ins: InsertSortedUnitSig.Aux[U, NP, D, DO], rc: Aux[MT, N, DO, NF, DF]): Aux[(U, P) :: MT, N, D, NF, DF] =
-    new SortUnitSig[(U, P) :: MT, N, D] { type OutN = NF; type OutD = DF }
+  implicit def evidence2[U, P, MT <: HList, N, D, NP, DO, NF, DF](implicit
+      neg: XIntLT.Aux[P, XInt0, True],
+      n: XIntNeg.Aux[P, NP],
+      ins: InsertSortedUnitSig.Aux[U, NP, D, DO],
+      rc: Aux[MT, N, DO, NF, DF]): Aux[(U, P) :: MT, N, D, NF, DF] =
+    new SortUnitSigCall[(U, P) :: MT, N, D] { type OutN = NF; type OutD = DF }
+}
+
+trait SortUnitSig[S] {
+  type OutN
+  type OutD
+}
+object SortUnitSig {
+  type Aux[S, ON, OD] = SortUnitSig[S] { type OutN = ON; type OutD = OD }
+
+  implicit def evidence[S, ON, OD](implicit ssc: SortUnitSigCall.Aux[S, HNil, HNil, ON, OD]): Aux[S, ON, OD] =
+    new SortUnitSig[S] { type OutN = ON; type OutD = OD }
 }
