@@ -36,7 +36,7 @@ object TempOps {
     }
 }
 
-trait TempBinaryOps[N1, U1, N2, U2] {
+trait TempConverterOps[N1, U1, N2, U2] {
   def n1: Numeric[N1]
   def n2: Numeric[N2]
   def cv12: TempConverter[N1, U1, N2, U2]
@@ -45,15 +45,15 @@ trait TempBinaryOps[N1, U1, N2, U2] {
   def cn21(x: N2): N1
 }
 
-object TempBinaryOps {
-  type Aux[N1, U1, N2, U2] = TempBinaryOps[N1, U1, N2, U2] {
+object TempConverterOps {
+  type Aux[N1, U1, N2, U2] = TempConverterOps[N1, U1, N2, U2] {
   }
   implicit def evidence[N1, U1, N2, U2](implicit
       nn1: Numeric[N1],
       nn2: Numeric[N2],
       cvv12: TempConverter[N1, U1, N2, U2],
       cvv21: TempConverter[N2, U2, N1, U1]): Aux[N1, U1, N2, U2] =
-    new TempBinaryOps[N1, U1, N2, U2] {
+    new TempConverterOps[N1, U1, N2, U2] {
       val n1 = nn1
       val n2 = nn2
       val cv12 = cvv12
