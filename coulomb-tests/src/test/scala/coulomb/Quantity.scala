@@ -23,6 +23,8 @@ import org.scalatest.QMatchers._
 
 class QuantitySpec extends FlatSpec with Matchers {
 
+  type _neg1 = W.`-1`.T
+  type _0 = W.`0`.T
   type _1 = W.`1`.T
   type _2 = W.`2`.T
   type _3 = W.`3`.T
@@ -171,29 +173,21 @@ class QuantitySpec extends FlatSpec with Matchers {
     (10D.withUnit[Meter] / 3D.withUnit[Second]) shouldBeQ[Double, Meter %/ Second](3.3333)
   }
 
-/*
   it should "implement pow" in {
-    Meter(3.toByte).pow[_2] shouldBeQXI[Byte, Meter %^ _2](9)
-    Meter(3.toShort).pow[_2] shouldBeQXI[Short, Meter %^ _2](9)
-    Meter(3).pow[_2] shouldBeQXI[Int, Meter %^ _2](9)
-    Meter(3L).pow[_2] shouldBeQXI[Long, Meter %^ _2](9)
-    Meter(BigInt(3)).pow[_2] shouldBeQXI[BigInt, Meter %^ _2](9)
+    3.withUnit[Meter].pow[_2] shouldBeQ[Int, Meter %^ _2](9, tolerant = false)
+    3L.withUnit[Meter].pow[_2] shouldBeQ[Long, Meter %^ _2](9, tolerant = false)
 
-    Meter(3f).pow[_2] shouldBeQ[Float, Meter %^ _2](9)
-    Meter(3D).pow[_2] shouldBeQ[Double, Meter %^ _2](9)
-    Meter(BigDecimal(3)).pow[_2] shouldBeQ[BigDecimal, Meter %^ _2](9)
-    Meter(Rational(3)).pow[_2] shouldBeQ[Rational, Meter %^ _2](9)
-    Meter(Algebraic(3)).pow[_2] shouldBeQ[Algebraic, Meter %^ _2](9)
-    Meter(Real(3)).pow[_2] shouldBeQ[Real, Meter %^ _2](9)
-    Meter(Number(3)).pow[_2] shouldBeQ[Number, Meter %^ _2](9)
+    3f.withUnit[Meter].pow[_2] shouldBeQ[Float, Meter %^ _2](9)
+    3D.withUnit[Meter].pow[_2] shouldBeQ[Double, Meter %^ _2](9)
   }
 
   it should "implement pow miscellaneous" in {
-    5D.withUnit[Meter %/ Second].pow[_0] shouldBeQ[Double, Unitless](1)
-    Meter(7).pow[_1] shouldBeQXI[Int, Meter](7)
-    Second(Rational(1, 11)).pow[_neg1] shouldBeQ[Rational, Second %^ _neg1](11)
+    5D.withUnit[Meter %/ Second].pow[_0] shouldBeQ[Double, Unitless](1, tolerant = false)
+    7.withUnit[Meter].pow[_1] shouldBeQ[Int, Meter](7, tolerant = false)
+    Rational(1, 11).withUnit[Second].pow[_neg1] shouldBeQ[Rational, Second %^ _neg1](11)
   }
 
+/*
   it should "implement <" in {
     (Meter(1) < Meter(2)) should be (true)
     (Meter(1) < Meter(1)) should be (false)
