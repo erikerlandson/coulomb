@@ -336,21 +336,6 @@ class QuantitySpec extends FlatSpec with Matchers {
     1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].showUnitFull should be ("(acre foot)/(meter second)")
     1.withUnit[Meter %/ (Second %^ _2)].showUnitFull should be ("meter/second^2")
   }
-/*
-  it should "implement converter companion method" in {
-    val f1 = Quantity.converter[Double, Kilo %* Meter, Mile]
-    f1(1D.withUnit[Kilo %* Meter]) shouldBeQ[Double, Mile](0.62137)
-    f1(Mile(1.0)) shouldBeQ[Double, Mile](1.0)
-
-    val f2 = Quantity.converter[Algebraic, Meter %/ (Second %^ _2), Foot %/ (Second %^ _2)]
-    f2(Algebraic(9.801).withUnit[Meter %/ (Second %^ _2)])
-       shouldBeQ[Algebraic, Foot %/ (Second %^ _2)](32.1555)
-    f2(Algebraic(1).withUnit[Foot %/ (Second %^ _2)])
-       shouldBeQ[Algebraic, Foot %/ (Second %^ _2)](1.0)
-
-    "Quantity.converter[Algebraic, Meter %/ (Second %^ _2), Mole %/ (Second %^ _2)]" shouldNot compile
-    "Quantity.converter[Algebraic, Meter %/ (Second %^ _2), Foot %/ (Second %^ _3)]" shouldNot compile
-  }
 
   it should "implement coefficient companion method" in {
     Quantity.coefficient[Yard, Meter] should be (Rational(9144, 10000))
@@ -365,13 +350,13 @@ class QuantitySpec extends FlatSpec with Matchers {
   it should "implement showUnit companion method" in {
     Quantity.showUnit[Meter] should be ("m")
     Quantity.showUnit[Kilo %* Meter] should be ("km")
-    Quantity.showUnit[Meter %/ Second] should be ("m / s")
+    Quantity.showUnit[Meter %/ Second] should be ("m/s")
   }
 
   it should "implement showUnitFull companion method" in {
     Quantity.showUnitFull[Meter] should be ("meter")
-    Quantity.showUnitFull[Kilo %* Meter] should be ("kilo-meter")
-    Quantity.showUnitFull[Meter %/ Second] should be ("meter / second")
+    Quantity.showUnitFull[Kilo %* Meter] should be ("kilometer")
+    Quantity.showUnitFull[Meter %/ Second] should be ("meter/second")
   }
 
   it should "implement implicit conversion between convertable units" in {
@@ -383,5 +368,4 @@ class QuantitySpec extends FlatSpec with Matchers {
     def f(a: Double WithUnit (Meter %/ (Second %^ _2))) = a
     f(32D.withUnit[Foot %/ (Second %^ _2)]) shouldBeQ[Double, Meter %/ (Second %^ _2)](9.7536)
   }
-*/
 }
