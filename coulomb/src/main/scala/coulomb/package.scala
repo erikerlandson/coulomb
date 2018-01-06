@@ -40,6 +40,4 @@ package object coulomb {
     /** create a new unit Quantity of type U with the value of `this` */
     def withUnit[U]: Quantity[N, U] = new Quantity[N, U](v)
   }
-
-  def coefficient[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Rational = cu.coef
 }
