@@ -300,44 +300,43 @@ class QuantitySpec extends FlatSpec with Matchers {
     (1f.withUnit[Yard] =!= 3f.withUnit[Foot]) should be (false)
     (1f.withUnit[Yard] =!= 2f.withUnit[Foot]) should be (true)
   }
+
+  it should "implement show" in {
+    1.withUnit[Meter].show should be ("1 m")
+    1.withUnit[Kilo %* Meter].show should be ("1 km")
+    (1.5.withUnit[Meter] / 1.0.withUnit[Second]).show should be ("1.5 m/s")
+    1.0.withUnit[Second].pow[_neg1].show should be ("1.0 s^(-1)")
+    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].show should be ("1 (acre ft)/(m s)")
+    1.withUnit[Meter %/ (Second %^ _2)].show should be ("1 m/s^2")
+  }
+
+  it should "implement showFull" in {
+    1.withUnit[Meter].showFull should be ("1 meter")
+    1.withUnit[Kilo %* Meter].showFull should be ("1 kilometer")
+    (1.5.withUnit[Meter] / 1.0.withUnit[Second]).showFull should be ("1.5 meter/second")
+    1.0.withUnit[Second].pow[_neg1].showFull should be ("1.0 second^(-1)")
+    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].showFull should be ("1 (acre foot)/(meter second)")
+    1.withUnit[Meter %/ (Second %^ _2)].showFull should be ("1 meter/second^2")
+  }
+
+  it should "implement showUnit" in {
+    1.withUnit[Meter].showUnit should be ("m")
+    1.withUnit[Kilo %* Meter].showUnit should be ("km")
+    (1.5.withUnit[Meter] / 1.0.withUnit[Second]).showUnit should be ("m/s")
+    1.0.withUnit[Second].pow[_neg1].showUnit should be ("s^(-1)")
+    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].showUnit should be ("(acre ft)/(m s)")
+    1.withUnit[Meter %/ (Second %^ _2)].showUnit should be ("m/s^2")
+  }
+
+  it should "implement showUnitFull" in {
+    1.withUnit[Meter].showUnitFull should be ("meter")
+    1.withUnit[Kilo %* Meter].showUnitFull should be ("kilometer")
+    (1.5.withUnit[Meter] / 1.0.withUnit[Second]).showUnitFull should be ("meter/second")
+    1.0.withUnit[Second].pow[_neg1].showUnitFull should be ("second^(-1)")
+    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].showUnitFull should be ("(acre foot)/(meter second)")
+    1.withUnit[Meter %/ (Second %^ _2)].showUnitFull should be ("meter/second^2")
+  }
 /*
-
-  it should "implement toStr" in {
-    1.withUnit[Meter].toStr should be ("1 m")
-    1.withUnit[Kilo %* Meter].toStr should be ("1 km")
-    (1.5.withUnit[Meter] / 1.0.withUnit[Second]).toStr should be ("1.5 m / s")
-    1.0.withUnit[Second].pow[_neg1].toStr should be ("1.0 s^-1")
-    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].toStr should be ("1 (acre ft) / (m s)")
-    1.withUnit[Meter %/ (Second %^ _2)].toStr should be ("1 m / (s^2)")
-  }
-
-  it should "implement toStrFull" in {
-    1.withUnit[Meter].toStrFull should be ("1 meter")
-    1.withUnit[Kilo %* Meter].toStrFull should be ("1 kilo-meter")
-    (1.5.withUnit[Meter] / 1.0.withUnit[Second]).toStrFull should be ("1.5 meter / second")
-    1.0.withUnit[Second].pow[_neg1].toStrFull should be ("1.0 second ^ -1")
-    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].toStrFull should be ("1 (acre * foot) / (meter * second)")
-    1.withUnit[Meter %/ (Second %^ _2)].toStrFull should be ("1 meter / (second ^ 2)")
-  }
-
-  it should "implement unitStr" in {
-    1.withUnit[Meter].unitStr should be ("m")
-    1.withUnit[Kilo %* Meter].unitStr should be ("km")
-    (1.5.withUnit[Meter] / 1.0.withUnit[Second]).unitStr should be ("m / s")
-    1.0.withUnit[Second].pow[_neg1].unitStr should be ("s^-1")
-    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].unitStr should be ("(acre ft) / (m s)")
-    1.withUnit[Meter %/ (Second %^ _2)].unitStr should be ("m / (s^2)")
-  }
-
-  it should "implement unitStrFull" in {
-    1.withUnit[Meter].unitStrFull should be ("meter")
-    1.withUnit[Kilo %* Meter].unitStrFull should be ("kilo-meter")
-    (1.5.withUnit[Meter] / 1.0.withUnit[Second]).unitStrFull should be ("meter / second")
-    1.0.withUnit[Second].pow[_neg1].unitStrFull should be ("second ^ -1")
-    1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].unitStrFull should be ("(acre * foot) / (meter * second)")
-    1.withUnit[Meter %/ (Second %^ _2)].unitStrFull should be ("meter / (second ^ 2)")
-  }
-
   it should "implement converter companion method" in {
     val f1 = Quantity.converter[Double, Kilo %* Meter, Mile]
     f1(1D.withUnit[Kilo %* Meter]) shouldBeQ[Double, Mile](0.62137)
@@ -363,16 +362,16 @@ class QuantitySpec extends FlatSpec with Matchers {
     "Quantity.coefficient[(Kilo %* Meter) %/ (Second %^ _2), Mile %/ (Ampere %^ _2)]" shouldNot compile
   }
 
-  it should "implement unitStr companion method" in {
-    Quantity.unitStr[Meter] should be ("m")
-    Quantity.unitStr[Kilo %* Meter] should be ("km")
-    Quantity.unitStr[Meter %/ Second] should be ("m / s")
+  it should "implement showUnit companion method" in {
+    Quantity.showUnit[Meter] should be ("m")
+    Quantity.showUnit[Kilo %* Meter] should be ("km")
+    Quantity.showUnit[Meter %/ Second] should be ("m / s")
   }
 
-  it should "implement unitStrFull companion method" in {
-    Quantity.unitStrFull[Meter] should be ("meter")
-    Quantity.unitStrFull[Kilo %* Meter] should be ("kilo-meter")
-    Quantity.unitStrFull[Meter %/ Second] should be ("meter / second")
+  it should "implement showUnitFull companion method" in {
+    Quantity.showUnitFull[Meter] should be ("meter")
+    Quantity.showUnitFull[Kilo %* Meter] should be ("kilo-meter")
+    Quantity.showUnitFull[Meter %/ Second] should be ("meter / second")
   }
 
   it should "implement implicit conversion between convertable units" in {
