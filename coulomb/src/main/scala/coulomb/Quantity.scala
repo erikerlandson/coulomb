@@ -92,4 +92,14 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
 object Quantity {
   def apply[N, U](v: N) = new Quantity[N, U](v)
+
+  def coefficient[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Rational = cu.coef
+
+  def showUnit[U](implicit ustr: UnitString[U]): String = ustr.abbv
+
+  def showUnitFull[U](implicit ustr: UnitString[U]): String = ustr.full
+
+  implicit def implicitlyConvertQuantity[N1, U1, N2, U2](q1: Quantity[N1, U1])(implicit
+      cv12: Converter[N1, U1, N2, U2]): Quantity[N2, U2] =
+    new Quantity[N2, U2](cv12(q1.value))
 }
