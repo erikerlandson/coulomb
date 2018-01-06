@@ -39,25 +39,29 @@ object UnitOps {
 trait UnitConverterOps[N1, U1, N2, U2] {
   def n1: Numeric[N1]
   def n2: Numeric[N2]
-  def cv12: Converter[N1, U1, N2, U2]
-  def cv21: Converter[N2, U2, N1, U1]
   def cn12(x: N1): N2
   def cn21(x: N2): N1
+  def cv12: Converter[N1, U1, N2, U2]
+  def cv21: Converter[N2, U2, N1, U1]
+  def coef12: Rational
+  def coef21: Rational = coef12.inverse
 }
 
 object UnitConverterOps {
   implicit def evidence[N1, U1, N2, U2](implicit
       nn1: Numeric[N1],
       nn2: Numeric[N2],
+      cu12: ConvertableUnits[U1, U2],
       cvv12: Converter[N1, U1, N2, U2],
       cvv21: Converter[N2, U2, N1, U1]): UnitConverterOps[N1, U1, N2, U2] =
     new UnitConverterOps[N1, U1, N2, U2] {
       val n1 = nn1
       val n2 = nn2
-      val cv12 = cvv12
-      val cv21 = cvv21
       def cn12(x: N1): N2 = nn1.toType[N2](x)
       def cn21(x: N2): N1 = nn2.toType[N1](x)
+      val coef12 = cu12.coef
+      val cv12 = cvv12
+      val cv21 = cvv21
     }
 }
 
