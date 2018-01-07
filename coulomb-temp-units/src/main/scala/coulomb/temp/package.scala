@@ -31,8 +31,8 @@ package object temp {
   }
 
   trait Celsius
-  implicit val defineUnitCelsius = DerivedTemp[Celsius](off = Rational(27315, 100), abbv = "°C")
+  implicit val defineUnitCelsius = DerivedTemp[Celsius](Rational(1), Rational(27315, 100), name = "Celsius", abbv = "°C")
 
   trait Fahrenheit
-  implicit val defineUnitFahrenheit = DerivedTemp[Fahrenheit](Rational(5, 9), Rational(45967, 100), "°F")
+  implicit val defineUnitFahrenheit = DerivedTemp[Fahrenheit](Rational(5, 9), Rational(45967, 100), name = "Fahrenheit", abbv = "°F")
 }
