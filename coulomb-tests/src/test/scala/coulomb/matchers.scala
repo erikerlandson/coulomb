@@ -123,4 +123,36 @@ object QMatchers {
       }
     }
   }
+
+  implicit class WithTemperatureShouldMethods[N, U](t: Temperature[N, U])(implicit
+      ttN: TypeTag[N],
+      ttU: TypeTag[U],
+      numN: Numeric[N],
+      prettifier: Prettifier,
+      pos: source.Position) {
+
+    def shouldBeT[NR, UR](tval: Double, tolerant: Boolean = true)(implicit
+        ttNR: TypeTag[NR],
+        ttUR: TypeTag[UR],
+        teq: org.scalactic.Equality[NR],
+        num: spire.math.Numeric[NR]): Assertion = {
+      val (passed, msg) = (typeOf[N], typeOf[U]) match {
+        case (tn, _) if (!(tn =:= typeOf[NR])) =>
+          (false, s"Numeric type $tn did not match target ${typeOf[NR]}")
+        case (_, tu) if (!(tu =:= typeOf[UR])) =>
+          (false, s"Unit type $tu did not match target ${typeOf[UR]}")
+        case _ => {
+          val tv: NR = num.fromDouble(tval)
+          val eq =
+            if (tolerant) teq.areEqual(tv, t.value) else (num.compare(tv, num.fromType[N](t.value)) == 0)
+          if (eq) (true, "") else (false, s"Value ${t.value} did not match target $tv")
+        }
+      }
+      if (passed) {
+        indicateSuccess(true, s"Temperature test passed", "")
+      } else {
+        indicateFailure(msg, None, pos)
+      }
+    }
+  }
 }
