@@ -28,7 +28,12 @@ class DerivedTemp[U](coef: Rational, val off: Rational, name: String, abbv: Stri
 
 object DerivedTemp {
   def apply[U](coef: Rational = Rational(1), off: Rational = Rational(0), name: String = "", abbv: String = "")(implicit
-    ut: TypeTag[U]): DerivedTemp[U] = new DerivedTemp[U](coef, off, name, abbv)
+      ut: TypeTag[U]): DerivedTemp[U] = {
+    require(coef > 0, "Unit coefficients must be strictly > 0")
+    val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
+    val a = if (abbv != "") abbv else n.take(1)
+    new DerivedTemp[U](coef, off, n, a)
+  }
 
   // A slight hack that is used by TempConverter to simplify its rules
   implicit def evidencek2k: DerivedTemp[Kelvin] = DerivedTemp[Kelvin](name = "Kelvin", abbv = "K")
