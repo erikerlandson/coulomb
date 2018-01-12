@@ -76,6 +76,12 @@ lazy val coulomb_tests = (project in file("coulomb-tests"))
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
 
+lazy val coulomb_docs = (project in file("."))
+  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units)
+  //.dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units)
+  .settings(name := "coulomb-docs")
+  .settings(commonSettings :_*)
+
 enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
 siteSubdirName in ScalaUnidoc := "latest/api"
