@@ -9,11 +9,12 @@ resolvers += "jgit-repo" at "http://download.eclipse.org/jgit/maven"
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
-addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.0")
+addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.1")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.2.0")
+//addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.2.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.3.1")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.0")
+addSbtPlugin("com.typesafe.sbt" % "sbt-ghpages" % "0.6.2")
 
 // I'm disabling these for now, since I'm not using them yet and they aren't all synced
 // up with scala 2.12

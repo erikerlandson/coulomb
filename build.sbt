@@ -1,7 +1,8 @@
 def commonSettings = Seq(
   organization := "com.manyangled",
   version := "0.3.0-SNAPSHOT",
-  scalaVersion := "2.12.3",
+  //scalaVersion := "2.12.3",
+  scalaVersion := "2.12.4",
   //scalaOrganization := "org.typelevel",
   //scalaVersion := "2.12.4-bin-typelevel-4",
   crossScalaVersions := Seq("2.12.4"),
@@ -78,7 +79,7 @@ lazy val coulomb_tests = (project in file("coulomb-tests"))
 
 lazy val coulomb_docs = (project in file("."))
   .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units)
-  //.dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units)
   .settings(name := "coulomb-docs")
   .settings(commonSettings :_*)
 
