@@ -83,6 +83,17 @@ lazy val coulomb_customary_units = (project in file("coulomb-customary-units"))
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
+lazy val coulomb_parser = (project in file("coulomb-parser"))
+  .aggregate(coulomb)
+  .dependsOn(coulomb)
+  .settings(name := "coulomb-parser")
+  .settings(commonSettings :_*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
+    )
+  )
+
 lazy val coulomb_tests = (project in file("coulomb-tests"))
   .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units)
   .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units)
