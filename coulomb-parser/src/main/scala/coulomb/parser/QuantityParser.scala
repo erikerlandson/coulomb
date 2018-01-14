@@ -16,7 +16,7 @@ limitations under the License.
 
 package coulomb.parser
 
-import scala.util.{ Try, Success, Failure }
+import scala.util.Try
 
 import scala.util.parsing.combinator.RegexParsers
 
@@ -52,7 +52,20 @@ object lexer {
 
     val expRE = "([+-]?\\d+)".r
 
-    def apply(expr: String): Try[List[UnitDSLToken]] = ???
+    def apply(expr: String): Try[List[UnitDSLToken]] = {
+      parse(tokens, expr) match {
+        case NoSuccess(msg, next) => scala.util.Failure(QPLexingException(msg))
+        case Success(result, next) => scala.util.Success(result)
+      }
+    }
+
+    lazy val tokens: Parser[List[UnitDSLToken]] = {
+      phrase(rep1(
+        mulop | divop | powop |
+        lparen | rparen |
+        exp | unit | pfunit
+      )) ^^ { x => x }
+    }
 
     def unit: Parser[UNIT] = unitRE ^^ { u => UNIT(u) }
 
