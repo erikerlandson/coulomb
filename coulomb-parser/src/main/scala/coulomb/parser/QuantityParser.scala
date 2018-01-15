@@ -18,7 +18,156 @@ package coulomb.parser
 
 import scala.util.Try
 
-import scala.util.parsing.combinator.RegexParsers
+import scala.util.parsing.combinator.{Parsers, RegexParsers}
+import scala.util.parsing.input.{NoPosition, Position, Reader}
+
+object infra {
+  import scala.language.implicitConversions
+  import scala.reflect.runtime.universe._
+
+  import shapeless._
+
+  import coulomb._
+  import coulomb.infra._
+  import coulomb.define._
+
+  trait SetInsert[E, S] {
+    type Out
+  }
+  object SetInsert {
+    type Aux[E, S, O] = SetInsert[E, S] { type Out = O }
+    implicit def evidence0[E]: Aux[E, HNil, E :: HNil] = new SetInsert[E, HNil] { type Out = E :: HNil }
+    implicit def evidence1[E, T <: HList]: Aux[E, E :: T, E :: T] =
+      new SetInsert[E, E :: T] { type Out = E :: T }
+    implicit def evidence2[E, H, T <: HList, O <: HList ](implicit
+        ne: E =:!= H,
+        rc: Aux[E, T, O]): Aux[E, H :: T, H :: O] =
+      new SetInsert[E, H :: T] { type Out = H :: O }
+  }
+
+  trait SetUnion[S1, S2] {
+    type Out
+  }
+  object SetUnion {
+    type Aux[S1, S2, O] = SetUnion[S1, S2] { type Out = O }
+    implicit def evidence0[S2]: Aux[HNil, S2, S2] = new SetUnion[HNil, S2] { type Out = S2 }
+    implicit def evidence1[H, T <: HList, S2, T2, O](implicit
+        ih: SetInsert.Aux[H, S2, T2],
+        rc: Aux[T, T2, O]): Aux[H :: T, S2, O] =
+      new SetUnion[H :: T, S2] { type Out = O }
+  }
+
+  trait UnitClosure[U] {
+    type Out
+  }
+  trait UnitClosureLowPriority {
+    type Aux[U, O] = UnitClosure[U] { type Out = O }
+
+    implicit def evidenceUnitless: Aux[Unitless, Unitless :: HNil] =
+      new UnitClosure[Unitless] { type Out = Unitless :: HNil }
+
+    implicit def evidenceBase[U](implicit bu: BaseUnit[U]): Aux[U, U :: HNil] =
+      new UnitClosure[U] { type Out = U :: HNil }
+
+    implicit def evidenceDerivedUnit[U, D, DC <: HList](implicit
+        du: DerivedUnit[U, D],
+        dc: Aux[D, DC]): Aux[U, U :: DC] = {
+      new UnitClosure[U] {
+        type Out = U :: DC
+      }
+    }
+
+    implicit def evidenceMul[L, LC, R, RC, OC](implicit
+        l: Aux[L, LC],
+        r: Aux[R, RC],
+        u: SetUnion.Aux[LC, RC, OC]): Aux[%*[L, R], OC] = {
+      new UnitClosure[%*[L, R]] { type Out = OC }
+    }
+
+    implicit def evidenceDiv[L, LC, R, RC, OC](implicit
+        l: Aux[L, LC],
+        r: Aux[R, RC],
+        u: SetUnion.Aux[LC, RC, OC]): Aux[%/[L, R], OC] = {
+      new UnitClosure[%/[L, R]] { type Out = OC }
+    }
+
+    implicit def evidencePow[B, BC, E](implicit
+        b: Aux[B, BC],
+        e: XIntValue[E]): Aux[%^[B, E], BC] = {
+      new UnitClosure[%^[B, E]] {
+        type Out = BC
+      }
+    }
+  }
+  object UnitClosure extends UnitClosureLowPriority {
+    implicit def evidenceDerivedUnitMul[U, DL, DR, SL, SR, US <: HList](implicit
+        du: DerivedUnit[U, %*[DL, DR]],
+        sl: Aux[DL, SL],
+        sr: Aux[DR, SR],
+        u: SetUnion.Aux[SL, SR, US]): Aux[U, U :: US] = {
+      new UnitClosure[U] { type Out = U :: US }
+    }
+
+    implicit def evidenceDerivedUnitDiv[U, DL, DR, SL, SR, US <: HList](implicit
+        du: DerivedUnit[U, %/[DL, DR]],
+        sl: Aux[DL, SL],
+        sr: Aux[DR, SR],
+        u: SetUnion.Aux[SR, SL, US]): Aux[U, U :: US] = {
+      new UnitClosure[U] { type Out = U :: US }
+    }
+
+    implicit def evidenceDerivedUnitPow[U, DB, DE, SB <: HList](implicit
+        du: DerivedUnit[U, %^[DB, DE]],
+        sb: Aux[DB, SB],
+        e: XIntValue[DE]): Aux[U, U :: SB] = {
+      new UnitClosure[U] { type Out = U :: SB }
+    }    
+  }
+
+  trait UnitTypeString[U] {
+    def expr: String
+  }
+  object UnitTypeString {
+    implicit def evidenceUnitless: UnitTypeString[Unitless] =
+      new UnitTypeString[Unitless] { val expr = "coulomb.Unitless" }
+
+    implicit def evidenceBase[U](implicit utt: TypeTag[U], bu: BaseUnit[U]): UnitTypeString[U] =
+      new UnitTypeString[U] { val expr = utt.tpe.typeSymbol.fullName }
+
+    implicit def evidenceDerived[U](implicit utt: TypeTag[U], du: DerivedUnit[U, _]): UnitTypeString[U] =
+      new UnitTypeString[U] { val expr = utt.tpe.typeSymbol.fullName }
+
+    implicit def evidenceMul[L, R](implicit udfL: UnitTypeString[L], udfR: UnitTypeString[R]): UnitTypeString[%*[L, R]] =
+      new UnitTypeString[%*[L, R]] { val expr = s"%*[${udfL.expr}, ${udfR.expr}]" }
+
+    implicit def evidenceDiv[L, R](implicit udfL: UnitTypeString[L], udfR: UnitTypeString[R]): UnitTypeString[%/[L, R]] =
+      new UnitTypeString[%/[L, R]] { val expr = s"%/[${udfL.expr}, ${udfR.expr}]" }
+
+    implicit def evidencePow[B, E](implicit udfB: UnitTypeString[B], e: XIntValue[E]): UnitTypeString[%^[B, E]] =
+      new UnitTypeString[%^[B, E]] { val expr = s"%^[${udfB.expr}, Witness.`${e.value}`.T]" }
+  }
+
+  trait UnitDefCode[U] {
+    def code: String
+  }
+  object UnitDefCode {
+    implicit def evidenceBase[U](implicit utt: TypeTag[U], bu: BaseUnit[U]): UnitDefCode[U] = {
+      val tpe = utt.tpe.typeSymbol.name
+      val tpeFull = utt.tpe.typeSymbol.fullName
+      new UnitDefCode[U] {
+        val code = s"""implicit val qpDefineUnit$tpe = new BaseUnit[$tpeFull]("${bu.name}", "${bu.abbv}")"""
+      }
+    }
+
+    implicit def evidenceDerived[U, D](implicit utt: TypeTag[U], du: DerivedUnit[U, D], uts: UnitTypeString[D]): UnitDefCode[U] = {
+      val tpe = utt.tpe.typeSymbol.name
+      val tpeFull = utt.tpe.typeSymbol.fullName
+      new UnitDefCode[U] {
+        val code = s"""implicit val qpDefineUnit$tpe = new DerivedUnit[$tpeFull, ${uts.expr}](Rational("${du.coef}"), "${du.name}", "${du.abbv}")"""
+      }
+    }
+  }
+}
 
 sealed class QuantityParserException(msg: String) extends Exception(msg)
 case class QPLexingException(msg: String) extends QuantityParserException(msg)
@@ -84,5 +233,34 @@ object lexer {
   }
 }
 
+object ast {
+  sealed trait UnitAST {
+    override def toString = this match {
+      case Unit(u) => u
+      case Mul(lhs, rhs) => s"%*[$lhs, $rhs]"
+      case Div(num, den) => s"%/[$num, $den]"
+      case Pow(rad, exp) => s"%^[$rad, Witness.`$exp`.T]"
+    }
+  }
+  case class Unit(unitType: String) extends UnitAST
+  case class Mul(lhs: UnitAST, rhs: UnitAST) extends UnitAST
+  case class Div(num: UnitAST, den: UnitAST) extends UnitAST
+  case class Pow(rad: UnitAST, exp: Int) extends UnitAST
+
+  object UnitAST {
+  }
+}
+
 object parser {
+  import lexer._
+  import ast._
+
+  class UnitDSLTokenReader(tokens: Seq[UnitDSLToken]) extends Reader[UnitDSLToken] {
+    override def first: UnitDSLToken = tokens.head
+    override def atEnd: Boolean = tokens.isEmpty
+    override def pos: Position = NoPosition
+    override def rest: Reader[UnitDSLToken] = new UnitDSLTokenReader(tokens.tail)
+  }
+
+  
 }
