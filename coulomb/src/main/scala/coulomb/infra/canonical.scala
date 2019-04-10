@@ -30,7 +30,7 @@ trait CanonicalSig[U] {
   def coef: Rational
 }
 
-trait CanonicalSigLowPriority {
+object CanonicalSig {
   type Aux[U, O] = CanonicalSig[U] { type Out = O }
 
   implicit def evidenceUnitless: Aux[Unitless, HNil] = {
@@ -72,29 +72,6 @@ trait CanonicalSigLowPriority {
     new CanonicalSig[%^[B, E]] {
       type Out = OC
       val coef = b.coef.pow(e.value)
-    }
-  }
-}
-
-object CanonicalSig extends CanonicalSigLowPriority {
-  implicit def evidenceDerivedUnitMul[U, DL, DR, SL, SR, US](implicit du: DerivedUnit[U, %*[DL, DR]], sl: Aux[DL, SL], sr: Aux[DR, SR], u: UnifySigMul.Aux[SL, SR, US]): Aux[U, US] = {
-    new CanonicalSig[U] {
-      type Out = US
-      val coef = du.coef * (sl.coef * sr.coef)
-    }
-  }
-
-  implicit def evidenceDerivedUnitDiv[U, DL, DR, SL, SR, US](implicit du: DerivedUnit[U, %/[DL, DR]], sl: Aux[DL, SL], sr: Aux[DR, SR], u: UnifySigDiv.Aux[SR, SL, US]): Aux[U, US] = {
-    new CanonicalSig[U] {
-      type Out = US
-      val coef = du.coef * (sl.coef / sr.coef)
-    }
-  }
-
-  implicit def evidenceDerivedUnitPow[U, DB, DE, SB, US](implicit du: DerivedUnit[U, %^[DB, DE]], sb: Aux[DB, SB], u: ApplySigPow.Aux[DE, SB, US], e: XIntValue[DE]): Aux[U, US] = {
-    new CanonicalSig[U] {
-      type Out = US
-      val coef = du.coef * (sb.coef.pow(e.value))
     }
   }
 }
