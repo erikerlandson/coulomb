@@ -87,7 +87,7 @@ lazy val coulomb_parser = (project in file("coulomb-parser"))
   .settings(commonSettings :_*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
+      "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
     )
   )
 
