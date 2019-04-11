@@ -18,19 +18,10 @@ package coulomb
 
 import scala.language.implicitConversions
 
-import scala.reflect.runtime.universe._
-
-import spire.math._
-import spire.syntax._
-import shapeless._
-import shapeless.syntax.singleton._
-import singleton.ops._
+import spire.math.Rational
 
 import infra._
-import define._
 import unitops._
-
-import test._
 
 class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
