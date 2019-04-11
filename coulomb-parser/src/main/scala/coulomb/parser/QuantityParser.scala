@@ -60,7 +60,7 @@ object infra {
   trait UnitClosure[U] {
     type Out
   }
-  trait UnitClosureLowPriority {
+  object UnitClosure {
     type Aux[U, O] = UnitClosure[U] { type Out = O }
 
     implicit def evidenceUnitless: Aux[Unitless, Unitless :: HNil] =
@@ -72,9 +72,7 @@ object infra {
     implicit def evidenceDerivedUnit[U, D, DC <: HList](implicit
         du: DerivedUnit[U, D],
         dc: Aux[D, DC]): Aux[U, U :: DC] = {
-      new UnitClosure[U] {
-        type Out = U :: DC
-      }
+      new UnitClosure[U] { type Out = U :: DC }
     }
 
     implicit def evidenceMul[L, LC, R, RC, OC](implicit
@@ -98,30 +96,6 @@ object infra {
         type Out = BC
       }
     }
-  }
-  object UnitClosure extends UnitClosureLowPriority {
-    implicit def evidenceDerivedUnitMul[U, DL, DR, SL, SR, US <: HList](implicit
-        du: DerivedUnit[U, %*[DL, DR]],
-        sl: Aux[DL, SL],
-        sr: Aux[DR, SR],
-        u: SetUnion.Aux[SL, SR, US]): Aux[U, U :: US] = {
-      new UnitClosure[U] { type Out = U :: US }
-    }
-
-    implicit def evidenceDerivedUnitDiv[U, DL, DR, SL, SR, US <: HList](implicit
-        du: DerivedUnit[U, %/[DL, DR]],
-        sl: Aux[DL, SL],
-        sr: Aux[DR, SR],
-        u: SetUnion.Aux[SR, SL, US]): Aux[U, U :: US] = {
-      new UnitClosure[U] { type Out = U :: US }
-    }
-
-    implicit def evidenceDerivedUnitPow[U, DB, DE, SB <: HList](implicit
-        du: DerivedUnit[U, %^[DB, DE]],
-        sb: Aux[DB, SB],
-        e: XIntValue[DE]): Aux[U, U :: SB] = {
-      new UnitClosure[U] { type Out = U :: SB }
-    }    
   }
 
   trait UnitTypeString[U] {
