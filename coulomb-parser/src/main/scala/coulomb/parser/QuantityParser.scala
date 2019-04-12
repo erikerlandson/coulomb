@@ -248,12 +248,30 @@ object parser extends Parsers {
     override def rest: Reader[UnitDSLToken] = new UnitDSLTokenReader(tokens.tail)
   }
 
+  def program: Parser[UnitAST] = {
+    unitexpr
+  }
+
+  def unitexpr: Parser[UnitAST] = {
+    val u = unit ^^ { case UNIT(uname) => Unit(uname) }
+    val pfu = prefixunit ^^ { case PFUNIT(pname, uname) => Mul(Unit(pname), Unit(uname)) }
+    val mul = (unitexpr ~ MULOP ~ unitexpr) ^^ { case lhs ~ _ ~ rhs => Mul(lhs, rhs) }
+    val div = (unitexpr ~ DIVOP ~ unitexpr) ^^ { case num ~ _ ~ den => Div(num, den) }
+    val pow = (unitexpr ~ POWOP ~ exponent) ^^ { case b ~ _ ~ EXP(e) => Pow(b, e) }
+    val paren = (LPAREN ~ unitexpr ~ RPAREN) ^^ { case _ ~ expr ~ _ => expr }
+    u | pfu | mul | div | pow | paren
+  }
+
   def unit: Parser[UNIT] = {
     accept("unit", { case u @ UNIT(uname) => u })
   }
 
-  def program: Parser[UnitAST] = {
-    unit ^^ { case UNIT(uname) => Unit(uname) }
+  def prefixunit: Parser[PFUNIT] = {
+    accept("pfunit", { case pfu @ PFUNIT(pname, uname) => pfu })
+  }
+
+  def exponent: Parser[EXP] = {
+    accept("exponent", { case exp @ EXP(e) => exp })
   }
 
   def apply(tokens: Seq[UnitDSLToken]): Either[QPParsingException, UnitAST] = {
