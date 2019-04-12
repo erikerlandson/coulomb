@@ -253,13 +253,25 @@ object parser extends Parsers {
   }
 
   def unitexpr: Parser[UnitAST] = {
-    val u = unit ^^ { case UNIT(uname) => Unit(uname) }
-    val pfu = prefixunit ^^ { case PFUNIT(pname, uname) => Mul(Unit(pname), Unit(uname)) }
-    val mul = (unitexpr ~ MULOP ~ unitexpr) ^^ { case lhs ~ _ ~ rhs => Mul(lhs, rhs) }
-    val div = (unitexpr ~ DIVOP ~ unitexpr) ^^ { case num ~ _ ~ den => Div(num, den) }
-    val pow = (unitexpr ~ POWOP ~ exponent) ^^ { case b ~ _ ~ EXP(e) => Pow(b, e) }
+    exprL2
+  }
+
+  def exprL2: Parser[UnitAST] = {
+    val mul = (exprL1 ~ MULOP ~ unitexpr) ^^ { case lhs ~ _ ~ rhs => Mul(lhs, rhs) }
+    val div = (exprL1 ~ DIVOP ~ unitexpr) ^^ { case num ~ _ ~ den => Div(num, den) }
+    mul | div | exprL1
+  }
+
+  def exprL1: Parser[UnitAST] = {
+    val pow = (atomic ~ POWOP ~ exponent) ^^ { case b ~ _ ~ EXP(e) => Pow(b, e) }
+    pow | atomic
+  }
+
+  def atomic: Parser[UnitAST] = {
     val paren = (LPAREN ~ unitexpr ~ RPAREN) ^^ { case _ ~ expr ~ _ => expr }
-    u | pfu | mul | div | pow | paren
+    val pfu = prefixunit ^^ { case PFUNIT(pname, uname) => Mul(Unit(pname), Unit(uname)) }
+    val u = unit ^^ { case UNIT(uname) => Unit(uname) }
+    paren | pfu | u
   }
 
   def unit: Parser[UNIT] = {
