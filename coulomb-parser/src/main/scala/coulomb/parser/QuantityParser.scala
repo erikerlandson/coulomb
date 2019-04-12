@@ -235,9 +235,11 @@ object ast {
   }
 }
 
-object parser {
+object parser extends Parsers {
   import lexer._
   import ast._
+
+  override type Elem = UnitDSLToken
 
   class UnitDSLTokenReader(tokens: Seq[UnitDSLToken]) extends Reader[UnitDSLToken] {
     override def first: UnitDSLToken = tokens.head
@@ -246,5 +248,19 @@ object parser {
     override def rest: Reader[UnitDSLToken] = new UnitDSLTokenReader(tokens.tail)
   }
 
-  
+  def unit: Parser[UNIT] = {
+    accept("unit", { case u @ UNIT(uname) => u })
+  }
+
+  def program: Parser[UnitAST] = {
+    unit ^^ { case UNIT(uname) => Unit(uname) }
+  }
+
+  def apply(tokens: Seq[UnitDSLToken]): Either[QPParsingException, UnitAST] = {
+    val reader = new UnitDSLTokenReader(tokens)
+    program(reader) match {
+      case NoSuccess(msg, next) => Left(QPParsingException(msg))
+      case Success(result, next) => Right(result)
+    }
+  }
 }
