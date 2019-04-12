@@ -96,6 +96,16 @@ object infra {
         type Out = BC
       }
     }
+
+    implicit def evidenceHNil: Aux[HNil, HNil] =
+      new UnitClosure[HNil] { type Out = HNil }
+
+    implicit def evidenceHList[H, T <: HList, HC, TC, OC](implicit
+        h: Aux[H, HC],
+        t: Aux[T, TC],
+        u: SetUnion.Aux[HC, TC, OC]): Aux[H :: T, OC] = {
+      new UnitClosure[H :: T] { type Out = OC }
+    }
   }
 
   trait UnitTypeString[U] {
