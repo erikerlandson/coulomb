@@ -31,6 +31,27 @@ object infra {
   import coulomb.infra._
   import coulomb.define._
 
+  trait Evidence[T] {
+    type Out
+  }
+  trait EvidenceLowPriority {
+    type Aux[T, O] = Evidence[T] { type Out = O }
+    implicit def evidenceFalse[T]: Aux[T, False] =
+      new Evidence[T] { type Out = False }
+  }
+  object Evidence extends EvidenceLowPriority {
+    implicit def evidenceTrue[T](implicit t: T): Aux[T, True] =
+      new Evidence[T] { type Out = True }
+  }
+
+  trait NoEvidence[T]
+  object NoEvidence {
+    // Note: if you try to directly ask for Evidence.Aux[T, False], it will match the
+    // low-priority rule above, and this won't work right.
+    implicit def evidence0[T, V](implicit no: Evidence.Aux[T, V], vf: V =:= False): NoEvidence[T] =
+      new NoEvidence[T] {}
+  }
+
   trait SetInsert[E, S] {
     type Out
   }
@@ -108,6 +129,49 @@ object infra {
     }
   }
 
+  trait FilterPrefixUnits[S] {
+    type Out
+  }
+  object FilterPrefixUnits {
+    type Aux[S, O] = FilterPrefixUnits[S] { type Out = O }
+    implicit def evidence0: Aux[HNil, HNil] = new FilterPrefixUnits[HNil] { type Out = HNil }
+    implicit def evidence1[U, T <: HList, TF <: HList](implicit
+        pfu: DerivedUnit[U, Unitless],
+        tf: Aux[T, TF]): Aux[U :: T, U :: TF] = {
+      new FilterPrefixUnits[U :: T] { type Out = U :: TF }
+    }
+    implicit def evidence2[U, T <: HList, TF <: HList](implicit
+        npfu: NoEvidence[DerivedUnit[U, Unitless]],
+        tf: Aux[T, TF]): Aux[U :: T, TF] = {
+      new FilterPrefixUnits[U :: T] { type Out = TF }
+    }
+  }
+
+  trait FilterNonPrefixUnits[S] {
+    type Out
+  }
+  trait FilterNonPrefixUnitsP1 {
+    type Aux[S, O] = FilterNonPrefixUnits[S] { type Out = O }
+    implicit def evidence3[U, T <: HList, TF <: HList](implicit
+        tf: Aux[T, TF]): Aux[U :: T, TF] = {
+      new FilterNonPrefixUnits[U :: T] { type Out = TF }
+    }
+  }
+  object FilterNonPrefixUnits extends FilterNonPrefixUnitsP1 {
+    implicit def evidence0: Aux[HNil, HNil] = new FilterNonPrefixUnits[HNil] { type Out = HNil }
+    implicit def evidence1[U, T <: HList, TF <: HList](implicit
+        pfu: DerivedUnit[U, _],
+        npfu: NoEvidence[DerivedUnit[U, Unitless]],
+        tf: Aux[T, TF]): Aux[U :: T, U :: TF] = {
+      new FilterNonPrefixUnits[U :: T] { type Out = U :: TF }
+    }
+    implicit def evidence2[U, T <: HList, TF <: HList](implicit
+        pfu: BaseUnit[U],
+        tf: Aux[T, TF]): Aux[U :: T, U :: TF] = {
+      new FilterNonPrefixUnits[U :: T] { type Out = U :: TF }
+    }
+  }
+
   trait UnitTypeString[U] {
     def expr: String
   }
@@ -150,6 +214,25 @@ object infra {
         val code = s"""implicit val qpDefineUnit$tpe = new DerivedUnit[$tpeFull, ${uts.expr}](Rational("${du.coef}"), "${du.name}", "${du.abbv}")"""
       }
     }
+  }
+
+  case class UnitNames[S](names: List[String])
+  object UnitNames {
+    implicit def evidence0: UnitNames[HNil] = UnitNames[HNil](Nil)
+    implicit def evidence1[U, T <: HList](implicit bu: BaseUnit[U], t: UnitNames[T]): UnitNames[U :: T] =
+      UnitNames[U :: T](bu.name :: t.names)
+    implicit def evidence2[U, T <: HList](implicit du: DerivedUnit[U, _], t: UnitNames[T]): UnitNames[U :: T] =
+      UnitNames[U :: T](du.name :: t.names)
+  }
+
+  case class QPP[S](names: Seq[String], pfnames: Seq[String])
+  object QPP {
+    implicit def evidence0[S, U, PU](implicit
+        units: FilterNonPrefixUnits.Aux[S, U],
+        pfunits: FilterPrefixUnits.Aux[S, PU],
+        names: UnitNames[U],
+        pfnames: UnitNames[PU]): QPP[S] =
+      QPP[S](names.names, pfnames.names)
   }
 }
 
@@ -292,5 +375,16 @@ object parser extends Parsers {
       case NoSuccess(msg, next) => Left(QPParsingException(msg))
       case Success(result, next) => Right(result)
     }
+  }
+}
+
+class QuantityParser(units: Seq[String], pfunits: Seq[String]) {
+  val lex = new lexer.UnitDSLLexer(units, pfunits)
+}
+
+object QuantityParser {
+  import infra._
+  def apply[U <: shapeless.HList]: QuantityParser = {
+    new QuantityParser(Nil, Nil)
   }
 }
