@@ -212,6 +212,13 @@ object infra {
     }
   }
 
+  case class UnitDefs[S](codes: List[String])
+  object UnitDefs {
+    implicit def evidence0: UnitDefs[HNil] = UnitDefs[HNil](Nil)
+    implicit def evidence1[U, T <: HList](implicit c: UnitDefCode[U], t: UnitDefs[T]): UnitDefs[U :: T] =
+      UnitDefs[U :: T](c.code :: t.codes)
+  }
+
   case class UnitNames[S](names: List[String])
   object UnitNames {
     implicit def evidence0: UnitNames[HNil] = UnitNames[HNil](Nil)
@@ -221,14 +228,16 @@ object infra {
       UnitNames[U :: T](du.name :: t.names)
   }
 
-  case class QPP[S](names: Seq[String], pfnames: Seq[String])
+  case class QPP[S](names: Seq[String], pfnames: Seq[String], defs: Seq[String])
   object QPP {
     implicit def evidence0[S, U, PU](implicit
         units: FilterNonPrefixUnits.Aux[S, U],
         pfunits: FilterPrefixUnits.Aux[S, PU],
         names: UnitNames[U],
-        pfnames: UnitNames[PU]): QPP[S] =
-      QPP[S](names.names, pfnames.names)
+        pfnames: UnitNames[PU],
+        defs: UnitDefs[U],
+        pfdefs: UnitDefs[PU]): QPP[S] =
+      QPP[S](names.names, pfnames.names, defs.codes ++ pfdefs.codes)
   }
 }
 
