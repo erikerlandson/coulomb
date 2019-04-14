@@ -195,24 +195,20 @@ object infra {
       new UnitTypeString[%^[B, E]] { val expr = s"%^[${udfB.expr}, Witness.`${e.value}`.T]" }
   }
 
-  trait UnitDefCode[U] {
-    def code: String
-  }
+  case class UnitDefCode[U](code: String)
   object UnitDefCode {
     implicit def evidenceBase[U](implicit utt: TypeTag[U], bu: BaseUnit[U]): UnitDefCode[U] = {
       val tpe = utt.tpe.typeSymbol.name
       val tpeFull = utt.tpe.typeSymbol.fullName
-      new UnitDefCode[U] {
-        val code = s"""implicit val qpDefineUnit$tpe = new BaseUnit[$tpeFull]("${bu.name}", "${bu.abbv}")"""
-      }
+      UnitDefCode[U](
+        s"""implicit val qpDefineUnit$tpe = new BaseUnit[$tpeFull]("${bu.name}", "${bu.abbv}")""")
     }
 
     implicit def evidenceDerived[U, D](implicit utt: TypeTag[U], du: DerivedUnit[U, D], uts: UnitTypeString[D]): UnitDefCode[U] = {
       val tpe = utt.tpe.typeSymbol.name
       val tpeFull = utt.tpe.typeSymbol.fullName
-      new UnitDefCode[U] {
-        val code = s"""implicit val qpDefineUnit$tpe = new DerivedUnit[$tpeFull, ${uts.expr}](Rational("${du.coef}"), "${du.name}", "${du.abbv}")"""
-      }
+      UnitDefCode[U](
+        s"""implicit val qpDefineUnit$tpe = new DerivedUnit[$tpeFull, ${uts.expr}](Rational("${du.coef}"), "${du.name}", "${du.abbv}")""")
     }
   }
 
