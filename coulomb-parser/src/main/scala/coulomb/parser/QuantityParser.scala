@@ -195,12 +195,15 @@ object infra {
       new UnitTypeString[%^[B, E]] { val expr = s"%^[${udfB.expr}, Witness.`${e.value}`.T]" }
   }
 
-  case class UnitDefCode[U](code: String)
+  case class UnitDefCode[U](name: String, tpe: String, tpeFull: String, defCode: String)
   object UnitDefCode {
     implicit def evidenceBase[U](implicit utt: TypeTag[U], bu: BaseUnit[U]): UnitDefCode[U] = {
       val tpe = utt.tpe.typeSymbol.name
       val tpeFull = utt.tpe.typeSymbol.fullName
       UnitDefCode[U](
+        bu.name,
+        tpe.toString,
+        tpeFull.toString,
         s"""implicit val qpDefineUnit$tpe = new BaseUnit[$tpeFull]("${bu.name}", "${bu.abbv}")""")
     }
 
@@ -208,36 +211,31 @@ object infra {
       val tpe = utt.tpe.typeSymbol.name
       val tpeFull = utt.tpe.typeSymbol.fullName
       UnitDefCode[U](
+        du.name,
+        tpe.toString,
+        tpeFull.toString,
         s"""implicit val qpDefineUnit$tpe = new DerivedUnit[$tpeFull, ${uts.expr}](Rational("${du.coef}"), "${du.name}", "${du.abbv}")""")
     }
   }
 
-  case class UnitDefs[S](codes: List[String])
+  case class UnitDefs[S](codes: List[UnitDefCode[_]])
   object UnitDefs {
     implicit def evidence0: UnitDefs[HNil] = UnitDefs[HNil](Nil)
     implicit def evidence1[U, T <: HList](implicit c: UnitDefCode[U], t: UnitDefs[T]): UnitDefs[U :: T] =
-      UnitDefs[U :: T](c.code :: t.codes)
+      UnitDefs[U :: T](c :: t.codes)
   }
 
-  case class UnitNames[S](names: List[String])
-  object UnitNames {
-    implicit def evidence0: UnitNames[HNil] = UnitNames[HNil](Nil)
-    implicit def evidence1[U, T <: HList](implicit bu: BaseUnit[U], t: UnitNames[T]): UnitNames[U :: T] =
-      UnitNames[U :: T](bu.name :: t.names)
-    implicit def evidence2[U, T <: HList](implicit du: DerivedUnit[U, _], t: UnitNames[T]): UnitNames[U :: T] =
-      UnitNames[U :: T](du.name :: t.names)
-  }
-
-  case class QPP[S](names: Seq[String], pfnames: Seq[String], defs: Seq[String])
+  case class QPP[S](unames: Seq[String], pfnames: Seq[String], decls: Seq[String], nameToType: Map[String, String])
   object QPP {
-    implicit def evidence0[S, U, PU](implicit
-        units: FilterNonPrefixUnits.Aux[S, U],
-        pfunits: FilterPrefixUnits.Aux[S, PU],
-        names: UnitNames[U],
-        pfnames: UnitNames[PU],
-        defs: UnitDefs[U],
-        pfdefs: UnitDefs[PU]): QPP[S] =
-      QPP[S](names.names, pfnames.names, defs.codes ++ pfdefs.codes)
+    implicit def evidence0[S, SU, SPU](implicit
+        units: FilterNonPrefixUnits.Aux[S, SU],
+        pfunits: FilterPrefixUnits.Aux[S, SPU],
+        udefs: UnitDefs[SU],
+        pfdefs: UnitDefs[SPU]): QPP[S] = {
+      val alldefs = udefs.codes ++ pfdefs.codes
+      val nameToType = Map(alldefs.map { u => (u.name, u.tpeFull) } :_*)
+      QPP[S](udefs.codes.map(_.name), pfdefs.codes.map(_.name), alldefs.map(_.defCode), nameToType)
+    }
   }
 }
 
