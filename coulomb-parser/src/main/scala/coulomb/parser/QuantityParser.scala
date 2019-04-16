@@ -324,62 +324,64 @@ object ast {
   }
 }
 
-object parser extends Parsers {
+object parser {
   import lexer._
   import ast._
 
-  override type Elem = UnitDSLToken
+  class UnitDSLParser(unitToType: Map[String, String]) extends Parsers {
+    override type Elem = UnitDSLToken
 
-  class UnitDSLTokenReader(tokens: Seq[UnitDSLToken]) extends Reader[UnitDSLToken] {
-    override def first: UnitDSLToken = tokens.head
-    override def atEnd: Boolean = tokens.isEmpty
-    override def pos: Position = NoPosition
-    override def rest: Reader[UnitDSLToken] = new UnitDSLTokenReader(tokens.tail)
-  }
+    class UnitDSLTokenReader(tokens: Seq[UnitDSLToken]) extends Reader[UnitDSLToken] {
+      override def first: UnitDSLToken = tokens.head
+      override def atEnd: Boolean = tokens.isEmpty
+      override def pos: Position = NoPosition
+      override def rest: Reader[UnitDSLToken] = new UnitDSLTokenReader(tokens.tail)
+    }
 
-  def program: Parser[UnitAST] = {
-    phrase(unitexpr)
-  }
+    def program: Parser[UnitAST] = {
+      phrase(unitexpr)
+    }
 
-  def unitexpr: Parser[UnitAST] = {
-    exprL2
-  }
+    def unitexpr: Parser[UnitAST] = {
+      exprL2
+    }
 
-  def exprL2: Parser[UnitAST] = {
-    val mul = (exprL1 ~ MULOP ~ unitexpr) ^^ { case lhs ~ _ ~ rhs => Mul(lhs, rhs) }
-    val div = (exprL1 ~ DIVOP ~ unitexpr) ^^ { case num ~ _ ~ den => Div(num, den) }
-    mul | div | exprL1
-  }
+    def exprL2: Parser[UnitAST] = {
+      val mul = (exprL1 ~ MULOP ~ unitexpr) ^^ { case lhs ~ _ ~ rhs => Mul(lhs, rhs) }
+      val div = (exprL1 ~ DIVOP ~ unitexpr) ^^ { case num ~ _ ~ den => Div(num, den) }
+      mul | div | exprL1
+    }
 
-  def exprL1: Parser[UnitAST] = {
-    val pow = (atomic ~ POWOP ~ exponent) ^^ { case b ~ _ ~ EXP(e) => Pow(b, e) }
-    pow | atomic
-  }
+    def exprL1: Parser[UnitAST] = {
+      val pow = (atomic ~ POWOP ~ exponent) ^^ { case b ~ _ ~ EXP(e) => Pow(b, e) }
+      pow | atomic
+    }
 
-  def atomic: Parser[UnitAST] = {
-    val paren = (LPAREN ~ unitexpr ~ RPAREN) ^^ { case _ ~ expr ~ _ => expr }
-    val pfu = prefixunit ^^ { case PFUNIT(pname, uname) => Mul(Unit(pname), Unit(uname)) }
-    val u = unit ^^ { case UNIT(uname) => Unit(uname) }
-    paren | pfu | u
-  }
+    def atomic: Parser[UnitAST] = {
+      val paren = (LPAREN ~ unitexpr ~ RPAREN) ^^ { case _ ~ expr ~ _ => expr }
+      val pfu = prefixunit ^^ { case PFUNIT(pname, uname) => Mul(Unit(unitToType(pname)), Unit(unitToType(uname))) }
+      val u = unit ^^ { case UNIT(uname) => Unit(unitToType(uname)) }
+      paren | pfu | u
+    }
 
-  def unit: Parser[UNIT] = {
-    accept("unit", { case u @ UNIT(uname) => u })
-  }
+    def unit: Parser[UNIT] = {
+      accept("unit", { case u @ UNIT(uname) => u })
+    }
 
-  def prefixunit: Parser[PFUNIT] = {
-    accept("pfunit", { case pfu @ PFUNIT(pname, uname) => pfu })
-  }
+    def prefixunit: Parser[PFUNIT] = {
+      accept("pfunit", { case pfu @ PFUNIT(pname, uname) => pfu })
+    }
 
-  def exponent: Parser[EXP] = {
-    accept("exponent", { case exp @ EXP(e) => exp })
-  }
+    def exponent: Parser[EXP] = {
+      accept("exponent", { case exp @ EXP(e) => exp })
+    }
 
-  def apply(tokens: Seq[UnitDSLToken]): Either[QPParsingException, UnitAST] = {
-    val reader = new UnitDSLTokenReader(tokens)
-    program(reader) match {
-      case NoSuccess(msg, next) => Left(QPParsingException(msg))
-      case Success(result, next) => Right(result)
+    def apply(tokens: Seq[UnitDSLToken]): Either[QPParsingException, UnitAST] = {
+      val reader = new UnitDSLTokenReader(tokens)
+      program(reader) match {
+        case NoSuccess(msg, next) => Left(QPParsingException(msg))
+        case Success(result, next) => Right(result)
+      }
     }
   }
 }
@@ -391,11 +393,12 @@ class QuantityParser(qpp: infra.QPP[_]) {
   private val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
 
   val lex = new lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
+  val parse = new parser.UnitDSLParser(qpp.nameToType)
 
   def apply[N :TypeTag, U :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
     val t = for {
       tok <- lex(quantityExpr)
-      ast <- parser(tok).toTry
+      ast <- parse(tok).toTry
     } yield ast
 
     println(s"ast= $t")
