@@ -281,10 +281,11 @@ object lexer {
     }
 
     lazy val tokens: Parser[List[UnitDSLToken]] = {
+      // putting pfunit before unit is important here:
       phrase(rep1(
         mulop | divop | powop |
         lparen | rparen |
-        exp | unit | pfunit
+        exp | pfunit | unit
       )) ^^ { x => x }
     }
 
@@ -337,7 +338,7 @@ object parser extends Parsers {
   }
 
   def program: Parser[UnitAST] = {
-    unitexpr
+    phrase(unitexpr)
   }
 
   def unitexpr: Parser[UnitAST] = {
@@ -392,7 +393,12 @@ class QuantityParser(qpp: infra.QPP[_]) {
   val lex = new lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
 
   def apply[N :TypeTag, U :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
-    
+    val t = for {
+      tok <- lex(quantityExpr)
+      ast <- parser(tok).toTry
+    } yield ast
+
+    println(s"ast= $t")
 /*
     val tpeU = typeOf[U]
     val tpeN = typeOf[N]
