@@ -16,10 +16,12 @@ limitations under the License.
 
 package coulomb.parser
 
-import scala.util.Try
+import scala.util.{ Try, Success, Failure }
 
 import scala.util.parsing.combinator.{Parsers, RegexParsers}
 import scala.util.parsing.input.{NoPosition, Position, Reader}
+
+import coulomb._
 
 object infra {
   import scala.language.implicitConversions
@@ -381,13 +383,34 @@ object parser extends Parsers {
   }
 }
 
-class QuantityParser(units: Seq[String], pfunits: Seq[String]) {
-  val lex = new lexer.UnitDSLLexer(units, pfunits)
+class QuantityParser(qpp: infra.QPP[_]) {
+  import scala.reflect.runtime.universe.{ Try => _, _ }
+  import scala.tools.reflect.ToolBox
+
+  private val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
+
+  val lex = new lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
+
+  def apply[N :TypeTag, U :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
+    
+/*
+    val tpeU = typeOf[U]
+    val tpeN = typeOf[N]
+    for {
+      qeTree <- Try { toolbox.parse(s"${importStr}($quantityExpr).toUnit[$tpeU].toRep[$tpeN]") }
+      qeEval <- Try { toolbox.eval(qeTree) }
+      qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
+    } yield {
+      qret
+    }
+*/
+    Failure(new Exception("oh no"))
+  }
 }
 
 object QuantityParser {
   import infra._
-  def apply[U <: shapeless.HList]: QuantityParser = {
-    new QuantityParser(Nil, Nil)
+  def apply[U <: shapeless.HList](implicit qpp: QPP[U]): QuantityParser = {
+    new QuantityParser(qpp)
   }
 }
