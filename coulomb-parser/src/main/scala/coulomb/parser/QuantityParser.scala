@@ -395,25 +395,30 @@ class QuantityParser(qpp: infra.QPP[_]) {
   val lex = new lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
   val parse = new parser.UnitDSLParser(qpp.nameToType)
 
-  def apply[N :TypeTag, U :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
-    val t = for {
-      tok <- lex(quantityExpr)
-      ast <- parse(tok).toTry
-    } yield ast
+  val unitDecls = qpp.decls.map { d => s"$d\n" }.mkString("")
 
-    println(s"ast= $t")
-/*
+  val imports = Seq(
+    "coulomb._",
+    "coulomb.define._",
+    "spire.math.Rational"
+  ).map { i => s"import $i\n" }.mkString("")
+
+  val preamble = s"${imports}${unitDecls}"
+
+  def apply[N :TypeTag, U :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
     val tpeU = typeOf[U]
     val tpeN = typeOf[N]
+    val cast = s".toUnit[$tpeU].toNumeric[$tpeN]"
     for {
-      qeTree <- Try { toolbox.parse(s"${importStr}($quantityExpr).toUnit[$tpeU].toRep[$tpeN]") }
+      tok <- lex(quantityExpr)
+      ast <- parse(tok).toTry
+      code <- Try { s"${preamble}(Rational(1).withUnit[${ast}])${cast}" }
+      qeTree <- Try { toolbox.parse(code) }
       qeEval <- Try { toolbox.eval(qeTree) }
       qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
     } yield {
       qret
     }
-*/
-    Failure(new Exception("oh no"))
   }
 }
 
