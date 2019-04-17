@@ -249,7 +249,8 @@ object lexer {
   sealed trait UnitDSLToken
   case class UNIT(unit: String) extends UnitDSLToken
   case class PFUNIT(prefix: String, unit: String) extends UnitDSLToken
-  case class EXP(e: Int) extends UnitDSLToken
+  case class INTLIT(v: Int) extends UnitDSLToken
+  case class FPLIT(v: Double) extends UnitDSLToken
   case object MULOP extends UnitDSLToken
   case object DIVOP extends UnitDSLToken
   case object POWOP extends UnitDSLToken
@@ -271,7 +272,9 @@ object lexer {
       (s"($t1)($t2)").r
     }
 
-    val expRE = "([+-]?\\d+)".r
+    val intRE = "([+-]?\\d+)".r
+
+    val fpRE = "[+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE][+-]?\\d+)?".r
 
     def apply(expr: String): Try[List[UnitDSLToken]] = {
       parse(tokens, expr) match {
@@ -281,11 +284,11 @@ object lexer {
     }
 
     lazy val tokens: Parser[List[UnitDSLToken]] = {
-      // putting pfunit before unit is important here:
       phrase(rep1(
         mulop | divop | powop |
         lparen | rparen |
-        exp | pfunit | unit
+        intlit | fplit |   // int before fp matters
+        pfunit | unit      // pfunit before unit matters
       )) ^^ { x => x }
     }
 
@@ -295,7 +298,8 @@ object lexer {
       uu match { case pfunitRE(pf, u) => PFUNIT(pf, u) }
     }
 
-    def exp: Parser[EXP] = expRE ^^ { e => EXP(e.toInt) }
+    def intlit: Parser[INTLIT] = intRE ^^ { v => INTLIT(v.toInt) }
+    def fplit: Parser[FPLIT] = fpRE ^^ { v => FPLIT(v.toDouble) }
 
     def mulop = "*" ^^ (_ => MULOP)
     def divop = "/" ^^ (_ => DIVOP)
@@ -353,7 +357,7 @@ object parser {
     }
 
     def exprL1: Parser[UnitAST] = {
-      val pow = (atomic ~ POWOP ~ exponent) ^^ { case b ~ _ ~ EXP(e) => Pow(b, e) }
+      val pow = (atomic ~ POWOP ~ exponent) ^^ { case b ~ _ ~ INTLIT(e) => Pow(b, e) }
       pow | atomic
     }
 
@@ -372,8 +376,8 @@ object parser {
       accept("pfunit", { case pfu @ PFUNIT(pname, uname) => pfu })
     }
 
-    def exponent: Parser[EXP] = {
-      accept("exponent", { case exp @ EXP(e) => exp })
+    def exponent: Parser[INTLIT] = {
+      accept("exponent", { case exp @ INTLIT(e) => exp })
     }
 
     def apply(tokens: Seq[UnitDSLToken]): Either[QPParsingException, UnitAST] = {
