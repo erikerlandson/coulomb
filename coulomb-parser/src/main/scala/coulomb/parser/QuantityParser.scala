@@ -194,7 +194,7 @@ object infra {
       new UnitTypeString[%/[L, R]] { val expr = s"%/[${udfL.expr}, ${udfR.expr}]" }
 
     implicit def evidencePow[B, E](implicit udfB: UnitTypeString[B], e: XIntValue[E]): UnitTypeString[%^[B, E]] =
-      new UnitTypeString[%^[B, E]] { val expr = s"%^[${udfB.expr}, Witness.`${e.value}`.T]" }
+      new UnitTypeString[%^[B, E]] { val expr = s"%^[${udfB.expr}, ${e.value}]" }
   }
 
   case class UnitDefCode[U](name: String, tpe: String, tpeFull: String, defCode: String)
@@ -249,8 +249,7 @@ object lexer {
   sealed trait UnitDSLToken
   case class UNIT(unit: String) extends UnitDSLToken
   case class PFUNIT(prefix: String, unit: String) extends UnitDSLToken
-  case class INTLIT(v: Int) extends UnitDSLToken
-  case class FPLIT(v: Double) extends UnitDSLToken
+  case class NUMLIT(n: Double, isInt: Boolean) extends UnitDSLToken
   case object MULOP extends UnitDSLToken
   case object DIVOP extends UnitDSLToken
   case object POWOP extends UnitDSLToken
@@ -272,9 +271,7 @@ object lexer {
       (s"($t1)($t2)").r
     }
 
-    val intRE = "([+-]?\\d+)".r
-
-    val fpRE = "[+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE][+-]?\\d+)?".r
+    val fpRE = "([+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE][+-]?\\d+)?)".r
 
     def apply(expr: String): Try[List[UnitDSLToken]] = {
       parse(tokens, expr) match {
@@ -287,19 +284,21 @@ object lexer {
       phrase(rep1(
         mulop | divop | powop |
         lparen | rparen |
-        intlit | fplit |   // int before fp matters
+        numlit |
         pfunit | unit      // pfunit before unit matters
       )) ^^ { x => x }
     }
 
     def unit: Parser[UNIT] = unitRE ^^ { u => UNIT(u) }
 
-    def pfunit: Parser[PFUNIT] = pfunitRE ^^ { uu =>
-      uu match { case pfunitRE(pf, u) => PFUNIT(pf, u) }
-    }
+    def pfunit: Parser[PFUNIT] = pfunitRE ^^ { case pfunitRE(pf, u) => PFUNIT(pf, u) }
 
-    def intlit: Parser[INTLIT] = intRE ^^ { v => INTLIT(v.toInt) }
-    def fplit: Parser[FPLIT] = fpRE ^^ { v => FPLIT(v.toDouble) }
+    def numlit: Parser[NUMLIT] = fpRE ^^ { t =>
+      Try { t.toInt } match {
+        case scala.util.Success(i) => NUMLIT(i, true)
+        case _ => NUMLIT(t.toDouble, false)
+      }
+    }
 
     def mulop = "*" ^^ (_ => MULOP)
     def divop = "/" ^^ (_ => DIVOP)
@@ -313,12 +312,14 @@ object lexer {
 object ast {
   sealed trait UnitAST {
     override def toString = this match {
+      case Quant(v, u) => s"(Rational($v)).withUnit[$u]"
       case Unit(u) => u
       case Mul(lhs, rhs) => s"%*[$lhs, $rhs]"
       case Div(num, den) => s"%/[$num, $den]"
-      case Pow(rad, exp) => s"%^[$rad, Witness.`$exp`.T]"
+      case Pow(rad, exp) => s"%^[$rad, $exp]"
     }
   }
+  case class Quant(v: Double, u: String) extends UnitAST
   case class Unit(unitType: String) extends UnitAST
   case class Mul(lhs: UnitAST, rhs: UnitAST) extends UnitAST
   case class Div(num: UnitAST, den: UnitAST) extends UnitAST
@@ -343,7 +344,11 @@ object parser {
     }
 
     def program: Parser[UnitAST] = {
-      phrase(unitexpr)
+      phrase(quant)
+    }
+
+    def quant: Parser[UnitAST] = {
+      (qval ~ unitexpr) ^^ { case NUMLIT(v, _) ~ u => Quant(v, u.toString) }
     }
 
     def unitexpr: Parser[UnitAST] = {
@@ -357,7 +362,7 @@ object parser {
     }
 
     def exprL1: Parser[UnitAST] = {
-      val pow = (atomic ~ POWOP ~ exponent) ^^ { case b ~ _ ~ INTLIT(e) => Pow(b, e) }
+      val pow = (atomic ~ POWOP ~ exponent) ^^ { case b ~ _ ~ NUMLIT(e, true) => Pow(b, e.toInt) }
       pow | atomic
     }
 
@@ -376,8 +381,12 @@ object parser {
       accept("pfunit", { case pfu @ PFUNIT(pname, uname) => pfu })
     }
 
-    def exponent: Parser[INTLIT] = {
-      accept("exponent", { case exp @ INTLIT(e) => exp })
+    def exponent: Parser[NUMLIT] = {
+      accept("exponent", { case exp @ NUMLIT(e, true) => exp })
+    }
+
+    def qval: Parser[NUMLIT] = {
+      accept("quantity value", { case qv @ NUMLIT(v, _) => qv })
     }
 
     def apply(tokens: Seq[UnitDSLToken]): Either[QPParsingException, UnitAST] = {
@@ -407,16 +416,16 @@ class QuantityParser(qpp: infra.QPP[_]) {
     "spire.math.Rational"
   ).map { i => s"import $i\n" }.mkString("")
 
+  // figure out how to pre-compile this preamble
   val preamble = s"${imports}${unitDecls}"
 
-  def apply[N :TypeTag, U :TypeTag](quantityExpr: String): Try[Quantity[N, U]] = {
-    val tpeU = typeOf[U]
+  def apply[N :TypeTag, U](quantityExpr: String)(implicit uts: infra.UnitTypeString[U]): Try[Quantity[N, U]] = {
     val tpeN = typeOf[N]
-    val cast = s".toUnit[$tpeU].toNumeric[$tpeN]"
+    val cast = s".toUnit[${uts.expr}].toNumeric[$tpeN]"
     for {
       tok <- lex(quantityExpr)
       ast <- parse(tok).toTry
-      code <- Try { s"${preamble}(Rational(1).withUnit[${ast}])${cast}" }
+      code <- Try { s"${preamble}($ast)${cast}" }
       qeTree <- Try { toolbox.parse(code) }
       qeEval <- Try { toolbox.eval(qeTree) }
       qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
