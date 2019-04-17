@@ -271,7 +271,7 @@ object lexer {
       (s"($t1)($t2)").r
     }
 
-    val fpRE = "([+-]?(\\d+|\\d+\\.\\d+|\\.\\d+|\\d+\\.)([eE][+-]?\\d+)?)".r
+    val fpRE = "([+-]?(\\d+\\.\\d+|\\d+\\.|\\d+|\\.\\d+)([eE][+-]?\\d+)?)".r
 
     def apply(expr: String): Try[List[UnitDSLToken]] = {
       parse(tokens, expr) match {
