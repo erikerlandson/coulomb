@@ -421,7 +421,9 @@ class QuantityParser(qpp: infra.QPP[_]) {
   // figure out how to pre-compile this preamble
   val preamble = s"${imports}${unitDecls}"
 
-  def apply[N :TypeTag, U](quantityExpr: String)(implicit uts: infra.UnitTypeString[U]): Try[Quantity[N, U]] = {
+  def apply[N, U](quantityExpr: String)(implicit
+      ntt: TypeTag[N],
+      uts: infra.UnitTypeString[U]): Try[Quantity[N, U]] = {
     val tpeN = typeOf[N]
     val cast = s".toUnit[${uts.expr}].toNumeric[$tpeN]"
     for {
