@@ -124,8 +124,8 @@ object PowResultType {
     new PowResultType[U, P] { type Out = RT }
 }
 
-trait Invoke[O]
 object invoke {
+  trait Invoke[O]
   def apply[I <: { type Out } ](implicit i: I): Invoke[i.Out] = new Invoke[i.Out] {}
   def ss[I <: { type OutN; type OutD }](implicit i: I): Invoke[(i.OutN, i.OutD)] = new Invoke[(i.OutN, i.OutD)] {}
 }
