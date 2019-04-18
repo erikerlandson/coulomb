@@ -271,6 +271,7 @@ object lexer {
       (s"($t1)($t2)").r
     }
 
+    // order of "x.y" alternatives matters here, to bind longest possible sequence preferentially
     val fpRE = "([+-]?(\\d+\\.\\d+|\\d+\\.|\\d+|\\.\\d+)([eE][+-]?\\d+)?)".r
 
     def apply(expr: String): Try[List[UnitDSLToken]] = {
@@ -281,11 +282,12 @@ object lexer {
     }
 
     lazy val tokens: Parser[List[UnitDSLToken]] = {
+      // pfunit before unit matters, to bind both prefix and unit preferntially
       phrase(rep1(
-        mulop | divop | powop |
-        lparen | rparen |
         numlit |
-        pfunit | unit      // pfunit before unit matters
+        pfunit | unit |
+        mulop | divop | powop |
+        lparen | rparen
       )) ^^ { x => x }
     }
 
