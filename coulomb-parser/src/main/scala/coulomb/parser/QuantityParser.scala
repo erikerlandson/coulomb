@@ -20,25 +20,25 @@ import scala.util.{ Try, Success, Failure }
 
 import coulomb._
 
-class QuantityParser(qpp: coulomb.parser.infra.QPP[_]) {
+class QuantityParser private (qpp: coulomb.parser.infra.QPP[_]) {
   import scala.reflect.runtime.universe.{ Try => _, _ }
   import scala.tools.reflect.ToolBox
 
   private val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
 
-  val lex = new coulomb.parser.lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
-  val parse = new coulomb.parser.parser.UnitDSLParser(qpp.nameToType)
+  private val lex = new coulomb.parser.lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
+  private val parse = new coulomb.parser.parser.UnitDSLParser(qpp.nameToType)
 
-  val unitDecls = qpp.decls.map { d => s"$d\n" }.mkString("")
+  private val unitDecls = qpp.decls.map { d => s"$d\n" }.mkString("")
 
-  val imports = Seq(
+  private val imports = Seq(
     "coulomb._",
     "coulomb.define._",
     "spire.math.Rational"
   ).map { i => s"import $i\n" }.mkString("")
 
   // figure out how to pre-compile this preamble
-  val preamble = s"${imports}${unitDecls}"
+  private val preamble = s"${imports}${unitDecls}"
 
   def apply[N, U](quantityExpr: String)(implicit
       ntt: TypeTag[N],
