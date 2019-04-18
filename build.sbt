@@ -2,23 +2,18 @@ def commonSettings = Seq(
   organization := "com.manyangled",
   version := "0.3.0-SNAPSHOT",
   scalaVersion := "2.13.0-M5",
-  //crossScalaVersions := Seq("2.12.4"),
+  crossScalaVersions := Seq("2.13.0-M5"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "org.scala-lang" % "scala-compiler" % scalaVersion.value,
     "eu.timepit" %% "singleton-ops" % "0.3.1",
-    //"com.chuusai" %% "shapeless" % "2.3.2",
     "org.typelevel" %% "spire-macros" % "0.16.1",
     "org.typelevel" %% "spire" % "0.16.1",
     "org.scalatest" %% "scalatest" % "3.0.7" % Test
   ),
-  //addCompilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full),
-  //scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xlog-implicits"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
 
