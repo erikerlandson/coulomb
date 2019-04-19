@@ -34,8 +34,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
 
   def showUnitFull(implicit ustr: UnitString[U]): String = ustr.full
 
-  def -[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Quantity[N, U] =
-    new Quantity[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
+  def -[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Quantity[N, U] =
+    new Quantity[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
 
   def +[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Temperature[N, U] =
     new Temperature[N, U](uc.n1.plus(value, uc.cv21(rhs.value)))
@@ -43,32 +43,32 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
   def -[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Temperature[N, U] =
     new Temperature[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
 
-  def ===[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) == 0
+  def ===[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) == 0
 
-  def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) != 0
+  def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) != 0
 
-  def <[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) < 0
+  def <[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) < 0
 
-  def <=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) <= 0
+  def <=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) <= 0
 
-  def >[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) > 0
+  def >[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) > 0
 
-  def >=[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) >= 0
+  def >=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) >= 0
 
-  def toUnit[U2](implicit ubo: TempConverterOps[N, U, N, U2]): Temperature[N, U2] =
-    new Temperature[N, U2](ubo.cv12(value))
+  def toUnit[U2](implicit uc: TempConverter[N, U, N, U2]): Temperature[N, U2] =
+    new Temperature[N, U2](uc.cv12(value))
 
-  def toNumeric[N2](implicit ubo: TempConverterOps[N, U, N2, U]): Temperature[N2, U] =
-    new Temperature[N2, U](ubo.cn12(value))
+  def toNumeric[N2](implicit uc: TempConverter[N, U, N2, U]): Temperature[N2, U] =
+    new Temperature[N2, U](uc.cv12(value))
 
-  def to[N2, U2](implicit ubo: TempConverterOps[N, U, N2, U2]): Temperature[N2, U2] =
-    new Temperature[N2, U2](ubo.cv12(value))
+  def to[N2, U2](implicit uc: TempConverter[N, U, N2, U2]): Temperature[N2, U2] =
+    new Temperature[N2, U2](uc.cv12(value))
 }
 
 object Temperature {
@@ -84,6 +84,6 @@ object Temperature {
   def toQuantity[N, U](t: Temperature[N, U]): Quantity[N, U] = new Quantity[N, U](t.value)
 
   implicit def implicitlyConvertTemperature[N1, U1, N2, U2](t1: Temperature[N1, U1])(implicit
-      cv12: TempConverter[N1, U1, N2, U2]): Temperature[N2, U2] =
-    new Temperature[N2, U2](cv12(t1.value))
+      uc: TempConverter[N1, U1, N2, U2]): Temperature[N2, U2] =
+    new Temperature[N2, U2](uc.cv12(t1.value))
 }
