@@ -31,52 +31,6 @@ object UnitStringAST {
   case class Mul(l: UnitStringAST, r: UnitStringAST) extends UnitStringAST
   case class Div(n: UnitStringAST, d: UnitStringAST) extends UnitStringAST
   case class Pow(b: UnitStringAST, e: Int) extends UnitStringAST
-}
-
-trait HasUnitStringAST[U] {
-  def ast: UnitStringAST
-  override def toString = ast.toString
-}
-object HasUnitStringAST {
-  import UnitStringAST._
-
-  implicit def evidence0: HasUnitStringAST[Unitless] =
-    new HasUnitStringAST[Unitless] { val ast = Uni }
-
-  implicit def evidence1[P](implicit d: DerivedUnit[P, Unitless]): HasUnitStringAST[P] =
-    new HasUnitStringAST[P] { val ast = Pre(d) }
-
-  implicit def evidence2[U, D](implicit d: DerivedUnit[U, D], nu: D =:!= Unitless): HasUnitStringAST[U] =
-    new HasUnitStringAST[U] { val ast = Def(d) }
-
-  implicit def evidence3[U](implicit d: BaseUnit[U]): HasUnitStringAST[U] =
-    new HasUnitStringAST[U] { val ast = Def(d) }
-
-  implicit def evidence4[L, R](implicit l: HasUnitStringAST[L], r: HasUnitStringAST[R]): HasUnitStringAST[%*[L, R]] =
-    new HasUnitStringAST[%*[L, R]] { val ast = Mul(l.ast, r.ast) }
-
-  implicit def evidence5[N, D](implicit n: HasUnitStringAST[N], d: HasUnitStringAST[D]): HasUnitStringAST[%/[N, D]] =
-    new HasUnitStringAST[%/[N, D]] { val ast = Div(n.ast, d.ast) }
-
-  implicit def evidence6[B, E](implicit b: HasUnitStringAST[B], e: XIntValue[E]): HasUnitStringAST[%^[B, E]] =
-    new HasUnitStringAST[%^[B, E]] { val ast = Pow(b.ast, e.value) }
-}
-
-trait UnitString[U] {
-  def full: String
-  def abbv: String
-}
-object UnitString {
-  import UnitStringAST._
-
-  implicit def evidence[U](implicit uast: HasUnitStringAST[U]): UnitString[U] = {
-    val fs = render(uast.ast, (d: UnitDefinition) => d.name)
-    val as = render(uast.ast, (d: UnitDefinition) => d.abbv)
-    new UnitString[U] {
-      val full = fs
-      val abbv = as
-    }
-  }
 
   def render(ast: UnitStringAST, f: UnitDefinition => String): String = ast match {
     case FlatMul(t) => termStrings(t, f).mkString(" ")
@@ -130,5 +84,51 @@ object UnitString {
     case Pow(FlatMul(Pre(_) +: Def(_) +: Nil), _) => true
     case FlatMul(Pre(_) +: Def(_) +: Nil) => true
     case _ => false
+  }
+}
+
+trait HasUnitStringAST[U] {
+  def ast: UnitStringAST
+  override def toString = ast.toString
+}
+object HasUnitStringAST {
+  import UnitStringAST._
+
+  implicit def evidence0: HasUnitStringAST[Unitless] =
+    new HasUnitStringAST[Unitless] { val ast = Uni }
+
+  implicit def evidence1[P](implicit d: DerivedUnit[P, Unitless]): HasUnitStringAST[P] =
+    new HasUnitStringAST[P] { val ast = Pre(d) }
+
+  implicit def evidence2[U, D](implicit d: DerivedUnit[U, D], nu: D =:!= Unitless): HasUnitStringAST[U] =
+    new HasUnitStringAST[U] { val ast = Def(d) }
+
+  implicit def evidence3[U](implicit d: BaseUnit[U]): HasUnitStringAST[U] =
+    new HasUnitStringAST[U] { val ast = Def(d) }
+
+  implicit def evidence4[L, R](implicit l: HasUnitStringAST[L], r: HasUnitStringAST[R]): HasUnitStringAST[%*[L, R]] =
+    new HasUnitStringAST[%*[L, R]] { val ast = Mul(l.ast, r.ast) }
+
+  implicit def evidence5[N, D](implicit n: HasUnitStringAST[N], d: HasUnitStringAST[D]): HasUnitStringAST[%/[N, D]] =
+    new HasUnitStringAST[%/[N, D]] { val ast = Div(n.ast, d.ast) }
+
+  implicit def evidence6[B, E](implicit b: HasUnitStringAST[B], e: XIntValue[E]): HasUnitStringAST[%^[B, E]] =
+    new HasUnitStringAST[%^[B, E]] { val ast = Pow(b.ast, e.value) }
+}
+
+trait UnitString[U] {
+  def full: String
+  def abbv: String
+}
+object UnitString {
+  import UnitStringAST._
+
+  implicit def evidence[U](implicit uast: HasUnitStringAST[U]): UnitString[U] = {
+    val fs = UnitStringAST.render(uast.ast, (d: UnitDefinition) => d.name)
+    val as = UnitStringAST.render(uast.ast, (d: UnitDefinition) => d.abbv)
+    new UnitString[U] {
+      val full = fs
+      val abbv = as
+    }
   }
 }
