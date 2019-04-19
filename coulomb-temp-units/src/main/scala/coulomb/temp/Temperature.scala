@@ -37,11 +37,11 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
   def -[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Quantity[N, U] =
     new Quantity[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
 
-  def +[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Temperature[N, U] =
-    new Temperature[N, U](ubo.n1.plus(value, ubo.cv21(rhs.value)))
+  def +[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Temperature[N, U] =
+    new Temperature[N, U](uc.n1.plus(value, uc.cv21(rhs.value)))
 
-  def -[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Temperature[N, U] =
-    new Temperature[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
+  def -[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Temperature[N, U] =
+    new Temperature[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
 
   def ===[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Boolean =
     ubo.n1.compare(value, ubo.cv21(rhs.value)) == 0

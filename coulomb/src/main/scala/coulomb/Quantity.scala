@@ -37,47 +37,47 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
   def unary_-() (implicit n: Numeric[N]): Quantity[N, U] =
     new Quantity[N, U](n.negate(value))
 
-  def +[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Quantity[N, U] =
-    new Quantity[N, U](ubo.n1.plus(value, ubo.cv21(rhs.value)))
+  def +[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N, U] =
+    new Quantity[N, U](uc.n1.plus(value, uc.cv21(rhs.value)))
 
-  def -[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Quantity[N, U] =
-    new Quantity[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
+  def -[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N, U] =
+    new Quantity[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
 
-  def *[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitProductOps[N, U, N2, U2]): Quantity[N, ubo.MulRT12] =
-    new Quantity[N, ubo.MulRT12](ubo.n1.times(value, ubo.cn21(rhs.value)))
+  def *[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitProductOps[N, U, N2, U2]): Quantity[N, uc.MulRT12] =
+    new Quantity[N, uc.MulRT12](uc.n1.times(value, uc.cn21(rhs.value)))
 
-  def /[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitProductOps[N, U, N2, U2]): Quantity[N, ubo.DivRT12] =
-    new Quantity[N, ubo.DivRT12](ubo.n1.div(value, ubo.cn21(rhs.value)))
+  def /[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitProductOps[N, U, N2, U2]): Quantity[N, uc.DivRT12] =
+    new Quantity[N, uc.DivRT12](uc.n1.div(value, uc.cn21(rhs.value)))
 
   def pow[P](implicit upo: UnitPowerOps[N, U, P], p: infra.XIntValue[P]): Quantity[N, upo.PowRT] =
     new Quantity[N, upo.PowRT](upo.n.pow(value, p.value))
 
-  def ===[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) == 0
+  def ===[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) == 0
 
-  def =!=[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) != 0
+  def =!=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) != 0
 
-  def <[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) < 0
+  def <[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) < 0
 
-  def <=[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) <= 0
+  def <=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) <= 0
 
-  def >[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) > 0
+  def >[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) > 0
 
-  def >=[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Boolean =
-    ubo.n1.compare(value, ubo.cv21(rhs.value)) >= 0
+  def >=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
+    uc.n1.compare(value, uc.cv21(rhs.value)) >= 0
 
-  def toUnit[U2](implicit ubo: UnitConverterOps[N, U, N, U2]): Quantity[N, U2] =
-    new Quantity[N, U2](ubo.cv12(value))
+  def toUnit[U2](implicit uc: UnitConverter[N, U, N, U2]): Quantity[N, U2] =
+    new Quantity[N, U2](uc.cv12(value))
 
-  def toNumeric[N2](implicit ubo: UnitConverterOps[N, U, N2, U]): Quantity[N2, U] =
-    new Quantity[N2, U](ubo.cn12(value))
+  def toNumeric[N2](implicit uc: UnitConverter[N, U, N2, U]): Quantity[N2, U] =
+    new Quantity[N2, U](uc.cv12(value))
 
-  def to[N2, U2](implicit ubo: UnitConverterOps[N, U, N2, U2]): Quantity[N2, U2] =
-    new Quantity[N2, U2](ubo.cv12(value))
+  def to[N2, U2](implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N2, U2] =
+    new Quantity[N2, U2](uc.cv12(value))
 }
 
 object Quantity {
@@ -90,6 +90,6 @@ object Quantity {
   def showUnitFull[U](implicit ustr: UnitString[U]): String = ustr.full
 
   implicit def implicitlyConvertQuantity[N1, U1, N2, U2](q1: Quantity[N1, U1])(implicit
-      cv12: infra.Converter[N1, U1, N2, U2]): Quantity[N2, U2] =
-    new Quantity[N2, U2](cv12(q1.value))
+      uc: UnitConverter[N1, U1, N2, U2]): Quantity[N2, U2] =
+    new Quantity[N2, U2](uc.cv12(q1.value))
 }
