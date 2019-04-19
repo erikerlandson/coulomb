@@ -43,11 +43,11 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
   def -[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N, U] =
     new Quantity[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
 
-  def *[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitProductOps[N, U, N2, U2]): Quantity[N, uc.MulRT12] =
-    new Quantity[N, uc.MulRT12](uc.n1.times(value, uc.cn21(rhs.value)))
+  def *[N2, U2](rhs: Quantity[N2, U2])(implicit um: UnitMultiply[N, U, N2, U2]): Quantity[N, um.RT12] =
+    new Quantity[N, um.RT12](um.n1.times(value, um.cn21(rhs.value)))
 
-  def /[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitProductOps[N, U, N2, U2]): Quantity[N, uc.DivRT12] =
-    new Quantity[N, uc.DivRT12](uc.n1.div(value, uc.cn21(rhs.value)))
+  def /[N2, U2](rhs: Quantity[N2, U2])(implicit ud: UnitDivide[N, U, N2, U2]): Quantity[N, ud.RT12] =
+    new Quantity[N, ud.RT12](ud.n1.div(value, ud.cn21(rhs.value)))
 
   def pow[P](implicit up: UnitPower[N, U, P]): Quantity[N, up.PowRT] =
     new Quantity[N, up.PowRT](up.n.pow(value, up.p))
