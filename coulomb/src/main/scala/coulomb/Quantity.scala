@@ -49,8 +49,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
   def /[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitProductOps[N, U, N2, U2]): Quantity[N, uc.DivRT12] =
     new Quantity[N, uc.DivRT12](uc.n1.div(value, uc.cn21(rhs.value)))
 
-  def pow[P](implicit upo: UnitPowerOps[N, U, P], p: infra.XIntValue[P]): Quantity[N, upo.PowRT] =
-    new Quantity[N, upo.PowRT](upo.n.pow(value, p.value))
+  def pow[P](implicit up: UnitPower[N, U, P]): Quantity[N, up.PowRT] =
+    new Quantity[N, up.PowRT](up.n.pow(value, up.p))
 
   def ===[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
     uc.n1.compare(value, uc.cv21(rhs.value)) == 0
