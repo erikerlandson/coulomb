@@ -26,13 +26,13 @@ import coulomb.define._
 class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Serializable {
   override def toString = s"Temperature($value)"
 
-  def show(implicit uo: TempOps[N, U]): String = s"$value ${uo.ustr.abbv}"
+  def show(implicit ustr: UnitString[U]): String = s"$value ${ustr.abbv}"
 
-  def showFull(implicit uo: TempOps[N, U]): String = s"$value ${uo.ustr.full}"
+  def showFull(implicit ustr: UnitString[U]): String = s"$value ${ustr.full}"
 
-  def showUnit(implicit uo: TempOps[N, U]): String = uo.ustr.abbv
+  def showUnit(implicit ustr: UnitString[U]): String = ustr.abbv
 
-  def showUnitFull(implicit uo: TempOps[N, U]): String = uo.ustr.full
+  def showUnitFull(implicit ustr: UnitString[U]): String = ustr.full
 
   def -[N2, U2](rhs: Temperature[N2, U2])(implicit ubo: TempConverterOps[N, U, N2, U2]): Quantity[N, U] =
     new Quantity[N, U](ubo.n1.minus(value, ubo.cv21(rhs.value)))
