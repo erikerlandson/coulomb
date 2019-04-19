@@ -115,20 +115,3 @@ object HasUnitStringAST {
   implicit def evidence6[B, E](implicit b: HasUnitStringAST[B], e: XIntValue[E]): HasUnitStringAST[%^[B, E]] =
     new HasUnitStringAST[%^[B, E]] { val ast = Pow(b.ast, e.value) }
 }
-
-trait UnitString[U] {
-  def full: String
-  def abbv: String
-}
-object UnitString {
-  import UnitStringAST._
-
-  implicit def evidence[U](implicit uast: HasUnitStringAST[U]): UnitString[U] = {
-    val fs = UnitStringAST.render(uast.ast, (d: UnitDefinition) => d.name)
-    val as = UnitStringAST.render(uast.ast, (d: UnitDefinition) => d.abbv)
-    new UnitString[U] {
-      val full = fs
-      val abbv = as
-    }
-  }
-}
