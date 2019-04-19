@@ -20,23 +20,22 @@ import scala.language.implicitConversions
 
 import spire.math.Rational
 
-import infra._
 import unitops._
 
 class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   override def toString = s"Quantity($value)"
 
-  def show(implicit uo: UnitOps[N, U]): String = s"$value ${uo.ustr.abbv}"
+  def show(implicit ustr: UnitString[U]): String = s"$value ${ustr.abbv}"
 
-  def showFull(implicit uo: UnitOps[N, U]): String = s"$value ${uo.ustr.full}"
+  def showFull(implicit ustr: UnitString[U]): String = s"$value ${ustr.full}"
 
-  def showUnit(implicit uo: UnitOps[N, U]): String = uo.ustr.abbv
+  def showUnit(implicit ustr: UnitString[U]): String = ustr.abbv
 
-  def showUnitFull(implicit uo: UnitOps[N, U]): String = uo.ustr.full
+  def showUnitFull(implicit ustr: UnitString[U]): String = ustr.full
 
-  def unary_-() (implicit uo: UnitOps[N, U]): Quantity[N, U] =
-    new Quantity[N, U](uo.n.negate(value))
+  def unary_-() (implicit n: Numeric[N]): Quantity[N, U] =
+    new Quantity[N, U](n.negate(value))
 
   def +[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Quantity[N, U] =
     new Quantity[N, U](ubo.n1.plus(value, ubo.cv21(rhs.value)))
@@ -50,7 +49,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
   def /[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitProductOps[N, U, N2, U2]): Quantity[N, ubo.DivRT12] =
     new Quantity[N, ubo.DivRT12](ubo.n1.div(value, ubo.cn21(rhs.value)))
 
-  def pow[P](implicit upo: UnitPowerOps[N, U, P], p: XIntValue[P]): Quantity[N, upo.PowRT] =
+  def pow[P](implicit upo: UnitPowerOps[N, U, P], p: infra.XIntValue[P]): Quantity[N, upo.PowRT] =
     new Quantity[N, upo.PowRT](upo.n.pow(value, p.value))
 
   def ===[N2, U2](rhs: Quantity[N2, U2])(implicit ubo: UnitConverterOps[N, U, N2, U2]): Boolean =
@@ -84,13 +83,13 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 object Quantity {
   def apply[N, U](v: N) = new Quantity[N, U](v)
 
-  def coefficient[U1, U2](implicit cu: ConvertableUnits[U1, U2]): Rational = cu.coef
+  def coefficient[U1, U2](implicit cu: infra.ConvertableUnits[U1, U2]): Rational = cu.coef
 
   def showUnit[U](implicit ustr: UnitString[U]): String = ustr.abbv
 
   def showUnitFull[U](implicit ustr: UnitString[U]): String = ustr.full
 
   implicit def implicitlyConvertQuantity[N1, U1, N2, U2](q1: Quantity[N1, U1])(implicit
-      cv12: Converter[N1, U1, N2, U2]): Quantity[N2, U2] =
+      cv12: infra.Converter[N1, U1, N2, U2]): Quantity[N2, U2] =
     new Quantity[N2, U2](cv12(q1.value))
 }

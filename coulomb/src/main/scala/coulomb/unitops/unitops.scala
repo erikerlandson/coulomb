@@ -24,16 +24,23 @@ import spire.math._
 
 import coulomb.infra._
 
-trait UnitOps[N, U] {
-  def n: Numeric[N]
-  def ustr: UnitString[U]
+import coulomb.define.UnitDefinition
+
+trait UnitString[U] {
+  def full: String
+  def abbv: String
 }
-object UnitOps {
-  implicit def evidence[N, U](implicit nn: Numeric[N], us: UnitString[U]): UnitOps[N, U] =
-    new UnitOps[N, U] {
-      val n = nn
-      val ustr = us
+object UnitString {
+  import UnitStringAST._
+
+  implicit def evidence[U](implicit uast: HasUnitStringAST[U]): UnitString[U] = {
+    val fs = UnitStringAST.render(uast.ast, (d: UnitDefinition) => d.name)
+    val as = UnitStringAST.render(uast.ast, (d: UnitDefinition) => d.abbv)
+    new UnitString[U] {
+      val full = fs
+      val abbv = as
     }
+  }
 }
 
 trait UnitConverterOps[N1, U1, N2, U2] {
