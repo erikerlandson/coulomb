@@ -20,8 +20,7 @@ import scala.language.implicitConversions
 
 import coulomb._
 import coulomb.unitops._
-import coulomb.infra._
-import coulomb.define._
+import coulomb.define.DerivedTemp
 
 class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Serializable {
   override def toString = s"Temperature($value)"
