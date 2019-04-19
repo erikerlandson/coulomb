@@ -21,29 +21,30 @@ import spire.math._
 import coulomb.infra._
 import coulomb.define._
 
-trait TempConverterOps[N1, U1, N2, U2] {
+trait TempConverter[N1, U1, N2, U2] {
   def n1: Numeric[N1]
   def n2: Numeric[N2]
-  def cv12: TempConverter[N1, U1, N2, U2]
-  def cv21: TempConverter[N2, U2, N1, U1]
-  def cn12(x: N1): N2
-  def cn21(x: N2): N1
+  def cv12(v: N1): N2
+  def cv21(v: N2): N1
 }
-
-object TempConverterOps {
-  type Aux[N1, U1, N2, U2] = TempConverterOps[N1, U1, N2, U2] {
-  }
+trait TempConverterDefaultPriority {
+  // this default rule should work well everywhere but may be overridden for efficiency
   implicit def evidence[N1, U1, N2, U2](implicit
-      nn1: Numeric[N1],
-      nn2: Numeric[N2],
-      cvv12: TempConverter[N1, U1, N2, U2],
-      cvv21: TempConverter[N2, U2, N1, U1]): Aux[N1, U1, N2, U2] =
-    new TempConverterOps[N1, U1, N2, U2] {
+      t1: DerivedTemp[U1], t2: DerivedTemp[U2],
+      nn1: Numeric[N1], nn2: Numeric[N2]): TempConverter[N1, U1, N2, U2] = {
+    val coef = t1.coef / t2.coef
+    new TempConverter[N1, U1, N2, U2] {
       val n1 = nn1
       val n2 = nn2
-      val cv12 = cvv12
-      val cv21 = cvv21
-      def cn12(x: N1): N2 = nn1.toType[N2](x)
-      def cn21(x: N2): N1 = nn2.toType[N1](x)
+      def cv12(v: N1): N2 = {
+        n2.fromType[Rational](((n1.toType[Rational](v) + t1.off) * coef) - t2.off)
+      }
+      def cv21(v: N2): N1 = {
+        n1.fromType[Rational](((n2.toType[Rational](v) + t2.off) / coef) - t1.off)
+      }
     }
+  }
+}
+object TempConverter extends TempConverterDefaultPriority {
+  // override the default temp-converter generation here for specific cases
 }

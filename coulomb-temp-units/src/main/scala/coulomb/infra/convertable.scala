@@ -20,22 +20,3 @@ import spire.math._
 
 import coulomb.define._
 
-trait TempConverter[N1, U1, N2, U2] {
-  def apply(v: N1): N2
-}
-trait TempConverterDefaultPriority {
-  // this default rule should work well everywhere but may be overridden for efficiency
-  implicit def evidence[N1, U1, N2, U2](implicit
-      t1: DerivedTemp[U1], t2: DerivedTemp[U2],
-      n1: Numeric[N1], n2: Numeric[N2]): TempConverter[N1, U1, N2, U2] = {
-    val coef = t1.coef / t2.coef
-    new TempConverter[N1, U1, N2, U2] {
-      def apply(v: N1): N2 = {
-        n2.fromType[Rational](((n1.toType[Rational](v) + t1.off) * coef) - t2.off)
-      }
-    }
-  }
-}
-object TempConverter extends TempConverterDefaultPriority {
-  // override the default temp-converter generation here for specific cases
-}
