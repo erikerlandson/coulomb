@@ -21,21 +21,6 @@ import spire.math._
 import coulomb.infra._
 import coulomb.define._
 
-trait TempOps[N, U] {
-  def n: Numeric[N]
-  def ustr: UnitString[U]
-}
-object TempOps {
-  implicit def evidence[N, U](implicit
-      t2k: DerivedTemp[U],
-      nn: Numeric[N],
-      us: UnitString[U]): TempOps[N, U] =
-    new TempOps[N, U] {
-      val n = nn
-      val ustr = us
-    }
-}
-
 trait TempConverterOps[N1, U1, N2, U2] {
   def n1: Numeric[N1]
   def n2: Numeric[N2]
