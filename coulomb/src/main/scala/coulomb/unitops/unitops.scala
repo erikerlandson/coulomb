@@ -43,39 +43,43 @@ object UnitString {
   }
 }
 
-trait UnitProductOps[N1, U1, N2, U2] {
+trait UnitMultiply[N1, U1, N2, U2] {
   def n1: Numeric[N1]
-  def n2: Numeric[N2]
-  def cn12(x: N1): N2
   def cn21(x: N2): N1
-  type MulRT12
-  type MulRT21
-  type DivRT12
-  type DivRT21
+  type RT12
 }
-object UnitProductOps {
-  type Aux[N1, U1, N2, U2, MR12, MR21, DR12, DR21] = UnitProductOps[N1, U1, N2, U2] {
-    type MulRT12 = MR12
-    type MulRT21 = MR21
-    type DivRT12 = DR12
-    type DivRT21 = DR21      
+object UnitMultiply {
+  type Aux[N1, U1, N2, U2, R12] = UnitMultiply[N1, U1, N2, U2] {
+    type RT12 = R12
   }
   implicit def evidence[N1, U1, N2, U2](implicit
       nn1: Numeric[N1],
       nn2: Numeric[N2],
-      mrt12: MulResultType[U1, U2],
-      mrt21: MulResultType[U2, U1],
-      drt12: DivResultType[U1, U2],
-      drt21: DivResultType[U2, U1]): Aux[N1, U1, N2, U2, mrt12.Out, mrt21.Out, drt12.Out, drt21.Out] =
-    new UnitProductOps[N1, U1, N2, U2] {
+      mrt12: MulResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
+    new UnitMultiply[N1, U1, N2, U2] {
       val n1 = nn1
-      val n2 = nn2
-      def cn12(x: N1): N2 = nn1.toType[N2](x)
-      def cn21(x: N2): N1 = nn2.toType[N1](x)
-      type MulRT12 = mrt12.Out
-      type MulRT21 = mrt21.Out
-      type DivRT12 = drt12.Out
-      type DivRT21 = drt21.Out
+      def cn21(x: N2): N1 = n1.fromType[N2](x)
+      type RT12 = mrt12.Out
+    }
+}
+
+trait UnitDivide[N1, U1, N2, U2] {
+  def n1: Numeric[N1]
+  def cn21(x: N2): N1
+  type RT12
+}
+object UnitDivide {
+  type Aux[N1, U1, N2, U2, R12] = UnitDivide[N1, U1, N2, U2] {
+    type RT12 = R12
+  }
+  implicit def evidence[N1, U1, N2, U2](implicit
+      nn1: Numeric[N1],
+      nn2: Numeric[N2],
+      drt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, drt12.Out] =
+    new UnitDivide[N1, U1, N2, U2] {
+      val n1 = nn1
+      def cn21(x: N2): N1 = n1.fromType[N2](x)
+      type RT12 = drt12.Out
     }
 }
 
