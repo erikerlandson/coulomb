@@ -79,18 +79,21 @@ object UnitProductOps {
     }
 }
 
-trait UnitPowerOps[N, U, P] {
+trait UnitPower[N, U, P] {
   def n: Numeric[N]
+  def p: Int
   type PowRT
 }
-object UnitPowerOps {
-  type Aux[N, U, P, PRT] = UnitPowerOps[N, U, P] { type PowRT = PRT }
+object UnitPower {
+  type Aux[N, U, P, PRT] = UnitPower[N, U, P] { type PowRT = PRT }
   implicit def evidence[N, U, P](implicit
       nn: Numeric[N],
+      xivP: XIntValue[P],
       prt: PowResultType[U, P]): Aux[N, U, P, prt.Out] =
-    new UnitPowerOps[N, U, P] {
+    new UnitPower[N, U, P] {
       type PowRT = prt.Out
       val n = nn
+      val p = xivP.value
     }
 }
 
