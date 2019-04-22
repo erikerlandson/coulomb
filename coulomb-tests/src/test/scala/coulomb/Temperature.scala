@@ -209,4 +209,12 @@ class TemperatureSpec extends FlatSpec with Matchers {
     Temperature.toQuantity(300f.withTemperature[Kelvin]) shouldBeQ[Float, Kelvin](300)
     Temperature.toQuantity(Algebraic(100).withTemperature[Celsius]) shouldBeQ[Algebraic, Celsius](100)
   }
+
+  it should "be serializable" in {
+    import coulomb.scalatest.serde._
+    val ts = Temperature[Int, Celsius](100)
+    val td = roundTripSerDe(ts)
+    td.shouldBeT[Int, Celsius](100)
+    (td === ts).shouldBe(true)
+  }
 }
