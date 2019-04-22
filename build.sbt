@@ -91,6 +91,7 @@ lazy val coulomb_tests = (project in file("coulomb-tests"))
   .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser)
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
+  .settings(libraryDependencies += "com.typesafe" % "config" % "1.3.3")
 
 lazy val coulomb_docs = (project in file("."))
   .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units)
