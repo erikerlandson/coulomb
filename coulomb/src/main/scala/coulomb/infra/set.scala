@@ -25,8 +25,8 @@ trait IsMember[E, L] {
 }
 object IsMember {
   type Aux[E, L, O] = IsMember[E, L] { type Out = O }
-  implicit def ismember0[E]: Aux[E, HNil, False] = new IsMember[E, HNil] { type Out = False }
-  implicit def ismember1[E, T <: HList]: Aux[E, E :: T, True] = new IsMember[E, E :: T] { type Out = True }
+  implicit def ismember0[E]: Aux[E, HNil, false] = new IsMember[E, HNil] { type Out = false }
+  implicit def ismember1[E, T <: HList]: Aux[E, E :: T, true] = new IsMember[E, E :: T] { type Out = true }
   implicit def ismember2[E, E0, T <: HList, O](implicit ne: E =:!= E0, r: Aux[E, T, O]): Aux[E, E0 :: T, O] = {
     new IsMember[E, E0 :: T] { type Out = O }
   }
@@ -37,10 +37,10 @@ trait Subset[S1, S2] {
 }
 object Subset {
   type Aux[S1, S2, O] = Subset[S1, S2] { type Out = O }
-  implicit def subset0[S]: Aux[HNil, S, True] = new Subset[HNil, S] { type Out = True }
-  implicit def subset1[E, T <: HList, S2](implicit m: IsMember.Aux[E, S2, False]): Aux[E :: T, S2, False] =
-    new Subset[E :: T, S2] { type Out = False }
-  implicit def subset2[E, T <: HList, S2, O](implicit m: IsMember.Aux[E, S2, True], s: Aux[T, S2, O]): Aux[E :: T, S2, O] =
+  implicit def subset0[S]: Aux[HNil, S, true] = new Subset[HNil, S] { type Out = true }
+  implicit def subset1[E, T <: HList, S2](implicit m: IsMember.Aux[E, S2, false]): Aux[E :: T, S2, false] =
+    new Subset[E :: T, S2] { type Out = false }
+  implicit def subset2[E, T <: HList, S2, O](implicit m: IsMember.Aux[E, S2, true], s: Aux[T, S2, O]): Aux[E :: T, S2, O] =
     new Subset[E :: T, S2] { type Out = O }
 }
 

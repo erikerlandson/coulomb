@@ -31,19 +31,19 @@ object infra {
   }
   trait EvidenceLowPriority {
     type Aux[T, O] = Evidence[T] { type Out = O }
-    implicit def evidenceFalse[T]: Aux[T, False] =
-      new Evidence[T] { type Out = False }
+    implicit def evidenceFalse[T]: Aux[T, false] =
+      new Evidence[T] { type Out = false }
   }
   object Evidence extends EvidenceLowPriority {
-    implicit def evidenceTrue[T](implicit t: T): Aux[T, True] =
-      new Evidence[T] { type Out = True }
+    implicit def evidenceTrue[T](implicit t: T): Aux[T, true] =
+      new Evidence[T] { type Out = true }
   }
 
   trait NoEvidence[T]
   object NoEvidence {
-    // Note: if you try to directly ask for Evidence.Aux[T, False], it will match the
+    // Note: if you try to directly ask for Evidence.Aux[T, false], it will match the
     // low-priority rule above, and this won't work right.
-    implicit def evidence0[T, V](implicit no: Evidence.Aux[T, V], vf: V =:= False): NoEvidence[T] =
+    implicit def evidence0[T, V](implicit no: Evidence.Aux[T, V], vf: V =:= false): NoEvidence[T] =
       new NoEvidence[T] {}
   }
 

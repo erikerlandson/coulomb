@@ -102,6 +102,6 @@ trait XIntNon01[N] {
 }
 object XIntNon01 {
   type Aux[N, O] = XIntNon01[N] { type Out = O }
-  implicit def evidence[N, R0, R1](implicit ne0: XIntNE.Aux[N, XInt0, R0], ne1: XIntNE.Aux[N, XInt1, R1], a01: &&[R0, R1]): Aux[N, a01.Out] =
+  implicit def evidence[N, R0, R1](implicit ne0: XIntNE.Aux[N, 0, R0], ne1: XIntNE.Aux[N, 1, R1], a01: &&[R0, R1]): Aux[N, a01.Out] =
     new XIntNon01[N] { type Out = a01.Out }
 }

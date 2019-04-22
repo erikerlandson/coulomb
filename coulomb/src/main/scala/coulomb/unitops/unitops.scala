@@ -107,7 +107,7 @@ object ConvertableUnits {
   implicit def witnessCU[U1, U2, C1, C2](implicit
       u1: CanonicalSig.Aux[U1, C1],
       u2: CanonicalSig.Aux[U2, C2],
-      eq: SetEqual.Aux[C1, C2, True]): ConvertableUnits[U1, U2] =
+      eq: SetEqual.Aux[C1, C2, true]): ConvertableUnits[U1, U2] =
     new ConvertableUnits[U1, U2](u1.coef / u2.coef)
 }
 
