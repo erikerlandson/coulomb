@@ -368,4 +368,12 @@ class QuantitySpec extends FlatSpec with Matchers {
     def f(a: Double WithUnit (Meter %/ (Second %^ _2))) = a
     f(32D.withUnit[Foot %/ (Second %^ _2)]) shouldBeQ[Double, Meter %/ (Second %^ _2)](9.7536)
   }
+
+  it should "be serializable" in {
+    import coulomb.scalatest.serde._
+    val qs = Quantity[Int, Meter %/ Second](10)
+    val qd = roundTripSerDe(qs)
+    qd.shouldBeQ[Int, Meter %/ Second](10)
+    (qd === qs) shouldBe (true)
+  }
 }
