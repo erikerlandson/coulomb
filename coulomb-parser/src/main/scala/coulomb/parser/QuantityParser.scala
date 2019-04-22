@@ -20,6 +20,16 @@ import scala.util.{ Try, Success, Failure }
 
 import coulomb._
 
+/**
+ * A class that can parse an expression into a unit-typed Quantity
+ * {{{
+ * import coulomb.parser._
+ * // declare a parser with a particular set of legal units
+ * val qp = QuantityParser[Meter :: Second :: Kilo :: HNil]
+ * val duration = qp[Int, Minute]("60 second") // a duration of one minute
+ * val speed = qp[Double, Mile %/ Hour]("10.0 kilometer / second") // prefix units are parsed
+ * }}}
+ */
 class QuantityParser private (qpp: coulomb.parser.infra.QPP[_]) {
   import scala.reflect.runtime.universe.{ Try => _, _ }
   import scala.tools.reflect.ToolBox
@@ -40,6 +50,17 @@ class QuantityParser private (qpp: coulomb.parser.infra.QPP[_]) {
   // figure out how to pre-compile this preamble
   private val preamble = s"${imports}${unitDecls}"
 
+  /**
+   * Parse an expression into a unit typed Quantity
+   * @tparam N numeric type of the quantity
+   * @tparam U the unit type - must be compatible (convertable) with the unit type in the expression
+   * @param quantityExpr the unit quantity expression. A number followed by a unit expression,
+   * where individual units are given by their full names (e.g. "meter", "second", etc), and operators
+   * "/", "*", "&#94;". Prefix units may be prepended, e.g. "kilometer". Sub-expressions may be contained
+   * in parentheses, e.g. "9.8 meter / (second &#94; 2)"
+   * @return a Try value wrapping a Quantity with type parameters N, U. This Try will be Failure(...)
+   * in the event of eiher a parsing error or failure to convert the unit expression into Quantity[N,U]
+   */
   def apply[N, U](quantityExpr: String)(implicit
       ntt: TypeTag[N],
       uts: coulomb.parser.infra.UnitTypeString[U]): Try[Quantity[N, U]] = {
@@ -59,7 +80,16 @@ class QuantityParser private (qpp: coulomb.parser.infra.QPP[_]) {
 }
 
 object QuantityParser {
-  def apply[U <: shapeless.HList](implicit qpp: coulomb.parser.infra.QPP[U]): QuantityParser = {
+  /**
+   * Construct a QuantityParser instance that recognizes a given list of units.
+   * @tparam UL a list of unit types to expect, as a shapeless HList
+   * {{{
+   * // declare a quantity parser that will recognize "meter", "second" and prefix unit "kilo"
+   * // prefix units are automatically detected and parsed as prefixes, e.g. "kilometer"
+   * val qp = QuantityParser[Meter :: Second :: Kilo :: HNil]
+   * }}}
+   */
+  def apply[UL <: shapeless.HList](implicit qpp: coulomb.parser.infra.QPP[UL]): QuantityParser = {
     new QuantityParser(qpp)
   }
 }
