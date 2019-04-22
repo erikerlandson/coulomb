@@ -14,9 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import spire.math._
-import coulomb.infra.ConvertableUnits
-
 package object coulomb {
   trait Unitless
   trait %*[L, R]
