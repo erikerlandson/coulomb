@@ -29,19 +29,19 @@ object SigToUnit {
   type Aux[S, U] = SigToUnit[S] { type Out = U }
   implicit def evidence0: Aux[HNil, Unitless] = new SigToUnit[HNil] { type Out = Unitless }
 
-  implicit def evidence1[U, ST <: HList, UC](implicit cont: Aux[ST, UC]): Aux[(U, XInt0) :: ST, UC] =
-    new SigToUnit[(U, XInt0) :: ST] { type Out = UC }
+  implicit def evidence1[U, ST <: HList, UC](implicit cont: Aux[ST, UC]): Aux[(U, 0) :: ST, UC] =
+    new SigToUnit[(U, 0) :: ST] { type Out = UC }
 
-  implicit def evidence2[U, ST <: HList, UC](implicit cont: Aux[ST, UC], nu: UC =:!= Unitless): Aux[(U, XInt1) :: ST, %*[U, UC]] =
-    new SigToUnit[(U, XInt1) :: ST] { type Out = %*[U, UC] }
+  implicit def evidence2[U, ST <: HList, UC](implicit cont: Aux[ST, UC], nu: UC =:!= Unitless): Aux[(U, 1) :: ST, %*[U, UC]] =
+    new SigToUnit[(U, 1) :: ST] { type Out = %*[U, UC] }
 
-  implicit def evidence3[U, P, ST <: HList, UC](implicit ne01: XIntNon01.Aux[P, True], cont: Aux[ST, UC], nu: UC =:!= Unitless): Aux[(U, P) :: ST, %*[%^[U, P], UC]] =
+  implicit def evidence3[U, P, ST <: HList, UC](implicit ne01: XIntNon01.Aux[P, true], cont: Aux[ST, UC], nu: UC =:!= Unitless): Aux[(U, P) :: ST, %*[%^[U, P], UC]] =
     new SigToUnit[(U, P) :: ST] { type Out = %*[%^[U, P], UC] }
 
-  implicit def evidence4[U, ST <: HList](implicit cont: Aux[ST, Unitless]): Aux[(U, XInt1) :: ST, U] =
-    new SigToUnit[(U, XInt1) :: ST] { type Out = U }
+  implicit def evidence4[U, ST <: HList](implicit cont: Aux[ST, Unitless]): Aux[(U, 1) :: ST, U] =
+    new SigToUnit[(U, 1) :: ST] { type Out = U }
 
-  implicit def evidence5[U, P, ST <: HList](implicit ne01: XIntNon01.Aux[P, True], cont: Aux[ST, Unitless]): Aux[(U, P) :: ST, %^[U, P]] =
+  implicit def evidence5[U, P, ST <: HList](implicit ne01: XIntNon01.Aux[P, true], cont: Aux[ST, Unitless]): Aux[(U, P) :: ST, %^[U, P]] =
     new SigToUnit[(U, P) :: ST] { type Out = %^[U, P] }
 }
 
@@ -61,7 +61,7 @@ object ResTypeCase {
 
   implicit def evidence2[DS, TDS, DU](implicit
       nnd: DS =:!= HNil,
-      neg: ApplySigPow.Aux[XIntNeg1, DS, TDS],
+      neg: ApplySigPow.Aux[-1, DS, TDS],
       s2u: SigToUnit.Aux[TDS, DU]): Aux[HNil, DS, DU] =
     new ResTypeCase[HNil, DS] { type Out = DU }
 

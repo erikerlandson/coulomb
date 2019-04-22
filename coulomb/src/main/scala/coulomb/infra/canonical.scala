@@ -40,9 +40,9 @@ object CanonicalSig {
     }
   }
 
-  implicit def evidenceBaseUnit[U](implicit buU: BaseUnit[U]): Aux[U, (U, XInt1) :: HNil] = {
+  implicit def evidenceBaseUnit[U](implicit buU: BaseUnit[U]): Aux[U, (U, 1) :: HNil] = {
     new CanonicalSig[U] {
-      type Out = (U, XInt1) :: HNil
+      type Out = (U, 1) :: HNil
       val coef = Rational(1)
     }
   }
@@ -85,11 +85,11 @@ object StandardSig {
   implicit def evidenceUnitless: Aux[Unitless, HNil] =
     new StandardSig[Unitless] { type Out = HNil }
 
-  implicit def evidenceBaseUnit[U](implicit buU: BaseUnit[U]): Aux[U, (U, XInt1) :: HNil] =
-    new StandardSig[U] { type Out = (U, XInt1) :: HNil }
+  implicit def evidenceBaseUnit[U](implicit buU: BaseUnit[U]): Aux[U, (U, 1) :: HNil] =
+    new StandardSig[U] { type Out = (U, 1) :: HNil }
 
-  implicit def evidenceDerivedUnit[U](implicit du: DerivedUnit[U, _]): Aux[U, (U, XInt1) :: HNil] =
-    new StandardSig[U] { type Out = (U, XInt1) :: HNil }
+  implicit def evidenceDerivedUnit[U](implicit du: DerivedUnit[U, _]): Aux[U, (U, 1) :: HNil] =
+    new StandardSig[U] { type Out = (U, 1) :: HNil }
 
   implicit def evidenceMul[L, LC, R, RC, OC](implicit l: Aux[L, LC], r: Aux[R, RC], u: UnifySigMul.Aux[LC, RC, OC]): Aux[%*[L, R], OC] =
     new StandardSig[%*[L, R]] { type Out = OC }
