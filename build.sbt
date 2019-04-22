@@ -1,3 +1,6 @@
+// xsbt clean unidoc previewSite
+// xsbt clean unidoc ghpagesPushSite
+
 def commonSettings = Seq(
   organization := "com.manyangled",
   version := "0.3.0-SNAPSHOT",
