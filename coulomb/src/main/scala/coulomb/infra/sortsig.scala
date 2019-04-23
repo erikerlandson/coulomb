@@ -21,10 +21,10 @@ import shapeless.syntax.singleton._
 import singleton.ops._
 
 // assuming inputs (U, P) are already from some canonical sig; so a type U will never pre-exist in M
-trait InsertSortedUnitSig[U, P, M] {
+private [coulomb] trait InsertSortedUnitSig[U, P, M] {
   type Out
 }
-object InsertSortedUnitSig {
+private [coulomb] object InsertSortedUnitSig {
   type Aux[U, P, M, O] = InsertSortedUnitSig[U, P, M] { type Out = O }
 
   implicit def evidence0[U, P]: Aux[U, P, HNil, (U, P) :: HNil] =
@@ -38,12 +38,12 @@ object InsertSortedUnitSig {
 
 }
 
-trait SortUnitSigCall[M, N, D] {
+private [coulomb] trait SortUnitSigCall[M, N, D] {
   type OutN
   type OutD
 }
 
-object SortUnitSigCall {
+private [coulomb] object SortUnitSigCall {
   type Aux[M, N, D, ON, OD] = SortUnitSigCall[M, N, D] { type OutN = ON; type OutD = OD }
 
   implicit def evidence0[N, D]: Aux[HNil, N, D, N, D] =
@@ -63,11 +63,11 @@ object SortUnitSigCall {
     new SortUnitSigCall[(U, P) :: MT, N, D] { type OutN = NF; type OutD = DF }
 }
 
-trait SortUnitSig[S] {
+private [coulomb] trait SortUnitSig[S] {
   type OutN
   type OutD
 }
-object SortUnitSig {
+private [coulomb] object SortUnitSig {
   type Aux[S, ON, OD] = SortUnitSig[S] { type OutN = ON; type OutD = OD }
 
   implicit def evidence[S, ON, OD](implicit ssc: SortUnitSigCall.Aux[S, HNil, HNil, ON, OD]): Aux[S, ON, OD] =

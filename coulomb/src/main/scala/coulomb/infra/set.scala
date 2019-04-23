@@ -20,10 +20,10 @@ import shapeless._
 import shapeless.syntax.singleton._
 import singleton.ops._
 
-trait IsMember[E, L] {
+private [coulomb] trait IsMember[E, L] {
   type Out
 }
-object IsMember {
+private [coulomb] object IsMember {
   type Aux[E, L, O] = IsMember[E, L] { type Out = O }
   implicit def ismember0[E]: Aux[E, HNil, false] = new IsMember[E, HNil] { type Out = false }
   implicit def ismember1[E, T <: HList]: Aux[E, E :: T, true] = new IsMember[E, E :: T] { type Out = true }
@@ -32,10 +32,10 @@ object IsMember {
   }
 }
 
-trait Subset[S1, S2] {
+private [coulomb] trait Subset[S1, S2] {
   type Out
 }
-object Subset {
+private [coulomb] object Subset {
   type Aux[S1, S2, O] = Subset[S1, S2] { type Out = O }
   implicit def subset0[S]: Aux[HNil, S, true] = new Subset[HNil, S] { type Out = true }
   implicit def subset1[E, T <: HList, S2](implicit m: IsMember.Aux[E, S2, false]): Aux[E :: T, S2, false] =
@@ -44,10 +44,10 @@ object Subset {
     new Subset[E :: T, S2] { type Out = O }
 }
 
-trait SetEqual[S1, S2] {
+private [coulomb] trait SetEqual[S1, S2] {
   type Out
 }
-object SetEqual {
+private [coulomb] object SetEqual {
   type Aux[S1, S2, O] = SetEqual[S1, S2] { type Out = O }
   implicit def equal0[S1, S2, O1, O2](implicit s1: Subset.Aux[S1, S2, O1], s2: Subset.Aux[S2, S1, O2], a: &&[O1, O2]): Aux[S1, S2, a.Out] =
     new SetEqual[S1, S2] { type Out = a.Out }

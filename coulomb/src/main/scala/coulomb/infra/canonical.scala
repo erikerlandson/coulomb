@@ -25,12 +25,12 @@ import spire.math._
 import coulomb._
 import coulomb.define._
 
-trait CanonicalSig[U] {
+private [coulomb] trait CanonicalSig[U] {
   type Out
   def coef: Rational
 }
 
-object CanonicalSig {
+private [coulomb] object CanonicalSig {
   type Aux[U, O] = CanonicalSig[U] { type Out = O }
 
   implicit def evidenceUnitless: Aux[Unitless, HNil] = {
@@ -76,10 +76,10 @@ object CanonicalSig {
   }
 }
 
-trait StandardSig[U] {
+private [coulomb] trait StandardSig[U] {
   type Out
 }
-object StandardSig {
+private [coulomb] object StandardSig {
   type Aux[U, O] = StandardSig[U] { type Out = O }
 
   implicit def evidenceUnitless: Aux[Unitless, HNil] =

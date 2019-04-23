@@ -20,10 +20,10 @@ import shapeless._
 import shapeless.syntax.singleton._
 import singleton.ops._
 
-trait InsertSigMul[K, V, M] {
+private [coulomb] trait InsertSigMul[K, V, M] {
   type Out
 }
-object InsertSigMul {
+private [coulomb] object InsertSigMul {
   type Aux[K, V, M, O] = InsertSigMul[K, V, M] { type Out = O }
 
   implicit def insert0[K, V]: Aux[K, V, HNil, (K, V) :: HNil] =
@@ -39,10 +39,10 @@ object InsertSigMul {
     new InsertSigMul[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
 }
 
-trait InsertSigDiv[K, V, M] {
+private [coulomb] trait InsertSigDiv[K, V, M] {
   type Out
 }
-object InsertSigDiv {
+private [coulomb] object InsertSigDiv {
   type Aux[K, V, M, O] = InsertSigDiv[K, V, M] { type Out = O }
 
   implicit def insert0[K, V](implicit n: Negate[V]): Aux[K, V, HNil, (K, n.Out) :: HNil] =
@@ -58,10 +58,10 @@ object InsertSigDiv {
     new InsertSigDiv[K, V, (K0, V0) :: MT] { type Out = (K0, V0) :: O }
 }
 
-trait UnifySigMul[M1, M2] {
+private [coulomb] trait UnifySigMul[M1, M2] {
   type Out
 }
-object UnifySigMul {
+private [coulomb] object UnifySigMul {
   type Aux[M1, M2, O] = UnifySigMul[M1, M2] { type Out = O }
   implicit def unify0[M2]: Aux[HNil, M2, M2] =
     new UnifySigMul[HNil, M2] { type Out = M2 }
@@ -70,10 +70,10 @@ object UnifySigMul {
 }
 
 // Note, this is like "M2 / M1" so careful with type argument order
-trait UnifySigDiv[M1, M2] {
+private [coulomb] trait UnifySigDiv[M1, M2] {
   type Out
 }
-object UnifySigDiv {
+private [coulomb] object UnifySigDiv {
   type Aux[M1, M2, O] = UnifySigDiv[M1, M2] { type Out = O }
   implicit def unify0[M2]: Aux[HNil, M2, M2] =
     new UnifySigDiv[HNil, M2] { type Out = M2 }
@@ -81,10 +81,10 @@ object UnifySigDiv {
     new UnifySigDiv[(K, V) :: MT, M2] { type Out = O2 }
 }
 
-trait ApplySigPow[P, M] {
+private [coulomb] trait ApplySigPow[P, M] {
   type Out
 }
-object ApplySigPow {
+private [coulomb] object ApplySigPow {
   type Aux[P, M, O] = ApplySigPow[P, M] { type Out = O }
   implicit def apply0[P](implicit nz: P =:!= 0): Aux[P, HNil, HNil] = new ApplySigPow[P, HNil] { type Out = HNil }
   implicit def apply1[P, K, V, MT <: HList, O <: HList, Q](implicit nz: P =:!= 0, rc: Aux[P, MT, O], op: XIntMul.Aux[V, P, Q]): Aux[P, (K, V) :: MT, (K, Q) :: O] =

@@ -22,10 +22,10 @@ import singleton.ops._
 
 import coulomb._
 
-trait SigToUnit[S] {
+private [coulomb] trait SigToUnit[S] {
   type Out
 }
-object SigToUnit {
+private [coulomb] object SigToUnit {
   type Aux[S, U] = SigToUnit[S] { type Out = U }
   implicit def evidence0: Aux[HNil, Unitless] = new SigToUnit[HNil] { type Out = Unitless }
 
@@ -45,10 +45,10 @@ object SigToUnit {
     new SigToUnit[(U, P) :: ST] { type Out = %^[U, P] }
 }
 
-trait ResTypeCase[NS, DS] {
+private [coulomb] trait ResTypeCase[NS, DS] {
   type Out
 }
-object ResTypeCase {
+private [coulomb] object ResTypeCase {
   type Aux[NS, DS, O] = ResTypeCase[NS, DS] { type Out = O }
 
   implicit def evidence0: Aux[HNil, HNil, Unitless] =
@@ -73,10 +73,10 @@ object ResTypeCase {
     new ResTypeCase[NS, DS] { type Out = %/[NU, DU] }
 }
 
-trait ResType[S] {
+private [coulomb] trait ResType[S] {
   type Out
 }
-object ResType {
+private [coulomb] object ResType {
   type Aux[S, O] = ResType[S] { type Out = O }
   implicit def evidence[S, NS, DS, RT](implicit
       ss: SortUnitSig.Aux[S, NS, DS],
@@ -84,10 +84,10 @@ object ResType {
     new ResType[S] { type Out = RT }
 }
 
-trait MulResultType[LU, RU] {
+private [coulomb] trait MulResultType[LU, RU] {
   type Out
 }
-object MulResultType {
+private [coulomb] object MulResultType {
   type Aux[LU, RU, O] = MulResultType[LU, RU] { type Out = O }
 
   implicit def result[LU, RU, OL, OR, OU, RT](implicit
@@ -98,10 +98,10 @@ object MulResultType {
     new MulResultType[LU, RU] { type Out = RT }
 }
 
-trait DivResultType[LU, RU] {
+private [coulomb] trait DivResultType[LU, RU] {
   type Out
 }
-object DivResultType {
+private [coulomb] object DivResultType {
   type Aux[LU, RU, O] = DivResultType[LU, RU] { type Out = O }
 
   implicit def result[LU, RU, OL, OR, OU, RT](implicit
@@ -112,10 +112,10 @@ object DivResultType {
     new DivResultType[LU, RU] { type Out = RT }
 }
 
-trait PowResultType[U, P] {
+private [coulomb] trait PowResultType[U, P] {
   type Out
 }
-object PowResultType {
+private [coulomb] object PowResultType {
   type Aux[U, P, O] = PowResultType[U, P] { type Out = O }
   implicit def evidence[U, P, SS, AP, RT](implicit
       ss: StandardSig.Aux[U, SS],

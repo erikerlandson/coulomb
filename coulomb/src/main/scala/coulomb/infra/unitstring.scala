@@ -23,8 +23,9 @@ import singleton.ops._
 import coulomb._
 import coulomb.define._
 
-trait UnitStringAST
-object UnitStringAST {
+private [coulomb] trait UnitStringAST
+
+private [coulomb] object UnitStringAST {
   case object Uni extends UnitStringAST
   case class Def(d: UnitDefinition) extends UnitStringAST
   case class Pre(p: UnitDefinition) extends UnitStringAST
@@ -87,11 +88,11 @@ object UnitStringAST {
   }
 }
 
-trait HasUnitStringAST[U] {
+private [coulomb] trait HasUnitStringAST[U] {
   def ast: UnitStringAST
   override def toString = ast.toString
 }
-object HasUnitStringAST {
+private [coulomb] object HasUnitStringAST {
   import UnitStringAST._
 
   implicit def evidence0: HasUnitStringAST[Unitless] =
