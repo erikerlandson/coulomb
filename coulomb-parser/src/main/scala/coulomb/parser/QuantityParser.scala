@@ -63,7 +63,7 @@ class QuantityParser private (qpp: coulomb.parser.infra.QPP[_]) {
    */
   def apply[N, U](quantityExpr: String)(implicit
       ntt: TypeTag[N],
-      uts: coulomb.parser.infra.UnitTypeString[U]): Try[Quantity[N, U]] = {
+      uts: coulomb.parser.unitops.UnitTypeString[U]): Try[Quantity[N, U]] = {
     val tpeN = typeOf[N]
     val cast = s".toUnit[${uts.expr}].toNumeric[$tpeN]"
     for {

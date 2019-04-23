@@ -16,15 +16,42 @@ limitations under the License.
 
 package coulomb.parser
 
-object infra {
-  import scala.language.implicitConversions
-  import scala.reflect.runtime.universe._
+import scala.language.implicitConversions
+import scala.reflect.runtime.universe._
 
-  import shapeless._
+import shapeless._
 
-  import coulomb._
-  import coulomb.infra._
-  import coulomb.define._
+import coulomb._
+import coulomb.infra._
+import coulomb.define._
+
+object unitops {
+  trait UnitTypeString[U] {
+    def expr: String
+  }
+  object UnitTypeString {
+    implicit def evidenceUnitless: UnitTypeString[Unitless] =
+      new UnitTypeString[Unitless] { val expr = "coulomb.Unitless" }
+
+    implicit def evidenceBase[U](implicit utt: TypeTag[U], bu: BaseUnit[U]): UnitTypeString[U] =
+      new UnitTypeString[U] { val expr = utt.tpe.typeSymbol.fullName }
+
+    implicit def evidenceDerived[U](implicit utt: TypeTag[U], du: DerivedUnit[U, _]): UnitTypeString[U] =
+      new UnitTypeString[U] { val expr = utt.tpe.typeSymbol.fullName }
+
+    implicit def evidenceMul[L, R](implicit udfL: UnitTypeString[L], udfR: UnitTypeString[R]): UnitTypeString[%*[L, R]] =
+      new UnitTypeString[%*[L, R]] { val expr = s"%*[${udfL.expr}, ${udfR.expr}]" }
+
+    implicit def evidenceDiv[L, R](implicit udfL: UnitTypeString[L], udfR: UnitTypeString[R]): UnitTypeString[%/[L, R]] =
+      new UnitTypeString[%/[L, R]] { val expr = s"%/[${udfL.expr}, ${udfR.expr}]" }
+
+    implicit def evidencePow[B, E](implicit udfB: UnitTypeString[B], e: XIntValue[E]): UnitTypeString[%^[B, E]] =
+      new UnitTypeString[%^[B, E]] { val expr = s"%^[${udfB.expr}, ${e.value}]" }
+  }
+}
+
+private [coulomb] object infra {
+  import coulomb.parser.unitops._
 
   trait Evidence[T] {
     type Out
@@ -165,29 +192,6 @@ object infra {
         tf: Aux[T, TF]): Aux[U :: T, U :: TF] = {
       new FilterNonPrefixUnits[U :: T] { type Out = U :: TF }
     }
-  }
-
-  trait UnitTypeString[U] {
-    def expr: String
-  }
-  object UnitTypeString {
-    implicit def evidenceUnitless: UnitTypeString[Unitless] =
-      new UnitTypeString[Unitless] { val expr = "coulomb.Unitless" }
-
-    implicit def evidenceBase[U](implicit utt: TypeTag[U], bu: BaseUnit[U]): UnitTypeString[U] =
-      new UnitTypeString[U] { val expr = utt.tpe.typeSymbol.fullName }
-
-    implicit def evidenceDerived[U](implicit utt: TypeTag[U], du: DerivedUnit[U, _]): UnitTypeString[U] =
-      new UnitTypeString[U] { val expr = utt.tpe.typeSymbol.fullName }
-
-    implicit def evidenceMul[L, R](implicit udfL: UnitTypeString[L], udfR: UnitTypeString[R]): UnitTypeString[%*[L, R]] =
-      new UnitTypeString[%*[L, R]] { val expr = s"%*[${udfL.expr}, ${udfR.expr}]" }
-
-    implicit def evidenceDiv[L, R](implicit udfL: UnitTypeString[L], udfR: UnitTypeString[R]): UnitTypeString[%/[L, R]] =
-      new UnitTypeString[%/[L, R]] { val expr = s"%/[${udfL.expr}, ${udfR.expr}]" }
-
-    implicit def evidencePow[B, E](implicit udfB: UnitTypeString[B], e: XIntValue[E]): UnitTypeString[%^[B, E]] =
-      new UnitTypeString[%^[B, E]] { val expr = s"%^[${udfB.expr}, ${e.value}]" }
   }
 
   case class UnitDefCode[U](name: String, tpe: String, tpeFull: String, defCode: String)

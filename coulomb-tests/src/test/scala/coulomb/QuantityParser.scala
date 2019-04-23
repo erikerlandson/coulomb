@@ -29,7 +29,7 @@ object ConfigIntegration {
   import scala.util.Try
   import scala.reflect.runtime.universe.TypeTag
   import com.typesafe.config.ConfigFactory
-  import coulomb.parser.infra.UnitTypeString
+  import coulomb.parser.unitops.UnitTypeString
   import coulomb.parser.QuantityParser
 
   val conf = ConfigFactory.parseString("""
