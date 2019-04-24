@@ -15,9 +15,16 @@ limitations under the License.
 */
 
 package object coulomb {
+  /** Represents a unitless value */
   trait Unitless
+
+  /** Represents the product of two unit expressions L and R */
   trait %*[L, R]
+
+  /** Represents the unit division L / R */
   trait %/[L, R]
+
+  /** Represents raising unit expression B to integer power E */
   trait %^[B, E]
 
   /**
@@ -25,8 +32,8 @@ package object coulomb {
    * @tparam N The numeric representation type of the quantity value
    * @tparam U The unit type of the quantity
    * {{{
-   * import com.manyangled.coulomb._
-   * import SIBaseUnits._
+   * import coulomb._
+   * import coulomb.si._
    * def f(v: Double WithUnit (Meter %/ Second)) = v * 60D.withUnit[Second]
    * }}}
    */
