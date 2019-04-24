@@ -21,6 +21,7 @@ import spire.math._
 import coulomb.define._
 
 package object temp {
+  /** An infix type alias for [[Temperature]] */
   type WithTemperature[N, U] = Temperature[N, U]
 
   /** enhances numeric types with utility methods for `coulomb` */
