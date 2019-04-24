@@ -22,11 +22,28 @@ import spire.math._
 
 import coulomb.si._
 
+/**
+ * Define a temperature scale. A Temperature is a subclass of a derived unit from [[Kelvin]].
+ * {{{
+ * import coulomb.define._
+ * trait Fahrenheit
+ * implicit val defineUnitFahrenheit = DerivedTemp[Fahrenheit](Rational(5, 9), Rational(45967, 100), name = "Fahrenheit", abbv = "°F")
+ * }}}
+ * @tparam U the unit type to define for this temperature scale
+ */
 class DerivedTemp[U](coef: Rational, val off: Rational, name: String, abbv: String) extends DerivedUnit[U, Kelvin](coef, name, abbv) {
   override def toString = s"DerivedTemp($coef, $off, $name, $abbv)"
 }
 
 object DerivedTemp {
+  /**
+   * Obtain an instance of a temperature scale.
+   * @tparam U the unit type to define for this temperature scale
+   * @param coef the coefficient for this temperature definition
+   * @param off the offset for this definition
+   * @param name the full name of the temperature unit, e.g. "Celsius"
+   * @param abbv an abbreviation for the temperature unit, e.g. "C"
+   */
   def apply[U](coef: Rational = Rational(1), off: Rational = Rational(0), name: String = "", abbv: String = "")(implicit
       ut: TypeTag[U]): DerivedTemp[U] = {
     require(coef > 0, "Unit coefficients must be strictly > 0")
