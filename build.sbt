@@ -12,8 +12,8 @@ def commonSettings = Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies ++= Seq(
-    "eu.timepit" %% "singleton-ops" % "0.3.1",
-    "org.typelevel" %% "spire" % "0.16.1",
+    "org.typelevel" %% "spire" % "0.16.1" % Provided,
+    "eu.timepit" %% "singleton-ops" % "0.3.1" % Provided,
     "org.scalatest" %% "scalatest" % "3.0.7" % Test
   ),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
