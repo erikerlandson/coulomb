@@ -26,8 +26,15 @@ import coulomb.infra._
 
 import coulomb.define.UnitDefinition
 
+/**
+ * An implicit trait that allows compile-time access to unit names and abbreviations.
+ * This includes compound unit expressions as well as base units and derived units.
+ * @tparam U the unit, or unit expression
+ */
 trait UnitString[U] {
+  /** the full name of a unit, or expression using full unit names */
   def full: String
+  /** the abbreviation of a unit, or expression using unit abbreviations */
   def abbv: String
 }
 object UnitString {
@@ -43,9 +50,19 @@ object UnitString {
   }
 }
 
+/**
+ * An implicit trait that supports compile-time unit quantity multiplication
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
 trait UnitMultiply[N1, U1, N2, U2] {
+  /** the `Numeric` implicit for quantity numeric type N1 */
   def n1: Numeric[N1]
+  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
   def cn21(x: N2): N1
+  /** a type representing the unit product `U1*U2` */
   type RT12
 }
 object UnitMultiply {
@@ -63,9 +80,19 @@ object UnitMultiply {
     }
 }
 
+/**
+ * An implicit trait that supports compile-time unit quantity division
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
 trait UnitDivide[N1, U1, N2, U2] {
+  /** the `Numeric` implicit for quantity numeric type N1 */
   def n1: Numeric[N1]
+  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
   def cn21(x: N2): N1
+  /** a type representing the unit division `U1/U2` */
   type RT12
 }
 object UnitDivide {
@@ -83,9 +110,18 @@ object UnitDivide {
     }
 }
 
+/**
+ * An implicit trait that supports compile time unit exponents
+ * @tparam N the numeric type of a quantity value
+ * @tparam U the unit expression type of the quantity
+ * @tparam P a literal type representing an integer exponent
+ */
 trait UnitPower[N, U, P] {
+  /** the `Numeric` implicit for quantity numeric type N */
   def n: Numeric[N]
+  /** the integer value of literal type exponent P */
   def p: Int
+  /** a unit type corresponding to `U^P` */
   type PowRT
 }
 object UnitPower {
@@ -101,8 +137,15 @@ object UnitPower {
     }
 }
 
+/**
+ * An implicit trait that supports compile time checking of whether
+ * two unit types are convertable (aka compatible), and if so what
+ * their coefficient of conversion is.
+ * This implicit value will not exist if U1 and U2 are not convertable to one another.
+ * @tparam U1 a unit expression type
+ * @tparam U2 another unit expression type
+ */
 class ConvertableUnits[U1, U2](val coef: Rational)
-
 object ConvertableUnits {
   implicit def witnessCU[U1, U2, C1, C2](implicit
       u1: CanonicalSig.Aux[U1, C1],
@@ -111,10 +154,23 @@ object ConvertableUnits {
     new ConvertableUnits[U1, U2](u1.coef / u2.coef)
 }
 
+/**
+ * An implicit trait that supports compile-time unit quantity conversion, when possible.
+ * Also used to support addition, subtraction and comparisons of quantities.
+ * This implicit will not exist if U1 and U2 are not convertable to one another.
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of another quantity value
+ * @tparam U2 unit expression type of the other quantity
+ */
 trait UnitConverter[N1, U1, N2, U2] {
+  /** the `Numeric` implicit for quantity numeric type N1 */
   def n1: Numeric[N1]
+  /** the `Numeric` implicit for quantity numeric type N2 */
   def n2: Numeric[N2]
+  /** a conversion from value with type `(N1,U1)` to type `(N2,U2)` */
   def cv12(v: N1): N2
+  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
   def cv21(v: N2): N1
 }
 trait UnitConverterDefaultPriority {
