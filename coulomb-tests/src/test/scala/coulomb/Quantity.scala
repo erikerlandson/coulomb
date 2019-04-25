@@ -23,13 +23,6 @@ import org.scalatest.QMatchers._
 
 class QuantitySpec extends FlatSpec with Matchers {
 
-  type _neg1 = W.`-1`.T
-  type _0 = W.`0`.T
-  type _1 = W.`1`.T
-  type _2 = W.`2`.T
-  type _3 = W.`3`.T
-  type _4 = W.`4`.T
-
   it should "allocate a Quantity" in {
     val q = new Quantity[Double, Meter](1.0)
     q shouldBeQ[Double, Meter](1.0)
@@ -60,8 +53,8 @@ class QuantitySpec extends FlatSpec with Matchers {
     "1D.withUnit[Acre %* Foot].toUnit[Mega %* Liter]" should compile
     "1D.withUnit[Acre %* Foot].toUnit[Mega %* Hectare]" shouldNot compile
 
-    "1D.withUnit[Mole %/ Liter].toUnit[(Kilo %* Mole) %/ (Meter %^ _3)]" should compile
-    "1D.withUnit[Mole %/ Liter].toUnit[(Kilo %* Mole) %/ (Meter %^ _4)]" shouldNot compile
+    "1D.withUnit[Mole %/ Liter].toUnit[(Kilo %* Mole) %/ (Meter %^ 3)]" should compile
+    "1D.withUnit[Mole %/ Liter].toUnit[(Kilo %* Mole) %/ (Meter %^ 4)]" shouldNot compile
   }
 
   it should "implement toUnit over supported numeric types" in {
@@ -174,17 +167,17 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "implement pow" in {
-    3.withUnit[Meter].pow[_2] shouldBeQ[Int, Meter %^ _2](9, tolerant = false)
-    3L.withUnit[Meter].pow[_2] shouldBeQ[Long, Meter %^ _2](9, tolerant = false)
+    3.withUnit[Meter].pow[2] shouldBeQ[Int, Meter %^ 2](9, tolerant = false)
+    3L.withUnit[Meter].pow[2] shouldBeQ[Long, Meter %^ 2](9, tolerant = false)
 
-    3f.withUnit[Meter].pow[_2] shouldBeQ[Float, Meter %^ _2](9)
-    3D.withUnit[Meter].pow[_2] shouldBeQ[Double, Meter %^ _2](9)
+    3f.withUnit[Meter].pow[2] shouldBeQ[Float, Meter %^ 2](9)
+    3D.withUnit[Meter].pow[2] shouldBeQ[Double, Meter %^ 2](9)
   }
 
   it should "implement pow miscellaneous" in {
-    5D.withUnit[Meter %/ Second].pow[_0] shouldBeQ[Double, Unitless](1, tolerant = false)
-    7.withUnit[Meter].pow[_1] shouldBeQ[Int, Meter](7, tolerant = false)
-    Rational(1, 11).withUnit[Second].pow[_neg1] shouldBeQ[Rational, Second %^ _neg1](11)
+    5D.withUnit[Meter %/ Second].pow[0] shouldBeQ[Double, Unitless](1, tolerant = false)
+    7.withUnit[Meter].pow[1] shouldBeQ[Int, Meter](7, tolerant = false)
+    Rational(1, 11).withUnit[Second].pow[-1] shouldBeQ[Rational, Second %^ -1](11)
   }
 
   it should "implement <" in {
@@ -305,46 +298,46 @@ class QuantitySpec extends FlatSpec with Matchers {
     1.withUnit[Meter].show should be ("1 m")
     1.withUnit[Kilo %* Meter].show should be ("1 km")
     (1.5.withUnit[Meter] / 1.0.withUnit[Second]).show should be ("1.5 m/s")
-    1.0.withUnit[Second].pow[_neg1].show should be ("1.0 s^(-1)")
+    1.0.withUnit[Second].pow[-1].show should be ("1.0 s^(-1)")
     1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].show should be ("1 (acre ft)/(m s)")
-    1.withUnit[Meter %/ (Second %^ _2)].show should be ("1 m/s^2")
+    1.withUnit[Meter %/ (Second %^ 2)].show should be ("1 m/s^2")
   }
 
   it should "implement showFull" in {
     1.withUnit[Meter].showFull should be ("1 meter")
     1.withUnit[Kilo %* Meter].showFull should be ("1 kilometer")
     (1.5.withUnit[Meter] / 1.0.withUnit[Second]).showFull should be ("1.5 meter/second")
-    1.0.withUnit[Second].pow[_neg1].showFull should be ("1.0 second^(-1)")
+    1.0.withUnit[Second].pow[-1].showFull should be ("1.0 second^(-1)")
     1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].showFull should be ("1 (acre foot)/(meter second)")
-    1.withUnit[Meter %/ (Second %^ _2)].showFull should be ("1 meter/second^2")
+    1.withUnit[Meter %/ (Second %^ 2)].showFull should be ("1 meter/second^2")
   }
 
   it should "implement showUnit" in {
     1.withUnit[Meter].showUnit should be ("m")
     1.withUnit[Kilo %* Meter].showUnit should be ("km")
     (1.5.withUnit[Meter] / 1.0.withUnit[Second]).showUnit should be ("m/s")
-    1.0.withUnit[Second].pow[_neg1].showUnit should be ("s^(-1)")
+    1.0.withUnit[Second].pow[-1].showUnit should be ("s^(-1)")
     1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].showUnit should be ("(acre ft)/(m s)")
-    1.withUnit[Meter %/ (Second %^ _2)].showUnit should be ("m/s^2")
+    1.withUnit[Meter %/ (Second %^ 2)].showUnit should be ("m/s^2")
   }
 
   it should "implement showUnitFull" in {
     1.withUnit[Meter].showUnitFull should be ("meter")
     1.withUnit[Kilo %* Meter].showUnitFull should be ("kilometer")
     (1.5.withUnit[Meter] / 1.0.withUnit[Second]).showUnitFull should be ("meter/second")
-    1.0.withUnit[Second].pow[_neg1].showUnitFull should be ("second^(-1)")
+    1.0.withUnit[Second].pow[-1].showUnitFull should be ("second^(-1)")
     1.withUnit[(Acre %* Foot) %/ (Meter %* Second)].showUnitFull should be ("(acre foot)/(meter second)")
-    1.withUnit[Meter %/ (Second %^ _2)].showUnitFull should be ("meter/second^2")
+    1.withUnit[Meter %/ (Second %^ 2)].showUnitFull should be ("meter/second^2")
   }
 
   it should "implement coefficient companion method" in {
     Quantity.coefficient[Yard, Meter] should be (Rational(9144, 10000))
     Quantity.coefficient[Mile %/ Hour, Meter %/ Second] should be (Rational(1397, 3125))
-    Quantity.coefficient[(Kilo %* Meter) %/ (Second %^ _2), Mile %/ (Minute %^ _2)] should be (
+    Quantity.coefficient[(Kilo %* Meter) %/ (Second %^ 2), Mile %/ (Minute %^ 2)] should be (
       Rational(3125000, 1397))
 
     "Quantity.coefficient[Mile %/ Hour, Meter %/ Kilogram]" shouldNot compile
-    "Quantity.coefficient[(Kilo %* Meter) %/ (Second %^ _2), Mile %/ (Ampere %^ _2)]" shouldNot compile
+    "Quantity.coefficient[(Kilo %* Meter) %/ (Second %^ 2), Mile %/ (Ampere %^ 2)]" shouldNot compile
   }
 
   it should "implement showUnit companion method" in {
@@ -365,8 +358,8 @@ class QuantitySpec extends FlatSpec with Matchers {
     val q: Quantity[Double, Mile %/ Hour] = 1D.withUnit[Kilo %* Meter %/ Second]
     q shouldBeQ[Double, Mile %/ Hour](2236.936292)
 
-    def f(a: Double WithUnit (Meter %/ (Second %^ _2))) = a
-    f(32D.withUnit[Foot %/ (Second %^ _2)]) shouldBeQ[Double, Meter %/ (Second %^ _2)](9.7536)
+    def f(a: Double WithUnit (Meter %/ (Second %^ 2))) = a
+    f(32D.withUnit[Foot %/ (Second %^ 2)]) shouldBeQ[Double, Meter %/ (Second %^ 2)](9.7536)
   }
 
   it should "be serializable" in {
