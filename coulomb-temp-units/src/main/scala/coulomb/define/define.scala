@@ -23,7 +23,7 @@ import spire.math._
 import coulomb.si._
 
 /**
- * Define a temperature scale. A Temperature is a subclass of a derived unit from [[Kelvin]].
+ * Define a temperature scale. A Temperature is a subclass of a derived unit from Kelvin.
  * {{{
  * import coulomb.define._
  * trait Fahrenheit
