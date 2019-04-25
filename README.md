@@ -3,22 +3,51 @@ A statically typed unit analysis library for Scala
 
  [ ![Download](https://api.bintray.com/packages/manyangled/maven/coulomb/images/download.svg) ](https://bintray.com/manyangled/maven/coulomb/_latestVersion)
 
-##### Why name it `coulomb`?
-`coulomb` is a library for "static units", and 'coulomb' is the "unit of static" (aka charge).
-
 ### Documentation
 API documentation for `coulomb` is available at: https://erikerlandson.github.io/coulomb/latest/api/
 
 There is also a [tutorial](#tutorial) below.
 
 ### How to include `coulomb` in your project
+
+The core `coulomb` package can be included by adding the dependencies shown below.
+Note that its two 3rd-party dependencies -- `spire` and `singleton-ops` -- are `%Provided`,
+and so you must also include them, if your project does not already do so. The `shapeless`
+package is also a dependency, but is included transitively via `spire`.
+
 ```scala
 resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb" % "0.2.0",
-  "com.manyangled" %% "coulomb-unitexpr" % "0.2.0",
-  "com.manyangled" %% "coulomb-macros" % "0.2.0")
+  "com.manyangled" %% "coulomb" % "0.3.0",
+  "org.typelevel" %% "spire" % "0.16.1",
+  "eu.timepit" %% "singleton-ops" % "0.3.1"
+)
+```
+
+The `coulomb` project also provides a selection of predefined units, which are available as
+separate sub-packages.
+
+```scala
+libraryDependencies ++= Seq(
+  "com.manyangled" %% "coulomb-si-units" % "0.3.0",        // The seven SI units: meter, second, kilogram, etc
+  "com.manyangled" %% "coulomb-accepted-units" % "0.3.0",  // Common non-SI metric: liter, centimeter, gram, etc
+  "com.manyangled" %% "coulomb-time-units" % "0.3.0",      // minute, hour, day, week
+  "com.manyangled" %% "coulomb-info-units" % "0.3.0",      // bit, byte, nat
+  "com.manyangled" %% "coulomb-mks-units" % "0.3.0",       // MKS units: Joule, Newton, Watt, Volt, etc
+  "com.manyangled" %% "coulomb-customary-units" % "0.3.0", // non-metric units: foot, mile, pound, gallon, pint, etc
+  "com.manyangled" %% "coulomb-temp-units" % "0.3.0"       // Celsius and Fahrenheit temperature scales
+)
+```
+
+This project also provides a parsing facility, `QuantityParser`, that can parse a
+unit expression language into properly typed `Quantity` objects. This tool can be
+used for extending standard configuration systems with type-safe unit quantities.
+
+```scala
+libraryDependencies ++= Seq(
+  "com.manyangled" %% "coulomb-parser" % "0.3.0"   // QuantityParser
+)
 ```
 
 ### Code of Conduct
