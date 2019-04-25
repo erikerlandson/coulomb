@@ -63,7 +63,6 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Quantity and UnitExpr](#quantity-and-unitexpr)
 * [Quantity Values](#quantity-values)
 * [String Representations](#string-representations)
-* [Unit Exponents and Church Integers](#unit-exponents-and-church-integers)
 * [Predefined Units](#predefined-units)
 * [Unit Types and Convertability](#unit-types-and-convertability)
 * [Unit Conversions](#unit-conversions)
@@ -182,26 +181,6 @@ res3: String = Gb / s
 
 scala> bandwidth.unitStrFull
 res4: String = giga-bit / second
-```
-
-#### Unit Exponents and Church Integers
-The `coulomb` library allows unit expression types to include integer exponents.
-Representing integers in the type system is accomplished using a type encoding of
-[Church numerals](https://en.wikipedia.org/wiki/Church_encoding).
-In `coulomb`, these are defined using the
-[`ChurchInt` type](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.ChurchInt),
-which pre-defines integer type "constants" `_0`, `_1`, `_2` ... `_9` and negative integers
-`_neg1`, `_neg2`, ... `_neg9`.
-(the `ChurchInt` type is not bounded, and can represent values outside this range,
-for example `_9#Add[_9]` or `_neg9#Mul[_9]`)
-The following examples demonstrate typical uses of type exponents in unit expressions:
-```scala
-import com.manyangled.coulomb._
-import SIBaseUnits._
-import ChurchInt._
-
-val frequency = 60.withUnit[Second %^ _neg1]
-val volume = (1.5).withUnit[Meter %^ _3]
 ```
 
 #### Predefined Units
