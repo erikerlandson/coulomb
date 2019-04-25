@@ -26,10 +26,10 @@ package object mks {
   implicit val defineUnitRadian = DerivedUnit[Radian, Unitless](abbv = "rad")
 
   trait Hertz
-  implicit val defineUnitHertz = DerivedUnit[Hertz, Second %^ W.`-1`.T](abbv = "Hz")
+  implicit val defineUnitHertz = DerivedUnit[Hertz, Second %^ -1](abbv = "Hz")
 
   trait Newton
-  implicit val defineUnitNewton = DerivedUnit[Newton, Kilogram %* Meter %/ (Second %^ W.`2`.T)](abbv = "N")
+  implicit val defineUnitNewton = DerivedUnit[Newton, Kilogram %* Meter %/ (Second %^ 2)](abbv = "N")
 
   trait Joule
   implicit val defineUnitJoule = DerivedUnit[Joule, Newton %* Meter](abbv = "J")
@@ -38,7 +38,7 @@ package object mks {
   implicit val defineUnitWatt = DerivedUnit[Watt, Joule %/ Second](abbv = "W")
 
   trait Pascal
-  implicit val defineUnitPascal = DerivedUnit[Pascal, Newton %/ (Meter %^ W.`2`.T)](abbv = "Pa")
+  implicit val defineUnitPascal = DerivedUnit[Pascal, Newton %/ (Meter %^ 2)](abbv = "Pa")
 
   trait Coulomb
   implicit val defineUnitCoulomb = DerivedUnit[Coulomb, Ampere %* Second](abbv = "C")
@@ -56,7 +56,7 @@ package object mks {
   implicit val defineUnitWeber = DerivedUnit[Weber, Joule %/ Ampere](abbv = "Wb")
 
   trait Tesla
-  implicit val defineUnitTesla = DerivedUnit[Tesla, Weber %/ (Meter %^ W.`2`.T)](abbv = "T")
+  implicit val defineUnitTesla = DerivedUnit[Tesla, Weber %/ (Meter %^ 2)](abbv = "T")
 
   trait Henry
   implicit val defineUnitHenry = DerivedUnit[Henry, Weber %/ Ampere](abbv = "H")

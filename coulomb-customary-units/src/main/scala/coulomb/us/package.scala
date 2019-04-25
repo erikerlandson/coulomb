@@ -38,7 +38,7 @@ package object us {
   implicit val defineUnitMile = DerivedUnit[Mile, Yard](1760, abbv = "mi")
 
   trait Acre
-  implicit val defineUnitAcre = DerivedUnit[Acre, Foot %^ W.`2`.T](43560, abbv = "acre")
+  implicit val defineUnitAcre = DerivedUnit[Acre, Foot %^ 2](43560, abbv = "acre")
 
   trait Ounce
   implicit val defineUnitOunce = DerivedUnit[Ounce, Pound](Rational(1, 16), abbv = "oz")
@@ -50,19 +50,19 @@ package object us {
   implicit val defineUnitShortTon = DerivedUnit[ShortTon, Pound](2000, abbv = "ton")
 
   trait BTU
-  implicit val defineUnitBTU = DerivedUnit[BTU, Kilogram %* (Meter %^ W.`2`.T) %/ (Second %^ W.`2`.T)](1054.3503, abbv = "BTU")
+  implicit val defineUnitBTU = DerivedUnit[BTU, Kilogram %* (Meter %^ 2) %/ (Second %^ 2)](1054.3503, abbv = "BTU")
 
   trait Calorie
-  implicit val defineUnitCalorie = DerivedUnit[Calorie, Kilogram %* (Meter %^ W.`2`.T) %/ (Second %^ W.`2`.T)](4.184, abbv = "cal")
+  implicit val defineUnitCalorie = DerivedUnit[Calorie, Kilogram %* (Meter %^ 2) %/ (Second %^ 2)](4.184, abbv = "cal")
 
   trait FoodCalorie
   implicit val defineUnitFoodCalorie = DerivedUnit[FoodCalorie, Calorie](1000, abbv = "kcal")
 
   trait FootPound
-  implicit val defineUnitFootPound = DerivedUnit[FootPound, Kilogram %* (Meter %^ W.`2`.T) %/ (Second %^ W.`2`.T)](1.355817948331, abbv = "ft·lbf")
+  implicit val defineUnitFootPound = DerivedUnit[FootPound, Kilogram %* (Meter %^ 2) %/ (Second %^ 2)](1.355817948331, abbv = "ft·lbf")
 
   trait Horsepower
-  implicit val defineUnitHorsepower = DerivedUnit[Horsepower, Kilogram %* (Meter %^ W.`2`.T) %/ (Second %^ W.`3`.T)](745.69987158227, abbv = "hp")
+  implicit val defineUnitHorsepower = DerivedUnit[Horsepower, Kilogram %* (Meter %^ 2) %/ (Second %^ 3)](745.69987158227, abbv = "hp")
 
   trait Teaspoon
   implicit val defineUnitTeaspoon = DerivedUnit[Teaspoon, Tablespoon](Rational(1, 3), abbv = "tsp")
@@ -74,7 +74,7 @@ package object us {
   implicit val defineUnitFluidOunce = DerivedUnit[FluidOunce, Cup](Rational(1, 8), abbv = "floz")
 
   trait Cup
-  implicit val defineUnitCup = DerivedUnit[Cup, Meter %^ W.`3`.T](Rational(2365882365L, 10000000000000L), abbv = "cp")
+  implicit val defineUnitCup = DerivedUnit[Cup, Meter %^ 3](Rational(2365882365L, 10000000000000L), abbv = "cp")
 
   trait Pint
   implicit val defineUnitPint = DerivedUnit[Pint, Cup](2, abbv = "pt")

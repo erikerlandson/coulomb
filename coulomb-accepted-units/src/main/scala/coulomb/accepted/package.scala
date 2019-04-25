@@ -37,10 +37,10 @@ package object accepted {
   implicit val defineUnitArcSecond = DerivedUnit[ArcSecond, Degree](Rational(1, 3600), abbv = "\"")
 
   trait Hectare
-  implicit val defineUnitHectare = DerivedUnit[Hectare, Meter %^ W.`2`.T](10000, abbv = "ha")
+  implicit val defineUnitHectare = DerivedUnit[Hectare, Meter %^ 2](10000, abbv = "ha")
 
   trait Liter
-  implicit val defineUnitLiter = DerivedUnit[Liter, Meter %^ W.`3`.T](Rational(1, 1000))
+  implicit val defineUnitLiter = DerivedUnit[Liter, Meter %^ 3](Rational(1, 1000))
 
   trait Milliliter
   implicit val defineUnitMilliliter = DerivedUnit[Milliliter, Liter](Rational(1, 1000), abbv = "ml")
@@ -49,7 +49,7 @@ package object accepted {
   implicit val defineUnitTonne = DerivedUnit[Tonne, Kilogram](1000)
 
   trait Millibar
-  implicit val defineUnitMillibar = DerivedUnit[Millibar, Kilogram %/ (Meter %* (Second %^ W.`2`.T))](100, abbv = "mbar")
+  implicit val defineUnitMillibar = DerivedUnit[Millibar, Kilogram %/ (Meter %* (Second %^ 2))](100, abbv = "mbar")
 
   trait Kilometer
   implicit val defineUnitKilometer = DerivedUnit[Kilometer, Meter](1000, abbv = "km")
