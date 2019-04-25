@@ -186,16 +186,38 @@ trait UnitConverterDefaultPriority {
       def cv21(v: N2): N1 = nN1.fromType[Rational](nN2.toType[Rational](v) / cu.coef)
     }
 }
-object UnitConverter extends UnitConverterDefaultPriority {
+trait UnitConverterP1 extends UnitConverterDefaultPriority {
   implicit def witnessDouble[U1, U2](implicit
       cu: ConvertableUnits[U1, U2],
-      nD: Numeric[Double]): UnitConverter[Double, U1, Double, U2] = {
+      n: Numeric[Double]): UnitConverter[Double, U1, Double, U2] = {
     val coef = cu.coef.toDouble
     new UnitConverter[Double, U1, Double, U2] {
-      val n1 = nD
-      val n2 = nD
-      def cv12(v: Double): Double = v * coef
-      def cv21(v: Double): Double = v / coef
+      val n1 = n
+      val n2 = n
+      @inline def cv12(v: Double): Double = v * coef
+      @inline def cv21(v: Double): Double = v / coef
+    }
+  }
+  implicit def witnessFloat[U1, U2](implicit
+      cu: ConvertableUnits[U1, U2],
+      n: Numeric[Float]): UnitConverter[Float, U1, Float, U2] = {
+    val coef = cu.coef.toFloat
+    new UnitConverter[Float, U1, Float, U2] {
+      val n1 = n
+      val n2 = n
+      @inline def cv12(v: Float): Float = v * coef
+      @inline def cv21(v: Float): Float = v / coef
+    }
+  }
+}
+object UnitConverter extends UnitConverterP1 {
+  implicit def witnessIdentity[N, U](implicit
+      n: Numeric[N]): UnitConverter[N, U, N, U] = {
+    new UnitConverter[N, U, N, U] {
+      val n1 = n
+      val n2 = n
+      @inline def cv12(v: N): N = v
+      @inline def cv21(v: N): N = v
     }
   }
 }
