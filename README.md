@@ -163,24 +163,24 @@ any other numeric type `N` for which the `spire` implicit `Numeric[N]` is define
 for example `BigDecimal` or `spire` `Rational`.
 
 #### String representations
-The `toStr` method can be used to obtain a human-readable string that represents a quantity's
-type and value using standard unit abbreviations.  The `toStrFull` method uses full unit names.
-The methods `unitStr` and `unitStrFull` output only the unit without the value.
+The `show` method can be used to obtain a human-readable string that represents a quantity's
+type and value using standard unit abbreviations.  The `showFull` method uses full unit names.
+The methods `showUnit` and `showUnitFull` output only the unit without the value.
 ```scala
 scala> val bandwidth = 10.withUnit[(Giga %* Bit) %/ Second]
-bandwidth: com.manyangled.coulomb.Quantity[...] = com.manyangled.coulomb.Quantity@40240000
+bandwidth: coulomb.Quantity[...] = coulomb.Quantity@40240000
 
-scala> bandwidth.toStr
-res1: String = 10 Gb / s
+scala> bandwidth.show
+res1: String = 10 Gb/s
 
-scala> bandwidth.toStrFull
-res2: String = 10 giga-bit / second
+scala> bandwidth.showFull
+res2: String = 10 gigabit/second
 
-scala> bandwidth.unitStr
-res3: String = Gb / s
+scala> bandwidth.showUnit
+res3: String = Gb/s
 
-scala> bandwidth.unitStrFull
-res4: String = giga-bit / second
+scala> bandwidth.showUnitFull
+res4: String = gigabit/second
 ```
 
 #### Predefined Units
