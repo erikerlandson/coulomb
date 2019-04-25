@@ -81,13 +81,13 @@ The `coulomb` provides the following features:
 Allow a programmer to associate unit analysis with values, in the form of static types
 ```scala
 val length = 10.withUnit[Meter]
-val duration = Second(30.0)
-val mass = new Quantity[Float, Kilogram](100)
+val duration = (30.0).withUnit[Second]
+val mass = Quantity[Float, Kilogram](100)
 ```
 Express those types with arbitrary and natural static type expressions
 ```scala
 val speed = (100.0).withUnit[(Kilo %* Meter) %/ Hour]
-val acceleration = (9.8).withUnit[Meter %/ (Second %^ _2)]
+val acceleration = (9.8).withUnit[Meter %/ (Second %^ 2)]
 ```
 Let the compiler determine which unit expressions are equivalent (aka _convertable_)
 and transparently convert between them
@@ -104,12 +104,12 @@ val mps: Quantity[Double, Meter %/ Second] = Mile(60.0) / Hour(1.0)
 ```
 Allow a programmer to easily declare new units that will work seamlessly with existing units
 ```scala
-// a new length:
-@UnitDecl("smoot", 67)
-trait Smoot extends DerivedType[Inch]
+// a new unit of length:
+trait Smoot
+implicit val defineUnitSmoot = DerivedUnit[Smoot, Inch](67, name = "Smoot", abbv = "Smt")
 // a unit of acceleration:
-@UnitDecl("earthgravity", 9.8, "g")
-trait EarthGravity extends DerivedType[Meter %/ (Second %^ _2)]
+trait EarthGravity
+implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](9.8, abbv = "g")
 ```
 
 #### `Quantity` and `UnitExpr`
