@@ -152,13 +152,15 @@ val ohms = (0.01).withUnit[(Kilogram %* (Meter %^ 2)) %/ ((Second %^ 3) %* (Ampe
 The internal representation type of a `Quantity` is given by its first type parameter.
 Each quantity's value is accessible via the `value` field
 ```scala
+import coulomb._, coulomb.info._, coulomb.siprefix._
+
 val memory = 100.withUnit[Giga %* Byte]  // type is: Quantity[Int, Giga %* Byte]
 val raw: Int = memory.value              // memory's raw integer value
 ```
 
-Standard Scala types `Float`, `Double`, `Int` and `Long` are supported, as well as `BigInt`,
-`BigDecimal`, `Byte` and `Short`. Additionally, the [spire](https://github.com/non/spire)
-numeric types `Rational`, `Algebraic`, `Real` and `Number` are supported.
+Standard Scala types `Float`, `Double`, `Int` and `Long` are supported, as well as
+any other numeric type `N` for which the `spire` implicit `Numeric[N]` is defined,
+for example `BigDecimal` or `spire` `Rational`.
 
 #### String representations
 The `toStr` method can be used to obtain a human-readable string that represents a quantity's
