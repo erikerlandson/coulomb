@@ -13,7 +13,6 @@ def commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "eu.timepit" %% "singleton-ops" % "0.3.1",
-    "org.typelevel" %% "spire-macros" % "0.16.1",
     "org.typelevel" %% "spire" % "0.16.1",
     "org.scalatest" %% "scalatest" % "3.0.7" % Test
   ),
