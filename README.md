@@ -60,7 +60,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 #### Table of Contents
 
 * [Features](#features)
-* [Quantity and UnitExpr](#quantity-and-unitexpr)
+* [`Quantity` and Unit Expressions](#quantity-and-unitexpr)
 * [Quantity Values](#quantity-values)
 * [String Representations](#string-representations)
 * [Predefined Units](#predefined-units)
@@ -107,6 +107,7 @@ Allow a programmer to easily declare new units that will work seamlessly with ex
 // a new unit of length:
 trait Smoot
 implicit val defineUnitSmoot = DerivedUnit[Smoot, Inch](67, name = "Smoot", abbv = "Smt")
+
 // a unit of acceleration:
 trait EarthGravity
 implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](9.8, abbv = "g")
@@ -115,39 +116,36 @@ implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](9.
 #### `Quantity` and `UnitExpr`
 
 `coulomb` defines the
-[class `Quantity`](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.Quantity)
+[class `Quantity`](https://erikerlandson.github.io/coulomb/latest/api/#coulomb.Quantity)
 for representing values with associated units.
 Quantities are represented by their two type parameters: A numeric representation parameter `N`
-(e.g. Int or Double) and a unit type `U` which is a sub-type of
-[`UnitExpr`](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.UnitExpr).
+(e.g. Int or Double) and a unit type `U` which represents the unit associated with the value.
 Here are some simple declarations of `Quantity` objects:
 ```scala
-import com.manyangled.coulomb._
-import SIBaseUnits._
+import coulomb._
+import coulomb.si._
 
-val length = 10.withUnit[Meter]                // An Int value of meters
-val duration = Second(30.0)                    // a Double value in seconds
-val mass = new Quantity[Float, Kilogram](100)  // a Float value in kg
+val length = 10.withUnit[Meter]            // An Int value of meters
+val duration = (30.0).withUnit[Second]     // a Double value in seconds
+val mass = Quantity[Float, Kilogram](100)  // a Float value in kg
 ```
 
-The `UnitExpr` trait hierarchy provides three operator types for building more complex unit types:
+Three operator types can be used for building more complex unit types:
 `%*`, `%/`, and `%^`.
 ```scala
-import com.manyangled.coulomb._
-import ChurchInt._   // integer exponents are represented as types _1, _2, ...
-import SIBaseUnits._
-import SIPrefixes._
+import coulomb._
+import coulomb.si._
 
-val area = 100.withUnit[Meter %* Meter]    // unit product
-val speed = 10.withUnit[Meter %/ Second]   // unit ratio
-val volume = 50.withUnit[Meter %^ _3]      // unit power
+val area = 100.withUnit[Meter %* Meter]   // unit product
+val speed = 10.withUnit[Meter %/ Second]  // unit ratio
+val volume = 50.withUnit[Meter %^ 3]      // unit power
 ```
 
-Using these operators, a `UnitExpr` can be composed into unit type expressions of arbitrary
+Using these operators, units can be composed into unit type expressions of arbitrary
 complexity.
 ```scala
-val acceleration = (9.8).withUnit[Meter %/ (Second %^ _2)]
-val ohms = (0.01).withUnit[(Kilogram %* (Meter %^ _2)) %/ ((Second %^ _3) %* (Ampere %^ _2))]
+val acceleration = (9.8).withUnit[Meter %/ (Second %^ 2)]
+val ohms = (0.01).withUnit[(Kilogram %* (Meter %^ 2)) %/ ((Second %^ 3) %* (Ampere %^ 2))]
 ```
 
 #### Quantity Values
