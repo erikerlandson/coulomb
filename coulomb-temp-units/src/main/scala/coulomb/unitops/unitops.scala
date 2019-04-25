@@ -21,10 +21,23 @@ import spire.math._
 import coulomb.infra._
 import coulomb.define._
 
+/**
+ * An implicit trait that supports compile-time temperature conversion, when possible.
+ * Also used to support addition, subtraction and comparisons.
+ * This implicit will not exist if U1 and U2 are not convertable to one another.
+ * @tparam N1 the numeric type of the temperature value
+ * @tparam U1 the unit expresion type of the temperature
+ * @tparam N2 numeric type of another temperature value
+ * @tparam U2 unit expression type of the other temperature
+ */
 trait TempConverter[N1, U1, N2, U2] {
+  /** the `Numeric` implicit for temperature numeric type N1 */
   def n1: Numeric[N1]
+  /** the `Numeric` implicit for temperature numeric type N2 */
   def n2: Numeric[N2]
+  /** a conversion from temperature value with type `(N1,U1)` to type `(N2,U2)` */
   def cv12(v: N1): N2
+  /** a conversion from temperature value with type `(N2,U2)` to type `(N1,U1)` */
   def cv21(v: N2): N1
 }
 trait TempConverterDefaultPriority {
