@@ -293,18 +293,19 @@ The `coulomb` library strives to make it easy to add new units which work seamle
 There are two varieties of unit declaration: _base units_ and _derived units_.
 
 A base unit, as its name suggests, is not defined in terms of any other unit; it is axiomatic.
-The Standard International [Base Units](https://en.wikipedia.org/wiki/SI_base_unit) are all declared as base units in the `coulomb` [`SIBaseUnits` subpackage](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.SIBaseUnits$).
-In the [`InfoUnits` sub-package](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.InfoUnits$), `Byte` is declared as the base unit of information.
+The Standard International [Base Units](https://en.wikipedia.org/wiki/SI_base_unit) are all declared as base units in the [`coulomb.si` subpackage](https://erikerlandson.github.io/coulomb/latest/api/coulomb/si/index.html).
+In the [`coulomb.info` sub-package](https://erikerlandson.github.io/coulomb/latest/api/coulomb/info/index.html), `Byte` is declared as the base unit of information.
 Declaring a base unit is special in the sense that it also defines a new kind of fundamental _abstract quantity_.
-For example, by declaring `Meter` as a base unit, `coulomb` establishes `Meter` as the canonical representation of the abstract quantity of Length.
-Any other unit of Length must be declared as a _derived unit_, or it would be considered _non-convertable_ with other lengths.
+For example, by declaring `coulomb.si.Meter` as a base unit, `coulomb` establishes `Meter` as the canonical representation of the abstract quantity of Length.
+Any other unit of length must be declared as a _derived unit_ of `Meter`, or it would be considered _non-convertable_ with other lengths.
 
-Here is an example of defining a new base unit `Scoville`, representing an abstract quantity of [Spicy Heat](https://en.wikipedia.org/wiki/Scoville_scale):
+Here is an example of defining a new base unit `Scoville`, representing an abstract quantity of [Spicy Heat](https://en.wikipedia.org/wiki/Scoville_scale).
+The `BaseUnit` value must be defined as an implicit value:
 ```scala
+import coulomb._, coulomb.define._
 object SpiceUnits {
-  // conversion coefficient defaults to 1.  Include a standard abbreviation "sco"
-  @UnitDecl("scoville", abbv = "sco")
-  trait Scoville extends BaseUnit
+  trait Scoville
+  implicit val defineUnitScoville = BaseUnit[Scoville](name = "scoville", abbv = "sco")
 }
 ```
 
@@ -312,29 +313,27 @@ The second variety of unit declarations is the _derived_ unit, which is defined 
 Derived units do _not_ define new kinds of abstract quantity, and are generally more common than base units:
 ```scala
 object NewUnits {
-  import SIBaseUnits._
-  import USCustomaryUnits.Foot
+  import coulomb._, coulomb.define._, coulomb.si._, coulomb.us._
 
   // a furlong is 660 feet
-  @UnitDecl("furlong", 660)
-  trait Furlong extends DerivedUnit[Foot]
+  trait Furlong
+  implicit val defineUnitFurlong = DerivedUnit[Furlong, Foot](coef = 660, abbv = "flg")
 
   // speed of sound is 1130 feet/second (at sea level, 20C)
-  @UnitDecl("mach", 1130)
-  trait Mach extends DerivedUnit[Foot %/ Second]
+  trait Mach
+  implicit val defineUnitMach = DerivedUnit[Mach, Foot %/ Second](coef = 1130, abbv = "mach")
 
   // a standard earth gravity is 9.807 meters per second-squared
   // Define an abbreviation "g"
-  @UnitDecl("earthgravity", 9.807, "g")
-  trait EarthGravity extends DerivedUnit[Meter %/ (Second %^ _2)]
+  trait EarthGravity
+  implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](coef = 9.807, abbv = "g")
 }
 ```
 
-Due to certain Scala compiler [behaviors](https://github.com/scala/scala-dev/issues/353),
-unit definitions must be fully compiled before they can be used.
-Pragmatically, this means that new units should either be defined in a separate project,
-or in a [sub-project](http://www.scala-sbt.org/0.13/docs/Multi-Project.html)
-configured to compile before the calling code.
+Notice that there are no constraints or requrements associated with the unit types `Scoville`, `Furlong`, etc.
+These may simply be declared, as shown above, however they _may also be pre-existing types_.
+In other words, you may define any type, pre-existing or otherwise, to be a `coulomb` unit by declaring the
+appropriate implicit value.
 
 #### Unitless Quantities
 
