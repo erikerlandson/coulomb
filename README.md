@@ -295,6 +295,7 @@ There are two varieties of unit declaration: _base units_ and _derived units_.
 A base unit, as its name suggests, is not defined in terms of any other unit; it is axiomatic.
 The Standard International [Base Units](https://en.wikipedia.org/wiki/SI_base_unit) are all declared as base units in the [`coulomb.si` subpackage](https://erikerlandson.github.io/coulomb/latest/api/coulomb/si/index.html).
 In the [`coulomb.info` sub-package](https://erikerlandson.github.io/coulomb/latest/api/coulomb/info/index.html), `Byte` is declared as the base unit of information.
+
 Declaring a base unit is special in the sense that it also defines a new kind of fundamental _abstract quantity_.
 For example, by declaring `coulomb.si.Meter` as a base unit, `coulomb` establishes `Meter` as the canonical representation of the abstract quantity of Length.
 Any other unit of length must be declared as a _derived unit_ of `Meter`, or it would be considered _non-convertable_ with other lengths.
@@ -302,7 +303,8 @@ Any other unit of length must be declared as a _derived unit_ of `Meter`, or it 
 Here is an example of defining a new base unit `Scoville`, representing an abstract quantity of [Spicy Heat](https://en.wikipedia.org/wiki/Scoville_scale).
 The `BaseUnit` value must be defined as an implicit value:
 ```scala
-import coulomb._, coulomb.define._
+import coulomb._
+import coulomb.define._  // BaseUnit and DerivedUnit
 object SpiceUnits {
   trait Scoville
   implicit val defineUnitScoville = BaseUnit[Scoville](name = "scoville", abbv = "sco")
@@ -337,63 +339,74 @@ appropriate implicit value.
 
 #### Unitless Quantities
 
-When units in an expression all cancel out -- for example, a ratio of quantities with convertable units -- the value is said to be "unitless."
-In `coulomb` the unit expression subtype `Unitless` represents this particular state.
+When units in an expression all cancel out -- for example, a ratio of quantities with convertable units -- the value is said to be "unitless".
+In `coulomb` the unit expression type `Unitless` represents this particular state.
 Here are a few examples of situations when `Unitless` values arise:
 ```scala
 // ratios of convertable unit types are always unitless
-scala> (1.withUnit[Yard] / 1.withUnit[Foot]).toUnit[Unitless].toStrFull
+scala> (1.withUnit[Yard] / 1.withUnit[Foot]).toUnit[Unitless].show
 res1: String = 3 unitless
 
 // raising to the zeroth power
-scala> 100.withUnit[Second].pow[_0].toStrFull
+scala> 100.withUnit[Second].pow[0].show
 res2: String = 1 unitless
 
 // Radians and other angular units are derived from Unitless
-scala> math.Pi.withUnit[Radian].toUnit[Unitless].toStrFull
+scala> math.Pi.withUnit[Radian].toUnit[Unitless].show
 res3: String = 3.141592653589793 unitless
+
+// Percentages
+scala> 90D.withUnit[Percent].toUnit[Unitless].show
+res4: String = 0.9 unitless
 ```
 
 #### Unit Prefixes
 
-Unit prefixes are "first-class" objects in `coulomb`.
+Unit prefixes are a first-class concept in `coulomb`.
 In fact, prefixes are derived units of `Unitless`:
 ```scala
-scala> Kilo(1).toUnit[Unitless].toStrFull
+scala> 1.withUnit[Kilo].toUnit[Unitless].show
 res1: String = 1000 unitless
 
-scala> Kibi(1).toUnit[Unitless].toStrFull
+scala> 1.withUnit[Kibi].toUnit[Unitless].show
 res2: String = 1024 unitless
 ```
 
-Because they are just another kind of derived unit, prefixes work seamlessly with all other units.
+Because they are just another kind of unit, prefixes work seamlessly with all other units.
 ```scala
-scala> 3.withUnit[Meter %^ _3].toUnit[Kilo %* Liter].toStrFull
-res1: String = 3 kilo-liter
+scala> 3.withUnit[Meter %^ 3].toUnit[Kilo %* Liter].showFull
+res1: String = 3 kiloliter
 
-scala> 3D.withUnit[Meter %^ _3].toUnit[Mega %* Liter].toStrFull
-res2: String = 0.003 mega-liter
+scala> 3D.withUnit[Meter %^ 3].toUnit[Mega %* Liter].showFull
+res2: String = 0.003 megaliter
 
-scala> (Kilo(1) * Meter(1)).toUnit[Meter].toStrFull
+scala> (1.withUnit[Kilo] * 1.withUnit[Meter]).toUnit[Meter].showFull
 res3: String = 1000 meter
 
-scala> (Meter(1D) / Mega(1D)).toUnit[Meter].toStrFull
+scala> (1D.withUnit[Meter] / 1D.withUnit[Mega]).toUnit[Meter].showFull
 res4: String = 1.0E-6 meter
 ```
 
-The `coulomb` library comes with definitions for the standard [SI prefixes](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.SIPrefixes$), and also standard [binary prefixes](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.BinaryPrefixes$).
-It is also easy to declare new prefix units:
+The `coulomb` library comes with definitions for the standard [SI prefixes](https://erikerlandson.github.io/coulomb/latest/api/coulomb/siprefix/index.html), and also standard [binary prefixes](https://erikerlandson.github.io/coulomb/latest/api/coulomb/binprefix/index.html).
+
+It is also easy to declare new prefix units using `coulomb.define.PrefixUnit`
 ```scala
-@UnitDecl("dozen", 12, "doz")
-trait Dozen extends PrefixUnit
+scala> trait Dozen
+defined trait Dozen
+
+scala> implicit val defineUnitDozen = PrefixUnit[Dozen](coef = 12, abbv = "doz")
+defineUnitDozen: coulomb.define.DerivedUnit[Dozen,coulomb.Unitless] = DerivedUnit(12, dozen, doz)
+
+scala> 1D.withUnit[Dozen %* Inch].toUnit[Foot].show
+res1: String = 1.0 ft
 ```
 
 #### Using `WithUnit`
 The `WithUnit` type alias can be used to make unit definitions more readable.  The following two
 function definitions are equivalent:
 ```scala
-def f1(duration: Quantity[Float, Second]) = duration + Minute(1f)
-def f2(duration: Float WithUnit Second) = duration + Minute(1f)
+def f1(duration: Quantity[Float, Second]) = duration + 1f.withUnit[Minute]
+def f2(duration: Float WithUnit Second) = duration + 1f.withUnit[Minute]
 ```
 
 There is a similar `WithTemperature` alias for working with `Temperature` values.
