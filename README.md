@@ -60,7 +60,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 #### Table of Contents
 
 * [Features](#features)
-* [`Quantity` and Unit Expressions](#quantity-and-unitexpr)
+* [`Quantity` and Unit Expressions](#quantity-and-unit-expressions)
 * [Quantity Values](#quantity-values)
 * [String Representations](#string-representations)
 * [Predefined Units](#predefined-units)
@@ -71,7 +71,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Unitless Quantities](#unitless-quantities)
 * [Unit Prefixes](#unit-prefixes)
 * [Using `WithUnit`](#using-withunit)
-* [Quantity Parsing and Type Safe Configurations](#runtime-parsing)
+* [Quantity Parsing and Type Safe Configurations](#quantity-parsing-and-type-safe-configurations)
 * [Temperature Values](#temperature-values)
 
 #### Features
