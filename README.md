@@ -113,7 +113,7 @@ trait EarthGravity
 implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](9.8, abbv = "g")
 ```
 
-#### `Quantity` and `UnitExpr`
+#### `Quantity` and Unit Expressions
 
 `coulomb` defines the
 [class `Quantity`](https://erikerlandson.github.io/coulomb/latest/api/#coulomb.Quantity)
@@ -202,27 +202,37 @@ The concept of unit _convertability_ is fundamental to the `coulomb` library and
 implementation of unit analysis.
 Two unit type expressions are _convertable_ if they encode an equivalent
 "[abstract quantity](https://en.wikipedia.org/wiki/International_System_of_Quantities)."
-For example, `Meter` and `Mile` are convertable because they both encode the abstract quantity of Length.
-`Foot %^ _3` and `Liter` are convertable because they both encode a volume, or Length^3.
-`Kilo %* Meter %/ Hour` and `Foot %* (Second %^ _neg1)` are convertable because they encode a velocity, or Length\*Time^-1.
+For example, `Meter` and `Mile` are convertable because they both encode the abstract quantity of `length`.
+`Foot %^ 3` and `Liter` are convertable because they both encode a volume, or `length^3`.
+`Kilo %* Meter %/ Hour` and `Foot %* (Second %^ -1)` are convertable because they encode a velocity, or `length / time`.
+
+In `coulomb`, abstract quantities like `length` are represented by a unique `BaseUnit`.
+For example the base unit for length is the type `coulomb.si.Meter`.
+Compound abstract quantities such as `length / time` or `length ^ 3` are internally represented
+by pairs of base units with exponents:
+
+* `velocity` <=> `length / time` <=> `(Meter ^ 1)(Second ^ -1)`
+* `volume` <=> `length ^ 3` <=> `(Meter ^ 3)`
+* `acceleration` <=> `length / time^2` <=> `(Meter ^ 1)(Second ^ -2)`
+* `bandwidth` <=> `information / time` <=> `(Byte ^ 1)(Second ^ -1)` 
 
 In `coulomb`, a unit quantity will be implicitly converted into a quantity of a different unit type whenever those types are convertable.
 Any attempt to convert between _non-convertable_ unit types results in a compile-time type error.
 
 ```scala
-scala> def foo(q: Quantity[Double, Meter %/ Second]) = q.toStrFull
+scala> def foo(q: Quantity[Double, Meter %/ Second]) = q.showFull
 
 scala> foo(60f.withUnit[Mile %/ Hour])
-res5: String = 26.8224 meter / second
+res5: String = 26.8224 meter/second
 
 scala> foo(1f.withUnit[Mile %/ Minute])
-res6: String = 26.8224 meter / second
+res6: String = 26.8224 meter/second
 
 scala> foo(1f.withUnit[Foot %/ Day])
-res7: String = 3.5277778E-6 meter / second
+res7: String = 3.5277778E-6 meter/second
 
 scala> foo(1f.withUnit[Foot %* Day])
-<console>:40: error: non-convertable unit types:
+       error: type mismatch;
 ```
 
 #### Unit Conversions
