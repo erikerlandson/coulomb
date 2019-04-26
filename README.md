@@ -237,90 +237,55 @@ scala> foo(1f.withUnit[Foot %* Day])
 
 #### Unit Conversions
 As described in the previous section, unit quantities can be converted from one unit type to another when the two types are convertable.
-Unit conversions come in a few different forms:
+Unit conversions come in a couple different forms:
 ```scala
 // Implicit conversion
-scala> val vol: Quantity[Double, Meter %^ _3] = Liter(4000.0)
-vol: com.manyangled.coulomb.Quantity[...] = Quantity(4.0)
+scala> val vol: Quantity[Double, Meter %^ 3] = 4000D.withUnit[Liter]
+vol: coulomb.Quantity[Double,coulomb.si.Meter %^ 3] = Quantity(4.0)
 
-scala> vol.toStrFull
-res0: String = 4.0 meter ^ 3
+scala> vol.showFull
+res2: String = 4.0 meter^3
 
 // Explicit conversion using the `toUnit` method
-scala> Liter(4000.0).toUnit[Meter %^ _3].toStrFull
-res1: String = 4.0 meter ^ 3
-
-// Creation of a conversion function using the `converter` factory function:
-scala> val f = Quantity.converter[Double, Liter, Meter %^ _3]
-
-scala> f(Liter(4000.0)).toStrFull
-res2: String = 4.0 meter ^ 3
-```
-
-**A note on conversions for quantities having integral types (Int, Long, etc).**
-In order to maintain operations in the chosen numeric representation type, conversion factors
-are expressed as multiplication of a numerator, followed by division.  For example, the
-conversion coefficient from Liter to Cup is `2000000000 / 473176473`, and so the conversion
-`100.withUnit[Liter].toUnit[Cup]` looks like this: `100 * 2000000000 / 473176473`, which
-will suffer from integer overflows.  To address this problem, conversion coefficients
-in the case of integral representations are _reduced_ to approximate values using smaller
-numerators and denominators.  The smallest numerator and denominator are found that yield
-an error of < one part in a thousand (i.e. relative error is < 0.001).  For example, in the
-above Int conversion, the conversion coefficient `2000000000 / 473176473` is approximated
-as: `224/53`, which allows much larger quantity values to be converted safely, and yet
-has a relative error of < 0.0001; less than one part in ten thousand.  In the event that
-coefficients reduce the maximum safe values "too far", or an accurate approximation cannot be
-found, a compiler warning is emitted, as in this example, which emits both warnings
-(and with good reason, since the resulting conversion is bad):
-```scala
-scala> 1.withUnit[Tera %* Meter].toUnit[Meter]
-<console>:39: warning: Coefficient approximation deviates by 0.997852516353 relative error
-       1.withUnit[Tera %* Meter].toUnit[Meter]
-                                       ^
-<console>:39: warning: Maximum safe value is 1
-       1.withUnit[Tera %* Meter].toUnit[Meter]
-                                       ^
-res1: com.manyangled.coulomb.Quantity[Int,com.manyangled.coulomb.SIBaseUnits.Meter] = Quantity(2147483647)
+scala> 4000D.withUnit[Liter].toUnit[Meter %^ 3].showFull
+res3: String = 4.0 meter^3
 ```
 
 #### Unit Operations
 Unit quantities support math operations `+`, `-`, `*`, `/`, and `pow`.
 Quantities must be of convertable unit types to be added or subtracted.
-The unit of the left-hand argument is taken as the unit of the output:
+The type of the left-hand argument is taken as the type of the output:
 ```scala
-scala> (Foot(1) + Yard(1)).toStr
-res12: String = 4 ft
+scala> (1.withUnit[Foot] + 1.withUnit[Yard]).show
+res4: String = 4 ft
 
-scala> (Foot(4) - Yard(1)).toStr
-res13: String = 1 ft
+scala> (4.withUnit[Foot] - 1.withUnit[Yard]).show
+res5: String = 1 ft
 ```
 
 Quantities of any unit types may be multiplied or divided.
 Result types are different than either argument:
 ```scala
-scala> (Mile(60) / Hour(1)).toStr
-res14: String = 60 mi / h
+scala> (60.withUnit[Mile] / 1.withUnit[Hour]).show
+res6: String = 60 mi/h
 
-scala> (Yard(1) * Yard(1)).toStr
-res15: String = 1 yd^2
+scala> (1.withUnit[Yard] * 1.withUnit[Yard]).show
+res7: String = 1 yd^2
 
-scala> (Yard(1) / Inch(1)).toStr
-res16: String = 1 yd / in
-
-scala> (Yard(1) / Inch(1)).toUnit[Percent].toStr
-res17: String = 3600 %
+scala> (1.withUnit[Yard] / 1.withUnit[Inch]).toUnit[Percent].show
+res8: String = 3600 %
 ```
 
-When raising a unit to a power, the exponent is given as a type, in Church integer representation:
+When raising a unit to a power, the exponent is given as a literal type:
 ```scala
-scala> Meter(3.0).pow[_2].toStrFull
-res25: String = 9.0 meter ^ 2
+scala> 3D.withUnit[Meter].pow[2].show
+res13: String = 9.0 m^2
 
-scala> Meter(Rational(3)).pow[_neg1].toStrFull
-res26: String = 1/3 meter ^ -1
+scala> Rational(3).withUnit[Meter].pow[-1].show
+res14: String = 1/3 m^(-1)
 
-scala> Meter(3).pow[_0].toStrFull
-res27: String = 1 unitless
+scala>  3.withUnit[Meter].pow[0].show
+res15: String = 1 unitless
 ```
 
 #### Declaring New Units
