@@ -71,7 +71,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Unitless Quantities](#unitless-quantities)
 * [Unit Prefixes](#unit-prefixes)
 * [Using `WithUnit`](#using-withunit)
-* [Runtime Parsing](#runtime-parsing)
+* [Quantity Parsing and Type Safe Configurations](#runtime-parsing)
 * [Temperature Values](#temperature-values)
 
 #### Features
@@ -411,62 +411,98 @@ def f2(duration: Float WithUnit Second) = duration + 1f.withUnit[Minute]
 
 There is a similar `WithTemperature` alias for working with `Temperature` values.
 
-#### Runtime Parsing
-As a demonstration of `coulomb` applied to improved type safety for application configuration
-settings, the `examples` sub-project defines a class `QuantityParser` for
-[run-time parsing](https://erikerlandson.github.io/coulomb/latest/api/#com.manyangled.coulomb.QuantityParser)
-of `Quantity` expressions, and applies it to enhance the
+#### Quantity Parsing and Type Safe Configurations
+The `coulomb` package `coulomb-parser` provides a utility for parsing a quantity expression DSL into
+correctly typed `Quantity` values, called `QuantityParser`.
+A `QuantityParser` is instantiated with a list of types that it will recognize.
+This example shows a quantity parser that can recognize values in bytes, seconds,
+and the two prefixes mega and giga:
+```scala
+scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.info._, coulomb.time._, coulomb.parser._
+
+scala> val qp = QuantityParser[Byte :: Second :: Giga :: Mega :: HNil]
+qp: coulomb.parser.QuantityParser = coulomb.parser.QuantityParser@43356dd9
+```
+
+Parsing an expression requires an expected numeric and unit type.
+Here we see a quantity given in seconds, successfully being parsed and converted to minutes:
+```scala
+scala> qp[Double, Minute]("60 second")
+res1: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] = Success(Quantity(1.0))
+```
+
+A quantity parser recognizes and understands how to interpret prefix units, as well as
+compound unit expressions:
+```scala
+scala> qp[Double, Mega %* Byte %/ Second]("1.0 gigabyte/second").get.show
+res2: String = 1000.0 MB/s
+```
+
+The quantity parser in this example was not created to recognize minutes inside the DSL, and so
+the following parse will fail.
+```scala
+scala> qp[Double, Minute]("60 minute")
+res3: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] = Failure(coulomb.parser.QPLexingException: ')' expected but 'm' found)
+```
+
+As usual, incompatible units will also cause a parsing error:
+```scala
+scala> qp[Double, Minute]("60 byte")
+res4: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] =
+Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed ...
+```
+
+As an example of `coulomb` applied to improved type safety for application configuration
+settings, the following demonstrates a simple integration of the
 [Typesafe `config` package](https://typesafehub.github.io/config/)
-with `coulomb` unit analysis.
+with `coulomb` unit analysis, using `QuantityParser`.
 
 To see this in action, build the examples and load the demo into a REPL:
 
 ```scala
 % cd /path/to/coulomb
-% xsbt examples/console
-Welcome to Scala 2.11.8 (OpenJDK 64-Bit Server VM, Java 1.8.0_131).
-Type in expressions for evaluation. Or try :help.
+% xsbt coulomb_tests/test:console
+Welcome to Scala 2.13.0-M5 (OpenJDK 64-Bit Server VM, Java 1.8.0_201).
 
 scala>
+
 ```
 First import a selection of `coulomb` units, and the demo objects:
 
 ```scala
-scala> import com.manyangled.coulomb._; import SIBaseUnits._; import InfoUnits._; import SIPrefixes._; import SIAcceptedUnits._; import ChurchInt._; import scala.collection.JavaConverters._
+scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.info._, coulomb.time._, coulomb.parser._
 
-scala> import DemoQP._
+scala> import ConfigIntegration._, scala.collection.JavaConverters._
 ```
 
 The demo pre-defines a simple configuration object:
 ```scala
 scala> conf.entrySet().asScala.map { e => s"${e.getKey()} = ${e.getValue()}" }.mkString("\n")
 res0: String =
-duration = Quoted("60 Second")
-bandwidth = Quoted("10 Mega * Byte / Second")
-memory = Quoted("100 Giga * Byte")
+bandwidth = Quoted("10 megabyte / second")
+memory = Quoted("100 gigabyte")
+duration = Quoted("60 second")
 ```
 
-It also defines an implicit enhancement to add a new method `getUnitQuantity`, which transforms
-the configuration values into a simple `Quantity` expression, and converts that expression into
-the specified representation type and unit:
+It also defines an implicit enhancement to add a new method `getUnitQuantity`, which applies a
+`QuantityParser` like the one above to transform the configuration values into a
+`Quantity` expression:
 ```scala
-scala> conf.getUnitQuantity[Double, Minute]("duration").get.toStrFull
-res1: String = 1.0 minute
+scala> conf.getUnitQuantity[Double, Minute]("duration").get.show
+res1: String = 1.0 min
 
-scala> conf.getUnitQuantity[Int, Mega %* Byte]("memory").get.toStrFull
-res2: String = 100000 mega-byte
+scala> conf.getUnitQuantity[Int, Mega %* Byte]("memory").get.show
+res2: String = 100000 MB
 
-scala> conf.getUnitQuantity[Float, Giga %* Bit %/ Second]("bandwidth").get.toStrFull
-res3: String = 0.08 giga-bit / second
+scala> conf.getUnitQuantity[Float, Giga %* Bit %/ Second]("bandwidth").get.show
+res3: String = 0.08 Gb/s
 ```
 
-If we ask for a unit type that is non-convertable to the configuration, an error is returned:
+If we ask for a unit type that is incompatible with the configuration, an error is returned:
 ```scala
 scala> conf.getUnitQuantity[Int, Giga %* Bit]("bandwidth")
-res5: scala.util.Try[com.manyangled.coulomb.Quantity[Int,com.manyangled.coulomb.%*[com.manyangled.coulomb.SIPrefixes.Giga,com.manyangled.coulomb.InfoUnits.Bit]]] =
-Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed:
-
-non-convertable unit types...
+res4: scala.util.Try[coulomb.Quantity[Int,coulomb.siprefix.Giga %* coulomb.info.Bit]] =
+Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed...
 ```
 
 #### Temperature Values
