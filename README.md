@@ -67,6 +67,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 
 #### Table of Contents
 
+* [Running Tutorial Examples](#running-tutorial-examples)
 * [Features](#features)
 * [`Quantity` and Unit Expressions](#quantity-and-unit-expressions)
 * [Quantity Values](#quantity-values)
@@ -81,6 +82,16 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Using `WithUnit`](#using-withunit)
 * [Quantity Parsing and Type Safe Configurations](#quantity-parsing-and-type-safe-configurations)
 * [Temperature Values](#temperature-values)
+
+#### Running Tutorial Examples
+
+Except where otherwise noted, the following tutorial examples can be run in a scala REPL as follows:
+```
+% cd /path/to/scala
+% sbt coulomb_tests/console
+
+scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.mks._, coulomb.time._, coulomb.info._, coulomb.binprefix._, coulomb.accepted._, coulomb.us._, coulomb.temp._, coulomb.define._, coulomb.parser._
+```
 
 #### Features
 
