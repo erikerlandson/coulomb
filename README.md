@@ -136,7 +136,7 @@ implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](9.
 #### `Quantity` and Unit Expressions
 
 `coulomb` defines the
-[class `Quantity`](https://erikerlandson.github.io/coulomb/latest/api/#coulomb.Quantity)
+[class `Quantity`](https://erikerlandson.github.io/coulomb/latest/api/coulomb/Quantity.html)
 for representing values with associated units.
 Quantities are represented by their two type parameters: A numeric representation parameter `N`
 (e.g. Int or Double) and a unit type `U` which represents the unit associated with the value.
@@ -474,7 +474,7 @@ Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed ...
 
 As an example of `coulomb` applied to improved type safety for application configuration
 settings, the following demonstrates a simple integration of the
-[Typesafe `config` package](https://typesafehub.github.io/config/)
+[Typesafe `config` package](https://github.com/lightbend/config)
 with `coulomb` unit analysis, using `QuantityParser`.
 
 To see this in action, build the examples and load the demo into a REPL:
