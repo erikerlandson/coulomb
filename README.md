@@ -8,6 +8,14 @@ API documentation for `coulomb` is available at: https://erikerlandson.github.io
 
 There is also a [tutorial](#tutorial) below.
 
+### Scala Requirements
+
+The latest version of `coulomb` currently depends on
+[upgrades](https://github.com/scala/scala/pull/6050)
+to Scala's implicit resolution algorithms that are not available prior to Scala 2.13.
+At the time of this release, Scala 2.13 is pre-release and `coulomb` is built only aggainst scala-2.13.0-M5.
+I will re-publish for scala-2.13 when it officially releases, possibly for "-RC" versions if the typelevel ecosystem supports it.
+
 ### How to include `coulomb` in your project
 
 The core `coulomb` package can be included by adding the dependencies shown below.
