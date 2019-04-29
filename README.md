@@ -82,6 +82,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Using `WithUnit`](#using-withunit)
 * [Quantity Parsing and Type Safe Configurations](#quantity-parsing-and-type-safe-configurations)
 * [Temperature Values](#temperature-values)
+* [Type Parameter Integrations](#type-parameter-integrations)
 
 #### Running Tutorial Examples
 
