@@ -565,3 +565,58 @@ q: coulomb.Quantity[Float,coulomb.temp.Fahrenheit] = Quantity(3.6)
 scala> q.show
 res5: String = 3.6 °F
 ```
+
+#### Type Parameter Integrations
+
+Previous topics have focused on how to work with specific `Quantity` and unit expressions.
+However, suppose you wish to write your own "generic" functions or classes, where `Quantity` values
+have parameterized types? For these situations, `coulomb` provides a set of type-classes that
+allow `Quantity` operations to be supported with type parameters.
+
+The `UnitString` type class supports unit names and abbreviations:
+```scala
+scala> import coulomb.unitops._
+
+scala> def uname[N, U](q: Quantity[N, U])(implicit us: UnitString[U]): String = us.full
+uname: [N, U](q: coulomb.Quantity[N,U])(implicit us: coulomb.unitops.UnitString[U])String
+
+scala> uname(3.withUnit[Meter %/ Second])
+res0: String = meter/second
+```
+
+The `UnitConverter` type class supports unit (and numeric) conversions, in addition to
+subtraction, addition, and ordering predicates `<`, `>`, etc:
+```scala
+scala> def convert[N1, U1, N2, U2](q1: Quantity[N1, U1], q2: Quantity[N2, U2])(implicit
+    s1: UnitString[U1], s2: UnitString[U2],
+    uc: UnitConverter[N1, U1, N2, U2]) = {
+  val r1 = q1.to[N2, U2]
+  val r2 = q1 + q2
+  (r1.show, r2.show)
+}
+
+scala> convert(2f.withUnit[Mile], 1f.withUnit[Kilo %* Meter])
+res1: (String, String) = (3.218688 km,2.6213713 mi)
+```
+
+The three typeclasses `UnitMultiply`, `UnitDivide` and `UnitPower` support quantity operations
+`*`, `/` and `pow`, respectively:
+```scala
+scala> def operate[N1, U1, N2, U2](q1: Quantity[N1, U1], q2: Quantity[N2, U2])(implicit
+    mul: UnitMultiply[N1, U1, N2, U2],
+    div: UnitDivide[N1, U1, N2, U2],
+    pow: UnitPower[N1, U1, 3]) = {
+  val r1 = q1 * q2
+  val r2 = q1 / q2
+  val r3 = q1.pow[3]
+  (r1, r2, r3)
+}
+
+scala> val (q1, q2, q3) = operate(3f.withUnit[Meter], 3f.withUnit[Meter])
+q1: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(2)] = Quantity(9.0)
+q2: coulomb.Quantity[Float,coulomb.Unitless] = Quantity(1.0)
+q3: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(3)] = Quantity(27.0)
+
+scala> List(q1.show, q2.show, q3.show)
+res3: List[String] = List(9.0 m^2, 1.0 unitless, 27.0 m^3)
+```
