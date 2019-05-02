@@ -30,7 +30,7 @@ import coulomb._
  * val speed = qp[Double, Mile %/ Hour]("10.0 kilometer / second") // prefix units are parsed
  * }}}
  */
-class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) {
+class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) extends Serializable {
   import scala.reflect.runtime.universe.{ Try => _, _ }
   import scala.tools.reflect.ToolBox
 

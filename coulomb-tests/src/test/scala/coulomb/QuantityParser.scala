@@ -51,6 +51,7 @@ object ConfigIntegration {
 }
 
 class QuantityParserSpec extends FlatSpec with Matchers {
+  import coulomb.parser.QuantityParser
   import ConfigIntegration._
 
   it should "return configured unit quantities" in {
@@ -68,5 +69,16 @@ class QuantityParserSpec extends FlatSpec with Matchers {
   it should "fail on incompatible units" in {
     val try1 = conf.getUnitQuantity[Double, Meter]("duration")
     try1.isInstanceOf[scala.util.Failure[_]] should be (true)
+  }
+
+  it should "support ser/de" in {
+    import coulomb.scalatest.serde._
+    val expr = "3.14 gigabyte / second"
+    val qp1 = QuantityParser[Byte :: Second :: Giga :: Mega :: HNil]
+    val t1 = qp1[Float, Giga %* Byte %/ Second](expr).get
+    val qp2 = roundTripSerDe(qp1)
+    val t2 = qp2[Float, Giga %* Byte %/ Second](expr).get
+    (t1 === t2) shouldBe (true)
+    t2.shouldBeQ[Float, Giga %* Byte %/ Second](3.14)
   }
 }
