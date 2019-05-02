@@ -120,7 +120,7 @@ val mps: Quantity[Double, Meter %/ Second] = (60.0).withUnit[Mile] // compile-ti
 ```
 Automatically determine correct output unit types for operations on unit quantities
 ```scala
-val mps: Quantity[Double, Meter %/ Second] = Mile(60.0) / Hour(1.0)
+val mps: Quantity[Double, Meter %/ Second] = 60D.withUnit[Mile] / 1D.withUnit[Hour]
 ```
 Allow a programmer to easily declare new units that will work seamlessly with existing units
 ```scala
