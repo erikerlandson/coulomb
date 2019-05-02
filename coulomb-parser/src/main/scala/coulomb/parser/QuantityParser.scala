@@ -30,25 +30,25 @@ import coulomb._
  * val speed = qp[Double, Mile %/ Hour]("10.0 kilometer / second") // prefix units are parsed
  * }}}
  */
-class QuantityParser private (qpp: coulomb.parser.infra.QPP[_]) {
+class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) {
   import scala.reflect.runtime.universe.{ Try => _, _ }
   import scala.tools.reflect.ToolBox
 
-  private val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
+  @transient private lazy val lex = new coulomb.parser.lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
+  @transient private lazy val parse = new coulomb.parser.parser.UnitDSLParser(qpp.nameToType)
 
-  private val lex = new coulomb.parser.lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
-  private val parse = new coulomb.parser.parser.UnitDSLParser(qpp.nameToType)
+  @transient private lazy val unitDecls = qpp.decls.map { d => s"$d\n" }.mkString("")
 
-  private val unitDecls = qpp.decls.map { d => s"$d\n" }.mkString("")
-
-  private val imports = Seq(
+  @transient private lazy val imports = Seq(
     "coulomb._",
     "coulomb.define._",
     "spire.math.Rational"
   ).map { i => s"import $i\n" }.mkString("")
 
   // figure out how to pre-compile this preamble
-  private val preamble = s"${imports}${unitDecls}"
+  @transient private lazy val preamble = s"${imports}${unitDecls}"
+
+  @transient private lazy val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
 
   /**
    * Parse an expression into a unit typed Quantity
