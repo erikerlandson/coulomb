@@ -8,6 +8,8 @@ API documentation for `coulomb` is available at: https://erikerlandson.github.io
 
 There is also a [tutorial](#tutorial) below.
 
+The logical representation coulomb uses for units and unit analysis is described in this [blog post](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/).
+
 ### Scala Requirements
 
 The latest version of `coulomb` currently depends on
