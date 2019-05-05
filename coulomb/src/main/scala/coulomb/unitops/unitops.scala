@@ -147,11 +147,9 @@ object UnitPower {
  */
 class ConvertableUnits[U1, U2](val coef: Rational)
 object ConvertableUnits {
-  implicit def witnessCU[U1, U2, C1, C2](implicit
-      u1: CanonicalSig.Aux[U1, C1],
-      u2: CanonicalSig.Aux[U2, C2],
-      eq: SetEqual.Aux[C1, C2, true]): ConvertableUnits[U1, U2] =
-    new ConvertableUnits[U1, U2](u1.coef / u2.coef)
+  import coulomb.%/
+  implicit def witnessCU[U1, U2](implicit cs: CanonicalSig.Aux[%/[U1, U2], HNil]): ConvertableUnits[U1, U2] =
+    new ConvertableUnits[U1, U2](cs.coef)
 }
 
 /**
