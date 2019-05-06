@@ -56,7 +56,8 @@ used for extending standard configuration systems with type-safe unit quantities
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-parser" % "0.3.0"   // QuantityParser
+  "com.manyangled" %% "coulomb-parser" % "0.3.0",                    // QuantityParser
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"   // %Provided parser dependency
 )
 ```
 
