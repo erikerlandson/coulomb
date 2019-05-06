@@ -89,6 +89,18 @@ lazy val coulomb_parser = (project in file("coulomb-parser"))
     )
   )
 
+lazy val coulomb_typesafe_config = (project in file("coulomb-typesafe-config"))
+  .aggregate(coulomb, coulomb_parser)
+  .dependsOn(coulomb, coulomb_parser)
+  .settings(name := "coulomb-typesafe-config")
+  .settings(commonSettings :_*)
+  .settings(docDepSettings :_*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.typesafe" % "config" % "1.3.3" % Provided
+    )
+  )
+
 lazy val coulomb_tests = (project in file("coulomb-tests"))
   .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser)
   .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser)
