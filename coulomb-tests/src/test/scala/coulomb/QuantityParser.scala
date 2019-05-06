@@ -26,13 +26,11 @@ import coulomb.temp._
 import org.scalatest.QMatchers._
 
 object ConfigIntegration {
-  import scala.util.Try
-  import scala.reflect.runtime.universe.TypeTag
   import com.typesafe.config.ConfigFactory
-  import coulomb.parser.unitops.UnitTypeString
   import coulomb.parser.QuantityParser
+  import coulomb.typesafeconfig._
 
-  val conf = ConfigFactory.parseString("""
+  val confTS = ConfigFactory.parseString("""
     "duration" = "60 second"
     "memory" = "100 gigabyte"
     "bandwidth" = "10 megabyte / second"
@@ -40,14 +38,7 @@ object ConfigIntegration {
 
   private val qp = QuantityParser[Byte :: Second :: Giga :: Mega :: HNil]
 
-  implicit class TypesafeConfigWithUnits(conf: com.typesafe.config.Config) {
-    def getUnitQuantity[N :TypeTag, U :UnitTypeString](key: String) = {
-      for {
-        raw <- Try { conf.getString(key) }
-        qv <- qp[N, U](raw)
-      } yield { qv }
-    }
-  }
+  val conf = confTS.withQuantityParser(qp)
 }
 
 class QuantityParserSpec extends FlatSpec with Matchers {
@@ -55,19 +46,19 @@ class QuantityParserSpec extends FlatSpec with Matchers {
   import ConfigIntegration._
 
   it should "return configured unit quantities" in {
-    conf.getUnitQuantity[Double, Second]("duration").get.shouldBeQ[Double, Second](60)
-    conf.getUnitQuantity[Int, Giga %* Byte]("memory").get.shouldBeQ[Int, Giga %* Byte](100)
-    conf.getUnitQuantity[Float, Mega %* Byte %/ Second]("bandwidth").get.shouldBeQ[Float, Mega %* Byte %/ Second](10)
+    conf.getQuantity[Double, Second]("duration").get.shouldBeQ[Double, Second](60)
+    conf.getQuantity[Int, Giga %* Byte]("memory").get.shouldBeQ[Int, Giga %* Byte](100)
+    conf.getQuantity[Float, Mega %* Byte %/ Second]("bandwidth").get.shouldBeQ[Float, Mega %* Byte %/ Second](10)
   }
 
   it should "return convertable unit quantities" in {
-    conf.getUnitQuantity[Double, Minute]("duration").get.shouldBeQ[Double, Minute](1)
-    conf.getUnitQuantity[Int, Giga %* Bit]("memory").get.shouldBeQ[Int, Giga %* Bit](800)
-    conf.getUnitQuantity[Float, Giga %* Bit %/ Minute]("bandwidth").get.shouldBeQ[Float, Giga %* Bit %/ Minute](4.8)
+    conf.getQuantity[Double, Minute]("duration").get.shouldBeQ[Double, Minute](1)
+    conf.getQuantity[Int, Giga %* Bit]("memory").get.shouldBeQ[Int, Giga %* Bit](800)
+    conf.getQuantity[Float, Giga %* Bit %/ Minute]("bandwidth").get.shouldBeQ[Float, Giga %* Bit %/ Minute](4.8)
   }
 
   it should "fail on incompatible units" in {
-    val try1 = conf.getUnitQuantity[Double, Meter]("duration")
+    val try1 = conf.getQuantity[Double, Meter]("duration")
     try1.isInstanceOf[scala.util.Failure[_]] should be (true)
   }
 
