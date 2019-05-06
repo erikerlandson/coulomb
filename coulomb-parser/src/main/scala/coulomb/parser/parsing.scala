@@ -94,11 +94,11 @@ object lexer {
 object ast {
   sealed trait UnitAST {
     override def toString = this match {
-      case Quant(v, u) => s"(Rational($v)).withUnit[$u]"
+      case Quant(v, u) => s"coulomb.Quantity[spire.math.Rational, $u](spire.math.Rational($v))"
       case Unit(u) => u
-      case Mul(lhs, rhs) => s"%*[$lhs, $rhs]"
-      case Div(num, den) => s"%/[$num, $den]"
-      case Pow(rad, exp) => s"%^[$rad, $exp]"
+      case Mul(lhs, rhs) => s"coulomb.%*[$lhs, $rhs]"
+      case Div(num, den) => s"coulomb.%/[$num, $den]"
+      case Pow(rad, exp) => s"coulomb.%^[$rad, $exp]"
     }
   }
   case class Quant(v: Double, u: String) extends UnitAST

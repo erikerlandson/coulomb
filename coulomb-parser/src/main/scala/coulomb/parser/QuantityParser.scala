@@ -37,18 +37,7 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
   @transient private lazy val lex = new coulomb.parser.lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
   @transient private lazy val parse = new coulomb.parser.parser.UnitDSLParser(qpp.nameToType)
 
-  @transient private lazy val unitDecls = qpp.decls.map { d => s"$d\n" }.mkString("")
-
-  @transient private lazy val imports = Seq(
-    "coulomb._",
-    "coulomb.define._",
-    "spire.math.Rational"
-  ).map { i => s"import $i\n" }.mkString("")
-
-  // figure out how to pre-compile this preamble
-  @transient private lazy val preamble = s"${imports}${unitDecls}"
-
-  @transient private lazy val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
+  @transient lazy val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
 
   /**
    * Parse an expression into a unit typed Quantity
@@ -69,7 +58,7 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
     for {
       tok <- lex(quantityExpr)
       ast <- parse(tok).toTry
-      code <- Try { s"${preamble}($ast)${cast}" }
+      code <- Try { s"($ast)${cast}" }
       qeTree <- Try { toolbox.parse(code) }
       qeEval <- Try { toolbox.eval(qeTree) }
       qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
