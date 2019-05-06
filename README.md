@@ -500,30 +500,32 @@ scala> import ConfigIntegration._, scala.collection.JavaConverters._
 
 The demo pre-defines a simple configuration object:
 ```scala
-scala> conf.entrySet().asScala.map { e => s"${e.getKey()} = ${e.getValue()}" }.mkString("\n")
+scala> confTS.entrySet().asScala.map { e => s"${e.getKey()} = ${e.getValue()}" }.mkString("\n")
 res0: String =
 bandwidth = Quoted("10 megabyte / second")
 memory = Quoted("100 gigabyte")
 duration = Quoted("60 second")
 ```
 
-It also defines an implicit enhancement to add a new method `getUnitQuantity`, which applies a
-`QuantityParser` like the one above to transform the configuration values into a
+It also imports definitions from the `coulomb-typesafe-config` sub-package,
+which defines [CoulombConfig](https://erikerlandson.github.io/coulomb/latest/api/coulomb/typesafeconfig/CoulombConfig.html),
+and a new method `getQuantity`.
+This new `getter`method applies a `QuantityParser` like the one above to transform the configuration values into a
 `Quantity` expression:
 ```scala
-scala> conf.getUnitQuantity[Double, Minute]("duration").get.show
+scala> conf.getQuantity[Double, Minute]("duration").get.show
 res1: String = 1.0 min
 
-scala> conf.getUnitQuantity[Int, Mega %* Byte]("memory").get.show
+scala> conf.getQuantity[Int, Mega %* Byte]("memory").get.show
 res2: String = 100000 MB
 
-scala> conf.getUnitQuantity[Float, Giga %* Bit %/ Second]("bandwidth").get.show
+scala> conf.getQuantity[Float, Giga %* Bit %/ Second]("bandwidth").get.show
 res3: String = 0.08 Gb/s
 ```
 
 If we ask for a unit type that is incompatible with the configuration, an error is returned:
 ```scala
-scala> conf.getUnitQuantity[Int, Giga %* Bit]("bandwidth")
+scala> conf.getQuantity[Int, Giga %* Bit]("bandwidth")
 res4: scala.util.Try[coulomb.Quantity[Int,coulomb.siprefix.Giga %* coulomb.info.Bit]] =
 Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed...
 ```
