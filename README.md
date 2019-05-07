@@ -61,6 +61,16 @@ libraryDependencies ++= Seq(
 )
 ```
 
+The package `coulomb-typesafe-config` provides an integration of unit parsing with the Typesafe Config.
+```scala
+libraryDependencies ++= Seq(
+  "com.manyangled" %% "coulomb-typesafe-config" % "0.3.0"
+  "com.manyangled" %% "coulomb-parser" % "0.3.0",
+  "com.typesafe" % "config" % "1.3.3",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
+)
+```
+
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
 all contributors are expected to respect this code.
@@ -475,8 +485,8 @@ res4: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] =
 Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed ...
 ```
 
-As an example of `coulomb` applied to improved type safety for application configuration
-settings, the following demonstrates a simple integration of the
+As an example of `coulomb` applied to unit type safety for application configuration
+settings, the following demonstrates the `coulomb.typesafeconfig` integration of the
 [Typesafe `config` package](https://github.com/lightbend/config)
 with `coulomb` unit analysis, using `QuantityParser`.
 
@@ -510,7 +520,7 @@ duration = Quoted("60 second")
 It also imports definitions from the `coulomb-typesafe-config` sub-package,
 which defines [CoulombConfig](https://erikerlandson.github.io/coulomb/latest/api/coulomb/typesafeconfig/CoulombConfig.html),
 and a new method `getQuantity`.
-This new `getter`method applies a `QuantityParser` like the one above to transform the configuration values into a
+This new getter method applies a `QuantityParser` like the one above to transform the configuration values into a
 `Quantity` expression:
 ```scala
 scala> conf.getQuantity[Double, Minute]("duration").get.show
