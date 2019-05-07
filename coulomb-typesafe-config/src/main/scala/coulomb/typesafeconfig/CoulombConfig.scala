@@ -26,7 +26,33 @@ import com.typesafe.config.Config
 import coulomb.parser.unitops.UnitTypeString
 import coulomb.parser.QuantityParser
 
+/**
+ * Represents a typesafe Config object, augmented with a coulomb QuantityParser
+ * to provide additional static type checking for unit expressions.
+ * {{{
+ * import coulomb.typesafeconfig._
+ *
+ * val confTS = ConfigFactory.parseString("""
+ *   "duration" = "60 second"
+ *   "memory" = "100 gigabyte"
+ *   "bandwidth" = "10 megabyte / second"
+ * """)
+ *
+ * val qp = QuantityParser[Byte :: Second :: Giga :: Mega :: HNil]
+ *
+ * val conf = confTS.withQuantityParser(qp)
+ *
+ * val bw = conf.getQuantity[Float, Giga %* Bit %/ Minute]("bandwidth")
+ * }}}
+ */
 case class CoulombConfig(conf: Config, qp: QuantityParser) {
+  /**
+   * Obtain the value at the given key, as a coulomb Quantity
+   * @tparam N the numeric value type
+   * @tparam U the unit type
+   * @param key the Config key to look up
+   * @return a Quantity[N, U] parsed from value at the key, wrapped in a Try
+   */
   def getQuantity[N :TypeTag, U :UnitTypeString](key: String) = {
     for {
       raw <- Try { conf.getString(key) }
@@ -35,6 +61,8 @@ case class CoulombConfig(conf: Config, qp: QuantityParser) {
   }
 }
 
+/** Static methods and values for CoulombConfig */
 object CoulombConfig {
+  /** Enable the Config methods to be called on a CoulombConfig object */
   implicit def exposeConfig(cc: CoulombConfig): Config = cc.conf
 }
