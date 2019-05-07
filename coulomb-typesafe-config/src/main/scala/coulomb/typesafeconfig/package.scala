@@ -20,7 +20,13 @@ import com.typesafe.config.Config
 import coulomb.parser.QuantityParser
 
 package object typesafeconfig {
+  /** enhance a Config object to add a QuantityParser */
   implicit class EnhanceTSConfig(conf: Config) {
+    /**
+     * Generate a CoulombConfig object from this Config and the provided QuantityParser
+     * @param qp the QuantityParser to associate with this Config
+     * @return a CoulombConfig that associates this Config with 'qp'
+     */
     def withQuantityParser(qp: QuantityParser): CoulombConfig =
       CoulombConfig(conf, qp)
   }
