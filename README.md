@@ -1,5 +1,4 @@
 ### coulomb
-
 A statically typed unit analysis library for Scala
 
  [ ![Download](https://api.bintray.com/packages/manyangled/maven/coulomb/images/download.svg) ](https://bintray.com/manyangled/maven/coulomb/_latestVersion)
