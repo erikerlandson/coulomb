@@ -1,10 +1,10 @@
 ### coulomb
 
-[![Join the chat at https://gitter.im/erikerlandson/community](https://badges.gitter.im/erikerlandson/community.svg)](https://gitter.im/erikerlandson/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 A statically typed unit analysis library for Scala
 
  [ ![Download](https://api.bintray.com/packages/manyangled/maven/coulomb/images/download.svg) ](https://bintray.com/manyangled/maven/coulomb/_latestVersion)
+ [![Join the chat at https://gitter.im/erikerlandson/community](https://badges.gitter.im/erikerlandson/community.svg)](https://gitter.im/erikerlandson/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 ### Documentation
 API documentation for `coulomb` is available at: https://erikerlandson.github.io/coulomb/latest/api/
