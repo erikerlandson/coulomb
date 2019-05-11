@@ -20,6 +20,6 @@ before_cache:
   - find $HOME/.sbt        -name "*.lock"               -print -delete
 
 script:
-  - sbt ++${TRAVIS_SCALA_VERSION}! clean &&
-    sbt ++${TRAVIS_SCALA_VERSION}! compile &&
-    sbt ++${TRAVIS_SCALA_VERSION}! coulomb_tests/test
+  - sbt ++${TRAVIS_SCALA_VERSION} clean &&
+    sbt ++${TRAVIS_SCALA_VERSION} compile &&
+    sbt ++${TRAVIS_SCALA_VERSION} coulomb_tests/test
