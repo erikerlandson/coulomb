@@ -1,5 +1,6 @@
 <img src="https://raw.githubusercontent.com/erikerlandson/coulomb/develop/assets/coulomb-splash-800x400.png" alt="coulomb: a statically typed unit analysis library for Scala" width="300" height="150">
 
+ [![Build Status](https://travis-ci.org/erikerlandson/coulomb.svg?branch=develop)](https://travis-ci.org/erikerlandson/coulomb)
  [ ![Download](https://api.bintray.com/packages/manyangled/maven/coulomb/images/download.svg) ](https://bintray.com/manyangled/maven/coulomb/_latestVersion)
  [![Join the chat at https://gitter.im/erikerlandson/community](https://badges.gitter.im/erikerlandson/community.svg)](https://gitter.im/erikerlandson/coulomb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
