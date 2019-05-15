@@ -1,0 +1,2 @@
+package coulomb.avro
+
