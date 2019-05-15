@@ -107,6 +107,7 @@ lazy val coulomb_tests = (project in file("coulomb-tests"))
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
   .settings(libraryDependencies += "com.typesafe" % "config" % "1.3.3")
+  .settings(libraryDependencies += "org.apache.avro" % "avro" % "1.8.2")
   .settings(libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1")
 
 lazy val coulomb_docs = (project in file("."))
