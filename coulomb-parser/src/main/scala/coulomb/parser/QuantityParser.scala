@@ -18,6 +18,8 @@ package coulomb.parser
 
 import scala.util.{ Try, Success, Failure }
 
+import spire.math.Rational
+
 import coulomb._
 
 /**
@@ -62,6 +64,21 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
       qeTree <- Try { toolbox.parse(code) }
       qeEval <- Try { toolbox.eval(qeTree) }
       qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
+    } yield {
+      qret
+    }
+  }
+
+  def coefficient(u1: String, u2: String): Try[Rational] = {
+    for {
+      tok1 <- lex(u1)
+      ast1 <- parse.parseUnit(tok1).toTry
+      tok2 <- lex(u2)
+      ast2 <- parse.parseUnit(tok2).toTry
+      code <- Try { s"coulomb.Quantity.coefficient[${ast1},${ast2}]" }
+      qeTree <- Try { toolbox.parse(code) }
+      qeEval <- Try { toolbox.eval(qeTree) }
+      qret <- Try { qeEval.asInstanceOf[Rational] }
     } yield {
       qret
     }
