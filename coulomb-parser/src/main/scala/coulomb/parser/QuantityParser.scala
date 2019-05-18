@@ -22,6 +22,8 @@ import spire.math.Rational
 
 import coulomb._
 
+import coulomb.parser.unitops.UnitTypeString
+
 /**
  * A class that can parse an expression into a unit-typed Quantity
  * {{{
@@ -54,7 +56,7 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
    */
   def apply[N, U](quantityExpr: String)(implicit
       ntt: TypeTag[N],
-      uts: coulomb.parser.unitops.UnitTypeString[U]): Try[Quantity[N, U]] = {
+      uts: UnitTypeString[U]): Try[Quantity[N, U]] = {
     val tpeN = typeOf[N]
     val cast = s".toUnit[${uts.expr}].toNumeric[$tpeN]"
     for {
@@ -76,6 +78,19 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
       tok2 <- lex(u2)
       ast2 <- parse.parseUnit(tok2).toTry
       code <- Try { s"coulomb.Quantity.coefficient[${ast1},${ast2}]" }
+      qeTree <- Try { toolbox.parse(code) }
+      qeEval <- Try { toolbox.eval(qeTree) }
+      qret <- Try { qeEval.asInstanceOf[Rational] }
+    } yield {
+      qret
+    }
+  }
+
+  def coefficient[U2](u1: String)(implicit ut2: UnitTypeString[U2]): Try[Rational] = {
+    for {
+      tok1 <- lex(u1)
+      ast1 <- parse.parseUnit(tok1).toTry
+      code <- Try { s"coulomb.Quantity.coefficient[${ast1},${ut2.expr}]" }
       qeTree <- Try { toolbox.parse(code) }
       qeEval <- Try { toolbox.eval(qeTree) }
       qret <- Try { qeEval.asInstanceOf[Rational] }
