@@ -1,0 +1,7 @@
+{
+    "type": "record",
+    "name": "config",
+    "fields": [
+        { "name": "latency", "type": "double", "unit": "second" }
+    ]
+}
