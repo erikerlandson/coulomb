@@ -2,6 +2,8 @@
     "type": "record",
     "name": "config",
     "fields": [
-        { "name": "latency", "type": "double", "unit": "second" }
+        { "name": "latency", "type": "double", "unit": "second" },
+        { "name": "bandwidth", "type": "double", "unit": "gigabyte / second" },
+        { "name": "nounit", "type": "double" }
     ]
 }

@@ -46,12 +46,28 @@ import org.apache.avro._
 import org.apache.avro.generic._
 
 class AvroIntegrationSpec extends FlatSpec with Matchers {
-  it should "integrate with an avro schema" in {
+
+  val record1 = {
     val schema = new Schema.Parser().parse(new java.io.File("coulomb-tests/src/test/scala/coulomb/test1.avsc"))
     val rec = new GenericData.Record(schema)
     rec.put("latency", 1.0)
-    val qp = QuantityParser[Second :: Byte :: Hour :: Mega :: HNil]
-    val qlat = rec.getQuantity[Double, Milli %* Second](qp)("latency")
-    qlat.shouldBeQ[Double, Milli %* Second](1000)
+    rec.put("bandwidth", 1.0)
+    rec.put("nounit", 1.0)
+    rec
+  }
+
+  val qp1 = QuantityParser[Second :: Byte :: Hour :: Mega :: Giga :: HNil]
+
+  it should "integrate with an avro schema" in {
+    record1.getQuantity[Double, Milli %* Second](qp1)("latency").shouldBeQ[Double, Milli %* Second](1000)
+    record1.getQuantity[Float, Tera %* Bit %/ Minute](qp1)("bandwidth").shouldBeQ[Float, Tera %* Bit %/ Minute](0.48)
+  }
+
+  it should "fail on incompatible units" in {
+    intercept[Throwable] { record1.getQuantity[Double, Byte](qp1)("latency") }
+  }
+
+  it should "fail on missing unit fields" in {
+    intercept[Exception] { record1.getQuantity[Double, Second](qp1)("nounit") }
   }
 }
