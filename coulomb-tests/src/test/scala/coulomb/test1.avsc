@@ -1,6 +1,6 @@
 {
     "type": "record",
-    "name": "config",
+    "name": "test1",
     "fields": [
         { "name": "latency", "type": "double", "unit": "second" },
         { "name": "bandwidth", "type": "double", "unit": "gigabyte / second" },
