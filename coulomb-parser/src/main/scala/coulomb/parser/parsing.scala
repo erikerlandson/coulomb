@@ -175,5 +175,13 @@ object parser {
         case Success(result, next) => Right(result)
       }
     }
+
+    def parseUnit(tokens: Seq[UnitDSLToken]): Either[QPParsingException, UnitAST] = {
+      val reader = new UnitDSLTokenReader(tokens)
+      (phrase(unitexpr))(reader) match {
+        case NoSuccess(msg, next) => Left(QPParsingException(msg))
+        case Success(result, next) => Right(result)
+      }
+    }
   }
 }
