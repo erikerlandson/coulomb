@@ -13,18 +13,23 @@ import coulomb.parser.QuantityParser
 
 package object avro {
   implicit class EnhanceGenericRecord(rec: GenericData.Record) {
-    val schema = rec.getSchema
+    private val schema = rec.getSchema
 
     def getQuantity[N, U](qp: QuantityParser)(field: String)(implicit
         n: spire.math.Numeric[N],
         ut: UnitTypeString[U],
         us: UnitString[U]): Quantity[N, U] = {
       val fld = schema.getField(field)
-      val ufld = fld.getObjectProp("unit").asInstanceOf[String]
       val uq = us.full
       val cq = fld.getObjectProp(uq)
       val coef = if (cq != null) cq.asInstanceOf[Double] else {
-        val c = qp.coefficient[U](ufld).get.toDouble
+        val uprop = fld.getObjectProp("unit")
+        if (uprop == null) throw new Exception(s"""field $field is missing "unit" metadata property""")
+        val c = try {
+          qp.coefficient[U](uprop.asInstanceOf[String]).get.toDouble
+        } catch {
+          case _: Throwable => throw new Exception(s"""unit metadata "${uprop}" incompatible with "${ut.expr}"""")
+        }
         fld.addProp(uq, c)
         c
       }

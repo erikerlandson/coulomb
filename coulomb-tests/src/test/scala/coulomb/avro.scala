@@ -64,7 +64,7 @@ class AvroIntegrationSpec extends FlatSpec with Matchers {
   }
 
   it should "fail on incompatible units" in {
-    intercept[Throwable] { record1.getQuantity[Double, Byte](qp1)("latency") }
+    intercept[Exception] { record1.getQuantity[Double, Byte](qp1)("latency") }
   }
 
   it should "fail on missing unit fields" in {
