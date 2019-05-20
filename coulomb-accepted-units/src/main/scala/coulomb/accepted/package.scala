@@ -23,6 +23,7 @@ import spire.math._
 import coulomb.define._
 import coulomb.si._
 
+/** Accepted non-SI metric units (Gram, Liter, Percent, etc) */
 package object accepted {
   trait Percent
   implicit val defineUnitPercent = DerivedUnit[Percent, Unitless](Rational(1, 100), abbv = "%")
