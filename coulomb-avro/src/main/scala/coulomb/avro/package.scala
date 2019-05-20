@@ -1,3 +1,19 @@
+/*
+Copyright 2019 Erik Erlandson
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package coulomb
 
 import scala.language.implicitConversions
@@ -11,10 +27,20 @@ import coulomb.parser.unitops.UnitTypeString
 import coulomb.unitops.UnitString
 import coulomb.parser.QuantityParser
 
+/** Integrations for Apache Avro schema */
 package object avro {
+  /** Adds enhancement methods for coulomb-avro integration */
   implicit class EnhanceGenericRecord(rec: GenericData.Record) {
     private val schema = rec.getSchema
 
+    /**
+     * get a field's value in a generic record as a unit Quantity
+     * @tparam N the numeric type to use for the Quantity
+     * @tparam U the unit type
+     * @param qp the QuantityParser to use
+     * @param field the name of the field to get. This field must have an additional
+     * metadata property "unit", which contains a unit-expression parseable by the given QuantityParser 'qp'
+     */
     def getQuantity[N, U](qp: QuantityParser)(field: String)(implicit
         n: spire.math.Numeric[N],
         ut: UnitTypeString[U],
@@ -45,6 +71,7 @@ package object avro {
       Quantity[N, U](n.fromType[Double](coef * dbv))
     }
 
+    /** Similar to getQuantity[N, U](qp)(field), but the QuantityParser is resolved implicitly */
     def getQuantity[N :spire.math.Numeric, U :UnitString :UnitTypeString](field: String)(implicit qp: QuantityParser): Quantity[N, U] =
       getQuantity[N, U](qp)(field)
   }
