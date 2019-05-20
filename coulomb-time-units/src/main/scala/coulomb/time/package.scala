@@ -20,6 +20,7 @@ import coulomb.define._
 
 import coulomb.si._
 
+/** Time units: Minute, Hour, Day, Week */
 package object time {
   trait Minute
   implicit val defineUnitMinute = DerivedUnit[Minute, Second](60, abbv = "min")

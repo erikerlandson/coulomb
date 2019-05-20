@@ -21,6 +21,7 @@ import singleton.ops._
 import coulomb.define._
 import coulomb.si._
 
+/** MKS (Meter, Kilogram, Second) unit definitions (Newton, Joule, Watt, etc) */
 package object mks {
   trait Radian
   implicit val defineUnitRadian = DerivedUnit[Radian, Unitless](abbv = "rad")

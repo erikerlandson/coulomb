@@ -19,6 +19,7 @@ package coulomb
 import com.typesafe.config.Config
 import coulomb.parser.QuantityParser
 
+/** Integrations for Lightbend's typesafe config system */
 package object typesafeconfig {
   /** enhance a Config object to add a QuantityParser */
   implicit class EnhanceTSConfig(conf: Config) {

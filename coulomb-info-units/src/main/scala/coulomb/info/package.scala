@@ -20,6 +20,7 @@ import spire.math._
 
 import coulomb.define._
 
+/** Information units: Bit, Byte, Nat */
 package object info {
   trait Byte
   implicit val defineUnitByte = BaseUnit[Byte](abbv = "B")

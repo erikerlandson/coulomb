@@ -20,6 +20,7 @@ import spire.math._
 
 import coulomb.define._
 
+/** SI prefix units (Kilo, Mega, Milli, Micro, etc) */
 package object siprefix {
   trait Deca
   implicit val defineUnitDeca = PrefixUnit[Deca](10, abbv = "da")

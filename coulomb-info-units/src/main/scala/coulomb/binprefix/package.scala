@@ -20,6 +20,7 @@ import spire.math._
 
 import coulomb.define._
 
+/** Binary prefix units (Kibi, Mebi, Gibi, etc) */
 package object binprefix {
   trait Kibi
   implicit val defineUnitKibi = PrefixUnit[Kibi](1024, abbv = "Ki")

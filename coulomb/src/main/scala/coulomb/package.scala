@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+/** Statically typed unit analysis for Scala */
 package object coulomb {
   /** Represents a unitless value */
   trait Unitless

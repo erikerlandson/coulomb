@@ -24,6 +24,7 @@ import coulomb.define._
 
 import coulomb.si._
 
+/** United States customary units (Foot, Pound, FluidOunce, Pint, etc) */
 package object us {
   trait Inch
   implicit val defineUnitInch = DerivedUnit[Inch, Foot](Rational(1, 12), abbv = "in")

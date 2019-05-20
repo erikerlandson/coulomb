@@ -20,6 +20,7 @@ import spire.math._
 
 import coulomb.define._
 
+/** Temperature and Temperature units: Celsius and Fahrenheit */
 package object temp {
   /** An infix type alias for [[Temperature]] */
   type WithTemperature[N, U] = Temperature[N, U]

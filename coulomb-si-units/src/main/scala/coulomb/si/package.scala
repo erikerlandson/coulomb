@@ -18,6 +18,7 @@ package coulomb
 
 import coulomb.define._
 
+/** Standard International (SI) units: Kilogram, Meter, Second, Ampere, Mole, Candela, Kelvin */
 package object si {
   trait Meter
   implicit val defineUnitMeter = BaseUnit[Meter]()
