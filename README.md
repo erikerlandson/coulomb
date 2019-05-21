@@ -97,7 +97,8 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Unitless Quantities](#unitless-quantities)
 * [Unit Prefixes](#unit-prefixes)
 * [Using `WithUnit`](#using-withunit)
-* [Quantity Parsing and Type Safe Configurations](#quantity-parsing-and-type-safe-configurations)
+* [Quantity Parsing](#quantity-parsing)
+* [Type Safe Configurations](#type-safe-configurations)
 * [Temperature Values](#temperature-values)
 * [Type Parameter Integrations](#type-parameter-integrations)
 
@@ -448,7 +449,7 @@ def f2(duration: Float WithUnit Second) = duration + 1f.withUnit[Minute]
 
 There is a similar `WithTemperature` alias for working with `Temperature` values.
 
-#### Quantity Parsing and Type Safe Configurations
+#### Quantity Parsing
 The `coulomb` package `coulomb-parser` provides a utility for parsing a quantity expression DSL into
 correctly typed `Quantity` values, called `QuantityParser`.
 A `QuantityParser` is instantiated with a list of types that it will recognize.
@@ -489,6 +490,7 @@ res4: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] =
 Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed ...
 ```
 
+#### Type Safe Configurations
 As an example of `coulomb` applied to unit type safety for application configuration
 settings, the following demonstrates the `coulomb.typesafeconfig` integration of the
 [Typesafe `config` package](https://github.com/lightbend/config)
