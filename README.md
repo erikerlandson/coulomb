@@ -75,6 +75,16 @@ libraryDependencies ++= Seq(
 )
 ```
 
+The package `coulomb-avro` provides an integration of unit parsing with Avro schemas:
+```scala
+libraryDependencies ++= Seq(
+  "com.manyangled" %% "coulomb-avro" % "0.3.2",
+  "com.manyangled" %% "coulomb-parser" % "0.3.2",
+  "org.apache.avro" % "avro" % "1.9.0",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
+)
+```
+
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
 all contributors are expected to respect this code.
