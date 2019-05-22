@@ -74,5 +74,45 @@ package object avro {
     /** Similar to getQuantity[N, U](qp)(field), but the QuantityParser is resolved implicitly */
     def getQuantity[N :spire.math.Numeric, U :UnitString :UnitTypeString](field: String)(implicit qp: QuantityParser): Quantity[N, U] =
       getQuantity[N, U](qp)(field)
+
+    /**
+     * put a field's value into a generic record, given a unit Quantity
+     * @tparam N the numeric type of the Quantity
+     * @tparam U the unit type
+     * @param qp the QuantityParser to use
+     * @param field the name of the field to put. This field must have an additional
+     * metadata property "unit", which contains a unit-expression parseable by the given QuantityParser 'qp'
+     */
+    def putQuantity[N, U](qp: QuantityParser)(field: String, q: Quantity[N, U])(implicit
+        n: spire.math.Numeric[N],
+        ut: UnitTypeString[U],
+        us: UnitString[U]): Unit = {
+      val fld = schema.getField(field)
+      val uq = us.full
+      val cq = fld.getObjectProp(uq)
+      val coef = if (cq != null) cq.asInstanceOf[Double] else {
+        val uprop = fld.getObjectProp("unit")
+        if (uprop == null) throw new Exception(s"""field $field is missing "unit" metadata property""")
+        val c = try {
+          qp.coefficient[U](uprop.asInstanceOf[String]).get.toDouble
+        } catch {
+          case _: Throwable => throw new Exception(s"""unit metadata "${uprop}" incompatible with "${ut.expr}"""")
+        }
+        fld.addProp(uq, c)
+        c
+      }
+      val dbv = n.toType[Double](q.value) / coef
+      fld.schema.getType match {
+        case tpe if (tpe == Schema.Type.FLOAT) => rec.put(field, dbv.toFloat)
+        case tpe if (tpe == Schema.Type.DOUBLE) => rec.put(field, dbv)
+        case tpe if (tpe == Schema.Type.INT) => rec.put(field, dbv.toInt)
+        case tpe if (tpe == Schema.Type.LONG) => rec.put(field, dbv.toLong)
+        case _ => throw new Exception(s"non-numeric field type: ${fld.schema.getType}")
+      }
+    }
+
+    /** Similar to putQuantity[N, U](qp)(field, q), but the QuantityParser is resolved implicitly */
+    def putQuantity[N :spire.math.Numeric, U :UnitString :UnitTypeString](field: String, q: Quantity[N, U])(implicit qp: QuantityParser): Unit =
+      putQuantity(qp)(field, q)
   }
 }
