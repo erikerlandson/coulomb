@@ -47,9 +47,10 @@ import org.apache.avro.generic._
 
 class AvroIntegrationSpec extends FlatSpec with Matchers {
 
+  val schema1 = new Schema.Parser().parse(new java.io.File("coulomb-tests/src/test/scala/coulomb/test1.avsc"))
+
   val record1 = {
-    val schema = new Schema.Parser().parse(new java.io.File("coulomb-tests/src/test/scala/coulomb/test1.avsc"))
-    val rec = new GenericData.Record(schema)
+    val rec = new GenericData.Record(schema1)
     rec.put("latency", 1.0)
     rec.put("bandwidth", 1.0)
     rec.put("nounit", 1.0)
@@ -69,5 +70,11 @@ class AvroIntegrationSpec extends FlatSpec with Matchers {
 
   it should "fail on missing unit fields" in {
     intercept[Exception] { record1.getQuantity[Double, Second](qp1)("nounit") }
+  }
+
+  it should "support putQuantity" in {
+    val rec = new GenericData.Record(schema1)
+    rec.putQuantity(qp1)("latency", 1.withUnit[Minute])
+    rec.getQuantity[Double, Second](qp1)("latency").shouldBeQ[Double, Second](60.0)
   }
 }
