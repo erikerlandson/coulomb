@@ -12,6 +12,9 @@ There is also a [tutorial](#tutorial) below.
 Preventing configuration errors with
 [unit types](http://erikerlandson.github.io/blog/2019/05/09/preventing-configuration-errors-with-unit-types/).
 
+Integrating Apache Avro
+[with coulomb](http://erikerlandson.github.io/blog/2019/05/23/unit-types-for-avro-schema-integrating-avro-with-coulomb/).
+
 The logical representation coulomb uses for units and unit analysis is described in this [blog post](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/).
 
 ### Scala Requirements
