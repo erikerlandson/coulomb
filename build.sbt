@@ -3,18 +3,18 @@
 
 def commonSettings = Seq(
   organization := "com.manyangled",
-  version := "0.3.4-SNAPSHOT",
-  scalaVersion := "2.13.0-M5",
-  crossScalaVersions := Seq("2.13.0-M5"),
+  version := "0.3.4",
+  scalaVersion := "2.13.0",
+  crossScalaVersions := Seq("2.13.0"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "spire" % "0.16.1" % Provided,
-    "eu.timepit" %% "singleton-ops" % "0.3.1" % Provided,
-    "org.scalatest" %% "scalatest" % "3.0.7" % Test
+    "org.typelevel" %% "spire" % "0.17.0-M1" % Provided,
+    "eu.timepit" %% "singleton-ops" % "0.4.0" % Provided,
+    "org.scalatest" %% "scalatest" % "3.0.8" % Test
   ),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
@@ -78,7 +78,7 @@ lazy val coulomb_customary_units = (project in file("coulomb-customary-units"))
   .settings(docDepSettings :_*)
 
 def coulombParserDeps = Seq(
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1" % Provided
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2" % Provided
 )
 
 lazy val coulomb_parser = (project in file("coulomb-parser"))
