@@ -19,11 +19,7 @@ The logical representation coulomb uses for units and unit analysis is described
 
 ### Scala Requirements
 
-The latest version of `coulomb` currently depends on
-[upgrades](https://github.com/scala/scala/pull/6050)
-to Scala's implicit resolution algorithms that are not available prior to Scala 2.13.
-At the time of this release, Scala 2.13 is pre-release and `coulomb` is built only aggainst scala-2.13.0-M5.
-I will re-publish for scala-2.13 when it officially releases, possibly for "-RC" versions if the typelevel ecosystem supports it.
+The `coulomb` libraries currently require scala 2.13.0, or higher.
 
 ### How to include `coulomb` in your project
 
