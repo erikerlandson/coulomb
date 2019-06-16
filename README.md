@@ -36,9 +36,9 @@ package is also a dependency, but is included transitively via `spire`.
 resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb" % "0.3.3",
-  "org.typelevel" %% "spire" % "0.16.1",
-  "eu.timepit" %% "singleton-ops" % "0.3.1"
+  "com.manyangled" %% "coulomb" % "0.3.4",
+  "org.typelevel" %% "spire" % "0.17.0-M1",
+  "eu.timepit" %% "singleton-ops" % "0.4.0"
 )
 ```
 
@@ -47,13 +47,13 @@ separate sub-packages.
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-si-units" % "0.3.3",        // The seven SI units: meter, second, kilogram, etc
-  "com.manyangled" %% "coulomb-accepted-units" % "0.3.3",  // Common non-SI metric: liter, centimeter, gram, etc
-  "com.manyangled" %% "coulomb-time-units" % "0.3.3",      // minute, hour, day, week
-  "com.manyangled" %% "coulomb-info-units" % "0.3.3",      // bit, byte, nat
-  "com.manyangled" %% "coulomb-mks-units" % "0.3.3",       // MKS units: Joule, Newton, Watt, Volt, etc
-  "com.manyangled" %% "coulomb-customary-units" % "0.3.3", // non-metric units: foot, mile, pound, gallon, pint, etc
-  "com.manyangled" %% "coulomb-temp-units" % "0.3.3"       // Celsius and Fahrenheit temperature scales
+  "com.manyangled" %% "coulomb-si-units" % "0.3.4",        // The seven SI units: meter, second, kilogram, etc
+  "com.manyangled" %% "coulomb-accepted-units" % "0.3.4",  // Common non-SI metric: liter, centimeter, gram, etc
+  "com.manyangled" %% "coulomb-time-units" % "0.3.4",      // minute, hour, day, week
+  "com.manyangled" %% "coulomb-info-units" % "0.3.4",      // bit, byte, nat
+  "com.manyangled" %% "coulomb-mks-units" % "0.3.4",       // MKS units: Joule, Newton, Watt, Volt, etc
+  "com.manyangled" %% "coulomb-customary-units" % "0.3.4", // non-metric units: foot, mile, pound, gallon, pint, etc
+  "com.manyangled" %% "coulomb-temp-units" % "0.3.4"       // Celsius and Fahrenheit temperature scales
 )
 ```
 
@@ -63,28 +63,28 @@ used for extending standard configuration systems with type-safe unit quantities
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-parser" % "0.3.3",                    // QuantityParser
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"   // %Provided parser dependency
+  "com.manyangled" %% "coulomb-parser" % "0.3.4",                    // QuantityParser
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"   // %Provided parser dependency
 )
 ```
 
 The package `coulomb-typesafe-config` provides an integration of unit parsing with the Typesafe Config.
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-typesafe-config" % "0.3.3"
-  "com.manyangled" %% "coulomb-parser" % "0.3.3",
+  "com.manyangled" %% "coulomb-typesafe-config" % "0.3.4"
+  "com.manyangled" %% "coulomb-parser" % "0.3.4",
   "com.typesafe" % "config" % "1.3.3",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
 )
 ```
 
 The package `coulomb-avro` provides an integration of unit parsing with Avro schemas:
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-avro" % "0.3.3",
-  "com.manyangled" %% "coulomb-parser" % "0.3.3",
+  "com.manyangled" %% "coulomb-avro" % "0.3.4",
+  "com.manyangled" %% "coulomb-parser" % "0.3.4",
   "org.apache.avro" % "avro" % "1.9.0",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.1"
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
 )
 ```
 
