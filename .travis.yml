@@ -8,6 +8,8 @@ jdk:
 
 sudo: false
 
+dist: trusty
+
 cache:
   directories:
   - $HOME/.sbt
