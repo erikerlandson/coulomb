@@ -4,9 +4,11 @@ scala:
   - 2.13.0
 
 jdk:
-  - oraclejdk9
+  - oraclejdk8
 
 sudo: false
+
+dist: trusty
 
 cache:
   directories:
