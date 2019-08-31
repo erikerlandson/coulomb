@@ -48,19 +48,21 @@ import _root_.pureconfig._
 import _root_.pureconfig.generic.auto._
 
 class PureconfigIntegrationSpec extends FlatSpec with Matchers {
-  case class QC(duration: Quantity[Double, Second], memory: Quantity[Double, Mega %* Byte])
+  case class QC(duration: Quantity[Double, Second], memory: Quantity[Double, Mega %* Byte], regular: Int)
 
   implicit val qp = QuantityParser[Second :: Byte :: Hour :: Giga :: HNil]
 
   val conf = ConfigFactory.parseString("""{
     "duration": { "value": 1, "unit": "hour" },
     "memory": { "value": 1, "unit": "gigabyte" }
+    "regular": 42
   }""")
 
   it should "load a pureconfic case class with unit conversions" in {
     val qc = loadConfig[QC](conf).toOption.get
     qc.duration.shouldBeQ[Double, Second](3600.0)
     qc.memory.shouldBeQ[Double, Mega %* Byte](1000.0)
+    qc.regular should be(42)
   }
 
   it should "fail on incompatible units" in {
