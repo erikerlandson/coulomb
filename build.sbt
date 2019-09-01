@@ -113,18 +113,31 @@ lazy val coulomb_avro = (project in file("coulomb-avro"))
   .settings(docDepSettings :_*)
   .settings(libraryDependencies ++= coulombAvroDeps)
 
+def coulombPureConfigDeps = Seq(
+  "com.github.pureconfig" %% "pureconfig" % "0.11.1" % Provided
+)
+
+lazy val coulomb_pureconfig = (project in file("coulomb-pureconfig"))
+  .aggregate(coulomb, coulomb_parser)
+  .dependsOn(coulomb, coulomb_parser)
+  .settings(name := "coulomb-pureconfig")
+  .settings(commonSettings :_*)
+  .settings(docDepSettings :_*)
+  .settings(libraryDependencies ++= coulombPureConfigDeps)
+
 lazy val coulomb_tests = (project in file("coulomb-tests"))
-  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro)
-  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro)
+  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
   .settings(libraryDependencies ++= coulombAvroDeps)
   .settings(libraryDependencies ++= coulombTypesafeConfigDeps)
   .settings(libraryDependencies ++= coulombParserDeps)
+  .settings(libraryDependencies ++= coulombPureConfigDeps)
 
 lazy val coulomb_docs = (project in file("."))
-  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro)
-  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro)
+  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
   .settings(name := "coulomb-docs")
   .settings(commonSettings :_*)
 
