@@ -27,6 +27,9 @@ import coulomb.unitops.UnitString
 import coulomb.parser.unitops.UnitTypeString
 import coulomb.parser.QuantityParser
 
+/**
+ * Defines implicit ConfigConvert materializers to save and load coulomb Quantity fields
+ */
 package object pureconfig {
   case class ConfigCoulomb[N](value: N, unit: String)
 
@@ -35,6 +38,7 @@ package object pureconfig {
       ConfigCoulomb(q.value, q.showUnitFull)
   }
 
+  /** implicit materializer for saving and loading coulomb Quantity fields */
   implicit def coulombQuantityConfigConvert[N, U](implicit
     ntt: TypeTag[N],
     qtt: TypeTag[Quantity[N, U]],
