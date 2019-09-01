@@ -89,6 +89,10 @@ libraryDependencies ++= Seq(
 )
 ```
 
+The package `coulomb-pureconfig` provides an integration with pureconfig configurations:
+
+https://github.com/erikerlandson/coulomb/tree/develop/coulomb-pureconfig
+
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
 all contributors are expected to respect this code.
