@@ -8,6 +8,9 @@ https://github.com/erikerlandson/coulomb#tutorial
 For more information on available coulomb packages, see:
 https://github.com/erikerlandson/coulomb#how-to-include-coulomb-in-your-project
 
+The coulomb libraries include most dependencies `%Provided` to allow maximum flexibility
+of binary compatible dependency versions:
+
 ```scala
 resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
@@ -15,9 +18,10 @@ libraryDependencies ++= Seq(
   // basic coulomb dependencies
   "com.manyangled" %% "coulomb" % "0.3.5",
   "org.typelevel" %% "spire" % "0.17.0-M1",
-  "eu.timepit" %% "singleton-ops" % "0.4.0"
+  "eu.timepit" %% "singleton-ops" % "0.4.0",
   // pureconfig integration:
-  "com.manyangled" %% "coulomb-pureconfig" % "0.3.5"
+  "com.manyangled" %% "coulomb-pureconfig" % "0.3.5",
+  "com.github.pureconfig" %% "pureconfig" % "0.11.1"
 )
 ```
 
