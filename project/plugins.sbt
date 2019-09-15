@@ -9,7 +9,7 @@ resolvers += "jgit-repo" at "http://download.eclipse.org/jgit/maven"
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 
-addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.1")
+addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.2")
 
 //addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.2.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-site" % "1.3.3")
