@@ -90,7 +90,7 @@ lazy val coulomb_parser = (project in file("coulomb-parser"))
   .settings(libraryDependencies ++= coulombParserDeps)
 
 def coulombTypesafeConfigDeps = Seq(
-  "com.typesafe" % "config" % "1.3.4" % Provided
+  "com.typesafe" % "config" % "1.4.0" % Provided
 )
 
 lazy val coulomb_typesafe_config = (project in file("coulomb-typesafe-config"))
