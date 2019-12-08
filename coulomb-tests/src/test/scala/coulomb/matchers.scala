@@ -6,6 +6,7 @@ import scala.language.implicitConversions
 import org.scalatest._
 import org.scalactic._
 import TripleEquals._
+import matchers._
 import MatchersHelper.indicateFailure
 import MatchersHelper.indicateSuccess
 
