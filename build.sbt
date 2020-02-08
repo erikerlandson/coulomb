@@ -13,7 +13,7 @@ def commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "org.typelevel" %% "spire" % "0.17.0-M1" % Provided,
-    "eu.timepit" %% "singleton-ops" % "0.4.1" % Provided,
+    "eu.timepit" %% "singleton-ops" % "0.4.3" % Provided,
     "org.scalatest" %% "scalatest" % "3.1.0" % Test
   ),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
