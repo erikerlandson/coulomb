@@ -14,7 +14,7 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "spire" % "0.17.0-M1" % Provided,
     "eu.timepit" %% "singleton-ops" % "0.4.3" % Provided,
-    "org.scalatest" %% "scalatest" % "3.1.0" % Test
+    "org.scalatest" %% "scalatest" % "3.1.1" % Test
   ),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
