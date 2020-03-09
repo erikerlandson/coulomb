@@ -95,8 +95,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @tparam P the literal type representing the integer exponent
    * @return this quantity raised to power P, with unit type U^P
    */
-  def pow[P](implicit up: UnitPower[N, U, P]): Quantity[N, up.PowRT] =
-    new Quantity[N, up.PowRT](up.n.pow(value, up.p))
+  def pow[P](implicit up: UnitPower[N, U, P]): Quantity[N, up.RT] =
+    new Quantity[N, up.RT](up.vpow(value))
 
   /**
    * Test if two quantities are equal

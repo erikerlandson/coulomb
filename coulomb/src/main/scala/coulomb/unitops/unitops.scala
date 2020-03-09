@@ -111,23 +111,23 @@ object UnitDivide {
  * @tparam P a literal type representing an integer exponent
  */
 trait UnitPower[N, U, P] {
-  /** the `Numeric` implicit for quantity numeric type N */
-  def n: Numeric[N]
   /** the integer value of literal type exponent P */
   def p: Int
+  /** returns a value raised to the power P */
+  def vpow(v: N): N
   /** a unit type corresponding to `U^P` */
-  type PowRT
+  type RT
 }
 object UnitPower {
-  type Aux[N, U, P, PRT] = UnitPower[N, U, P] { type PowRT = PRT }
+  type Aux[N, U, P, PRT] = UnitPower[N, U, P] { type RT = PRT }
   implicit def evidence[N, U, P](implicit
-      nn: Numeric[N],
+      n: Numeric[N],
       xivP: XIntValue[P],
       prt: PowResultType[U, P]): Aux[N, U, P, prt.Out] =
     new UnitPower[N, U, P] {
-      type PowRT = prt.Out
-      val n = nn
+      type RT = prt.Out
       val p = xivP.value
+      def vpow(v: N): N = n.pow(v, p)
     }
 }
 
