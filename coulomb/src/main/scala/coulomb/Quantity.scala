@@ -77,8 +77,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity in the product.
    * @return this*rhs, with numeric type N and unit type U*U2.
    */
-  def *[N2, U2](rhs: Quantity[N2, U2])(implicit um: UnitMultiply[N, U, N2, U2]): Quantity[N, um.RT12] =
-    new Quantity[N, um.RT12](um.n1.times(value, um.cn21(rhs.value)))
+  def *[N2, U2](rhs: Quantity[N2, U2])(implicit um: UnitMultiply[N, U, N2, U2]): Quantity[N, um.RT] =
+    new Quantity[N, um.RT](um.vmul(value, rhs.value))
 
   /**
    * Divide this quantity by another

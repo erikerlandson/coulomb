@@ -58,25 +58,22 @@ object UnitString {
  * @tparam U2 unit expression type of the RHS quantity
  */
 trait UnitMultiply[N1, U1, N2, U2] {
-  /** the `Numeric` implicit for quantity numeric type N1 */
-  def n1: Numeric[N1]
-  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
-  def cn21(x: N2): N1
+  /** multiply numeric values, returning "left hand" type N1 */
+  def vmul(v1: N1, v2: N2): N1
   /** a type representing the unit product `U1*U2` */
-  type RT12
+  type RT
 }
 object UnitMultiply {
   type Aux[N1, U1, N2, U2, R12] = UnitMultiply[N1, U1, N2, U2] {
-    type RT12 = R12
+    type RT = R12
   }
   implicit def evidence[N1, U1, N2, U2](implicit
-      nn1: Numeric[N1],
-      nn2: Numeric[N2],
+      n1: Numeric[N1],
+      n2: Numeric[N2],
       mrt12: MulResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
     new UnitMultiply[N1, U1, N2, U2] {
-      val n1 = nn1
-      def cn21(x: N2): N1 = n1.fromType[N2](x)
-      type RT12 = mrt12.Out
+      def vmul(v1: N1, v2: N2): N1 = n1.times(v1, n1.fromType[N2](v2))
+      type RT = mrt12.Out
     }
 }
 
