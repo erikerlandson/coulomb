@@ -87,8 +87,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity.
    * @return this/rhs, with numeric type N and unit type U/U2.
    */
-  def /[N2, U2](rhs: Quantity[N2, U2])(implicit ud: UnitDivide[N, U, N2, U2]): Quantity[N, ud.RT12] =
-    new Quantity[N, ud.RT12](ud.n1.div(value, ud.cn21(rhs.value)))
+  def /[N2, U2](rhs: Quantity[N2, U2])(implicit ud: UnitDivide[N, U, N2, U2]): Quantity[N, ud.RT] =
+    new Quantity[N, ud.RT](ud.vdiv(value, rhs.value))
 
   /**
    * Raise this quantity to an integer power

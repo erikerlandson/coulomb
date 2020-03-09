@@ -85,25 +85,22 @@ object UnitMultiply {
  * @tparam U2 unit expression type of the RHS quantity
  */
 trait UnitDivide[N1, U1, N2, U2] {
-  /** the `Numeric` implicit for quantity numeric type N1 */
-  def n1: Numeric[N1]
-  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
-  def cn21(x: N2): N1
+  /** divide numeric values, returning "left hand" type N1 */
+  def vdiv(v1: N1, v2: N2): N1
   /** a type representing the unit division `U1/U2` */
-  type RT12
+  type RT
 }
 object UnitDivide {
   type Aux[N1, U1, N2, U2, R12] = UnitDivide[N1, U1, N2, U2] {
-    type RT12 = R12
+    type RT = R12
   }
   implicit def evidence[N1, U1, N2, U2](implicit
-      nn1: Numeric[N1],
-      nn2: Numeric[N2],
+      n1: Numeric[N1],
+      n2: Numeric[N2],
       drt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, drt12.Out] =
     new UnitDivide[N1, U1, N2, U2] {
-      val n1 = nn1
-      def cn21(x: N2): N1 = n1.fromType[N2](x)
-      type RT12 = drt12.Out
+      def vdiv(v1: N1, v2: N2): N1 = n1.div(v1, n1.fromType[N2](v2))
+      type RT = drt12.Out
     }
 }
 
