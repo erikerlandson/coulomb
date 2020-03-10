@@ -51,8 +51,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature in the difference.
    * @return a quantity this-rhs, expressed in units (N,U).
    */
-  def -[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Quantity[N, U] =
-    new Quantity[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
+  def -[N2, U2](rhs: Temperature[N2, U2])(implicit ts: TempSub[N, U, N2, U2]): Quantity[N, U] =
+    new Quantity[N, U](ts.vsub(value, rhs.value))
 
   /**
    * Add a quantity to this temperature
@@ -84,8 +84,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if rhs is equal to this temperature (after conversion to types N,U), false otherwise
    */
-  def ===[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) == 0
+  def ===[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) == 0
 
   /**
    * Test if two quantities are not equal
@@ -95,8 +95,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if rhs is not equal to this temperature (after conversion to types N,U), false otherwise
    */
-  def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) != 0
+  def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) != 0
 
   /**
    * Test if this quantity is less than another
@@ -106,8 +106,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand quantity.
    * @return true if this quantity is less than the right quantity (after conversion to types N,U), false otherwise
    */
-  def <[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) < 0
+  def <[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) < 0
 
   /**
    * Test if this temperature is less than or equal to another
@@ -117,8 +117,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if this temperature is less than or equal to the right temperature (after conversion to types N,U), false otherwise
    */
-  def <=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) <= 0
+  def <=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) <= 0
 
   /**
    * Test if this temperature is greater than another
@@ -128,8 +128,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if this temperature is greater than the right temperature (after conversion to types N,U), false otherwise
    */
-  def >[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) > 0
+  def >[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) > 0
 
   /**
    * Test if this temperature is greater than or equal to another
@@ -139,8 +139,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if this temperature is greater than or equal to the right temperature (after conversion to types N,U), false otherwise
    */
-  def >=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) >= 0
+  def >=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) >= 0
 
   /**
    * Obtain a temperature that is equivalent to this but with different compatible units
@@ -149,7 +149,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @return a temperature equivalent to this, but with units U2
    */
   def toUnit[U2](implicit uc: TempConverter[N, U, N, U2]): Temperature[N, U2] =
-    new Temperature[N, U2](uc.cv12(value))
+    new Temperature[N, U2](uc.vcnv(value))
 
   /**
    * Obtain a temperature equivalent to this but with a different numeric type
@@ -157,7 +157,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @return a temperature equivalent to this but with numeric type N2 and units U
    */
   def toNumeric[N2](implicit uc: TempConverter[N, U, N2, U]): Temperature[N2, U] =
-    new Temperature[N2, U](uc.cv12(value))
+    new Temperature[N2, U](uc.vcnv(value))
 
   /**
    * Equivalent to this.toUnit[U2].toNumeric[N2]
@@ -167,7 +167,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @return a temperature equivalent to this but with numeric type N2 and units U2
    */
   def to[N2, U2](implicit uc: TempConverter[N, U, N2, U2]): Temperature[N2, U2] =
-    new Temperature[N2, U2](uc.cv12(value))
+    new Temperature[N2, U2](uc.vcnv(value))
 }
 
 /** methods and implicits for Temperature quantities associated with a temperature unit type */
@@ -190,5 +190,5 @@ object Temperature {
 
   implicit def implicitlyConvertTemperature[N1, U1, N2, U2](t1: Temperature[N1, U1])(implicit
       uc: TempConverter[N1, U1, N2, U2]): Temperature[N2, U2] =
-    new Temperature[N2, U2](uc.cv12(t1.value))
+    new Temperature[N2, U2](uc.vcnv(t1.value))
 }

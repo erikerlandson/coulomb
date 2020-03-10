@@ -22,6 +22,48 @@ import coulomb.infra._
 import coulomb.define._
 
 /**
+ * An implicit trait that supports compile-time temperature subtraction
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
+trait TempSub[N1, U1, N2, U2] {
+  /** convert value v2 to units of (U1,N1) (if necessary), and subtract from v1 */
+  def vsub(v1: N1, v2: N2): N1
+}
+object TempSub {
+  implicit def evidence[N1, U1, N2, U2](implicit
+      n1: Numeric[N1],
+      n2: Numeric[N2],
+      uc: TempConverter[N2, U2, N1, U1]): TempSub[N1, U1, N2, U2] =
+    new TempSub[N1, U1, N2, U2] {
+      def vsub(v1: N1, v2: N2): N1 = n1.minus(v1, uc.vcnv(v2))
+    }
+}
+
+/**
+ * An implicit trait that supports compile-time temperature comparisons / ordering
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
+trait TempCompare[N1, U1, N2, U2] {
+  /** convert value v2 to units of (U1,N1) (if necessary), and compare to v1 */
+  def vcmp(v1: N1, v2: N2): Int
+}
+object TempCompare {
+  implicit def evidence[N1, U1, N2, U2](implicit
+      n1: Numeric[N1],
+      n2: Numeric[N2],
+      uc: TempConverter[N2, U2, N1, U1]): TempCompare[N1, U1, N2, U2] =
+    new TempCompare[N1, U1, N2, U2] {
+      def vcmp(v1: N1, v2: N2): Int = n1.compare(v1, uc.vcnv(v2))
+    }
+}
+
+/**
  * An implicit trait that supports compile-time temperature conversion, when possible.
  * Also used to support addition, subtraction and comparisons.
  * This implicit will not exist if U1 and U2 are not convertable to one another.
@@ -31,29 +73,18 @@ import coulomb.define._
  * @tparam U2 unit expression type of the other temperature
  */
 trait TempConverter[N1, U1, N2, U2] {
-  /** the `Numeric` implicit for temperature numeric type N1 */
-  def n1: Numeric[N1]
-  /** the `Numeric` implicit for temperature numeric type N2 */
-  def n2: Numeric[N2]
   /** a conversion from temperature value with type `(N1,U1)` to type `(N2,U2)` */
-  def cv12(v: N1): N2
-  /** a conversion from temperature value with type `(N2,U2)` to type `(N1,U1)` */
-  def cv21(v: N2): N1
+  def vcnv(v: N1): N2
 }
 trait TempConverterDefaultPriority {
   // this default rule should work well everywhere but may be overridden for efficiency
   implicit def evidence[N1, U1, N2, U2](implicit
       t1: DerivedTemp[U1], t2: DerivedTemp[U2],
-      nn1: Numeric[N1], nn2: Numeric[N2]): TempConverter[N1, U1, N2, U2] = {
+      n1: Numeric[N1], n2: Numeric[N2]): TempConverter[N1, U1, N2, U2] = {
     val coef = t1.coef / t2.coef
     new TempConverter[N1, U1, N2, U2] {
-      val n1 = nn1
-      val n2 = nn2
-      def cv12(v: N1): N2 = {
+      def vcnv(v: N1): N2 = {
         n2.fromType[Rational](((n1.toType[Rational](v) + t1.off) * coef) - t2.off)
-      }
-      def cv21(v: N2): N1 = {
-        n1.fromType[Rational](((n2.toType[Rational](v) + t2.off) / coef) - t1.off)
       }
     }
   }
