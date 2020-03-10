@@ -132,6 +132,27 @@ object UnitPower {
 }
 
 /**
+ * An implicit trait that supports compile-time unit quantity addition
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
+trait UnitAdd[N1, U1, N2, U2] {
+  /** convert value v2 to units of (U1,N1) (if necessary), and add to v1  */
+  def vadd(v1: N1, v2: N2): N1
+}
+object UnitAdd {
+  implicit def evidence[N1, U1, N2, U2](implicit
+      n1: Numeric[N1],
+      n2: Numeric[N2],
+      uc: UnitConverter[N1, U1, N2, U2]): UnitAdd[N1, U1, N2, U2] =
+    new UnitAdd[N1, U1, N2, U2] {
+      def vadd(v1: N1, v2: N2): N1 = n1.plus(v1, uc.cv21(v2))
+    }
+}
+
+/**
  * An implicit trait that supports compile time checking of whether
  * two unit types are convertable (aka compatible), and if so what
  * their coefficient of conversion is.

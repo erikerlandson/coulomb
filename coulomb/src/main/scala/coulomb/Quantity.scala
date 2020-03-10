@@ -56,8 +56,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity in the sum.
    * @return this+rhs, expressed in units (N,U).
    */
-  def +[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N, U] =
-    new Quantity[N, U](uc.n1.plus(value, uc.cv21(rhs.value)))
+  def +[N2, U2](rhs: Quantity[N2, U2])(implicit ua: UnitAdd[N, U, N2, U2]): Quantity[N, U] =
+    new Quantity[N, U](ua.vadd(value, rhs.value))
 
   /**
    * Compute the difference of two quantities
