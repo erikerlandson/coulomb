@@ -106,8 +106,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity.
    * @return true if rhs is equal to this quantity (after conversion to types N,U), false otherwise
    */
-  def ===[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) == 0
+  def ===[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) == 0
 
   /**
    * Test if two quantities are not equal
@@ -117,8 +117,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity.
    * @return true if rhs is not equal to this quantity (after conversion to types N,U), false otherwise
    */
-  def =!=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) != 0
+  def =!=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) != 0
 
   /**
    * Test if this quantity is less than another
@@ -128,8 +128,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity.
    * @return true if this quantity is less than the right quantity (after conversion to types N,U), false otherwise
    */
-  def <[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) < 0
+  def <[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) < 0
 
   /**
    * Test if this quantity is less than or equal to another
@@ -139,8 +139,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity.
    * @return true if this quantity is less than or equal to the right quantity (after conversion to types N,U), false otherwise
    */
-  def <=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) <= 0
+  def <=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) <= 0
 
   /**
    * Test if this quantity is greater than another
@@ -150,8 +150,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity.
    * @return true if this quantity is greater than the right quantity (after conversion to types N,U), false otherwise
    */
-  def >[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) > 0
+  def >[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) > 0
 
   /**
    * Test if this quantity is greater than or equal to another
@@ -161,8 +161,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity.
    * @return true if this quantity is greater than or equal to the right quantity (after conversion to types N,U), false otherwise
    */
-  def >=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) >= 0
+  def >=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitCompare[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) >= 0
 
   /**
    * Obtain a quantity that is equivalent to this but with different compatible units

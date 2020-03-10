@@ -174,6 +174,27 @@ object UnitSub {
 }
 
 /**
+ * An implicit trait that supports compile-time unit comparisons / ordering
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
+trait UnitCompare[N1, U1, N2, U2] {
+  /** convert value v2 to units of (U1,N1) (if necessary), and compare to v1 */
+  def vcmp(v1: N1, v2: N2): Int
+}
+object UnitCompare {
+  implicit def evidence[N1, U1, N2, U2](implicit
+      n1: Numeric[N1],
+      n2: Numeric[N2],
+      uc: UnitConverter[N1, U1, N2, U2]): UnitCompare[N1, U1, N2, U2] =
+    new UnitCompare[N1, U1, N2, U2] {
+      def vcmp(v1: N1, v2: N2): Int = n1.compare(v1, uc.cv21(v2))
+    }
+}
+
+/**
  * An implicit trait that supports compile time checking of whether
  * two unit types are convertable (aka compatible), and if so what
  * their coefficient of conversion is.
