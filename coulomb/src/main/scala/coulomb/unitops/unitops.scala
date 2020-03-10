@@ -21,6 +21,7 @@ import shapeless.syntax.singleton._
 import singleton.ops._
 
 import spire.math._
+import spire.algebra._
 
 import coulomb.infra._
 
@@ -63,16 +64,36 @@ trait UnitMultiply[N1, U1, N2, U2] {
   /** a type representing the unit product `U1*U2` */
   type RT
 }
-object UnitMultiply {
+trait UnitMultiplyP2 {
   type Aux[N1, U1, N2, U2, R12] = UnitMultiply[N1, U1, N2, U2] {
     type RT = R12
   }
-  implicit def evidence[N1, U1, N2, U2](implicit
+  implicit def evidenceNumeric[N1, U1, N2, U2](implicit
       n1: Numeric[N1],
       n2: Numeric[N2],
       mrt12: MulResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
     new UnitMultiply[N1, U1, N2, U2] {
       def vmul(v1: N1, v2: N2): N1 = n1.times(v1, n1.fromType[N2](v2))
+      type RT = mrt12.Out
+    }
+}
+trait UnitMultiplyP1 extends UnitMultiplyP2 {
+  implicit def evidenceMSG1[N1, U1, N2, U2](implicit
+      ms1: MultiplicativeSemigroup[N1],
+      ct1: ConvertableTo[N1],
+      cf2: ConvertableFrom[N2],
+      mrt12: MulResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
+    new UnitMultiply[N1, U1, N2, U2] {
+      def vmul(v1: N1, v2: N2): N1 = ms1.times(v1, ct1.fromType[N2](v2))
+      type RT = mrt12.Out
+    }
+}
+object UnitMultiply extends UnitMultiplyP1 {
+  implicit def evidenceMSG0[N, U1, U2](implicit
+      ms: MultiplicativeSemigroup[N],
+      mrt12: MulResultType[U1, U2]): Aux[N, U1, N, U2, mrt12.Out] =
+    new UnitMultiply[N, U1, N, U2] {
+      def vmul(v1: N, v2: N): N = ms.times(v1, v2)
       type RT = mrt12.Out
     }
 }
