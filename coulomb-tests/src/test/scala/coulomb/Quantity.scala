@@ -372,36 +372,75 @@ class QuantitySpec extends FlatSpec with Matchers {
 
   it should "support semigroup multiply" in {
     import spire.algebra._
-    case class SG(value: Int)
-    implicit val sgsg: MultiplicativeSemigroup[SG] = new MultiplicativeSemigroup[SG] {
-      def times(x: SG, y: SG): SG = SG(x.value * y.value)
+    case class AG(value: Int)
+    implicit val sgsg: MultiplicativeSemigroup[AG] = new MultiplicativeSemigroup[AG] {
+      def times(x: AG, y: AG): AG = AG(x.value * y.value)
     }
-    val q = (SG(2).withUnit[Meter]) * (SG(3).withUnit[Meter])
-    assert(q.show == "SG(6) m^2")
+    val q = (AG(2).withUnit[Meter]) * (AG(3).withUnit[Meter])
+    assert(q.show == "AG(6) m^2")
   }
 
   it should "support convertable semigroup multiply" in {
     import spire.algebra._
-    case class SG(value: Int)
-    implicit val sgsg: MultiplicativeSemigroup[SG] = new MultiplicativeSemigroup[SG] {
-      def times(x: SG, y: SG): SG = SG(x.value * y.value)
+    case class AG(value: Int)
+    implicit val sgsg: MultiplicativeSemigroup[AG] = new MultiplicativeSemigroup[AG] {
+      def times(x: AG, y: AG): AG = AG(x.value * y.value)
     }
-    implicit val tosg: ConvertableTo[SG] = new ConvertableTo[SG] {
-      def fromByte(a: scala.Byte): SG = SG(a.toInt)
-      def fromShort(a: Short): SG = SG(a.toInt)
-      def fromInt(a: Int): SG = SG(a)
-      def fromLong(a: Long): SG = SG(a.toInt)
-      def fromFloat(a: Float): SG = SG(a.toInt)
-      def fromDouble(a: Double): SG = SG(a.toInt)
-      def fromBigInt(a: BigInt): SG = SG(a.toInt)
-      def fromBigDecimal(a: BigDecimal): SG = SG(a.toInt)
-      def fromRational(a: Rational): SG = SG(a.toBigInt.toInt)
-      def fromAlgebraic(a: Algebraic): SG = SG(a.toInt)
-      def fromReal(a: Real): SG = SG(a.toInt)
+    implicit val tosg: ConvertableTo[AG] = new ConvertableTo[AG] {
+      def fromByte(a: scala.Byte): AG = AG(a.toInt)
+      def fromShort(a: Short): AG = AG(a.toInt)
+      def fromInt(a: Int): AG = AG(a)
+      def fromLong(a: Long): AG = AG(a.toInt)
+      def fromFloat(a: Float): AG = AG(a.toInt)
+      def fromDouble(a: Double): AG = AG(a.toInt)
+      def fromBigInt(a: BigInt): AG = AG(a.toInt)
+      def fromBigDecimal(a: BigDecimal): AG = AG(a.toInt)
+      def fromRational(a: Rational): AG = AG(a.toBigInt.toInt)
+      def fromAlgebraic(a: Algebraic): AG = AG(a.toInt)
+      def fromReal(a: Real): AG = AG(a.toInt)
 
-      def fromType[B: ConvertableFrom](b: B): SG = SG(ConvertableFrom[B].toInt(b))
+      def fromType[B: ConvertableFrom](b: B): AG = AG(ConvertableFrom[B].toInt(b))
     }
-    val q = (SG(2).withUnit[Meter]) * (3.withUnit[Meter])
-    assert(q.show == "SG(6) m^2")
+    val q = (AG(2).withUnit[Meter]) * (3.withUnit[Meter])
+    assert(q.show == "AG(6) m^2")
+  }
+
+  it should "support group divide" in {
+    import spire.algebra._
+    case class AG(value: Int)
+    implicit val sgsg: MultiplicativeGroup[AG] = new MultiplicativeGroup[AG] {
+      def times(x: AG, y: AG): AG = AG(x.value * y.value)
+      def div(x: AG, y: AG): AG = AG(x.value / y.value)
+      def one: AG = AG(1)
+    }
+    val q = (AG(6).withUnit[Meter]) / (AG(3).withUnit[Second])
+    assert(q.show == "AG(2) m/s")
+  }
+
+  it should "support convertable group divide" in {
+    import spire.algebra._
+    case class AG(value: Int)
+    implicit val sgsg: MultiplicativeGroup[AG] = new MultiplicativeGroup[AG] {
+      def times(x: AG, y: AG): AG = AG(x.value * y.value)
+      def div(x: AG, y: AG): AG = AG(x.value / y.value)
+      def one: AG = AG(1)
+    }
+    implicit val tosg: ConvertableTo[AG] = new ConvertableTo[AG] {
+      def fromByte(a: scala.Byte): AG = AG(a.toInt)
+      def fromShort(a: Short): AG = AG(a.toInt)
+      def fromInt(a: Int): AG = AG(a)
+      def fromLong(a: Long): AG = AG(a.toInt)
+      def fromFloat(a: Float): AG = AG(a.toInt)
+      def fromDouble(a: Double): AG = AG(a.toInt)
+      def fromBigInt(a: BigInt): AG = AG(a.toInt)
+      def fromBigDecimal(a: BigDecimal): AG = AG(a.toInt)
+      def fromRational(a: Rational): AG = AG(a.toBigInt.toInt)
+      def fromAlgebraic(a: Algebraic): AG = AG(a.toInt)
+      def fromReal(a: Real): AG = AG(a.toInt)
+
+      def fromType[B: ConvertableFrom](b: B): AG = AG(ConvertableFrom[B].toInt(b))
+    }
+    val q = (AG(6).withUnit[Meter]) / (3.withUnit[Second])
+    assert(q.show == "AG(2) m/s")
   }
 }

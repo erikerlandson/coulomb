@@ -111,7 +111,7 @@ trait UnitDivide[N1, U1, N2, U2] {
   /** a type representing the unit division `U1/U2` */
   type RT
 }
-object UnitDivide {
+trait UnitDivideP2 {
   type Aux[N1, U1, N2, U2, R12] = UnitDivide[N1, U1, N2, U2] {
     type RT = R12
   }
@@ -121,6 +121,26 @@ object UnitDivide {
       drt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, drt12.Out] =
     new UnitDivide[N1, U1, N2, U2] {
       def vdiv(v1: N1, v2: N2): N1 = n1.div(v1, n1.fromType[N2](v2))
+      type RT = drt12.Out
+    }
+}
+trait UnitDivideP1 extends UnitDivideP2 {
+  implicit def evidenceMG1[N1, U1, N2, U2](implicit
+      mg1: MultiplicativeGroup[N1],
+      ct1: ConvertableTo[N1],
+      cf2: ConvertableFrom[N2],
+      mrt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
+    new UnitDivide[N1, U1, N2, U2] {
+      def vdiv(v1: N1, v2: N2): N1 = mg1.div(v1, ct1.fromType[N2](v2))
+      type RT = mrt12.Out
+    }
+}
+object UnitDivide extends UnitDivideP1 {
+  implicit def evidenceMG0[N, U1, U2](implicit
+      mg: MultiplicativeGroup[N],
+      drt12: DivResultType[U1, U2]): Aux[N, U1, N, U2, drt12.Out] =
+    new UnitDivide[N, U1, N, U2] {
+      def vdiv(v1: N, v2: N): N = mg.div(v1, v2)
       type RT = drt12.Out
     }
 }
