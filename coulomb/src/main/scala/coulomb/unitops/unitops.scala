@@ -153,6 +153,27 @@ object UnitAdd {
 }
 
 /**
+ * An implicit trait that supports compile-time unit quantity subtraction
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
+trait UnitSub[N1, U1, N2, U2] {
+  /** convert value v2 to units of (U1,N1) (if necessary), and subtract from v1 */
+  def vsub(v1: N1, v2: N2): N1
+}
+object UnitSub {
+  implicit def evidence[N1, U1, N2, U2](implicit
+      n1: Numeric[N1],
+      n2: Numeric[N2],
+      uc: UnitConverter[N1, U1, N2, U2]): UnitSub[N1, U1, N2, U2] =
+    new UnitSub[N1, U1, N2, U2] {
+      def vsub(v1: N1, v2: N2): N1 = n1.minus(v1, uc.cv21(v2))
+    }
+}
+
+/**
  * An implicit trait that supports compile time checking of whether
  * two unit types are convertable (aka compatible), and if so what
  * their coefficient of conversion is.

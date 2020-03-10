@@ -67,8 +67,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @param rhs the right hand quantity in the difference.
    * @return this-rhs, expressed in units (N,U).
    */
-  def -[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N, U] =
-    new Quantity[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
+  def -[N2, U2](rhs: Quantity[N2, U2])(implicit us: UnitSub[N, U, N2, U2]): Quantity[N, U] =
+    new Quantity[N, U](us.vsub(value, rhs.value))
 
   /**
    * Compute the product of two quantities
