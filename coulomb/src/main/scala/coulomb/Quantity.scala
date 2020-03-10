@@ -45,8 +45,8 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
   def showUnitFull(implicit ustr: UnitString[U]): String = ustr.full
 
   /** Obtain a quantity with the same unit but negated numeric value */
-  def unary_-() (implicit n: Numeric[N]): Quantity[N, U] =
-    new Quantity[N, U](n.negate(value))
+  def unary_-() (implicit n: UnitNeg[N]): Quantity[N, U] =
+    new Quantity[N, U](n.vneg(value))
 
   /**
    * Compute the sum of two quantities

@@ -174,6 +174,21 @@ object UnitSub {
 }
 
 /**
+ * An implicit trait that supports compile-time unit quantity negation
+ * @tparam N the numeric type of the quantity value
+ */
+trait UnitNeg[N] {
+  /** negate the unit's value */
+  def vneg(v: N): N
+}
+object UnitNeg {
+  implicit def evidence[N](implicit n: Numeric[N]): UnitNeg[N] =
+    new UnitNeg[N] {
+      def vneg(v: N): N = n.negate(v)
+    }
+}
+
+/**
  * An implicit trait that supports compile-time unit comparisons / ordering
  * @tparam N1 the numeric type of the quantity value
  * @tparam U1 the unit expresion type of the quantity
