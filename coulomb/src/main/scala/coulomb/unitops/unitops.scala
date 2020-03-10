@@ -146,9 +146,9 @@ object UnitAdd {
   implicit def evidence[N1, U1, N2, U2](implicit
       n1: Numeric[N1],
       n2: Numeric[N2],
-      uc: UnitConverter[N1, U1, N2, U2]): UnitAdd[N1, U1, N2, U2] =
+      uc: UnitConverter[N2, U2, N1, U1]): UnitAdd[N1, U1, N2, U2] =
     new UnitAdd[N1, U1, N2, U2] {
-      def vadd(v1: N1, v2: N2): N1 = n1.plus(v1, uc.cv21(v2))
+      def vadd(v1: N1, v2: N2): N1 = n1.plus(v1, uc.vcnv(v2))
     }
 }
 
@@ -167,9 +167,9 @@ object UnitSub {
   implicit def evidence[N1, U1, N2, U2](implicit
       n1: Numeric[N1],
       n2: Numeric[N2],
-      uc: UnitConverter[N1, U1, N2, U2]): UnitSub[N1, U1, N2, U2] =
+      uc: UnitConverter[N2, U2, N1, U1]): UnitSub[N1, U1, N2, U2] =
     new UnitSub[N1, U1, N2, U2] {
-      def vsub(v1: N1, v2: N2): N1 = n1.minus(v1, uc.cv21(v2))
+      def vsub(v1: N1, v2: N2): N1 = n1.minus(v1, uc.vcnv(v2))
     }
 }
 
@@ -203,9 +203,9 @@ object UnitCompare {
   implicit def evidence[N1, U1, N2, U2](implicit
       n1: Numeric[N1],
       n2: Numeric[N2],
-      uc: UnitConverter[N1, U1, N2, U2]): UnitCompare[N1, U1, N2, U2] =
+      uc: UnitConverter[N2, U2, N1, U1]): UnitCompare[N1, U1, N2, U2] =
     new UnitCompare[N1, U1, N2, U2] {
-      def vcmp(v1: N1, v2: N2): Int = n1.compare(v1, uc.cv21(v2))
+      def vcmp(v1: N1, v2: N2): Int = n1.compare(v1, uc.vcnv(v2))
     }
 }
 
@@ -226,68 +226,49 @@ object ConvertableUnits {
 
 /**
  * An implicit trait that supports compile-time unit quantity conversion, when possible.
- * Also used to support addition, subtraction and comparisons of quantities.
+ * Also implements conversion from N1 to N2.
  * This implicit will not exist if U1 and U2 are not convertable to one another.
+ * It will also not exist if there is no defined conversion from N1 to N2.
  * @tparam N1 the numeric type of the quantity value
- * @tparam U1 the unit expresion type of the quantity
+ * @tparam U1 the unit expression type of the quantity
  * @tparam N2 numeric type of another quantity value
  * @tparam U2 unit expression type of the other quantity
  */
 trait UnitConverter[N1, U1, N2, U2] {
-  /** the `Numeric` implicit for quantity numeric type N1 */
-  def n1: Numeric[N1]
-  /** the `Numeric` implicit for quantity numeric type N2 */
-  def n2: Numeric[N2]
   /** a conversion from value with type `(N1,U1)` to type `(N2,U2)` */
-  def cv12(v: N1): N2
-  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
-  def cv21(v: N2): N1
+  def vcnv(v: N1): N2
 }
 trait UnitConverterDefaultPriority {
-  // This should be specialized for efficiency, however this rule would give an accurate conversion for any type
+  // This could be specialized for efficiency, however this rule will
+  // give an accurate conversion for any types N1 and N2 with Numeric typeclass
   implicit def witness[N1, U1, N2, U2](implicit
       cu: ConvertableUnits[U1, U2],
-      nN1: Numeric[N1],
-      nN2: Numeric[N2]): UnitConverter[N1, U1, N2, U2] =
+      n1: Numeric[N1],
+      n2: Numeric[N2]): UnitConverter[N1, U1, N2, U2] =
     new UnitConverter[N1, U1, N2, U2] {
-      val n1 = nN1
-      val n2 = nN2
-      def cv12(v: N1): N2 = nN2.fromType[Rational](nN1.toType[Rational](v) * cu.coef)
-      def cv21(v: N2): N1 = nN1.fromType[Rational](nN2.toType[Rational](v) / cu.coef)
+      def vcnv(v: N1): N2 = n2.fromType[Rational](n1.toType[Rational](v) * cu.coef)
     }
 }
 trait UnitConverterP1 extends UnitConverterDefaultPriority {
   implicit def witnessDouble[U1, U2](implicit
-      cu: ConvertableUnits[U1, U2],
-      n: Numeric[Double]): UnitConverter[Double, U1, Double, U2] = {
+      cu: ConvertableUnits[U1, U2]): UnitConverter[Double, U1, Double, U2] = {
     val coef = cu.coef.toDouble
     new UnitConverter[Double, U1, Double, U2] {
-      val n1 = n
-      val n2 = n
-      @inline def cv12(v: Double): Double = v * coef
-      @inline def cv21(v: Double): Double = v / coef
+      @inline def vcnv(v: Double): Double = v * coef
     }
   }
   implicit def witnessFloat[U1, U2](implicit
-      cu: ConvertableUnits[U1, U2],
-      n: Numeric[Float]): UnitConverter[Float, U1, Float, U2] = {
+      cu: ConvertableUnits[U1, U2]): UnitConverter[Float, U1, Float, U2] = {
     val coef = cu.coef.toFloat
     new UnitConverter[Float, U1, Float, U2] {
-      val n1 = n
-      val n2 = n
-      @inline def cv12(v: Float): Float = v * coef
-      @inline def cv21(v: Float): Float = v / coef
+      @inline def vcnv(v: Float): Float = v * coef
     }
   }
 }
 object UnitConverter extends UnitConverterP1 {
-  implicit def witnessIdentity[N, U](implicit
-      n: Numeric[N]): UnitConverter[N, U, N, U] = {
+  implicit def witnessIdentity[N, U]: UnitConverter[N, U, N, U] = {
     new UnitConverter[N, U, N, U] {
-      val n1 = n
-      val n2 = n
-      @inline def cv12(v: N): N = v
-      @inline def cv21(v: N): N = v
+      @inline def vcnv(v: N): N = v
     }
   }
 }

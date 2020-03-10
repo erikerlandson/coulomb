@@ -171,7 +171,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @return a quantity equivalent to this, but with units U2
    */
   def toUnit[U2](implicit uc: UnitConverter[N, U, N, U2]): Quantity[N, U2] =
-    new Quantity[N, U2](uc.cv12(value))
+    new Quantity[N, U2](uc.vcnv(value))
 
   /**
    * Obtain a quantity equivalent to this but with a different numeric type
@@ -179,7 +179,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @return a quantity equivalent to this but with numeric type N2 and units U
    */
   def toNumeric[N2](implicit uc: UnitConverter[N, U, N2, U]): Quantity[N2, U] =
-    new Quantity[N2, U](uc.cv12(value))
+    new Quantity[N2, U](uc.vcnv(value))
 
   /**
    * Equivalent to this.toUnit[U2].toNumeric[N2]
@@ -189,7 +189,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @return a quantity equivalent to this but with numeric type N2 and units U2
    */
   def to[N2, U2](implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N2, U2] =
-    new Quantity[N2, U2](uc.cv12(value))
+    new Quantity[N2, U2](uc.vcnv(value))
 }
 
 /** static methods for quantities with units */
@@ -209,5 +209,5 @@ object Quantity {
 
   implicit def implicitlyConvertQuantity[N1, U1, N2, U2](q1: Quantity[N1, U1])(implicit
       uc: UnitConverter[N1, U1, N2, U2]): Quantity[N2, U2] =
-    new Quantity[N2, U2](uc.cv12(q1.value))
+    new Quantity[N2, U2](uc.vcnv(q1.value))
 }
