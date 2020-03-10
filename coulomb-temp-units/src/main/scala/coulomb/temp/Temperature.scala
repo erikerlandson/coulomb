@@ -62,8 +62,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand quantity in the sum.
    * @return temperature this+rhs, expressed in units (N,U).
    */
-  def +[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Temperature[N, U] =
-    new Temperature[N, U](uc.n1.plus(value, uc.cv21(rhs.value)))
+  def +[N2, U2](rhs: Quantity[N2, U2])(implicit ua: UnitAdd[N, U, N2, U2]): Temperature[N, U] =
+    new Temperature[N, U](ua.vadd(value, rhs.value))
 
   /**
    * Subtract a quantity from this temperature
@@ -73,8 +73,8 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand quantity in the difference.
    * @return temperature this-rhs, expressed in units (N,U).
    */
-  def -[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Temperature[N, U] =
-    new Temperature[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
+  def -[N2, U2](rhs: Quantity[N2, U2])(implicit us: UnitSub[N, U, N2, U2]): Temperature[N, U] =
+    new Temperature[N, U](us.vsub(value, rhs.value))
 
   /**
    * Test if two temperatures are equal
