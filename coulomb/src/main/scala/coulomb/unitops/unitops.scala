@@ -331,6 +331,11 @@ trait UnitConverterP0 extends UnitConverterP1 {
   }
 }
 object UnitConverter extends UnitConverterP0 {
+  // I'm allowing customized policies to override even the "identity" rule above.
+  // Practically this means someone customizing a policy has to do a bit of extra
+  // work to separate optimization cases but philosophically it feels right
+  // in the sense that it allows anyone who wants to customize the opportunity
+  // for total control.
   implicit def witnessCustomPolicy[N1, U1, N2, U2](implicit
       cu: ConvertableUnits[U1, U2],
       ucp: UnitConverterPolicy[N1, U1, N2, U2]): UnitConverter[N1, U1, N2, U2] = {
