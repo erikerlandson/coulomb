@@ -444,6 +444,16 @@ class QuantitySpec extends FlatSpec with Matchers {
     assert(q.show == "AG(2) m/s")
   }
 
+  it should "support semigroup power" in {
+    import spire.algebra._
+    case class AG(value: Int)
+    implicit val sgsg: MultiplicativeSemigroup[AG] = new MultiplicativeSemigroup[AG] {
+      def times(x: AG, y: AG): AG = AG(x.value * y.value)
+    }
+    val q = AG(2).withUnit[Meter].pow[3]
+    assert(q.show == "AG(8) m^3")
+  }
+
   it should "support UnitConverterPolicy" in {
     import coulomb.unitops._
     implicit def custom[U1, U2]: UnitConverterPolicy[Int, U1, Int, U2] =
