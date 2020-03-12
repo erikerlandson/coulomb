@@ -443,4 +443,14 @@ class QuantitySpec extends FlatSpec with Matchers {
     val q = (AG(6).withUnit[Meter]) / (3.withUnit[Second])
     assert(q.show == "AG(2) m/s")
   }
+
+  it should "support UnitConverterPolicy" in {
+    import coulomb.unitops._
+    implicit def custom[U1, U2]: UnitConverterPolicy[Int, U1, Int, U2] =
+      new UnitConverterPolicy[Int, U1, Int, U2] {
+        def convert(v: Int, cu: ConvertableUnits[U1, U2]): Int = 777
+      }
+    val q = 4.withUnit[Kilo %* Meter].toUnit[Meter]
+    assert(q.value == 777)
+  }
 }

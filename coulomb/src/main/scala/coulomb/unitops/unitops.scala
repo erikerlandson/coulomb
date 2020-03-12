@@ -266,6 +266,23 @@ object ConvertableUnits {
 }
 
 /**
+ * Define a customizable unit conversion policy.
+ * If such an implicitly defined policy exists, it will override
+ * any built-in policies defined for UnitConverter.
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expression type of the quantity
+ * @tparam N2 numeric type of another quantity value
+ * @tparam U2 unit expression type of the other quantity
+ */
+trait UnitConverterPolicy[N1, U1, N2, U2] {
+  /**
+   * a conversion from value with type `(N1,U1)` to type `(N2,U2)`, given
+   * the conversion factor supplied on `cu`
+   */
+  def convert(v: N1, cu: ConvertableUnits[U1, U2]): N2
+}
+
+/**
  * An implicit trait that supports compile-time unit quantity conversion, when possible.
  * Also implements conversion from N1 to N2.
  * This implicit will not exist if U1 and U2 are not convertable to one another.
@@ -306,10 +323,19 @@ trait UnitConverterP1 extends UnitConverterDefaultPriority {
     }
   }
 }
-object UnitConverter extends UnitConverterP1 {
+trait UnitConverterP0 extends UnitConverterP1 {
   implicit def witnessIdentity[N, U]: UnitConverter[N, U, N, U] = {
     new UnitConverter[N, U, N, U] {
       @inline def vcnv(v: N): N = v
+    }
+  }
+}
+object UnitConverter extends UnitConverterP0 {
+  implicit def witnessCustomPolicy[N1, U1, N2, U2](implicit
+      cu: ConvertableUnits[U1, U2],
+      ucp: UnitConverterPolicy[N1, U1, N2, U2]): UnitConverter[N1, U1, N2, U2] = {
+    new UnitConverter[N1, U1, N2, U2] {
+      def vcnv(v: N1): N2 = ucp.convert(v, cu)
     }
   }
 }
