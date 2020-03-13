@@ -85,43 +85,36 @@ object UnitMul {
  * @tparam N2 numeric type of a RHS quantity value
  * @tparam U2 unit expression type of the RHS quantity
  */
-trait UnitDivide[N1, U1, N2, U2] {
+trait UnitDiv[N1, U1, N2, U2] {
   /** divide numeric values, returning "left hand" type N1 */
   def vdiv(v1: N1, v2: N2): N1
   /** a type representing the unit division `U1/U2` */
   type RT
 }
-trait UnitDivideP2 {
-  type Aux[N1, U1, N2, U2, R12] = UnitDivide[N1, U1, N2, U2] {
+trait UnitDivP1 {
+  type Aux[N1, U1, N2, U2, R12] = UnitDiv[N1, U1, N2, U2] {
     type RT = R12
   }
-  implicit def evidence[N1, U1, N2, U2](implicit
-      n1: Numeric[N1],
-      n2: Numeric[N2],
-      drt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, drt12.Out] =
-    new UnitDivide[N1, U1, N2, U2] {
-      def vdiv(v1: N1, v2: N2): N1 = n1.div(v1, n1.fromType[N2](v2))
-      type RT = drt12.Out
-    }
-}
-trait UnitDivideP1 extends UnitDivideP2 {
-  implicit def evidenceMG1[N1, U1, N2, U2](implicit
-      mg1: MultiplicativeGroup[N1],
-      ct1: ConvertableTo[N1],
-      cf2: ConvertableFrom[N2],
+  // Spire does not recognize integer division as a "true" division group
+  // I will support it for purposes of backward compatibility on coulomb,
+  // but I might be convinced to make it a special import someday.
+  implicit def evidenceTD[N1, U1, N2, U2](implicit
+      mg1: TruncatedDivision[N1],
+      uc: UnitConverter[N2, U2, N1, U2],
       mrt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
-    new UnitDivide[N1, U1, N2, U2] {
-      def vdiv(v1: N1, v2: N2): N1 = mg1.div(v1, ct1.fromType[N2](v2))
+    new UnitDiv[N1, U1, N2, U2] {
+      def vdiv(v1: N1, v2: N2): N1 = mg1.tquot(v1, uc.vcnv(v2))
       type RT = mrt12.Out
     }
 }
-object UnitDivide extends UnitDivideP1 {
-  implicit def evidenceMG0[N, U1, U2](implicit
-      mg: MultiplicativeGroup[N],
-      drt12: DivResultType[U1, U2]): Aux[N, U1, N, U2, drt12.Out] =
-    new UnitDivide[N, U1, N, U2] {
-      def vdiv(v1: N, v2: N): N = mg.div(v1, v2)
-      type RT = drt12.Out
+object UnitDiv extends UnitDivP1 {
+  implicit def evidenceMG1[N1, U1, N2, U2](implicit
+      mg1: MultiplicativeGroup[N1],
+      uc: UnitConverter[N2, U2, N1, U2],
+      mrt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
+    new UnitDiv[N1, U1, N2, U2] {
+      def vdiv(v1: N1, v2: N2): N1 = mg1.div(v1, uc.vcnv(v2))
+      type RT = mrt12.Out
     }
 }
 

@@ -408,27 +408,17 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "support convertable group divide" in {
+    import coulomb.unitops._
     case class AG(value: Int)
     implicit val sgsg: MultiplicativeGroup[AG] = new MultiplicativeGroup[AG] {
       def times(x: AG, y: AG): AG = AG(x.value * y.value)
       def div(x: AG, y: AG): AG = AG(x.value / y.value)
       def one: AG = AG(1)
     }
-    implicit val tosg: ConvertableTo[AG] = new ConvertableTo[AG] {
-      def fromByte(a: scala.Byte): AG = AG(a.toInt)
-      def fromShort(a: Short): AG = AG(a.toInt)
-      def fromInt(a: Int): AG = AG(a)
-      def fromLong(a: Long): AG = AG(a.toInt)
-      def fromFloat(a: Float): AG = AG(a.toInt)
-      def fromDouble(a: Double): AG = AG(a.toInt)
-      def fromBigInt(a: BigInt): AG = AG(a.toInt)
-      def fromBigDecimal(a: BigDecimal): AG = AG(a.toInt)
-      def fromRational(a: Rational): AG = AG(a.toBigInt.toInt)
-      def fromAlgebraic(a: Algebraic): AG = AG(a.toInt)
-      def fromReal(a: Real): AG = AG(a.toInt)
-
-      def fromType[B: ConvertableFrom](b: B): AG = AG(ConvertableFrom[B].toInt(b))
-    }
+    implicit def custom[U1, U2]: UnitConverterPolicy[Int, U1, AG, U2] =
+      new UnitConverterPolicy[Int, U1, AG, U2] {
+        def convert(v: Int, cu: ConvertableUnits[U1, U2]): AG = AG((cu.coef * v).toInt)
+      }
     val q = (AG(6).withUnit[Meter]) / (3.withUnit[Second])
     assert(q.show == "AG(2) m/s")
   }
