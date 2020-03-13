@@ -5,7 +5,7 @@ import org.scalactic._
 import org.scalatest.matchers.{Matcher, MatchResult}
 import TripleEquals._
 
-import spire.math._
+import spire.math.{ Rational, Real, Algebraic }
 import spire.algebra._
 // pick up the various group/semigroup typeclasses
 import spire.std.any._

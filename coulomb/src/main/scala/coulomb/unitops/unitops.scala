@@ -20,7 +20,7 @@ import shapeless._
 import shapeless.syntax.singleton._
 import singleton.ops._
 
-import spire.math._
+import spire.math.{ Rational, ConvertableFrom, ConvertableTo }
 import spire.algebra._
 
 import coulomb.infra._
@@ -270,10 +270,10 @@ trait UnitConverterDefaultPriority {
   // give an accurate conversion for any types N1 and N2 with Numeric typeclass
   implicit def witness[N1, U1, N2, U2](implicit
       cu: ConvertableUnits[U1, U2],
-      n1: Numeric[N1],
-      n2: Numeric[N2]): UnitConverter[N1, U1, N2, U2] =
+      cf1: ConvertableFrom[N1],
+      ct2: ConvertableTo[N2]): UnitConverter[N1, U1, N2, U2] =
     new UnitConverter[N1, U1, N2, U2] {
-      def vcnv(v: N1): N2 = n2.fromType[Rational](n1.toType[Rational](v) * cu.coef)
+      def vcnv(v: N1): N2 = ct2.fromType[Rational](cf1.toType[Rational](v) * cu.coef)
     }
 }
 trait UnitConverterP2 extends UnitConverterDefaultPriority {
@@ -295,10 +295,10 @@ trait UnitConverterP2 extends UnitConverterDefaultPriority {
 trait UnitConverterP1 extends UnitConverterP2 {
   // the unit doesn't change - this is a purely numeric-value conversion
   implicit def witnessNumeric[N1, N2, U](implicit
-      n1: Numeric[N1],
-      n2: Numeric[N2]): UnitConverter[N1, U, N2, U] = {
+      cf1: ConvertableFrom[N1],
+      ct2: ConvertableTo[N2]): UnitConverter[N1, U, N2, U] = {
     new UnitConverter[N1, U, N2, U] {
-      @inline def vcnv(v: N1): N2 = n2.fromType[N1](v)
+      @inline def vcnv(v: N1): N2 = ct2.fromType[N1](v)
     }
   }
 }
