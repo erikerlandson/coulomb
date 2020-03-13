@@ -95,7 +95,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @tparam P the literal type representing the integer exponent
    * @return this quantity raised to power P, with unit type U^P
    */
-  def pow[P](implicit up: UnitPower[N, U, P]): Quantity[N, up.RT] =
+  def pow[P](implicit up: UnitPow[N, U, P]): Quantity[N, up.RT] =
     new Quantity[N, up.RT](up.vpow(value))
 
   /**

@@ -124,26 +124,23 @@ object UnitDiv extends UnitDivP1 {
  * @tparam U the unit expression type of the quantity
  * @tparam P a literal type representing an integer exponent
  */
-trait UnitPower[N, U, P] {
-  /** the integer value of literal type exponent P */
-  def p: Int
+trait UnitPow[N, U, P] {
   /** returns a value raised to the power P */
   def vpow(v: N): N
   /** a unit type corresponding to `U^P` */
   type RT
 }
-object UnitPower {
-  type Aux[N, U, P, PRT] = UnitPower[N, U, P] { type RT = PRT }
+object UnitPow {
+  type Aux[N, U, P, PRT] = UnitPow[N, U, P] { type RT = PRT }
   // a pure semigroup will fail for p <= 0, but
   // this also includes monoids (allows p=0) and groups (p<0)
   implicit def evidenceMSG0[N, U, P](implicit
       ms: MultiplicativeSemigroup[N],
       xivP: XIntValue[P],
       prt: PowResultType[U, P]): Aux[N, U, P, prt.Out] =
-    new UnitPower[N, U, P] {
+    new UnitPow[N, U, P] {
       type RT = prt.Out
-      val p = xivP.value
-      def vpow(v: N): N = ms.pow(v, p)
+      def vpow(v: N): N = ms.pow(v, xivP.value)
     }
 }
 
