@@ -287,7 +287,7 @@ trait UnitConverterDefaultPriority {
       def vcnv(v: N1): N2 = n2.fromType[Rational](n1.toType[Rational](v) * cu.coef)
     }
 }
-trait UnitConverterP1 extends UnitConverterDefaultPriority {
+trait UnitConverterP2 extends UnitConverterDefaultPriority {
   implicit def witnessDouble[U1, U2](implicit
       cu: ConvertableUnits[U1, U2]): UnitConverter[Double, U1, Double, U2] = {
     val coef = cu.coef.toDouble
@@ -303,7 +303,18 @@ trait UnitConverterP1 extends UnitConverterDefaultPriority {
     }
   }
 }
+trait UnitConverterP1 extends UnitConverterP2 {
+  // the unit doesn't change - this is a purely numeric-value conversion
+  implicit def witnessNumeric[N1, N2, U](implicit
+      n1: Numeric[N1],
+      n2: Numeric[N2]): UnitConverter[N1, U, N2, U] = {
+    new UnitConverter[N1, U, N2, U] {
+      @inline def vcnv(v: N1): N2 = n2.fromType[N1](v)
+    }
+  }
+}
 trait UnitConverterP0 extends UnitConverterP1 {
+  // when neither unit nor number type change, conversion is just identity function
   implicit def witnessIdentity[N, U]: UnitConverter[N, U, N, U] = {
     new UnitConverter[N, U, N, U] {
       @inline def vcnv(v: N): N = v
@@ -312,7 +323,7 @@ trait UnitConverterP0 extends UnitConverterP1 {
 }
 object UnitConverter extends UnitConverterP0 {
   // I'm allowing customized policies to override even the "identity" rule above.
-  // Practically this means someone customizing a policy has to do a bit of extra
+  // Practically this means someone customizing a policy may have to do a bit of extra
   // work to separate optimization cases but philosophically it feels right
   // in the sense that it allows anyone who wants to customize the opportunity
   // for total control.
