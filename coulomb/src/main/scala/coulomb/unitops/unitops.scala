@@ -159,19 +159,8 @@ trait UnitPower[N, U, P] {
   /** a unit type corresponding to `U^P` */
   type RT
 }
-trait UnitPowerP1 {
+object UnitPower {
   type Aux[N, U, P, PRT] = UnitPower[N, U, P] { type RT = PRT }
-  implicit def evidence[N, U, P](implicit
-      n: Numeric[N],
-      xivP: XIntValue[P],
-      prt: PowResultType[U, P]): Aux[N, U, P, prt.Out] =
-    new UnitPower[N, U, P] {
-      type RT = prt.Out
-      val p = xivP.value
-      def vpow(v: N): N = n.pow(v, p)
-    }
-}
-object UnitPower extends UnitPowerP1 {
   // a pure semigroup will fail for p <= 0, but
   // this also includes monoids (allows p=0) and groups (p<0)
   implicit def evidenceMSG0[N, U, P](implicit
