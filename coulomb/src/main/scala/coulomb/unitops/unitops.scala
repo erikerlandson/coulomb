@@ -206,17 +206,16 @@ object UnitNeg {
  * @tparam N2 numeric type of a RHS quantity value
  * @tparam U2 unit expression type of the RHS quantity
  */
-trait UnitCompare[N1, U1, N2, U2] {
+trait UnitOrd[N1, U1, N2, U2] {
   /** convert value v2 to units of (U1,N1) (if necessary), and compare to v1 */
   def vcmp(v1: N1, v2: N2): Int
 }
-object UnitCompare {
+object UnitOrd {
   implicit def evidence[N1, U1, N2, U2](implicit
-      n1: Numeric[N1],
-      n2: Numeric[N2],
-      uc: UnitConverter[N2, U2, N1, U1]): UnitCompare[N1, U1, N2, U2] =
-    new UnitCompare[N1, U1, N2, U2] {
-      def vcmp(v1: N1, v2: N2): Int = n1.compare(v1, uc.vcnv(v2))
+      ord1: Order[N1],
+      uc: UnitConverter[N2, U2, N1, U1]): UnitOrd[N1, U1, N2, U2] =
+    new UnitOrd[N1, U1, N2, U2] {
+      def vcmp(v1: N1, v2: N2): Int = ord1.compare(v1, uc.vcnv(v2))
     }
 }
 

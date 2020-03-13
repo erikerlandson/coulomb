@@ -8,6 +8,7 @@ import TripleEquals._
 import shapeless._
 
 import spire.math._
+import spire.std.any._
 
 import singleton.ops._
 
