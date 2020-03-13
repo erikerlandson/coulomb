@@ -6,6 +6,9 @@ import org.scalatest.matchers.{Matcher, MatchResult}
 import TripleEquals._
 
 import spire.math._
+import spire.algebra._
+// pick up the various group/semigroup typeclasses
+import spire.std.any._
 
 import singleton.ops._
 
@@ -371,7 +374,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "support semigroup multiply" in {
-    import spire.algebra._
     case class AG(value: Int)
     implicit val sgsg: MultiplicativeSemigroup[AG] = new MultiplicativeSemigroup[AG] {
       def times(x: AG, y: AG): AG = AG(x.value * y.value)
@@ -381,7 +383,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "support convertable semigroup multiply" in {
-    import spire.algebra._
     case class AG(value: Int)
     implicit val sgsg: MultiplicativeSemigroup[AG] = new MultiplicativeSemigroup[AG] {
       def times(x: AG, y: AG): AG = AG(x.value * y.value)
@@ -406,7 +407,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "support group divide" in {
-    import spire.algebra._
     case class AG(value: Int)
     implicit val sgsg: MultiplicativeGroup[AG] = new MultiplicativeGroup[AG] {
       def times(x: AG, y: AG): AG = AG(x.value * y.value)
@@ -418,7 +418,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "support convertable group divide" in {
-    import spire.algebra._
     case class AG(value: Int)
     implicit val sgsg: MultiplicativeGroup[AG] = new MultiplicativeGroup[AG] {
       def times(x: AG, y: AG): AG = AG(x.value * y.value)
@@ -445,7 +444,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "support semigroup power" in {
-    import spire.algebra._
     case class AG(value: Int)
     implicit val sgsg: MultiplicativeSemigroup[AG] = new MultiplicativeSemigroup[AG] {
       def times(x: AG, y: AG): AG = AG(x.value * y.value)
@@ -455,7 +453,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "support semigroup add" in {
-    import spire.algebra._
     import coulomb.unitops._
     case class AG(value: Int)
     implicit val sgsg: AdditiveSemigroup[AG] = new AdditiveSemigroup[AG] {
@@ -467,6 +464,22 @@ class QuantitySpec extends FlatSpec with Matchers {
       }
     val q = (AG(1).withUnit[Meter]) + (AG(2).withUnit[Kilo %* Meter])
     assert(q.show == "AG(2001) m")
+  }
+
+  it should "support group subtract" in {
+    import coulomb.unitops._
+    case class AG(value: Int)
+    implicit val sgsg: AdditiveGroup[AG] = new AdditiveGroup[AG] {
+      def plus(x: AG, y: AG): AG = AG(x.value + y.value)
+      def negate(x: AG): AG = AG(-x.value)
+      def zero: AG = AG(0)
+    }
+    implicit def custom[U1, U2]: UnitConverterPolicy[AG, U1, AG, U2] =
+      new UnitConverterPolicy[AG, U1, AG, U2] {
+        def convert(v: AG, cu: ConvertableUnits[U1, U2]): AG = AG((cu.coef * v.value).toInt)
+      }
+    val q = (AG(2000).withUnit[Meter]) - (AG(1).withUnit[Kilo %* Meter])
+    assert(q.show == "AG(1000) m")
   }
 
   it should "support UnitConverterPolicy" in {

@@ -6,6 +6,9 @@ import TripleEquals._
 
 import spire.math._
 
+// pick up the various group/semigroup typeclasses
+import spire.std.any._
+
 import singleton.ops._
 
 import coulomb.si._

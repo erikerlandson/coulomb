@@ -196,21 +196,12 @@ trait UnitAdd[N1, U1, N2, U2] {
   /** convert value v2 to units of (U1,N1) (if necessary), and add to v1  */
   def vadd(v1: N1, v2: N2): N1
 }
-trait UnitAddP1 {
-  implicit def evidence[N1, U1, N2, U2](implicit
-      n1: Numeric[N1],
-      n2: Numeric[N2],
+object UnitAdd {
+  implicit def evidenceASG0[N1, U1, N2, U2](implicit
+      as1: AdditiveSemigroup[N1],
       uc: UnitConverter[N2, U2, N1, U1]): UnitAdd[N1, U1, N2, U2] =
     new UnitAdd[N1, U1, N2, U2] {
-      def vadd(v1: N1, v2: N2): N1 = n1.plus(v1, uc.vcnv(v2))
-    }
-}
-object UnitAdd extends UnitAddP1 {
-  implicit def evidenceASG0[N, U1, U2](implicit
-      as: AdditiveSemigroup[N],
-      uc: UnitConverter[N, U2, N, U1]): UnitAdd[N, U1, N, U2] =
-    new UnitAdd[N, U1, N, U2] {
-      def vadd(v1: N, v2: N): N = as.plus(v1, uc.vcnv(v2))
+      def vadd(v1: N1, v2: N2): N1 = as1.plus(v1, uc.vcnv(v2))
     }
 }
 
@@ -227,11 +218,10 @@ trait UnitSub[N1, U1, N2, U2] {
 }
 object UnitSub {
   implicit def evidence[N1, U1, N2, U2](implicit
-      n1: Numeric[N1],
-      n2: Numeric[N2],
+      ag1: AdditiveGroup[N1],
       uc: UnitConverter[N2, U2, N1, U1]): UnitSub[N1, U1, N2, U2] =
     new UnitSub[N1, U1, N2, U2] {
-      def vsub(v1: N1, v2: N2): N1 = n1.minus(v1, uc.vcnv(v2))
+      def vsub(v1: N1, v2: N2): N1 = ag1.minus(v1, uc.vcnv(v2))
     }
 }
 
@@ -244,9 +234,9 @@ trait UnitNeg[N] {
   def vneg(v: N): N
 }
 object UnitNeg {
-  implicit def evidence[N](implicit n: Numeric[N]): UnitNeg[N] =
+  implicit def evidence[N](implicit ag: AdditiveGroup[N]): UnitNeg[N] =
     new UnitNeg[N] {
-      def vneg(v: N): N = n.negate(v)
+      def vneg(v: N): N = ag.negate(v)
     }
 }
 
