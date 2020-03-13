@@ -84,7 +84,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if rhs is equal to this temperature (after conversion to types N,U), false otherwise
    */
-  def ===[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+  def ===[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempOrd[N, U, N2, U2]): Boolean =
     uc.vcmp(value, rhs.value) == 0
 
   /**
@@ -95,7 +95,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if rhs is not equal to this temperature (after conversion to types N,U), false otherwise
    */
-  def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+  def =!=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempOrd[N, U, N2, U2]): Boolean =
     uc.vcmp(value, rhs.value) != 0
 
   /**
@@ -106,7 +106,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand quantity.
    * @return true if this quantity is less than the right quantity (after conversion to types N,U), false otherwise
    */
-  def <[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+  def <[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempOrd[N, U, N2, U2]): Boolean =
     uc.vcmp(value, rhs.value) < 0
 
   /**
@@ -117,7 +117,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if this temperature is less than or equal to the right temperature (after conversion to types N,U), false otherwise
    */
-  def <=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+  def <=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempOrd[N, U, N2, U2]): Boolean =
     uc.vcmp(value, rhs.value) <= 0
 
   /**
@@ -128,7 +128,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if this temperature is greater than the right temperature (after conversion to types N,U), false otherwise
    */
-  def >[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+  def >[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempOrd[N, U, N2, U2]): Boolean =
     uc.vcmp(value, rhs.value) > 0
 
   /**
@@ -139,7 +139,7 @@ class Temperature[N, U] private[coulomb] (val value: N) extends AnyVal with Seri
    * @param rhs the right hand temperature.
    * @return true if this temperature is greater than or equal to the right temperature (after conversion to types N,U), false otherwise
    */
-  def >=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempCompare[N, U, N2, U2]): Boolean =
+  def >=[N2, U2](rhs: Temperature[N2, U2])(implicit uc: TempOrd[N, U, N2, U2]): Boolean =
     uc.vcmp(value, rhs.value) >= 0
 
   /**

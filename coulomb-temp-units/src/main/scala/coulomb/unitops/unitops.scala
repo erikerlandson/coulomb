@@ -16,7 +16,8 @@ limitations under the License.
 
 package coulomb.unitops
 
-import spire.math._
+import spire.math.{ Rational, ConvertableFrom, ConvertableTo }
+import spire.algebra._
 
 import coulomb.infra._
 import coulomb.define._
@@ -34,11 +35,10 @@ trait TempSub[N1, U1, N2, U2] {
 }
 object TempSub {
   implicit def evidence[N1, U1, N2, U2](implicit
-      n1: Numeric[N1],
-      n2: Numeric[N2],
+      ag1: AdditiveGroup[N1],
       uc: TempConverter[N2, U2, N1, U1]): TempSub[N1, U1, N2, U2] =
     new TempSub[N1, U1, N2, U2] {
-      def vsub(v1: N1, v2: N2): N1 = n1.minus(v1, uc.vcnv(v2))
+      def vsub(v1: N1, v2: N2): N1 = ag1.minus(v1, uc.vcnv(v2))
     }
 }
 
@@ -49,17 +49,16 @@ object TempSub {
  * @tparam N2 numeric type of a RHS quantity value
  * @tparam U2 unit expression type of the RHS quantity
  */
-trait TempCompare[N1, U1, N2, U2] {
+trait TempOrd[N1, U1, N2, U2] {
   /** convert value v2 to units of (U1,N1) (if necessary), and compare to v1 */
   def vcmp(v1: N1, v2: N2): Int
 }
-object TempCompare {
+object TempOrd {
   implicit def evidence[N1, U1, N2, U2](implicit
-      n1: Numeric[N1],
-      n2: Numeric[N2],
-      uc: TempConverter[N2, U2, N1, U1]): TempCompare[N1, U1, N2, U2] =
-    new TempCompare[N1, U1, N2, U2] {
-      def vcmp(v1: N1, v2: N2): Int = n1.compare(v1, uc.vcnv(v2))
+      ord1: Order[N1],
+      uc: TempConverter[N2, U2, N1, U1]): TempOrd[N1, U1, N2, U2] =
+    new TempOrd[N1, U1, N2, U2] {
+      def vcmp(v1: N1, v2: N2): Int = ord1.compare(v1, uc.vcnv(v2))
     }
 }
 
@@ -80,11 +79,12 @@ trait TempConverterDefaultPriority {
   // this default rule should work well everywhere but may be overridden for efficiency
   implicit def evidence[N1, U1, N2, U2](implicit
       t1: DerivedTemp[U1], t2: DerivedTemp[U2],
-      n1: Numeric[N1], n2: Numeric[N2]): TempConverter[N1, U1, N2, U2] = {
+      cf1: ConvertableFrom[N1],
+      ct2: ConvertableTo[N2]): TempConverter[N1, U1, N2, U2] = {
     val coef = t1.coef / t2.coef
     new TempConverter[N1, U1, N2, U2] {
       def vcnv(v: N1): N2 = {
-        n2.fromType[Rational](((n1.toType[Rational](v) + t1.off) * coef) - t2.off)
+        ct2.fromType[Rational](((cf1.toType[Rational](v) + t1.off) * coef) - t2.off)
       }
     }
   }

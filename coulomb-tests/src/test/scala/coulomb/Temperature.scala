@@ -4,8 +4,8 @@ import org.scalatest._
 import org.scalactic._
 import TripleEquals._
 
-import spire.math._
-
+import spire.math.{ Rational, Real, Algebraic }
+import spire.algebra._
 // pick up the various group/semigroup typeclasses
 import spire.std.any._
 
