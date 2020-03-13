@@ -58,42 +58,22 @@ object UnitString {
  * @tparam N2 numeric type of a RHS quantity value
  * @tparam U2 unit expression type of the RHS quantity
  */
-trait UnitMultiply[N1, U1, N2, U2] {
+trait UnitMul[N1, U1, N2, U2] {
   /** multiply numeric values, returning "left hand" type N1 */
   def vmul(v1: N1, v2: N2): N1
   /** a type representing the unit product `U1*U2` */
   type RT
 }
-trait UnitMultiplyP2 {
-  type Aux[N1, U1, N2, U2, R12] = UnitMultiply[N1, U1, N2, U2] {
+object UnitMul {
+  type Aux[N1, U1, N2, U2, R12] = UnitMul[N1, U1, N2, U2] {
     type RT = R12
   }
-  implicit def evidenceNumeric[N1, U1, N2, U2](implicit
-      n1: Numeric[N1],
-      n2: Numeric[N2],
-      mrt12: MulResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
-    new UnitMultiply[N1, U1, N2, U2] {
-      def vmul(v1: N1, v2: N2): N1 = n1.times(v1, n1.fromType[N2](v2))
-      type RT = mrt12.Out
-    }
-}
-trait UnitMultiplyP1 extends UnitMultiplyP2 {
   implicit def evidenceMSG1[N1, U1, N2, U2](implicit
       ms1: MultiplicativeSemigroup[N1],
-      ct1: ConvertableTo[N1],
-      cf2: ConvertableFrom[N2],
+      uc: UnitConverter[N2, U2, N1, U2],
       mrt12: MulResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
-    new UnitMultiply[N1, U1, N2, U2] {
-      def vmul(v1: N1, v2: N2): N1 = ms1.times(v1, ct1.fromType[N2](v2))
-      type RT = mrt12.Out
-    }
-}
-object UnitMultiply extends UnitMultiplyP1 {
-  implicit def evidenceMSG0[N, U1, U2](implicit
-      ms: MultiplicativeSemigroup[N],
-      mrt12: MulResultType[U1, U2]): Aux[N, U1, N, U2, mrt12.Out] =
-    new UnitMultiply[N, U1, N, U2] {
-      def vmul(v1: N, v2: N): N = ms.times(v1, v2)
+    new UnitMul[N1, U1, N2, U2] {
+      def vmul(v1: N1, v2: N2): N1 = ms1.times(v1, uc.vcnv(v2))
       type RT = mrt12.Out
     }
 }
