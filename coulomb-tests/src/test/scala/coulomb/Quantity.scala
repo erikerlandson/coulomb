@@ -454,6 +454,21 @@ class QuantitySpec extends FlatSpec with Matchers {
     assert(q.show == "AG(8) m^3")
   }
 
+  it should "support semigroup add" in {
+    import spire.algebra._
+    import coulomb.unitops._
+    case class AG(value: Int)
+    implicit val sgsg: AdditiveSemigroup[AG] = new AdditiveSemigroup[AG] {
+      def plus(x: AG, y: AG): AG = AG(x.value + y.value)
+    }
+    implicit def custom[U1, U2]: UnitConverterPolicy[AG, U1, AG, U2] =
+      new UnitConverterPolicy[AG, U1, AG, U2] {
+        def convert(v: AG, cu: ConvertableUnits[U1, U2]): AG = AG((cu.coef * v.value).toInt)
+      }
+    val q = (AG(1).withUnit[Meter]) + (AG(2).withUnit[Kilo %* Meter])
+    assert(q.show == "AG(2001) m")
+  }
+
   it should "support UnitConverterPolicy" in {
     import coulomb.unitops._
     implicit def custom[U1, U2]: UnitConverterPolicy[Int, U1, Int, U2] =
