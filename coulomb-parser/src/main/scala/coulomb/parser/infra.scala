@@ -50,7 +50,7 @@ object unitops {
   }
 }
 
-private [coulomb] object infra {
+object infra {
   import coulomb.parser.unitops._
 
   trait Evidence[T] {
