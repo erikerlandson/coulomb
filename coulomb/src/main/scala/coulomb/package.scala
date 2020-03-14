@@ -45,4 +45,13 @@ package object coulomb {
     /** create a new unit Quantity of type U with the value of `this` */
     def withUnit[U]: Quantity[N, U] = new Quantity[N, U](v)
   }
+
+  trait EnableImplicitQuantityConversion
+}
+
+package coulomb {
+  object implicitQuantityConversion {
+    implicit val enableImplicitQuantityConversion: EnableImplicitQuantityConversion =
+      new EnableImplicitQuantityConversion {}
+  }
 }
