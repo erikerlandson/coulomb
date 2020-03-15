@@ -104,8 +104,8 @@ object HasUnitStringAST {
   implicit def evidence2[U, D](implicit d: DerivedUnit[U, D], nu: D =:!= Unitless): HasUnitStringAST[U] =
     new HasUnitStringAST[U] { val ast = Def(d) }
 
-  implicit def evidence3[U](implicit d: BaseUnit[U]): HasUnitStringAST[U] =
-    new HasUnitStringAST[U] { val ast = Def(d) }
+  implicit def evidence3[U](implicit bu: GetBaseUnit[U]): HasUnitStringAST[U] =
+    new HasUnitStringAST[U] { val ast = Def(bu.bu) }
 
   implicit def evidence4[L, R](implicit l: HasUnitStringAST[L], r: HasUnitStringAST[R]): HasUnitStringAST[%*[L, R]] =
     new HasUnitStringAST[%*[L, R]] { val ast = Mul(l.ast, r.ast) }

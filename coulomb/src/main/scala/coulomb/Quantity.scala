@@ -208,7 +208,7 @@ object Quantity {
   def showUnitFull[U](implicit ustr: UnitString[U]): String = ustr.full
 
   implicit def implicitlyConvertQuantity[N1, U1, N2, U2](q1: Quantity[N1, U1])(implicit
-      enable: EnableImplicitQuantityConversion,
+      enable: coulomb.policy.EnableImplicitQuantityConversion,
       uc: UnitConverter[N1, U1, N2, U2]): Quantity[N2, U2] =
     new Quantity[N2, U2](uc.vcnv(q1.value))
 }

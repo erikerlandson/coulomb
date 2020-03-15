@@ -356,7 +356,7 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "implement implicit conversion between convertable units" in {
-    import coulomb.implicitQuantityConversion._
+    import coulomb.policy.implicitQuantityConversion._
     (1D.withUnit[Yard] :Quantity[Double, Foot]) shouldBeQ[Double, Foot](3)
 
     val q: Quantity[Double, Mile %/ Hour] = 1D.withUnit[Kilo %* Meter %/ Second]
@@ -471,5 +471,14 @@ class QuantitySpec extends FlatSpec with Matchers {
       }
     val q = 4.withUnit[Kilo %* Meter].toUnit[Meter]
     assert(q.value == 777)
+  }
+
+  it should "support undeclared base units" in {
+    import coulomb.policy.undeclaredBaseUnits._
+    trait MooUnit
+    val q1 = (1.withUnit[MooUnit]) + (1.withUnit[Kilo %* MooUnit])
+    assert(q1.show == "1001 MooUnit")
+    val q2 = (10.withUnit[Seq[Int]]) / (5.withUnit[Second])
+    assert(q2.show == "2 Seq[Int]/s")
   }
 }

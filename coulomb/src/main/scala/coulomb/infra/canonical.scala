@@ -25,6 +25,69 @@ import spire.math._
 import coulomb._
 import coulomb.define._
 
+object TypeString {
+  import scala.reflect.runtime.universe._
+  def typeString[T :WeakTypeTag]: String = {
+    def work(t: Type): String = {
+      t match { case TypeRef(pre, sym, args) =>
+        val ss = sym.toString
+                    .stripPrefix("free ")
+                    .stripPrefix("trait ")
+                    .stripPrefix("class ")
+                    .stripPrefix("type ")
+        val as = args.map(work)
+        if (args.length <= 0) ss else (ss + "[" + as.mkString(",") + "]")
+      }
+    }
+    work(weakTypeOf[T])
+  }
+}
+
+trait IsUnitExpr[T] {
+  type Out
+}
+trait IsUnitExprP1 {
+  type Aux[T, O] = IsUnitExpr[T] { type Out = O }
+  implicit def notUnitExpr[T]: Aux[T, false] =
+    new IsUnitExpr[T] { type Out = false }
+}
+object IsUnitExpr extends IsUnitExprP1 {
+  implicit def trueUnitless: Aux[Unitless, true] =
+    new IsUnitExpr[Unitless] { type Out = true }
+  implicit def trueBaseUnit[U](implicit bu: BaseUnit[U]): Aux[U, true] =
+    new IsUnitExpr[U] { type Out = true }
+  implicit def trueDerivedUnit[U](implicit du: DerivedUnit[U, _]): Aux[U, true] =
+    new IsUnitExpr[U] { type Out = true }
+  implicit def trueMul[L, R]: Aux[%*[L, R], true] =
+    new IsUnitExpr[%*[L, R]] { type Out = true }
+  implicit def trueDiv[L, R]: Aux[%/[L, R], true] =
+    new IsUnitExpr[%/[L, R]] { type Out = true }
+  implicit def truePow[L, R]: Aux[%^[L, R], true] =
+    new IsUnitExpr[%^[L, R]] { type Out = true }
+}
+
+trait GetBaseUnit[U] {
+  def bu: BaseUnit[U]
+}
+trait GetBaseUnitP1 {
+  import scala.reflect.runtime.universe._
+
+  implicit def undeclared[T, TUE](implicit
+      enabled: coulomb.policy.EnableUndeclaredBaseUnits,
+      testUE: IsUnitExpr.Aux[T, TUE],
+      notUE: TUE =:!= true,
+      tt: WeakTypeTag[T]): GetBaseUnit[T] = {
+    val name = TypeString.typeString[T]
+    new GetBaseUnit[T] {
+      val bu = new BaseUnit[T](name, name)
+    }
+  }
+}
+object GetBaseUnit extends GetBaseUnitP1 {
+  implicit def baseUnit[U](implicit buu: BaseUnit[U]): GetBaseUnit[U] =
+    new GetBaseUnit[U] { val bu = buu }
+}
+
 trait CanonicalSig[U] {
   type Out
   def coef: Rational
@@ -40,7 +103,7 @@ object CanonicalSig {
     }
   }
 
-  implicit def evidenceBaseUnit[U](implicit buU: BaseUnit[U]): Aux[U, (U, 1) :: HNil] = {
+  implicit def evidenceBaseUnit[U](implicit bu: GetBaseUnit[U]): Aux[U, (U, 1) :: HNil] = {
     new CanonicalSig[U] {
       type Out = (U, 1) :: HNil
       val coef = Rational(1)
@@ -79,13 +142,14 @@ object CanonicalSig {
 trait StandardSig[U] {
   type Out
 }
+
 object StandardSig {
   type Aux[U, O] = StandardSig[U] { type Out = O }
 
   implicit def evidenceUnitless: Aux[Unitless, HNil] =
     new StandardSig[Unitless] { type Out = HNil }
 
-  implicit def evidenceBaseUnit[U](implicit buU: BaseUnit[U]): Aux[U, (U, 1) :: HNil] =
+  implicit def evidenceBaseUnit[U](implicit bu: GetBaseUnit[U]): Aux[U, (U, 1) :: HNil] =
     new StandardSig[U] { type Out = (U, 1) :: HNil }
 
   implicit def evidenceDerivedUnit[U](implicit du: DerivedUnit[U, _]): Aux[U, (U, 1) :: HNil] =
