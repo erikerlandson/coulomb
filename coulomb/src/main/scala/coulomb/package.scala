@@ -48,13 +48,7 @@ package object coulomb {
 }
 
 package coulomb.policy {
-  trait EnableImplicitQuantityConversion
   trait EnableUndeclaredBaseUnits
-
-  object implicitQuantityConversion {
-    implicit object enableImplicitQuantityConversion extends
-        EnableImplicitQuantityConversion {}
-  }
 
   object undeclaredBaseUnits {
     implicit object enableUndeclaredBaseUnits extends

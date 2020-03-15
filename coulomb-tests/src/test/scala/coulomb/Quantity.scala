@@ -356,7 +356,6 @@ class QuantitySpec extends FlatSpec with Matchers {
   }
 
   it should "implement implicit conversion between convertable units" in {
-    import coulomb.policy.implicitQuantityConversion._
     (1D.withUnit[Yard] :Quantity[Double, Foot]) shouldBeQ[Double, Foot](3)
 
     val q: Quantity[Double, Mile %/ Hour] = 1D.withUnit[Kilo %* Meter %/ Second]
