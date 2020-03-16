@@ -3,7 +3,7 @@
 
 def commonSettings = Seq(
   organization := "com.manyangled",
-  version := "0.3.7-SNAPSHOT",
+  version := "0.4.0-SNAPSHOT",
   scalaVersion := "2.13.0",
   crossScalaVersions := Seq("2.13.0"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
@@ -14,8 +14,9 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "spire" % "0.17.0-M1" % Provided,
     "eu.timepit" %% "singleton-ops" % "0.4.3" % Provided,
-    "org.scalatest" %% "scalatest" % "3.1.1" % Test
+    "com.lihaoyi" %% "utest" % "0.7.2" % Test
   ),
+  testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
 

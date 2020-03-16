@@ -1,16 +1,13 @@
 package coulomb.parser
 
-import org.scalatest._
-import org.scalactic._
-import org.scalatest.matchers.{Matcher, MatchResult}
-import TripleEquals._
-
-import shapeless._
+import shapeless.{ ::, HNil }
 
 import spire.math._
 import spire.std.any._
 
 import singleton.ops._
+
+import utest._
 
 import coulomb._
 import coulomb.unitops._
@@ -24,6 +21,17 @@ import coulomb.binprefix._
 import coulomb.us._
 import coulomb.temp._
 
+import coulomb.validators.CoulombValidators._
+
+object QuantityParserTests extends TestSuite {
+  val tests = Tests {
+    test("test1") {
+      assert(true)
+    }
+  }
+}
+
+/*
 import org.scalatest.QMatchers._
 
 object ConfigIntegration {
@@ -74,3 +82,4 @@ class QuantityParserSpec extends FlatSpec with Matchers {
     t2.shouldBeQ[Float, Giga %* Byte %/ Second](3.14)
   }
 }
+*/

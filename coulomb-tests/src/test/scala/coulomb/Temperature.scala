@@ -1,9 +1,5 @@
 package coulomb
 
-import org.scalatest._
-import org.scalactic._
-import TripleEquals._
-
 import spire.math.{ Rational, Real, Algebraic }
 import spire.algebra._
 // pick up the various group/semigroup typeclasses
@@ -11,11 +7,22 @@ import spire.std.any._
 
 import singleton.ops._
 
+import utest._
+
 import coulomb.si._
 import coulomb.temp._
 
-import org.scalatest.QMatchers._
+import coulomb.validators.CoulombValidators._
 
+object TemperatureTests extends TestSuite {
+  val tests = Tests {
+    test("test1") {
+      assert(true)
+    }
+  }
+}
+
+/*
 class TemperatureSpec extends FlatSpec with Matchers {
 
   it should "allocate a Temperature" in {
@@ -221,3 +228,4 @@ class TemperatureSpec extends FlatSpec with Matchers {
     (td === ts).shouldBe(true)
   }
 }
+*/

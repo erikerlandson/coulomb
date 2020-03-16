@@ -16,16 +16,13 @@ limitations under the License.
 
 package coulomb.pureconfig
 
-import org.scalatest._
-import org.scalactic._
-import org.scalatest.matchers.{Matcher, MatchResult}
-import TripleEquals._
-
-import shapeless._
+import shapeless.{ ::, HNil }
 
 import spire.math._
 
 import singleton.ops._
+
+import utest._
 
 import coulomb._
 import coulomb.unitops._
@@ -40,13 +37,20 @@ import coulomb.us._
 import coulomb.temp._
 import coulomb.parser.QuantityParser
 
-import org.scalatest.QMatchers._
-
 import com.typesafe.config.ConfigFactory
 
 import _root_.pureconfig._
 import _root_.pureconfig.generic.auto._
 
+object PureconfigTests extends TestSuite {
+  val tests = Tests {
+    test("test1") {
+      assert(true)
+    }
+  }
+}
+
+/*
 class PureconfigIntegrationSpec extends FlatSpec with Matchers {
   case class QC(duration: Quantity[Double, Second], memory: Quantity[Double, Mega %* Byte], regular: Int)
 
@@ -71,3 +75,4 @@ class PureconfigIntegrationSpec extends FlatSpec with Matchers {
     qc.isLeft.shouldBe(true)
   }
 }
+*/
