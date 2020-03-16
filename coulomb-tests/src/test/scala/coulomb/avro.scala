@@ -40,17 +40,9 @@ import coulomb.parser.QuantityParser
 import org.apache.avro._
 import org.apache.avro.generic._
 
+import coulomb.validators.CoulombValidators._
+
 object AvroIntegrationTests extends TestSuite {
-  val tests = Tests {
-    test("test1") {
-      assert(true)
-    }
-  }
-}
-
-/*
-class AvroIntegrationSpec extends FlatSpec with Matchers {
-
   val schema1 = new Schema.Parser().parse(new java.io.File("coulomb-tests/src/test/scala/coulomb/test1.avsc"))
 
   val record1 = {
@@ -63,23 +55,26 @@ class AvroIntegrationSpec extends FlatSpec with Matchers {
 
   val qp1 = QuantityParser[Second :: Byte :: Hour :: Mega :: Giga :: HNil]
 
-  it should "integrate with an avro schema" in {
-    record1.getQuantity[Double, Milli %* Second](qp1)("latency").shouldBeQ[Double, Milli %* Second](1000)
-    record1.getQuantity[Float, Tera %* Bit %/ Minute](qp1)("bandwidth").shouldBeQ[Float, Tera %* Bit %/ Minute](0.48)
-  }
+  val tests = Tests {
+    test("integrate with an avro schema") {
+      assert(
+        record1.getQuantity[Double, Milli %* Second](qp1)("latency").isValidQ[Double, Milli %* Second](1000),
+        record1.getQuantity[Float, Tera %* Bit %/ Minute](qp1)("bandwidth").isValidQ[Float, Tera %* Bit %/ Minute](0.48)
+      )
+    }
 
-  it should "fail on incompatible units" in {
-    intercept[Exception] { record1.getQuantity[Double, Byte](qp1)("latency") }
-  }
+    test("fail on incompatible units") {
+      intercept[Exception] { record1.getQuantity[Double, Byte](qp1)("latency") }
+    }
 
-  it should "fail on missing unit fields" in {
-    intercept[Exception] { record1.getQuantity[Double, Second](qp1)("nounit") }
-  }
+    test("fail on missing unit fields") {
+      intercept[Exception] { record1.getQuantity[Double, Second](qp1)("nounit") }
+    }
 
-  it should "support putQuantity" in {
-    val rec = new GenericData.Record(schema1)
-    rec.putQuantity(qp1)("latency", 1.withUnit[Minute])
-    rec.getQuantity[Double, Second](qp1)("latency").shouldBeQ[Double, Second](60.0)
+    test("support putQuantity") {
+      val rec = new GenericData.Record(schema1)
+      rec.putQuantity(qp1)("latency", 1.withUnit[Minute])
+      assert(rec.getQuantity[Double, Second](qp1)("latency").isValidQ[Double, Second](60.0))
+    }
   }
 }
-*/
