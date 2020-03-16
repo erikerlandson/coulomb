@@ -42,16 +42,9 @@ import com.typesafe.config.ConfigFactory
 import _root_.pureconfig._
 import _root_.pureconfig.generic.auto._
 
-object PureconfigTests extends TestSuite {
-  val tests = Tests {
-    test("test1") {
-      assert(true)
-    }
-  }
-}
+import coulomb.validators.CoulombValidators._
 
-/*
-class PureconfigIntegrationSpec extends FlatSpec with Matchers {
+object PureconfigTests extends TestSuite {
   case class QC(duration: Quantity[Double, Second], memory: Quantity[Double, Mega %* Byte], regular: Int)
 
   implicit val qp = QuantityParser[Second :: Byte :: Hour :: Giga :: HNil]
@@ -62,17 +55,20 @@ class PureconfigIntegrationSpec extends FlatSpec with Matchers {
     "regular": 42
   }""")
 
-  it should "load a pureconfic case class with unit conversions" in {
-    val qc = loadConfig[QC](conf).toOption.get
-    qc.duration.shouldBeQ[Double, Second](3600.0)
-    qc.memory.shouldBeQ[Double, Mega %* Byte](1000.0)
-    qc.regular should be(42)
-  }
+  val tests = Tests {
+    test("load a pureconfic case class with unit conversions") {
+      val qc = ConfigSource.fromConfig(conf).load[QC].toOption.get
+      assert(
+        qc.duration.isValidQ[Double, Second](3600.0),
+        qc.memory.isValidQ[Double, Mega %* Byte](1000.0),
+        qc.regular == 42
+      )
+    }
 
-  it should "fail on incompatible units" in {
-    case class Wrong(duration: Quantity[Double, Meter], memory: Quantity[Double, Mega %* Byte])
-    val qc = loadConfig[Wrong](conf)
-    qc.isLeft.shouldBe(true)
+    test("fail on incompatible units") {
+      case class Wrong(duration: Quantity[Double, Meter], memory: Quantity[Double, Mega %* Byte])
+      val qc = ConfigSource.fromConfig(conf).load[Wrong]
+      assert(qc.isLeft)
+    }
   }
 }
-*/
