@@ -23,72 +23,73 @@ import coulomb.infra._
 import coulomb.define._
 
 /**
- * An implicit trait that supports compile-time temperature subtraction
+ * An implicit trait that supports compile-time offset unit subtraction
  * @tparam N1 the numeric type of the quantity value
  * @tparam U1 the unit expresion type of the quantity
  * @tparam N2 numeric type of a RHS quantity value
  * @tparam U2 unit expression type of the RHS quantity
  */
-trait TempSub[N1, U1, N2, U2] {
+trait OffsetUnitSub[N1, U1, N2, U2] {
   /** convert value v2 to units of (U1,N1) (if necessary), and subtract from v1 */
   def vsub(v1: N1, v2: N2): N1
 }
-object TempSub {
+object OffsetUnitSub {
   implicit def evidence[N1, U1, N2, U2](implicit
       ag1: AdditiveGroup[N1],
-      uc: TempConverter[N2, U2, N1, U1]): TempSub[N1, U1, N2, U2] =
-    new TempSub[N1, U1, N2, U2] {
+      uc: OffsetUnitConverter[N2, U2, N1, U1]): OffsetUnitSub[N1, U1, N2, U2] =
+    new OffsetUnitSub[N1, U1, N2, U2] {
       def vsub(v1: N1, v2: N2): N1 = ag1.minus(v1, uc.vcnv(v2))
     }
 }
 
 /**
- * An implicit trait that supports compile-time temperature comparisons / ordering
- * @tparam N1 the numeric type of the quantity value
- * @tparam U1 the unit expresion type of the quantity
- * @tparam N2 numeric type of a RHS quantity value
- * @tparam U2 unit expression type of the RHS quantity
+ * An implicit trait that supports compile-time comparisons / ordering
+ * for offset quantities
+ * @tparam N1 the numeric type of the lhs
+ * @tparam U1 the unit type of the rhs
+ * @tparam N2 numeric type of the rhs
+ * @tparam U2 unit type of the rhs
  */
-trait TempOrd[N1, U1, N2, U2] {
+trait OffsetUnitOrd[N1, U1, N2, U2] {
   /** convert value v2 to units of (U1,N1) (if necessary), and compare to v1 */
   def vcmp(v1: N1, v2: N2): Int
 }
-object TempOrd {
+object OffsetUnitOrd {
   implicit def evidence[N1, U1, N2, U2](implicit
       ord1: Order[N1],
-      uc: TempConverter[N2, U2, N1, U1]): TempOrd[N1, U1, N2, U2] =
-    new TempOrd[N1, U1, N2, U2] {
+      uc: OffsetUnitConverter[N2, U2, N1, U1]): OffsetUnitOrd[N1, U1, N2, U2] =
+    new OffsetUnitOrd[N1, U1, N2, U2] {
       def vcmp(v1: N1, v2: N2): Int = ord1.compare(v1, uc.vcnv(v2))
     }
 }
 
 /**
- * An implicit trait that supports compile-time temperature conversion, when possible.
+ * An implicit trait that supports compile-time offset unit conversion, when possible.
  * Also used to support addition, subtraction and comparisons.
  * This implicit will not exist if U1 and U2 are not convertable to one another.
- * @tparam N1 the numeric type of the temperature value
- * @tparam U1 the unit expresion type of the temperature
- * @tparam N2 numeric type of another temperature value
- * @tparam U2 unit expression type of the other temperature
+ * @tparam N1 the numeric type of the offset-unit value
+ * @tparam U1 the unit expresion type of the offset-unit
+ * @tparam N2 numeric type of another offset-unit value
+ * @tparam U2 unit expression type of the other offset-unit
  */
-trait TempConverter[N1, U1, N2, U2] {
-  /** a conversion from temperature value with type `(N1,U1)` to type `(N2,U2)` */
+trait OffsetUnitConverter[N1, U1, N2, U2] {
+  /** a conversion from offset-unit value with type `(N1,U1)` to type `(N2,U2)` */
   def vcnv(v: N1): N2
 }
-trait TempConverterDefaultPriority {
+trait OffsetUnitConverterDefaultPriority {
   // this default rule should work well everywhere but may be overridden for efficiency
-  implicit def evidence[N1, U1, N2, U2](implicit
-      t1: DerivedTemp[U1], t2: DerivedTemp[U2],
+  implicit def evidence[N1, U1, N2, U2, B](implicit
+      ou1: OffsetUnit[U1, B], ou2: OffsetUnit[U2, B],
       cf1: ConvertableFrom[N1],
-      ct2: ConvertableTo[N2]): TempConverter[N1, U1, N2, U2] = {
-    val coef = t1.coef / t2.coef
-    new TempConverter[N1, U1, N2, U2] {
+      ct2: ConvertableTo[N2]): OffsetUnitConverter[N1, U1, N2, U2] = {
+    val coef = ou1.coef / ou2.coef
+    new OffsetUnitConverter[N1, U1, N2, U2] {
       def vcnv(v: N1): N2 = {
-        ct2.fromType[Rational](((cf1.toType[Rational](v) + t1.off) * coef) - t2.off)
+        ct2.fromType[Rational](((cf1.toType[Rational](v) + ou1.off) * coef) - ou2.off)
       }
     }
   }
 }
-object TempConverter extends TempConverterDefaultPriority {
-  // override the default temp-converter generation here for specific cases
+object OffsetUnitConverter extends OffsetUnitConverterDefaultPriority {
+  // override the default converter generation here for specific cases
 }

@@ -23,7 +23,7 @@ import spire.math._
 import coulomb.si._
 
 /**
- * Define a temperature scale. A Temperature is a subclass of a derived unit from Kelvin.
+ * An offset unit extends derived unit, with an offset as well as a coefficient
  * {{{
  * import coulomb.define._
  * trait Fahrenheit
@@ -31,27 +31,39 @@ import coulomb.si._
  * }}}
  * @tparam U the unit type to define for this temperature scale
  */
-class DerivedTemp[U](coef: Rational, val off: Rational, name: String, abbv: String) extends DerivedUnit[U, Kelvin](coef, name, abbv) {
-  override def toString = s"DerivedTemp($coef, $off, $name, $abbv)"
+class OffsetUnit[U, D](coef: Rational, val off: Rational, name: String, abbv: String) extends DerivedUnit[U, D](coef, name, abbv) {
+  override def toString = s"OffsetUnit($coef, $off, $name, $abbv)"
 }
 
-object DerivedTemp {
+object OffsetUnit {
+  import coulomb.infra.CanonicalSig
+  import shapeless.{ ::, HNil }
+
   /**
-   * Obtain an instance of a temperature scale.
+   * Obtain an instance of an offset unit scale.
    * @tparam U the unit type to define for this temperature scale
    * @param coef the coefficient for this temperature definition
    * @param off the offset for this definition
-   * @param name the full name of the temperature unit, e.g. "Celsius"
-   * @param abbv an abbreviation for the temperature unit, e.g. "C"
+   * @param name the full name of the offset unit, e.g. "Celsius"
+   * @param abbv an abbreviation for the offset unit, e.g. "C"
    */
-  def apply[U](coef: Rational = Rational(1), off: Rational = Rational(0), name: String = "", abbv: String = "")(implicit
-      ut: TypeTag[U]): DerivedTemp[U] = {
+  def apply[U, D](coef: Rational = Rational(1), off: Rational = Rational(0), name: String = "", abbv: String = "")(implicit
+      ut: WeakTypeTag[U]): OffsetUnit[U, D] = {
     require(coef > 0, "Unit coefficients must be strictly > 0")
     val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
     val a = if (abbv != "") abbv else n.take(1)
-    new DerivedTemp[U](coef, off, n, a)
+    new OffsetUnit[U, D](coef, off, n, a)
   }
 
-  // A slight hack that is used by TempConverter to simplify its rules
-  implicit def evidencek2k: DerivedTemp[Kelvin] = DerivedTemp[Kelvin](name = "Kelvin", abbv = "K")
+  /** lift a base unit to an offset unit */
+  implicit def liftBUtoOU[U](implicit bu: BaseUnit[U]): OffsetUnit[U, U] =
+    new OffsetUnit[U, U](coef = Rational(1), off = Rational(0), name = bu.name, abbv = bu.abbv)
+
+  /** lift a defined unit to an offset unit */
+  implicit def liftDUtoOU[U, D, B](implicit
+      du: DerivedUnit[U, D],
+      cs: CanonicalSig.Aux[U, (B, 1) :: HNil],
+      bb: BaseUnit[B]): OffsetUnit[U, B] = {
+    new OffsetUnit[U, B](coef = cs.coef, off = Rational(0), name = du.name, abbv = du.abbv)
+  }
 }
