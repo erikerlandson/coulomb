@@ -20,8 +20,6 @@ import scala.reflect.runtime.universe._
 
 import spire.math._
 
-import coulomb.si._
-
 /**
  * An offset unit extends derived unit, with an offset as well as a coefficient
  * {{{

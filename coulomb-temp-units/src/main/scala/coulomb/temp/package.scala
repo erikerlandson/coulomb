@@ -19,8 +19,8 @@ package coulomb
 import spire.math.Rational
 
 import coulomb.define._
-
 import coulomb.unitops._
+import coulomb.offset.OffsetQuantity
 
 import coulomb.si.Kelvin
 
