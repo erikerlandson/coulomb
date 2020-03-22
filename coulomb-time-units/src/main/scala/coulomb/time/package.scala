@@ -16,12 +16,25 @@ limitations under the License.
 
 package coulomb
 
-import coulomb.define._
+import spire.math.Rational
 
-import coulomb.si._
+import coulomb.define._
+import coulomb.offset._
+
+import coulomb.si.Second
 
 /** Time units: Minute, Hour, Day, Week */
 package object time {
+
+  type EpochTime[N, U] = OffsetQuantity[N, U]
+
+  /** enhances value types with utility methods for `coulomb` */
+  implicit class CoulombExtendWithEpochTime[N](val v: N) extends Serializable {
+    /** create a new epoch time of type U with numeric value of `this` */
+    def withEpochTime[U](implicit ou: OffsetUnit[U, Second]): EpochTime[N, U] =
+      new EpochTime[N, U](v)
+  }
+
   trait Minute
   implicit val defineUnitMinute = DerivedUnit[Minute, Second](60, abbv = "min")
 
@@ -33,4 +46,100 @@ package object time {
 
   trait Week
   implicit val defineUnitWeek = DerivedUnit[Week, Day](7, abbv = "wk")
+}
+
+package time {
+  object EpochTime {
+    def apply[N, U](v: N)(implicit ou: OffsetUnit[U, Second]) =
+      new EpochTime[N, U](v)
+    def fromQuantity[N, U](q: Quantity[N, U])(implicit
+        ou: OffsetUnit[U, Second]): EpochTime[N, U] =
+      OffsetQuantity.fromQuantity(q)
+    def toQuantity[N, U](t: EpochTime[N, U]): Quantity[N, U] =
+      OffsetQuantity.toQuantity(t)
+  }
+}
+
+object javatime {
+  import java.time.{ Instant, Duration }
+  import coulomb.unitops._
+  import time.EpochTime
+
+  implicit class CoulombExtendDuration(val duration: Duration) extends Serializable {
+    def toQuantity[N, U](implicit toQ: Duration => Quantity[N, U]): Quantity[N, U] = {
+      toQ(duration)
+    }
+    def plus[N, U](q: Quantity[N, U])(implicit toD: Quantity[N, U] => Duration): Duration = {
+      duration.plus(toD(q))
+    }
+    def minus[N, U](q: Quantity[N, U])(implicit toD: Quantity[N, U] => Duration): Duration = {
+      duration.minus(toD(q))
+    }
+  }
+
+  implicit class CoulombExtendQuantity[N, U](val quantity: Quantity[N, U]) extends Serializable {
+    def toDuration(implicit
+        toD: Quantity[N, U] => Duration): Duration = {
+      toD(quantity)
+    }
+    def plus(d: Duration)(implicit
+        add: UnitAdd[N, U, N, U],
+        toQ: Duration => Quantity[N, U]): Quantity[N, U] = {
+      quantity + toQ(d)
+    }
+    def minus(d: Duration)(implicit
+        sub: UnitSub[N, U, N, U],
+        toQ: Duration => Quantity[N, U]): Quantity[N, U] = {
+      quantity - toQ(d)
+    }
+  }
+
+  implicit class CoulombExtendInstant(val instant: Instant) extends Serializable {
+    def toEpochTime[N, U](implicit toQ: Duration => Quantity[N, U]): EpochTime[N, U] = {
+      val d = Duration.ofSeconds(instant.getEpochSecond(), instant.getNano())
+      new EpochTime[N, U](toQ(d).value)
+    }
+    def plus[N, U](q: Quantity[N, U])(implicit toD: Quantity[N, U] => Duration): Instant = {
+      instant.plus(toD(q))
+    }
+    def minus[N, U](q: Quantity[N, U])(implicit toD: Quantity[N, U] => Duration): Instant = {
+      instant.minus(toD(q))
+    }
+  }
+
+  implicit class CoulombExtendEpochTime[N, U](val t: EpochTime[N, U]) extends Serializable {
+    def toInstant(implicit toD: Quantity[N, U] => Duration): Instant = {
+      Instant.EPOCH.plus(EpochTime.toQuantity(t))
+    }
+    def plus(d: Duration)(implicit
+        add: UnitAdd[N, U, N, U],
+        toQ: Duration => Quantity[N, U]): OffsetQuantity[N, U] = {
+      t + toQ(d)
+    }
+    def minus(d: Duration)(implicit
+        sub: UnitSub[N, U, N, U],
+        toQ: Duration => Quantity[N, U]): OffsetQuantity[N, U] = {
+      t - toQ(d)
+    }
+  }
+
+  implicit def convertDurationToQuantity[N, U](implicit
+      s2u: UnitConverter[Rational, Second, N, U]): Duration => Quantity[N, U] = {
+    (duration: Duration) => {
+      val seconds = duration.getSeconds()
+      val nano = duration.getNano()
+      val qsec = if (nano == 0) Rational(seconds) else Rational(seconds) + Rational(nano, 1000000000)
+      new Quantity[N, U](s2u.vcnv(qsec))
+    }
+  }
+
+  implicit def convertQuantityToDuration[N, U](implicit
+      u2s: UnitConverter[N, U, Rational, Second]): Quantity[N, U] => Duration = {
+    (q: Quantity[N, U]) => {
+      val qsec = u2s.vcnv(q.value)
+      val secs = qsec.longValue
+      val nano = ((qsec - secs) * 1000000000).intValue
+      Duration.ofSeconds(secs, nano)
+    }
+  }
 }
