@@ -16,6 +16,8 @@ limitations under the License.
 
 package coulomb.unitops
 
+import shapeless.{ ::, HNil }
+
 import spire.math.{ Rational, ConvertableFrom, ConvertableTo }
 import spire.algebra._
 
@@ -63,6 +65,22 @@ object OffsetUnitOrd {
     }
 }
 
+/** Resolves for any unit that is linearly reducible to a single base unit */
+trait ReduceToBaseUnit[U] {
+  type Out
+}
+object ReduceToBaseUnit {
+  type Aux[U, O] = ReduceToBaseUnit[U] { type Out = O }
+  implicit def reduceBU[U](implicit bu: BaseUnit[U]): Aux[U, U] =
+    new ReduceToBaseUnit[U] { type Out = U }
+  implicit def reduceDU[U, D, B](implicit
+      du: DerivedUnit[U, D],
+      ru: ReduceToBaseUnit.Aux[D, B]): Aux[U, B] =
+    new ReduceToBaseUnit[U] { type Out = B }
+  // these rules might be augmented to include multiples of prefix-units
+  // but I'd need to work that logic through the entire offset-unit system
+}
+
 /**
  * An implicit trait that supports compile-time offset unit conversion, when possible.
  * Also used to support addition, subtraction and comparisons.
@@ -78,7 +96,9 @@ trait OffsetUnitConverter[N1, U1, N2, U2] {
 }
 trait OffsetUnitConverterDefaultPriority {
   // this default rule should work well everywhere but may be overridden for efficiency
-  implicit def evidence[N1, U1, N2, U2, B](implicit
+  implicit def evidence[N1, U1, B, N2, U2](implicit
+      // binding B first is crucial to making this implicit chain resolve
+      bu1: ReduceToBaseUnit.Aux[U1, B],
       ou1: OffsetUnit[U1, B], ou2: OffsetUnit[U2, B],
       cf1: ConvertableFrom[N1],
       ct2: ConvertableTo[N2]): OffsetUnitConverter[N1, U1, N2, U2] = {
