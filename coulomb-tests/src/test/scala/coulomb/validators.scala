@@ -7,6 +7,7 @@ import spire.math._
 
 import coulomb._
 import coulomb.temp._
+import coulomb.offset.OffsetQuantity
 
 object CoulombValidators {
 
@@ -140,6 +141,34 @@ object CoulombValidators {
           val eq =
             if (tolerant) teq.areEqual(tv, t.value) else (num.compare(tv, num.fromType[N](t.value)) == 0)
           if (!eq) throw new Exception(s"Value ${t.value} did not match target $tv")
+          true
+        }
+      }
+    }
+  }
+
+  implicit class WithOffsetQuantityValidateMethods[N, U](q: OffsetQuantity[N, U])(implicit
+      ttN: WeakTypeTag[N],
+      ttU: WeakTypeTag[U],
+      numN: Numeric[N]) {
+
+    def isValidOQ[NR, UR](tval: Double, tolerant: Boolean = true)(implicit
+        ttNR: WeakTypeTag[NR],
+        ttUR: WeakTypeTag[UR],
+        teq: Equality[NR],
+        num: spire.math.Numeric[NR]): Boolean = {
+      (weakTypeOf[N], weakTypeOf[U]) match {
+        case (tn, _) if (!(tn =:= weakTypeOf[NR])) =>
+          throw new Exception(s"Numeric type $tn did not match target ${weakTypeOf[NR]}")
+          false
+        case (_, tu) if (!(tu =:= weakTypeOf[UR])) =>
+          throw new Exception(s"Unit type $tu did not match target ${weakTypeOf[UR]}")
+          false
+        case _ => {
+          val tv: NR = num.fromDouble(tval)
+          val eq =
+            if (tolerant) teq.areEqual(tv, q.value) else (num.compare(tv, num.fromType[N](q.value)) == 0)
+          if (!eq) throw new Exception(s"Value ${q.value} did not match target $tv")
           true
         }
       }
