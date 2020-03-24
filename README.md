@@ -625,28 +625,18 @@ scala> uname(3.withUnit[Meter %/ Second])
 res0: String = meter/second
 ```
 
-The `UnitConverter` type class supports unit (and numeric) conversions, in addition to
-subtraction, addition, and ordering predicates `<`, `>`, etc:
-```scala
-scala> def convert[N1, U1, N2, U2](q1: Quantity[N1, U1], q2: Quantity[N2, U2])(implicit
-    s1: UnitString[U1], s2: UnitString[U2],
-    uc: UnitConverter[N1, U1, N2, U2]) = {
-  val r1 = q1.to[N2, U2]
-  val r2 = q1 + q2
-  (r1.show, r2.show)
-}
+<table style="width:90%">
+<tr><th>operation</th><th>implicit class</th><th>algebra</th></tr>
+<tr><td>`+`</td><td>`UnitAdd[N1,U1,N2,U2]`</td><td>`AdditiveSemigroup`</td></tr>
+<tr><td>`-`</td><td>`UnitSub[N1,U1,N2,U2]`</td><td>`AdditiveGroup`</td></tr>
+</table>
 
-scala> convert(2f.withUnit[Mile], 1f.withUnit[Kilo %* Meter])
-res1: (String, String) = (3.218688 km,2.6213713 mi)
-```
 
-The three typeclasses `UnitMultiply`, `UnitDivide` and `UnitPower` support quantity operations
-`*`, `/` and `pow`, respectively:
 ```scala
 scala> def operate[N1, U1, N2, U2](q1: Quantity[N1, U1], q2: Quantity[N2, U2])(implicit
-    mul: UnitMultiply[N1, U1, N2, U2],
-    div: UnitDivide[N1, U1, N2, U2],
-    pow: UnitPower[N1, U1, 3]) = {
+    mul: UnitMul[N1, U1, N2, U2],
+    div: UnitDiv[N1, U1, N2, U2],
+    pow: UnitPow[N1, U1, 3]) = {
   val r1 = q1 * q2
   val r2 = q1 / q2
   val r3 = q1.pow[3]
