@@ -627,8 +627,12 @@ res0: String = meter/second
 
 <table style="width:90%">
 <tr><th>operation</th><th>implicit class</th><th>algebra</th></tr>
-<tr><td>`+`</td><td>`UnitAdd[N1,U1,N2,U2]`</td><td>`AdditiveSemigroup`</td></tr>
-<tr><td>`-`</td><td>`UnitSub[N1,U1,N2,U2]`</td><td>`AdditiveGroup`</td></tr>
+<tr><td>+</td><td>UnitAdd[N1,U1,N2,U2]</td><td>AdditiveSemigroup[N1]</td></tr>
+<tr><td>-</td><td>UnitSub[N1,U1,N2,U2]</td><td>AdditiveGroup[N1]</td></tr>
+<tr><td>*</td><td>UnitMul[N1,U1,N2,U2]</td><td>MultiplicativeSemigroup[N1]</td></tr>
+<tr><td>/</td><td>UnitDiv[N1,U1,N2,U2]</td><td>MultiplicativeGroup[N1]</td></tr>
+<tr><td>pow</td><td>UnitPow[N, U, P]</td><td>MultiplicativeSemigroup[N]</td></tr>
+<tr><td>unary -</td><td>UnitNeg[N]</td><td>AdditiveGroup[N]</td></tr>
 </table>
 
 
