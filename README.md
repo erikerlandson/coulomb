@@ -627,6 +627,7 @@ res0: String = meter/second
 
 <table style="width:90%">
 <tr><th>operation</th><th>implicit class</th><th>algebra</th></tr>
+<tr><td> < <= > >= === =:= </td><td>UnitOrd[N1,U1,N2,U2]</td><td>Order[N1]</td></tr>
 <tr><td>+</td><td>UnitAdd[N1,U1,N2,U2]</td><td>AdditiveSemigroup[N1]</td></tr>
 <tr><td>-</td><td>UnitSub[N1,U1,N2,U2]</td><td>AdditiveGroup[N1]</td></tr>
 <tr><td>*</td><td>UnitMul[N1,U1,N2,U2]</td><td>MultiplicativeSemigroup[N1]</td></tr>
