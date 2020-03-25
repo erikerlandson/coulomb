@@ -674,8 +674,8 @@ scala> def pints[U](beer: Quantity[Double, U])(implicit
   print(s"I have so much beer: ${pintsOfBeer.showFull}")
 }
 
-scala> democnv(100D.withUnit[Milli %* Liter])
-So much gruel: 0.4226752837730375 cup
+scala> pints(500D.withUnit[Milli %* Liter])
+I have so much beer: 1.0566882094325938 pint
 ```
 
 The `UnitConverter` typeclass is also used by default typeclasses for `UnitAdd`, `UnitMul` and the other numeric operations above.
