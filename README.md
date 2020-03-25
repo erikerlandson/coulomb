@@ -611,10 +611,11 @@ res5: String = 3.6 °F
 
 Previous topics have focused on how to work with specific `Quantity` and unit expressions.
 However, suppose you wish to write your own "generic" functions or classes, where `Quantity` values
-have parameterized types? For these situations, `coulomb` provides a set of type-classes that
+have parameterized types? For these situations, `coulomb` provides a set of implicit type-classes that
 allow `Quantity` operations to be supported with type parameters.
+These typeclasses can be accessed via `import coulomb.unitops._`
 
-The `UnitString` type class supports unit names and abbreviations:
+The `UnitString` type-class supports unit names and abbreviations:
 ```scala
 scala> import coulomb.unitops._
 
@@ -624,6 +625,7 @@ uname: [N, U](q: coulomb.Quantity[N,U])(implicit us: coulomb.unitops.UnitString[
 scala> uname(3.withUnit[Meter %/ Second])
 res0: String = meter/second
 ```
+The various numeric operations are supported by a set of typeclasses, summarized in the following table.
 
 <table style="width:90%">
 <tr><th>operation</th><th>implicit class</th><th>algebra</th></tr>
@@ -636,23 +638,45 @@ res0: String = meter/second
 <tr><td>unary -</td><td>UnitNeg[N]</td><td>AdditiveGroup[N]</td></tr>
 </table>
 
+For common numeric types, the various algebras in the table above can be obtained via `import spire.std.any._`, or individually as in `import spire.std.double._`.
+The following code block shows an example of using typeclasses to support some numeric Quantity operations:
 
 ```scala
 scala> def operate[N1, U1, N2, U2](q1: Quantity[N1, U1], q2: Quantity[N2, U2])(implicit
+    add: UnitAdd[N1, U1, N2, U2],
     mul: UnitMul[N1, U1, N2, U2],
-    div: UnitDiv[N1, U1, N2, U2],
-    pow: UnitPow[N1, U1, 3]) = {
-  val r1 = q1 * q2
-  val r2 = q1 / q2
+    pow: UnitPow[N1, U1, 3],
+    ord: UnitOrd[N1, U1, N2, U2]) = {
+  val r1 = q1 + q2
+  val r2 = q1 * q2
   val r3 = q1.pow[3]
-  (r1, r2, r3)
+  val r4 = q1 < q2
+  (r1, r2, r3, r4)
 }
 
-scala> val (q1, q2, q3) = operate(3f.withUnit[Meter], 3f.withUnit[Meter])
-q1: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(2)] = Quantity(9.0)
-q2: coulomb.Quantity[Float,coulomb.Unitless] = Quantity(1.0)
-q3: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(3)] = Quantity(27.0)
+scala> val (r1, r2, r3, r4) = operate(2f.withUnit[Meter], 3f.withUnit[Meter])
+r1: coulomb.Quantity[Float,coulomb.si.Meter] = Quantity(5.0)
+r2: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(2)] = Quantity(6.0)
+r3: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(3)] = Quantity(8.0)
+r4: Boolean = true
 
-scala> List(q1.show, q2.show, q3.show)
-res3: List[String] = List(9.0 m^2, 1.0 unitless, 27.0 m^3)
+scala> List(r1.show, r2.show, r3.show, r4.toString)
+res1: List[String] = List(5.0 m, 6.0 m^2, 8.0 m^3, true)
 ```
+
+The ability to convert between unit quantities is represented by the `UnitConverter` typeclass.
+This example illustrates the use of `UnitConverter`:
+
+```scala
+scala> def democnv[U](gruel: Quantity[Double, U])(implicit
+    cnv: UnitConverter[Double, U, Double, Cup]): Unit = {
+  val cupsOfGruel = gruel.toUnit[Cup]
+  print(s"So much gruel: ${cupsOfGruel.showFull}")
+}
+
+scala> democnv(100D.withUnit[Milli %* Liter])
+So much gruel: 0.4226752837730375 cup
+```
+
+The `UnitConverter` typeclass is also used by default typeclasses for `UnitAdd`, `UnitMul` and the other numeric operations above.
+This typeclass can also be extended by adding unit converter policies, which is described in the next section.
