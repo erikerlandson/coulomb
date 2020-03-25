@@ -135,7 +135,7 @@ scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.
 
 #### Features
 
-The `coulomb` provides the following features:
+The `coulomb` libraries provide the following features:
 
 Allow a programmer to associate unit analysis with values, in the form of static types
 ```scala
@@ -681,7 +681,7 @@ I have so much beer: 1.0566882094325938 pint
 ```
 
 The `UnitConverter` typeclass is also used by default typeclasses for `UnitAdd`, `UnitMul` and the other numeric operations above.
-This typeclass can also be extended by adding unit converter policies, which is described in the next section.
+This typeclass can be extended by adding [unit converter policies](#unit-conversions-for-custom-value-types).
 
 #### Compute Model for Quantity Operations
 
