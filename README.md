@@ -120,6 +120,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Type Safe Configurations](#type-safe-configurations)
 * [Temperature Values](#temperature-values)
 * [Working with Type Parameters and Type-Classes](#working-with-type-parameters-and-type-classes)
+* [Compute Model for Quantity Operations](#compute-model-for-quantity-operations)
 
 #### Running Tutorial Examples
 
@@ -680,3 +681,86 @@ I have so much beer: 1.0566882094325938 pint
 
 The `UnitConverter` typeclass is also used by default typeclasses for `UnitAdd`, `UnitMul` and the other numeric operations above.
 This typeclass can also be extended by adding unit converter policies, which is described in the next section.
+
+#### Compute Model for Quantity Operations
+
+Previous sections have disussed the various operations that can be performed on `Quantity` objects.
+As mentioned in the section on [unit operations](#unit-operations),
+the quantity result type of binary operations is governed by the left-hand-side of an exression:
+```scala
+scala> (1.withUnit[Foot] + 1.withUnit[Yard]).show
+res0: String = 4 ft
+```
+As described in the previous section on
+[operation typeclasses](#working-with-type-parameters-and-type-classes)
+the `UnitAdd` typeclass implements unit quantity addition.
+Here is the code for `UnitAdd`:
+```scala
+trait UnitAdd[N1, U1, N2, U2] {
+  def vadd(v1: N1, v2: N2): N1
+}
+object UnitAdd {
+  implicit def evidenceASG0[N1, U1, N2, U2](implicit
+      as1: AdditiveSemigroup[N1],
+      uc: UnitConverter[N2, U2, N1, U1]): UnitAdd[N1, U1, N2, U2] =
+    new UnitAdd[N1, U1, N2, U2] {
+      def vadd(v1: N1, v2: N2): N1 = as1.plus(v1, uc.vcnv(v2))
+    }
+}
+```
+As the above code suggests, all quantity operations by convention first convert the RHS value to the value and unit type of the left hand side,
+and then use the appropriate algebra (in this example `AdditiveSemigroup`) to perform that operation with respect to the LHS value and unit.
+Note that this means only the LHS value type requires this algebra to exist.
+
+The full set of Quantity operation typeclasses are defined in
+[unitops.scala](https://github.com/erikerlandson/coulomb/blob/develop/coulomb/src/main/scala/coulomb/unitops/unitops.scala).
+
+How do unit conversions operate?
+Here is the default implementation of `UnitConverter`:
+```scala
+trait UnitConverter[N1, U1, N2, U2] {
+  def vcnv(v: N1): N2
+}
+trait UnitConverterDefaultPriority {
+  implicit def witness[N1, U1, N2, U2](implicit
+      cu: ConvertableUnits[U1, U2],
+      cf1: ConvertableFrom[N1],
+      ct2: ConvertableTo[N2]): UnitConverter[N1, U1, N2, U2] =
+    new UnitConverter[N1, U1, N2, U2] {
+      def vcnv(v: N1): N2 = ct2.fromType[Rational](cf1.toType[Rational](v) * cu.coef)
+    }
+}
+```
+As the above code illustrates, a standard unit conversion proceeds by:
+1. Converting the input type to `Rational`
+1. Multiply by the unit conversion coefficient (also a Rational)
+1. Converting the result to the output type.
+
+Coulomb uses the `Rational` type as the intermediary because it can operate lossessly on integer values,
+and it can accommodate most numeric repesentations with zero or minimal loss.
+Note that any numeric precision loss in this process is most likely to occur during the final conversion to the LHS value type.
+
+Some unit conversion specializations are applied.
+For example, in the case that both LHS and RHS units and value types are the same, the fast and lossless identity function is applied:
+```scala
+implicit def witnessIdentity[N, U]: UnitConverter[N, U, N, U] = {
+  new UnitConverter[N, U, N, U] {
+    @inline def vcnv(v: N): N = v
+  }
+}
+```
+
+Another example is the case of `Double` value types, where preconverting the conversion coefficient to `Double` is efficient while
+maintaining `Double` accuracy:
+```scala
+implicit def witnessDouble[U1, U2](implicit
+    cu: ConvertableUnits[U1, U2]): UnitConverter[Double, U1, Double, U2] = {
+  val coef = cu.coef.toDouble
+  new UnitConverter[Double, U1, Double, U2] {
+    @inline def vcnv(v: Double): Double = v * coef
+  }
+}
+```
+
+`UnitConverter` and its full set of typeclass rules are defined in
+[unitops.scala](https://github.com/erikerlandson/coulomb/blob/develop/coulomb/src/main/scala/coulomb/unitops/unitops.scala).
