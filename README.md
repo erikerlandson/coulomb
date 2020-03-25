@@ -121,6 +121,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Temperature Values](#temperature-values)
 * [Working with Type Parameters and Type-Classes](#working-with-type-parameters-and-type-classes)
 * [Compute Model for Quantity Operations](#compute-model-for-quantity-operations)
+* [Unit Conversions for Custom Value Types]9#unit-conversions-for-custom-value-types)
 
 #### Running Tutorial Examples
 
@@ -764,3 +765,39 @@ implicit def witnessDouble[U1, U2](implicit
 
 `UnitConverter` and its full set of typeclass rules are defined in
 [unitops.scala](https://github.com/erikerlandson/coulomb/blob/develop/coulomb/src/main/scala/coulomb/unitops/unitops.scala).
+
+#### Unit Conversions for Custom Value Types
+
+Coulomb's typeclass rules can be extended to support new value types.
+
+There are two components to a custom extension.
+The first is to define any desired algebras on the new value type.
+Defining algebras is optional, if no numeric operations need to be supported.
+
+The second customization component is to define what it means to multiply a value by a conversion coefficient.
+This can be accomplished using the `UnitConverterPolicy` typeclass, defined in `coulomb.unitops`.
+
+In the following example, coulomb is extended to support the spire `Complex` type.
+In the case of `Complex`, algebras such as additive and multiplicative (semi)groups are already defined.
+
+```scala
+scala> import coulomb.unitops._, spire.math.Complex, spire.algebra._
+
+// define what it means to apply unit conversion coefficients to Complex
+scala> implicit def complexPolicy[U1, U2]: UnitConverterPolicy[Complex[Double], U1, Complex[Double], U2] =
+  new UnitConverterPolicy[Complex[Double], U1, Complex[Double], U2] {
+    def convert(v: Complex[Double], cu: ConvertableUnits[U1, U2]): Complex[Double] = v * cu.coef.toDouble
+  }
+
+scala> q.show
+res0: String = (1.0 + 2.0i) m
+
+scala> q.toUnit[Foot].show
+res1: String = (3.2808398950131235 + 6.561679790026247i) ft
+
+scala> (q * q).show
+res2: String = (-3.0 + 4.0i) m^2
+
+scala> (q + q).show
+res3: String = (2.0 + 4.0i) m
+```
