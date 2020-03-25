@@ -303,24 +303,23 @@ trait UnitConverterP1 extends UnitConverterP2 {
   }
 }
 trait UnitConverterP0 extends UnitConverterP1 {
-  // when neither unit nor number type change, conversion is just identity function
-  implicit def witnessIdentity[N, U]: UnitConverter[N, U, N, U] = {
-    new UnitConverter[N, U, N, U] {
-      @inline def vcnv(v: N): N = v
-    }
-  }
-}
-object UnitConverter extends UnitConverterP0 {
-  // I'm allowing customized policies to override even the "identity" rule above.
-  // Practically this means someone customizing a policy may have to do a bit of extra
-  // work to separate optimization cases but philosophically it feels right
-  // in the sense that it allows anyone who wants to customize the opportunity
-  // for total control.
+  // I previously had this switched with identity below, however
+  // in cases where N1==N2 and U1==U2, it was causing an ambigous implicit failure
+  // so for some reason the priority of subclasses was not disambiguating.
+  // So far, making the identity rule highest priority has been stable
   implicit def witnessCustomPolicy[N1, U1, N2, U2](implicit
       cu: ConvertableUnits[U1, U2],
       ucp: UnitConverterPolicy[N1, U1, N2, U2]): UnitConverter[N1, U1, N2, U2] = {
     new UnitConverter[N1, U1, N2, U2] {
       def vcnv(v: N1): N2 = ucp.convert(v, cu)
+    }
+  }
+}
+object UnitConverter extends UnitConverterP0 {
+  // when neither unit nor number type change, conversion is just identity function
+  implicit def witnessIdentity[N, U]: UnitConverter[N, U, N, U] = {
+    new UnitConverter[N, U, N, U] {
+      @inline def vcnv(v: N): N = v
     }
   }
 }
