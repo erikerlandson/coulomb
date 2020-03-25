@@ -741,6 +741,17 @@ Coulomb uses the `Rational` type as the intermediary because it can operate loss
 and it can accommodate most numeric repesentations with zero or minimal loss.
 Note that any numeric precision loss in this process is most likely to occur during the final conversion to the LHS value type.
 
+The potential for precision loss is greatest when working with integer value types, and particuarly when the
+LHS unit is larger than the RHS unit, as in the second conversion below:
+
+```scala
+scala> ((100.withUnit[Meter]) + (1.withUnit[Kilo %* Meter])).show
+res0: String = 1100 m
+
+scala> ((1.withUnit[Kilo %* Meter]) + (100.withUnit[Meter])).show
+res1: String = 1 km
+```
+
 Some unit conversion specializations are applied.
 For example, in the case that both LHS and RHS units and value types are the same, the fast and lossless identity function is applied:
 ```scala
