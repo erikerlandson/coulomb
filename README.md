@@ -119,7 +119,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Quantity Parsing](#quantity-parsing)
 * [Type Safe Configurations](#type-safe-configurations)
 * [Temperature Values](#temperature-values)
-* [Type Parameter Integrations](#type-parameter-integrations)
+* [Working with Type Parameters and Type-Classes](#working-with-type-parameters-and-type-classes)
 
 #### Running Tutorial Examples
 
@@ -607,7 +607,7 @@ scala> q.show
 res5: String = 3.6 °F
 ```
 
-#### Type Parameter Integrations
+#### Working with Type Parameters and Type-Classes
 
 Previous topics have focused on how to work with specific `Quantity` and unit expressions.
 However, suppose you wish to write your own "generic" functions or classes, where `Quantity` values
