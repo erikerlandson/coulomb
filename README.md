@@ -668,10 +668,10 @@ The ability to convert between unit quantities is represented by the `UnitConver
 This example illustrates the use of `UnitConverter`:
 
 ```scala
-scala> def democnv[U](gruel: Quantity[Double, U])(implicit
-    cnv: UnitConverter[Double, U, Double, Cup]): Unit = {
-  val cupsOfGruel = gruel.toUnit[Cup]
-  print(s"So much gruel: ${cupsOfGruel.showFull}")
+scala> def pints[U](beer: Quantity[Double, U])(implicit
+    cnv: UnitConverter[Double, U, Double, Pint]): Unit = {
+  val pintsOfBeer = beer.toUnit[Pint]
+  print(s"I have so much beer: ${pintsOfBeer.showFull}")
 }
 
 scala> democnv(100D.withUnit[Milli %* Liter])
