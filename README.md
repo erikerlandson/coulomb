@@ -121,7 +121,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Temperature Values](#temperature-values)
 * [Working with Type Parameters and Type-Classes](#working-with-type-parameters-and-type-classes)
 * [Compute Model for Quantity Operations](#compute-model-for-quantity-operations)
-* [Unit Conversions for Custom Value Types]9#unit-conversions-for-custom-value-types)
+* [Unit Conversions for Custom Value Types](#unit-conversions-for-custom-value-types)
 
 #### Running Tutorial Examples
 
