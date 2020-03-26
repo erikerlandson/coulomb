@@ -53,17 +53,17 @@ object TimeTests extends TestSuite {
     }
 
     test("integrate Instant with coulomb") {
-      val ins = Instant.parse("1969-05-12T00:00:00Z")
-      assert(ins.toEpochTime[Double, Day].isValidOQ[Double, Day](-234.0))
-      assert(Instant.parse("1969-05-12T00:00:00Z").plus(1D.withUnit[Week]).toString == "1969-05-19T00:00:00Z")
-      assert(Instant.parse("1969-05-12T00:00:00Z").minus(1D.withUnit[Week]).toString == "1969-05-05T00:00:00Z")
+      val ins = Instant.parse("1969-07-20T00:00:00Z")
+      assert(ins.toEpochTime[Double, Day].isValidOQ[Double, Day](-165.0))
+      assert(Instant.parse("1969-07-20T00:00:00Z").plus(1D.withUnit[Week]).toString == "1969-07-27T00:00:00Z")
+      assert(Instant.parse("1969-07-20T00:00:00Z").minus(1D.withUnit[Week]).toString == "1969-07-13T00:00:00Z")
     }
 
     test("integrate EpochTime with java.time") {
-      val et = (-234L).withEpochTime[Day]
-      assert(et.toInstant.toString == "1969-05-12T00:00:00Z")
-      assert(et.plus(Duration.ofSeconds(86400, 0)).isValidOQ[Long, Day](-233))
-      assert(et.minus(Duration.ofSeconds(86400, 0)).isValidOQ[Long, Day](-235))
+      val et = (-165L).withEpochTime[Day]
+      assert(et.toInstant.toString == "1969-07-20T00:00:00Z")
+      assert(et.plus(Duration.ofSeconds(86400, 0)).isValidOQ[Long, Day](-164))
+      assert(et.minus(Duration.ofSeconds(86400, 0)).isValidOQ[Long, Day](-166))
     }
   }
 }
