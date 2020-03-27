@@ -380,6 +380,11 @@ object NewUnits {
   // Define an abbreviation "g"
   trait EarthGravity
   implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](coef = 9.807, abbv = "g")
+
+  // The maximum ping time to the moon
+  // https://twitter.com/cmuratori/status/1219847348433481729
+  trait MoonUnit
+  implicit val defineUnitMoonUnit = DerivedUnit[MoonUnit, Second](coef = 2.71321035034, abbv = "moo")
 }
 ```
 
