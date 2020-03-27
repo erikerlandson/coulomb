@@ -106,11 +106,20 @@ Any violations of this code of conduct should be reported to [the author](https:
 #### Running Tutorial Examples
 
 Except where otherwise noted, the following tutorial examples can be run in a scala REPL as follows:
-```
+```bash
 % cd /path/to/scala
 % sbt coulomb_tests/console
-
+```
+```scala
 scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.mks._, coulomb.time._, coulomb.info._, coulomb.binprefix._, coulomb.accepted._, coulomb.us._, coulomb.temp._, coulomb.define._, coulomb.parser._
+```
+
+Examples making use of numeric quantity operations depend on corresponding typeclasses for numeric algebras.
+Alebras for the common scala and spire numeric types can be obtained this way:
+
+```scala
+scala> import spire.std.any._     // import algebras for common numeric types
+scala> import spire.std.double._  // import algebras for Double
 ```
 
 #### Features
