@@ -59,9 +59,15 @@ libraryDependencies ++= Seq(
 )
 ```
 
-The package `coulomb-pureconfig` provides an integration with pureconfig configurations:
+#### Other coulomb packages
 
-https://github.com/erikerlandson/coulomb/tree/develop/coulomb-pureconfig
+In addition to core functionality and fundamental units, coulomb provides the following packages.
+
+* [coulomb-offset](coulomb-offset/) - unit quantities that include an absolute offset value
+* [coulomb-parser](coulomb-parser/) - parsing a DSL for unit expressions into typed unit Quantity
+* [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
+* [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
+* [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
 
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
