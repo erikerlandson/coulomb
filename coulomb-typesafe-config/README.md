@@ -35,26 +35,33 @@ To see this in action, build the examples and load the demo into a REPL:
 % sbt coulomb_tests/console
 ```
 
-First import a selection of `coulomb` units, and the demo objects:
+First import a selection of `coulomb` units, and the `coulomb.typesafeconfig` integration package:
 
 ```scala
 scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.info._, coulomb.time._, coulomb.parser._
 
-scala> import ConfigIntegration._, scala.collection.JavaConverters._
+scala> import scala.collection.JavaConverters._, com.typesafe.config.ConfigFactory, coulomb.typesafeconfig._
 ```
 
-The demo pre-defines a simple configuration object:
+Here we set up a typesafe configuration and bind it to a QuantityParser to enable unit awareness: 
 ```scala
-scala> confTS.entrySet().asScala.map { e => s"${e.getKey()} = ${e.getValue()}" }.mkString("\n")
-res0: String =
-bandwidth = Quoted("10 megabyte / second")
-memory = Quoted("100 gigabyte")
-duration = Quoted("60 second")
+scala> val confTS = ConfigFactory.parseString("""
+     |     "duration" = "60 second"
+     |     "memory" = "100 gigabyte"
+     |     "bandwidth" = "10 megabyte / second"
+     |   """)
+confTS: com.typesafe.config.Config = Config(SimpleConfigObject({"bandwidth":"10 megabyte / second","duration":"60 second","memory":"100 gigabyte"}))
+
+scala> val qp = QuantityParser[Byte :: Second :: Giga :: Mega :: HNil]
+qp: coulomb.parser.QuantityParser = coulomb.parser.QuantityParser@6c8590b1
+
+scala> val conf = confTS.withQuantityParser(qp)
+conf: coulomb.typesafeconfig.CoulombConfig = CoulombConfig(Config(SimpleConfigObject({"bandwidth":"10 megabyte / second","duration":"60 second","memory":"100 gigabyte"})),coulomb.parser.QuantityParser@6c8590b1)
 ```
 
-It also imports definitions from the `coulomb-typesafe-config` sub-package,
-which defines [CoulombConfig](https://erikerlandson.github.io/coulomb/latest/api/coulomb/typesafeconfig/CoulombConfig.html),
-and a new method `getQuantity`.
+The `coulomb-typesafe-config` package defines the
+[CoulombConfig](https://erikerlandson.github.io/coulomb/latest/api/coulomb/typesafeconfig/CoulombConfig.html)
+class and a new method `getQuantity`.
 This new getter method applies a `QuantityParser` like the one above to transform the configuration values into a
 `Quantity` expression:
 ```scala
