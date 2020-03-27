@@ -20,7 +20,9 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "spire" % "0.17.0-M1",
   "eu.timepit" %% "singleton-ops" % "0.4.0",
   // pureconfig integration:
-  "com.manyangled" %% "coulomb-pureconfig" % "0.3.5",
+  "com.manyangled" %% "coulomb-pureconfig" % "0.3.6",
+  "com.manyangled" %% "coulomb-parser" % "0.3.6",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
   "com.github.pureconfig" %% "pureconfig" % "0.12.0"
 )
 ```
