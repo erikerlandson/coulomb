@@ -92,7 +92,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Unit Prefixes](#unit-prefixes)
 * [Using `WithUnit`](#using-withunit)
 * [Type Safe Configurations](#type-safe-configurations)
-* [Temperature Values](#temperature-values)
+* [Absolute Temperature and Time Values](#absolute-temperature-and-time-values)
 * [Working with Type Parameters and Type-Classes](#working-with-type-parameters-and-type-classes)
 * [Compute Model for Quantity Operations](#compute-model-for-quantity-operations)
 * [Unit Conversions for Custom Value Types](#unit-conversions-for-custom-value-types)
@@ -493,11 +493,30 @@ There is a similar `WithTemperature` alias for working with `Temperature` values
 
 #### Type Safe Configurations
 
-Link to typesafe, pureconfig and avro readmes here.
+One of the significant use cases for coulomb is adding unit type awareness to software configurations "at the edge."
+The coulomb libraries include some integrations with popular configuration libraries:
 
-#### Temperature Values
+* [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
+* [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
+* [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
 
-Link to time and temperature readmes here.
+#### Absolute Temperature and Time Values
+
+In coulomb, both time and temperature units can serve as units in Quantity values,
+but they can also serve as measures against an absolute offset.
+
+In the case of temperature units, the `Temperature` type represents absolute temperature values, with respect to absolute zero.
+The type `EpochTime` represents absolute date/time moments, based on the unix Epoch: midnight, 1970.
+
+These "absolute" types obey somewhat different laws than Quantity:
+```
+Absolute + Quantity => Absolute  // Temperature[N, U] + Quantity[N2, U2] => Temperature[N, U]
+Absolute - Quantity => Absolute
+Absolute - Absolute => Quantity  // EpochTime[N, U] - EpochTime[N2, U2] => Quantity[N, U]
+```
+
+Temperature units are documented with examples at [coulomb-temp-units](coulomb-temp-units/).
+Time unit examples are documented under [coulomb-time-units](coulomb-time-units/).
 
 #### Working with Type Parameters and Type-Classes
 
