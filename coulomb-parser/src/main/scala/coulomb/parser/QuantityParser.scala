@@ -58,7 +58,7 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
       ntt: TypeTag[N],
       uts: UnitTypeString[U]): Try[Quantity[N, U]] = {
     val tpeN = typeOf[N]
-    val cast = s".toUnit[${uts.expr}].toNumeric[$tpeN]"
+    val cast = s".toUnit[${uts.expr}].toValue[$tpeN]"
     for {
       tok <- lex(quantityExpr)
       ast <- parse(tok).toTry

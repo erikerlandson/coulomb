@@ -160,8 +160,9 @@ implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](9.
 `coulomb` defines the
 [class `Quantity`](https://erikerlandson.github.io/coulomb/latest/api/coulomb/Quantity.html)
 for representing values with associated units.
-Quantities are represented by their two type parameters: A numeric representation parameter `N`
-(e.g. Int or Double) and a unit type `U` which represents the unit associated with the value.
+Quantities are represented by their two type parameters: A value type `N`
+(typically a numeric type such as Int or Double)
+and a unit type `U` which represents the unit associated with the value.
 Here are some simple declarations of `Quantity` objects:
 ```scala
 import coulomb._

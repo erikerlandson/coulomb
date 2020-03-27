@@ -24,7 +24,7 @@ import unitops._
 
 /**
  * A numeric quantity with an associated unit
- * @tparam N The numeric type (Double, Int, etc)
+ * @tparam N The value type (Double, Int, etc)
  * @tparam U The unit type (Second, Byte, Byte %/ Second, etc)
  * @param value the raw (unitless) value stored by this quantity
  */
@@ -50,7 +50,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Compute the sum of two quantities
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity in the sum.
@@ -61,7 +61,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Compute the difference of two quantities
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity in the difference.
@@ -72,20 +72,20 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Compute the product of two quantities
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity.
    * @param rhs the right hand quantity in the product.
-   * @return this*rhs, with numeric type N and unit type U*U2.
+   * @return this*rhs, with value type N and unit type U*U2.
    */
   def *[N2, U2](rhs: Quantity[N2, U2])(implicit um: UnitMul[N, U, N2, U2]): Quantity[N, um.RT] =
     new Quantity[N, um.RT](um.vmul(value, rhs.value))
 
   /**
    * Divide this quantity by another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity.
    * @param rhs the right hand quantity.
-   * @return this/rhs, with numeric type N and unit type U/U2.
+   * @return this/rhs, with value type N and unit type U/U2.
    */
   def /[N2, U2](rhs: Quantity[N2, U2])(implicit ud: UnitDiv[N, U, N2, U2]): Quantity[N, ud.RT] =
     new Quantity[N, ud.RT](ud.vdiv(value, rhs.value))
@@ -100,7 +100,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Test if two quantities are equal
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
@@ -111,7 +111,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Test if two quantities are not equal
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
@@ -122,7 +122,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Test if this quantity is less than another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
@@ -133,7 +133,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Test if this quantity is less than or equal to another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
@@ -144,7 +144,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Test if this quantity is greater than another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
@@ -155,7 +155,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
   /**
    * Test if this quantity is greater than or equal to another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
@@ -174,19 +174,19 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
     new Quantity[N, U2](uc.vcnv(value))
 
   /**
-   * Obtain a quantity equivalent to this but with a different numeric type
-   * @tparam N2 the numeric type to convert to.
-   * @return a quantity equivalent to this but with numeric type N2 and units U
+   * Obtain a quantity equivalent to this but with a different value type
+   * @tparam N2 the value type to convert to.
+   * @return a quantity equivalent to this but with value type N2 and units U
    */
-  def toNumeric[N2](implicit uc: UnitConverter[N, U, N2, U]): Quantity[N2, U] =
+  def toValue[N2](implicit uc: UnitConverter[N, U, N2, U]): Quantity[N2, U] =
     new Quantity[N2, U](uc.vcnv(value))
 
   /**
-   * Equivalent to this.toUnit[U2].toNumeric[N2]
-   * @tparam N2 the numeric type to convert to.
+   * Equivalent to this.toUnit[U2].toValue[N2]
+   * @tparam N2 the value type to convert to.
    * @tparam U2 the new units to convert to.  Must be convertable to U, or a compile-time type
    * error will result.
-   * @return a quantity equivalent to this but with numeric type N2 and units U2
+   * @return a quantity equivalent to this but with value type N2 and units U2
    */
   def to[N2, U2](implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N2, U2] =
     new Quantity[N2, U2](uc.vcnv(value))
@@ -194,7 +194,7 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
 
 /** static methods for quantities with units */
 object Quantity {
-  /** Create a new quantity with numeric type N and unit type U */
+  /** Create a new quantity with value type N and unit type U */
   def apply[N, U](v: N) = new Quantity[N, U](v)
 
   /** Obtain the coefficient of conversion from unit U1 to U2. U1 and U2 must be

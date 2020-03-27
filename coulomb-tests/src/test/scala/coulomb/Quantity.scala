@@ -85,19 +85,19 @@ object QuantityTests extends TestSuite {
       )
     }
 
-    test("implement toNumeric over various numeric types") {
+    test("implement toValue over various numeric types") {
       assert(
-        37.withUnit[Second].toNumeric[Short].isValidQ[Short, Second](37, tolerant = false),
-        37.withUnit[Second].toNumeric[Int].isValidQ[Int, Second](37, tolerant = false),
-        37.withUnit[Second].toNumeric[Long].isValidQ[Long, Second](37, tolerant = false),
-        37.withUnit[Second].toNumeric[BigInt].isValidQ[BigInt, Second](37, tolerant = false),
+        37.withUnit[Second].toValue[Short].isValidQ[Short, Second](37, tolerant = false),
+        37.withUnit[Second].toValue[Int].isValidQ[Int, Second](37, tolerant = false),
+        37.withUnit[Second].toValue[Long].isValidQ[Long, Second](37, tolerant = false),
+        37.withUnit[Second].toValue[BigInt].isValidQ[BigInt, Second](37, tolerant = false),
 
-        37.withUnit[Second].toNumeric[Float].isValidQ[Float, Second](37.0),
-        37.withUnit[Second].toNumeric[Double].isValidQ[Double, Second](37.0),
-        37.withUnit[Second].toNumeric[BigDecimal].isValidQ[BigDecimal, Second](37.0),
-        37.withUnit[Second].toNumeric[Rational].isValidQ[Rational, Second](37.0),
-        37.withUnit[Second].toNumeric[Algebraic].isValidQ[Algebraic, Second](37.0),
-        37.withUnit[Second].toNumeric[Real].isValidQ[Real, Second](37.0)
+        37.withUnit[Second].toValue[Float].isValidQ[Float, Second](37.0),
+        37.withUnit[Second].toValue[Double].isValidQ[Double, Second](37.0),
+        37.withUnit[Second].toValue[BigDecimal].isValidQ[BigDecimal, Second](37.0),
+        37.withUnit[Second].toValue[Rational].isValidQ[Rational, Second](37.0),
+        37.withUnit[Second].toValue[Algebraic].isValidQ[Algebraic, Second](37.0),
+        37.withUnit[Second].toValue[Real].isValidQ[Real, Second](37.0)
       )
     }
 

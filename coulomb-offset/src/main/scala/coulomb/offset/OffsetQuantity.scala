@@ -24,7 +24,7 @@ import coulomb.define.OffsetUnit
 
 /**
  * A quantity with a unit associated with an additional offset
- * @tparam N The numeric type (Double, Int, etc)
+ * @tparam N The value type (Double, Int, etc)
  * @tparam U The unit type (Celsius, Second, etc)
  * @param value the raw (unitless) value stored by this offset quantity
  */
@@ -45,7 +45,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Compute the difference of two offset-units
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand operand in the difference.
@@ -56,7 +56,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Add a quantity to this offset-quantity
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand of the sum.
@@ -67,7 +67,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Subtract a quantity from this offset-quantity
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand of the difference.
@@ -78,7 +78,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Test if two offset-quantities are equal
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand of the comparison.
@@ -89,7 +89,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Test if two quantities are not equal
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand of the comparison.
@@ -100,7 +100,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Test if this quantity is less than another
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand of the comparison.
@@ -111,7 +111,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Test if this quantity is less than or equal to another
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand of the comparison.
@@ -122,7 +122,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Test if this quantity is greater than another
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand of the comparison.
@@ -133,7 +133,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 
   /**
    * Test if this quantity is greater than or equal to another
-   * @tparam N2 the numeric type of the rhs
+   * @tparam N2 the value type of the rhs
    * @tparam U2 the unit type of the rhs. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand of the comparison.
@@ -152,19 +152,19 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
     new OffsetQuantity[N, U2](uc.vcnv(value))
 
   /**
-   * Obtain an offset-quantity equivalent to this but with a different numeric type
-   * @tparam N2 the numeric type to convert to.
-   * @return an offset-quantity equivalent to this but with numeric type N2 and units U
+   * Obtain an offset-quantity equivalent to this but with a different value type
+   * @tparam N2 the value type to convert to.
+   * @return an offset-quantity equivalent to this but with value type N2 and units U
    */
-  def toNumeric[N2](implicit uc: OffsetUnitConverter[N, U, N2, U]): OffsetQuantity[N2, U] =
+  def toValue[N2](implicit uc: OffsetUnitConverter[N, U, N2, U]): OffsetQuantity[N2, U] =
     new OffsetQuantity[N2, U](uc.vcnv(value))
 
   /**
-   * Equivalent to this.toUnit[U2].toNumeric[N2]
-   * @tparam N2 the numeric type to convert to.
+   * Equivalent to this.toUnit[U2].toValue[N2]
+   * @tparam N2 the value type to convert to.
    * @tparam U2 the new units to convert to.  Must be convertable to U, or a compile-time type
    * error will result.
-   * @return an offset-quantity equivalent to this but with numeric type N2 and units U2
+   * @return an offset-quantity equivalent to this but with value type N2 and units U2
    */
   def to[N2, U2](implicit uc: OffsetUnitConverter[N, U, N2, U2]): OffsetQuantity[N2, U2] =
     new OffsetQuantity[N2, U2](uc.vcnv(value))
@@ -173,7 +173,7 @@ class OffsetQuantity[N, U] private[coulomb] (val value: N) extends AnyVal with S
 /** methods and implicits for offset quantities associated with a unit type */
 object OffsetQuantity {
 
-  /** Create a new temperature with numeric type N and unit type U */
+  /** Create a new temperature with value type N and unit type U */
   def apply[N, U](v: N) = new OffsetQuantity[N, U](v)
 
   /** A string representation of unit type U, using unit abbreviations */

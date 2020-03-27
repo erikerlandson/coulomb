@@ -55,19 +55,19 @@ object TemperatureTests extends TestSuite {
       )
     }
 
-    test("implement toNumeric") {
+    test("implement toValue") {
       assert(
-        (37.0).withTemperature[Celsius].toNumeric[Short].isValidT[Short, Celsius](37, tolerant = false),
-        (37.0).withTemperature[Celsius].toNumeric[Int].isValidT[Int, Celsius](37, tolerant = false),
-        (37.0).withTemperature[Celsius].toNumeric[Long].isValidT[Long, Celsius](37, tolerant = false),
-        (37.0).withTemperature[Celsius].toNumeric[BigInt].isValidT[BigInt, Celsius](37, tolerant = false),
+        (37.0).withTemperature[Celsius].toValue[Short].isValidT[Short, Celsius](37, tolerant = false),
+        (37.0).withTemperature[Celsius].toValue[Int].isValidT[Int, Celsius](37, tolerant = false),
+        (37.0).withTemperature[Celsius].toValue[Long].isValidT[Long, Celsius](37, tolerant = false),
+        (37.0).withTemperature[Celsius].toValue[BigInt].isValidT[BigInt, Celsius](37, tolerant = false),
 
-        (37.0).withTemperature[Celsius].toNumeric[Float].isValidT[Float, Celsius](37),
-        (37.0).withTemperature[Celsius].toNumeric[Double].isValidT[Double, Celsius](37),
-        (37.0).withTemperature[Celsius].toNumeric[BigDecimal].isValidT[BigDecimal, Celsius](37),
-        (37.0).withTemperature[Celsius].toNumeric[Rational].isValidT[Rational, Celsius](37),
-        (37.0).withTemperature[Celsius].toNumeric[Algebraic].isValidT[Algebraic, Celsius](37),
-        (37.0).withTemperature[Celsius].toNumeric[Real].isValidT[Real, Celsius](37)
+        (37.0).withTemperature[Celsius].toValue[Float].isValidT[Float, Celsius](37),
+        (37.0).withTemperature[Celsius].toValue[Double].isValidT[Double, Celsius](37),
+        (37.0).withTemperature[Celsius].toValue[BigDecimal].isValidT[BigDecimal, Celsius](37),
+        (37.0).withTemperature[Celsius].toValue[Rational].isValidT[Rational, Celsius](37),
+        (37.0).withTemperature[Celsius].toValue[Algebraic].isValidT[Algebraic, Celsius](37),
+        (37.0).withTemperature[Celsius].toValue[Real].isValidT[Real, Celsius](37)
       )
     }
 
