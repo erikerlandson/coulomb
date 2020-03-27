@@ -16,10 +16,10 @@ resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
 libraryDependencies ++= Seq(
   // coulomb libraries used by temperature units
-  "com.manyangled" %% "coulomb" % "0.3.6",
-  "com.manyangled" %% "coulomb-offset" % "0.3.6",
-  "com.manyangled" %% "coulomb-si-units" % "0.3.6",
-  "com.manyangled" %% "coulomb-temp-units" % "0.3.6",
+  "com.manyangled" %% "coulomb" % "0.4.0",
+  "com.manyangled" %% "coulomb-offset" % "0.4.0",
+  "com.manyangled" %% "coulomb-si-units" % "0.4.0",
+  "com.manyangled" %% "coulomb-temp-units" % "0.4.0",
   // coulomb external %Provided deps
   "org.typelevel" %% "spire" % "0.17.0-M1",
   "eu.timepit" %% "singleton-ops" % "0.4.0"
