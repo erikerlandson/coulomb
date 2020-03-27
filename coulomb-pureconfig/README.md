@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb-pureconfig" % "0.4.0",
   "com.manyangled" %% "coulomb-parser" % "0.4.0",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "com.github.pureconfig" %% "pureconfig" % "0.12.0"
+  "com.github.pureconfig" %% "pureconfig" % "0.12.3"
 )
 ```
 
