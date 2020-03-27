@@ -59,17 +59,6 @@ libraryDependencies ++= Seq(
 )
 ```
 
-This project also provides a parsing facility, `QuantityParser`, that can parse a
-unit expression language into properly typed `Quantity` objects. This tool can be
-used for extending standard configuration systems with type-safe unit quantities.
-
-```scala
-libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-parser" % "0.3.6",                    // QuantityParser
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"   // %Provided parser dependency
-)
-```
-
 The package `coulomb-pureconfig` provides an integration with pureconfig configurations:
 
 https://github.com/erikerlandson/coulomb/tree/develop/coulomb-pureconfig
@@ -96,7 +85,6 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Unitless Quantities](#unitless-quantities)
 * [Unit Prefixes](#unit-prefixes)
 * [Using `WithUnit`](#using-withunit)
-* [Quantity Parsing](#quantity-parsing)
 * [Type Safe Configurations](#type-safe-configurations)
 * [Temperature Values](#temperature-values)
 * [Working with Type Parameters and Type-Classes](#working-with-type-parameters-and-type-classes)
@@ -473,47 +461,6 @@ def f2(duration: Float WithUnit Second) = duration + 1f.withUnit[Minute]
 ```
 
 There is a similar `WithTemperature` alias for working with `Temperature` values.
-
-#### Quantity Parsing
-The `coulomb` package `coulomb-parser` provides a utility for parsing a quantity expression DSL into
-correctly typed `Quantity` values, called `QuantityParser`.
-A `QuantityParser` is instantiated with a list of types that it will recognize.
-This example shows a quantity parser that can recognize values in bytes, seconds,
-and the two prefixes mega and giga:
-```scala
-scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.info._, coulomb.time._, coulomb.parser._
-
-scala> val qp = QuantityParser[Byte :: Second :: Giga :: Mega :: HNil]
-qp: coulomb.parser.QuantityParser = coulomb.parser.QuantityParser@43356dd9
-```
-
-Parsing an expression requires an expected numeric and unit type.
-Here we see a quantity given in seconds, successfully being parsed and converted to minutes:
-```scala
-scala> qp[Double, Minute]("60 second")
-res1: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] = Success(Quantity(1.0))
-```
-
-A quantity parser recognizes and understands how to interpret prefix units, as well as
-compound unit expressions:
-```scala
-scala> qp[Double, Mega %* Byte %/ Second]("1.0 gigabyte/second").get.show
-res2: String = 1000.0 MB/s
-```
-
-The quantity parser in this example was not created to recognize minutes inside the DSL, and so
-the following parse will fail.
-```scala
-scala> qp[Double, Minute]("60 minute")
-res3: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] = Failure(coulomb.parser.QPLexingException: ')' expected but 'm' found)
-```
-
-As usual, incompatible units will also cause a parsing error:
-```scala
-scala> qp[Double, Minute]("60 byte")
-res4: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] =
-Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed ...
-```
 
 #### Type Safe Configurations
 
