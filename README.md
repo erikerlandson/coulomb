@@ -388,10 +388,28 @@ object NewUnits {
 }
 ```
 
-Notice that there are no constraints or requrements associated with the unit types `Scoville`, `Furlong`, etc.
+Notice that there are no constraints or requirements associated with the unit types `Scoville`, `Furlong`, etc.
 These may simply be declared, as shown above, however they _may also be pre-existing types_.
 In other words, you may define any type, pre-existing or otherwise, to be a `coulomb` unit by declaring the
 appropriate implicit value.
+
+Newer versions of coulomb allow Base Units to be implicitly inferred for any type,
+even if no BaseUnit object has been specifically declared, by importing the `undeclaredBaseUnits` policy:
+
+```scala
+scala> import coulomb.policy.undeclaredBaseUnits._
+import coulomb.policy.undeclaredBaseUnits._
+
+scala> case class Foo(goo: String)
+defined class Foo
+
+scala> (1.withUnit[Foo] + 1.withUnit[Kilo %* Foo]).show
+res1: String = 1001 Foo
+
+scala> (10.withUnit[Seq[Int]] / 5.withUnit[Second]).show
+res2: String = 2 Seq[Int]/s
+```
+
 
 #### Unitless Quantities
 
