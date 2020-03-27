@@ -21,7 +21,7 @@ import scala.util.{ Try, Success, Failure }
 import _root_.pureconfig.{ConfigConvert, ConfigCursor}
 import _root_.pureconfig.error.{CannotConvert, ConfigReaderFailures, ConvertFailure}
 import com.typesafe.config.ConfigValue
-import scala.reflect.runtime.universe.{WeakTypeTag, TypeTag}
+import scala.reflect.runtime.universe.WeakTypeTag
 
 import coulomb.unitops.UnitString
 import coulomb.parser.unitops.UnitTypeString
@@ -40,8 +40,8 @@ package object pureconfig {
 
   /** implicit materializer for saving and loading coulomb Quantity fields */
   implicit def coulombQuantityConfigConvert[N, U](implicit
-    ntt: TypeTag[N],
-    qtt: TypeTag[Quantity[N, U]],
+    ntt: WeakTypeTag[N],
+    qtt: WeakTypeTag[Quantity[N, U]],
     ustr: UnitString[U],
     uts: UnitTypeString[U],
     qp: QuantityParser,

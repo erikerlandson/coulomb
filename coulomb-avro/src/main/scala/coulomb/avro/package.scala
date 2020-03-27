@@ -18,8 +18,6 @@ package coulomb
 
 import scala.language.implicitConversions
 
-import scala.reflect.runtime.universe.TypeTag
-
 import org.apache.avro.generic.GenericData
 import org.apache.avro.Schema
 

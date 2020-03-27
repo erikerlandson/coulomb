@@ -33,10 +33,10 @@ object unitops {
     implicit def evidenceUnitless: UnitTypeString[Unitless] =
       new UnitTypeString[Unitless] { val expr = "coulomb.Unitless" }
 
-    implicit def evidenceBase[U](implicit utt: TypeTag[U], bu: BaseUnit[U]): UnitTypeString[U] =
+    implicit def evidenceBase[U](implicit utt: WeakTypeTag[U], bu: BaseUnit[U]): UnitTypeString[U] =
       new UnitTypeString[U] { val expr = utt.tpe.typeSymbol.fullName }
 
-    implicit def evidenceDerived[U](implicit utt: TypeTag[U], du: DerivedUnit[U, _]): UnitTypeString[U] =
+    implicit def evidenceDerived[U](implicit utt: WeakTypeTag[U], du: DerivedUnit[U, _]): UnitTypeString[U] =
       new UnitTypeString[U] { val expr = utt.tpe.typeSymbol.fullName }
 
     implicit def evidenceMul[L, R](implicit udfL: UnitTypeString[L], udfR: UnitTypeString[R]): UnitTypeString[%*[L, R]] =
@@ -119,14 +119,14 @@ object infra {
 
   case class UnitDefCode[U](name: String, tpeFull: String)
   object UnitDefCode {
-    implicit def evidenceBase[U](implicit utt: TypeTag[U], bu: BaseUnit[U]): UnitDefCode[U] = {
+    implicit def evidenceBase[U](implicit utt: WeakTypeTag[U], bu: BaseUnit[U]): UnitDefCode[U] = {
       val tpeFull = utt.tpe.typeSymbol.fullName
       UnitDefCode[U](
         bu.name,
         tpeFull.toString)
     }
 
-    implicit def evidenceDerived[U](implicit utt: TypeTag[U], du: DerivedUnit[U, _]): UnitDefCode[U] = {
+    implicit def evidenceDerived[U](implicit utt: WeakTypeTag[U], du: DerivedUnit[U, _]): UnitDefCode[U] = {
       val tpeFull = utt.tpe.typeSymbol.fullName
       UnitDefCode[U](
         du.name,
