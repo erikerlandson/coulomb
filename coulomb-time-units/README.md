@@ -1,12 +1,12 @@
 # Time Units, EpochTime and java.time
 
-To learn more about coulomb in general see:
-https://github.com/erikerlandson/coulomb#tutorial
+To learn more about coulomb in general refer to the
+[coulomb tutorial](../README.md#tutorial)
 
 ### How to include in your project
 
-For more information on available coulomb packages, see:
-https://github.com/erikerlandson/coulomb#how-to-include-coulomb-in-your-project
+For more information on available coulomb packages, see this
+[guide](../README.md#how-to-include-coulomb-in-your-project)
 
 The coulomb libraries include most dependencies `%Provided` to allow maximum flexibility
 of binary compatible dependency versions:
