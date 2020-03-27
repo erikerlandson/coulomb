@@ -70,16 +70,6 @@ libraryDependencies ++= Seq(
 )
 ```
 
-The package `coulomb-avro` provides an integration of unit parsing with Avro schemas:
-```scala
-libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-avro" % "0.3.6",
-  "com.manyangled" %% "coulomb-parser" % "0.3.6",
-  "org.apache.avro" % "avro" % "1.9.1",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
-)
-```
-
 The package `coulomb-pureconfig` provides an integration with pureconfig configurations:
 
 https://github.com/erikerlandson/coulomb/tree/develop/coulomb-pureconfig
