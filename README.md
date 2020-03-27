@@ -506,7 +506,7 @@ In coulomb, both time and temperature units can serve as units in Quantity value
 but they can also serve as measures against an absolute offset.
 
 In the case of temperature units, the `Temperature` type represents absolute temperature values, with respect to absolute zero.
-The type `EpochTime` represents absolute date/time moments, based on the unix Epoch: midnight, 1970.
+The type `EpochTime` represents absolute date/time moments, based on the unix epoch: midnight of Jan 1, 1970.
 
 These "absolute" types obey somewhat different laws than Quantity:
 ```
