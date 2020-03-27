@@ -27,9 +27,9 @@ The `coulomb` package `coulomb-parser` provides a utility for parsing a quantity
 correctly typed `Quantity` values, called `QuantityParser`.
 The following coulomb packages make use of QuantityParser:
 
-* [coulomb-avro](../coulomb-avro/README.md)
-* [coulomb-pureconfig](../coulomb-pureconfig/README.md)
-* [coulomb-typesafe-config](../coulomb-typesafe-config/README.md)
+* [coulomb-avro](../coulomb-avro/)
+* [coulomb-pureconfig](../coulomb-pureconfig/)
+* [coulomb-typesafe-config](../coulomb-typesafe-config/)
 
 ### Examples
 A `QuantityParser` is instantiated with a list of types that it will recognize.
