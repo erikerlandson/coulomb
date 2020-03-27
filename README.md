@@ -207,8 +207,23 @@ val raw: Int = memory.value              // memory's raw integer value
 ```
 
 Standard Scala types `Float`, `Double`, `Int` and `Long` are supported, as well as
-any other numeric type `N` for which the `spire` implicit `Numeric[N]` is defined,
+any other numeric type `N` for which `spire` algebra typeclasses are defined,
 for example `BigDecimal` or `spire` `Rational`.
+Algebra typeclasses for standard value types may be imported via `import spire.std.any._`
+
+Operations on coulomb Quantity objects require only the typeclasses they need to operate.
+If you wish to work with operations that do not require algebras, then these typeclasses
+do not need to exist:
+
+```scala
+scala> import coulomb._, coulomb.si._
+
+scala> case class Foo(foo: String)  // no algebras are defined for this type
+defined class Foo
+
+scala> Foo("goo").withUnit[Meter].show  // 'show' requires no algebra typeclass
+res0: String = Foo(goo) m
+```
 
 #### String representations
 The `show` method can be used to obtain a human-readable string that represents a quantity's
