@@ -497,45 +497,7 @@ Link to typesafe, pureconfig and avro readmes here.
 
 #### Temperature Values
 
-In `coulomb` you can also work with [`Temperature` values](https://erikerlandson.github.io/coulomb/latest/api/coulomb/temp/index.html).
-A temperature object has a unit type like `Quantity`, but it is constrained to be a unit of temperature, for example
-Kelvin, Celsius or Fahrenheit.
-Another difference is that `Temperature` values convert between temperature units using the temperature scale offsets.
-They are not just quantities of temperature, but temperature values:
-```scala
-import coulomb._, coulomb.si._, coulomb.temp._
-
-scala> 212f.withTemperature[Fahrenheit].toUnit[Celsius].show
-res1: String = 100.0 °C
-
-scala> 0f.withTemperature[Celsius].toUnit[Fahrenheit].show
-res2: String = 32.0 °F
-```
-
-You can add or subtract a convertable temperature `Quantity` from a `Temperature`, and get a new `Temperature` value.
-Conversely, if you subtract one `Temperature` from another, you will get a `Quantity`.
-```scala
-// Add a quantity to a temperature to get a new temperature
-scala> val t1 = 50f.withTemperature[Fahrenheit] + 1f.withUnit[Celsius]
-t1: coulomb.temp.Temperature[Float,coulomb.temp.Fahrenheit] = Temperature(51.8)
-
-scala> t1.show
-res3: String = 51.8 °F
-
-// subtract a quantity from a temperature to get a new temperature
-scala> val t2 = 50f.withTemperature[Fahrenheit] - 1f.withUnit[Celsius]
-t2: coulomb.temp.Temperature[Float,coulomb.temp.Fahrenheit] = Temperature(48.2)
-
-scala> t2.toStrFull
-res4: String = 48.2 fahrenheit
-
-// subtract two temperatures to get a quantity
-scala> val q = t1 - t2
-q: coulomb.Quantity[Float,coulomb.temp.Fahrenheit] = Quantity(3.6)
-
-scala> q.show
-res5: String = 3.6 °F
-```
+Link to time and temperature readmes here.
 
 #### Working with Type Parameters and Type-Classes
 
