@@ -1,4 +1,4 @@
-# Integration with pureconfig
+# Integration with typesafe config
 
 To learn more about coulomb in general refer to the
 [coulomb tutorial](../README.md#tutorial)
