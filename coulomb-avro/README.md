@@ -88,7 +88,7 @@ scala> rec.getQuantity[Double, Giga %* Bit %/ Minute](qp)("bandwidth")
 res5: coulomb.Quantity[Double,coulomb.siprefix.Giga %* coulomb.info.Bit %/ coulomb.time.Minute] = Quantity(1000.0000000000001)
 ```
 
-// Like `putQuantity`, `getQuantity` will fail on incorrect units.
+Like `putQuantity`, `getQuantity` will fail on incorrect units.
 ```scala
 scala> rec.getQuantity[Double, Byte](qp)("latency")
 java.lang.Exception: unit metadata "second" incompatible with "coulomb.info.Byte"
