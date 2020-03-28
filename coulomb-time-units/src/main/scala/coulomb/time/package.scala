@@ -19,7 +19,8 @@ package coulomb
 import spire.math.Rational
 
 import coulomb.define._
-import coulomb.offset._
+import coulomb.offset.OffsetQuantity
+import coulomb.offset.define.OffsetUnit
 
 import coulomb.si.Second
 

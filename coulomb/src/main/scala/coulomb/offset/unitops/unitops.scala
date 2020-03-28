@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package coulomb.unitops
+package coulomb.offset.unitops
 
 import shapeless.{ ::, HNil }
 
@@ -23,6 +23,7 @@ import spire.algebra._
 
 import coulomb.infra._
 import coulomb.define._
+import coulomb.offset.define._
 
 /**
  * An implicit trait that supports compile-time offset unit subtraction

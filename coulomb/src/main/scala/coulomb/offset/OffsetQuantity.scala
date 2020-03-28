@@ -20,7 +20,8 @@ import scala.language.implicitConversions
 
 import coulomb._
 import coulomb.unitops._
-import coulomb.define.OffsetUnit
+import coulomb.offset.unitops._
+//import coulomb.offset.define.OffsetUnit
 
 /**
  * A quantity with a unit associated with an additional offset

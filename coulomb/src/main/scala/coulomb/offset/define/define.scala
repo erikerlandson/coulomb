@@ -14,11 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package coulomb.define
+package coulomb.offset.define
 
-import scala.reflect.runtime.universe._
+import scala.reflect.runtime.universe.WeakTypeTag
 
 import spire.math._
+
+import coulomb.define._
 
 /**
  * An offset unit extends derived unit, with an offset as well as a coefficient
