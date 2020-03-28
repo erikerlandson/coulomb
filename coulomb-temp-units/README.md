@@ -33,7 +33,7 @@ Kelvin, Celsius or Fahrenheit.
 Another difference is that `Temperature` values convert between temperature units using the temperature scale offsets.
 They are not just quantities of temperature, but temperature values:
 ```scala
-import coulomb._, coulomb.si._, coulomb.temp._, spire.std.any._
+scala> import coulomb._, coulomb.si._, coulomb.temp._, spire.std.any._
 
 scala> 212f.withTemperature[Fahrenheit].toUnit[Celsius].show
 res1: String = 100.0 °C
