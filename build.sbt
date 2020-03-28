@@ -14,7 +14,7 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %% "spire" % "0.17.0-M1" % Provided,
     "eu.timepit" %% "singleton-ops" % "0.4.3" % Provided,
-    "com.lihaoyi" %% "utest" % "0.7.2" % Test
+    "com.lihaoyi" %% "utest" % "0.7.4" % Test
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
