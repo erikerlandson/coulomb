@@ -7,7 +7,7 @@ resolvers += Resolver.url(
 
 resolvers += "jgit-repo" at "https://download.eclipse.org/jgit/maven"
 
-addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
+addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.6")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.3")
 
