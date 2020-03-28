@@ -20,8 +20,7 @@ libraryDependencies ++= Seq(
   "org.typelevel" %% "spire" % "0.17.0-M1",
   "eu.timepit" %% "singleton-ops" % "0.4.3",
   // coulomb time units, EpochTime, and java.time integrations
-  "com.manyangled" %% "coulomb-time-units" % "0.4.0",
-  "com.manyangled" %% "coulomb-offset" % "0.4.0"
+  "com.manyangled" %% "coulomb-time-units" % "0.4.0"
 )
 ```
 

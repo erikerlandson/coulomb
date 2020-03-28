@@ -63,7 +63,6 @@ libraryDependencies ++= Seq(
 
 In addition to core functionality and fundamental units, coulomb provides the following packages.
 
-* [coulomb-offset](coulomb-offset/) - unit quantities that include an absolute offset value
 * [coulomb-parser](coulomb-parser/) - parsing a DSL for unit expressions into typed unit Quantity
 * [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
 * [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
