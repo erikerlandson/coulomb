@@ -33,6 +33,7 @@ scala> import coulomb._, coulomb.si._, coulomb.time._, spire.std.any._
 import coulomb._
 import coulomb.si._
 import coulomb.time._
+import spire.std.any._
 
 // an EpochTime represents absolute time, in units since midnight 1970
 scala> val t1 = 61.withEpochTime[Second]
@@ -73,6 +74,8 @@ import coulomb.si._
 import coulomb.siprefix._
 import coulomb.time._
 import coulomb.javatime._
+import java.time._
+import spire.std.any._
 
 scala> val dur = Duration.ofSeconds(90, 0)
 dur: java.time.Duration = PT1M30S
@@ -111,11 +114,13 @@ res18: String = 0.8203833 min
 #### Integrating `coulomb` with `java.time.Instant`
 
 ```scala
-scala> import coulomb._, coulomb.si._, coulomb.time._, coulomb.javatime._
+scala> import coulomb._, coulomb.si._, coulomb.time._, coulomb.javatime._, java.time._, spire.std.any._
 import coulomb._
 import coulomb.si._
 import coulomb.time._
 import coulomb.javatime._
+import java.time._
+import spire.std.any._
 
 scala> val ins = Instant.parse("1969-07-20T00:00:00Z")
 ins: java.time.Instant = 1969-07-20T00:00:00Z
