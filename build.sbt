@@ -3,7 +3,7 @@
 
 def commonSettings = Seq(
   organization := "com.manyangled",
-  version := "0.4.0-SNAPSHOT",
+  version := "0.4.0-PR2",
   scalaVersion := "2.13.0",
   crossScalaVersions := Seq("2.13.0"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
@@ -36,16 +36,9 @@ lazy val coulomb_si_units = (project in file("coulomb-si-units"))
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
-lazy val coulomb_offset = (project in file ("coulomb-offset"))
-  .aggregate(coulomb)
-  .dependsOn(coulomb)
-  .settings(name := "coulomb-offset")
-  .settings(commonSettings :_*)
-  .settings(docDepSettings :_*)
-
 lazy val coulomb_temp_units = (project in file("coulomb-temp-units"))
-  .aggregate(coulomb, coulomb_offset, coulomb_si_units)
-  .dependsOn(coulomb, coulomb_offset, coulomb_si_units)
+  .aggregate(coulomb, coulomb_si_units)
+  .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-temp-units")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
@@ -65,8 +58,8 @@ lazy val coulomb_accepted_units = (project in file("coulomb-accepted-units"))
   .settings(docDepSettings :_*)
 
 lazy val coulomb_time_units = (project in file("coulomb-time-units"))
-  .aggregate(coulomb, coulomb_offset, coulomb_si_units)
-  .dependsOn(coulomb, coulomb_offset, coulomb_si_units)
+  .aggregate(coulomb, coulomb_si_units)
+  .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-time-units")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
@@ -134,8 +127,8 @@ lazy val coulomb_pureconfig = (project in file("coulomb-pureconfig"))
   .settings(libraryDependencies ++= coulombPureConfigDeps)
 
 lazy val coulomb_tests = (project in file("coulomb-tests"))
-  .aggregate(coulomb, coulomb_offset, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
-  .dependsOn(coulomb, coulomb_offset, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
+  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
   .settings(libraryDependencies ++= coulombAvroDeps)
@@ -144,8 +137,8 @@ lazy val coulomb_tests = (project in file("coulomb-tests"))
   .settings(libraryDependencies ++= coulombPureConfigDeps)
 
 lazy val coulomb_docs = (project in file("."))
-  .aggregate(coulomb, coulomb_offset, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
-  .dependsOn(coulomb, coulomb_offset, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
+  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig)
   .settings(name := "coulomb-docs")
   .settings(commonSettings :_*)
 
