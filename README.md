@@ -507,16 +507,18 @@ but they can also serve as measures against an absolute offset.
 
 In the case of temperature units, the `Temperature` type represents absolute temperature values, with respect to absolute zero.
 The type `EpochTime` represents absolute date/time moments, based on the unix epoch: midnight of Jan 1, 1970.
+EpochTime is similar to `java.time.Instant`, and can interoperate with it.
 
-These "absolute" types obey somewhat different laws than Quantity:
+Temperature and EpochTime are both specializations of `OffsetQuantity[N, U]`.
+These obey somewhat different laws than Quantity:
 ```
-Absolute + Quantity => Absolute  // Temperature[N, U] + Quantity[N2, U2] => Temperature[N, U]
-Absolute - Quantity => Absolute
-Absolute - Absolute => Quantity  // EpochTime[N, U] - EpochTime[N2, U2] => Quantity[N, U]
+OffsetQuantity - OffsetQuantity => Quantity  // e.g. EpochTime - EpochTime => Quantity
+OffsetQuantity + Quantity => OffsetQuantity  // e.g. Temperature + Quantity => Temperature
+OffsetQuantity - Quantity => OffsetQuantity
 ```
 
-Temperature units are documented with examples at [coulomb-temp-units](coulomb-temp-units/).
-Time unit examples are documented under [coulomb-time-units](coulomb-time-units/).
+* Temperature units are documented with examples at [coulomb-temp-units](coulomb-temp-units/)
+* Time unit examples are documented under [coulomb-time-units](coulomb-time-units/)
 
 #### Working with Type Parameters and Type-Classes
 
