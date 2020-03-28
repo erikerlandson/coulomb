@@ -29,7 +29,7 @@ libraryDependencies ++= Seq(
 #### Time Units and `EpochTime`
 
 ```scala
-scala> import coulomb._, coulomb.si._, coulomb.time._
+scala> import coulomb._, coulomb.si._, coulomb.time._, spire.std.any._
 import coulomb._
 import coulomb.si._
 import coulomb.time._
@@ -67,7 +67,7 @@ res9: Boolean = true
 #### Integrating `coulomb` with `java.time.Duration`
 
 ```scala
-scala> import coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.time._, coulomb.javatime._
+scala> import coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.time._, coulomb.javatime._, java.time._, spire.std.any._
 import coulomb._
 import coulomb.si._
 import coulomb.siprefix._
