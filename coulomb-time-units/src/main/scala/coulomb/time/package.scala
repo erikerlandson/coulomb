@@ -74,7 +74,7 @@ package time {
 }
 
 /** defines integrations between coulomb time units and java.time objects */
-object javatime {
+package object javatime {
   import java.time.{ Instant, Duration }
   import coulomb.unitops._
   import time.EpochTime
