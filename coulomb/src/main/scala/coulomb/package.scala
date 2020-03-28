@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -44,5 +44,14 @@ package object coulomb {
   implicit class CoulombExtendWithUnits[N](val v: N) extends AnyVal with Serializable {
     /** create a new unit Quantity of type U with the value of `this` */
     def withUnit[U]: Quantity[N, U] = new Quantity[N, U](v)
+  }
+}
+
+package coulomb.policy {
+  trait EnableUndeclaredBaseUnits
+
+  object undeclaredBaseUnits {
+    implicit object enableUndeclaredBaseUnits extends
+        EnableUndeclaredBaseUnits {}
   }
 }

@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import singleton.ops._
 import coulomb._
 import coulomb.define._
 
-private [coulomb] trait UnitStringAST
+trait UnitStringAST
 
-private [coulomb] object UnitStringAST {
+object UnitStringAST {
   case object Uni extends UnitStringAST
   case class Def(d: UnitDefinition) extends UnitStringAST
   case class Pre(p: UnitDefinition) extends UnitStringAST
@@ -88,11 +88,11 @@ private [coulomb] object UnitStringAST {
   }
 }
 
-private [coulomb] trait HasUnitStringAST[U] {
+trait HasUnitStringAST[U] {
   def ast: UnitStringAST
   override def toString = ast.toString
 }
-private [coulomb] object HasUnitStringAST {
+object HasUnitStringAST {
   import UnitStringAST._
 
   implicit def evidence0: HasUnitStringAST[Unitless] =
@@ -104,8 +104,8 @@ private [coulomb] object HasUnitStringAST {
   implicit def evidence2[U, D](implicit d: DerivedUnit[U, D], nu: D =:!= Unitless): HasUnitStringAST[U] =
     new HasUnitStringAST[U] { val ast = Def(d) }
 
-  implicit def evidence3[U](implicit d: BaseUnit[U]): HasUnitStringAST[U] =
-    new HasUnitStringAST[U] { val ast = Def(d) }
+  implicit def evidence3[U](implicit bu: GetBaseUnit[U]): HasUnitStringAST[U] =
+    new HasUnitStringAST[U] { val ast = Def(bu.bu) }
 
   implicit def evidence4[L, R](implicit l: HasUnitStringAST[L], r: HasUnitStringAST[R]): HasUnitStringAST[%*[L, R]] =
     new HasUnitStringAST[%*[L, R]] { val ast = Mul(l.ast, r.ast) }

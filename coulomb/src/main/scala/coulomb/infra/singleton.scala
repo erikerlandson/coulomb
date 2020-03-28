@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,84 +20,84 @@ import shapeless._
 import shapeless.syntax.singleton._
 import singleton.ops._
 
-private [coulomb] trait XIntValue[I] {
+trait XIntValue[I] {
   def value: Int
 }
-private [coulomb] object XIntValue {
+object XIntValue {
   implicit def evidence[I](implicit i: singleton.ops.Id[I]): XIntValue[I] =
     new XIntValue[I] {
       val value = i.value.asInstanceOf[Int]
     }
 }
 
-private [coulomb] trait XIntAdd[L, R] {
+trait XIntAdd[L, R] {
   type Out
 }
-private [coulomb] object XIntAdd {
+object XIntAdd {
   type Aux[L, R, O] = XIntAdd[L, R] { type Out = O }
   implicit def witness[L, R](implicit op: +[L, R]): Aux[L, R, op.Out] = new XIntAdd[L, R] { type Out = op.Out }
 }
 
-private [coulomb] trait XIntSub[L, R] {
+trait XIntSub[L, R] {
   type Out
 }
-private [coulomb] object XIntSub {
+object XIntSub {
   type Aux[L, R, O] = XIntSub[L, R] { type Out = O }
   implicit def witness[L, R](implicit op: -[L, R]): Aux[L, R, op.Out] = new XIntSub[L, R] { type Out = op.Out }
 }
 
-private [coulomb] trait XIntMul[L, R] {
+trait XIntMul[L, R] {
   type Out
 }
-private [coulomb] object XIntMul {
+object XIntMul {
   type Aux[L, R, O] = XIntMul[L, R] { type Out = O }
   implicit def witness[L, R](implicit op: *[L, R]): Aux[L, R, op.Out] = new XIntMul[L, R] { type Out = op.Out }
 }
 
-private [coulomb] trait XIntNeg[N] {
+trait XIntNeg[N] {
   type Out
 }
-private [coulomb] object XIntNeg {
+object XIntNeg {
   type Aux[N, O] = XIntNeg[N] { type Out = O }
   implicit def witness[N](implicit op: Negate[N]): Aux[N, op.Out] = new XIntNeg[N] { type Out = op.Out }
 }
 
-private [coulomb] trait XIntLT[L, R] {
+trait XIntLT[L, R] {
   type Out
 }
-private [coulomb] object XIntLT {
+object XIntLT {
   type Aux[L, R, O] = XIntLT[L, R] { type Out = O }
   implicit def witness[L, R](implicit op: <[L, R]): Aux[L, R, op.Out] = new XIntLT[L, R] { type Out = op.Out }
 }
 
-private [coulomb] trait XIntGT[L, R] {
+trait XIntGT[L, R] {
   type Out
 }
-private [coulomb] object XIntGT {
+object XIntGT {
   type Aux[L, R, O] = XIntGT[L, R] { type Out = O }
   implicit def witness[L, R](implicit op: >[L, R]): Aux[L, R, op.Out] = new XIntGT[L, R] { type Out = op.Out }
 }
 
-private [coulomb] trait XIntEQ[L, R] {
+trait XIntEQ[L, R] {
   type Out
 }
-private [coulomb] object XIntEQ {
+object XIntEQ {
   type Aux[L, R, O] = XIntEQ[L, R] { type Out = O }
   implicit def witness[L, R](implicit op: ==[L, R]): Aux[L, R, op.Out] = new XIntEQ[L, R] { type Out = op.Out }
 }
 
-private [coulomb] trait XIntNE[L, R] {
+trait XIntNE[L, R] {
   type Out
 }
-private [coulomb] object XIntNE {
+object XIntNE {
   type Aux[L, R, O] = XIntNE[L, R] { type Out = O }
   implicit def witness[L, R](implicit op: !=[L, R]): Aux[L, R, op.Out] = new XIntNE[L, R] { type Out = op.Out }
 }
 
-private [coulomb] trait XIntNon01[N] {
+trait XIntNon01[N] {
   type Out
 }
-private [coulomb] object XIntNon01 {
+object XIntNon01 {
   type Aux[N, O] = XIntNon01[N] { type Out = O }
   implicit def evidence[N, R0, R1](implicit ne0: XIntNE.Aux[N, 0, R0], ne1: XIntNE.Aux[N, 1, R1], a01: &&[R0, R1]): Aux[N, a01.Out] =
     new XIntNon01[N] { type Out = a01.Out }

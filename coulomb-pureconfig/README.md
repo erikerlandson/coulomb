@@ -1,12 +1,12 @@
 # Integration with pureconfig
 
-To learn more about coulomb in general see:
-https://github.com/erikerlandson/coulomb#tutorial
+To learn more about coulomb in general refer to the
+[coulomb tutorial](../README.md#tutorial)
 
 ### How to include in your project
 
-For more information on available coulomb packages, see:
-https://github.com/erikerlandson/coulomb#how-to-include-coulomb-in-your-project
+For more information on available coulomb packages, see this
+[guide](../README.md#how-to-include-coulomb-in-your-project)
 
 The coulomb libraries include most dependencies `%Provided` to allow maximum flexibility
 of binary compatible dependency versions:
@@ -16,12 +16,14 @@ resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
 libraryDependencies ++= Seq(
   // basic coulomb dependencies
-  "com.manyangled" %% "coulomb" % "0.3.6",
+  "com.manyangled" %% "coulomb" % "0.4.0",
   "org.typelevel" %% "spire" % "0.17.0-M1",
-  "eu.timepit" %% "singleton-ops" % "0.4.0",
+  "eu.timepit" %% "singleton-ops" % "0.4.3",
   // pureconfig integration:
-  "com.manyangled" %% "coulomb-pureconfig" % "0.3.5",
-  "com.github.pureconfig" %% "pureconfig" % "0.12.0"
+  "com.manyangled" %% "coulomb-pureconfig" % "0.4.0",
+  "com.manyangled" %% "coulomb-parser" % "0.4.0",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+  "com.github.pureconfig" %% "pureconfig" % "0.12.3"
 )
 ```
 

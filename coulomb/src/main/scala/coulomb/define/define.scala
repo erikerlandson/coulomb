@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ object BaseUnit {
    * @param name the full name of the unit, e.g. "meter"
    * @param abbv an abbreviation for the unit, e.g. "m"
    */
-  def apply[U](name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): BaseUnit[U] = {
+  def apply[U](name: String = "", abbv: String = "")(implicit ut: WeakTypeTag[U]): BaseUnit[U] = {
     val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
     val a = if (abbv != "") abbv else n.take(1)
     new BaseUnit[U](n, a)
@@ -89,7 +89,8 @@ object DerivedUnit {
    * @param name the full name of the unit, e.g. "liter"
    * @param abbv an abbreviation for the unit, e.g. "l"
    */
-  def apply[U, D](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): DerivedUnit[U, D] = {
+  def apply[U, D](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit
+      ut: WeakTypeTag[U]): DerivedUnit[U, D] = {
     require(coef > 0, "Unit coefficients must be strictly > 0")
     val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
     val a = if (abbv != "") abbv else n.take(1)
@@ -106,6 +107,7 @@ object PrefixUnit {
    * @param name the full name of the unit, e.g. "kilo"
    * @param abbv an abbreviation for the unit, e.g. "k"
    */
-  def apply[U](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit ut: TypeTag[U]): DerivedUnit[U, Unitless] =
+  def apply[U](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit
+      ut: WeakTypeTag[U]): DerivedUnit[U, Unitless] =
     DerivedUnit[U, Unitless](coef, name, abbv)
 }

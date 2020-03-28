@@ -1,5 +1,5 @@
 /*
-Copyright 2017-2019 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -55,10 +55,10 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
    * in the event of eiher a parsing error or failure to convert the unit expression into Quantity[N,U]
    */
   def apply[N, U](quantityExpr: String)(implicit
-      ntt: TypeTag[N],
+      ntt: WeakTypeTag[N],
       uts: UnitTypeString[U]): Try[Quantity[N, U]] = {
-    val tpeN = typeOf[N]
-    val cast = s".toUnit[${uts.expr}].toNumeric[$tpeN]"
+    val tpeN = weakTypeOf[N]
+    val cast = s".toUnit[${uts.expr}].toValue[$tpeN]"
     for {
       tok <- lex(quantityExpr)
       ast <- parse(tok).toTry

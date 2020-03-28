@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import shapeless.syntax.singleton._
 import singleton.ops._
 
 // assuming inputs (U, P) are already from some canonical sig; so a type U will never pre-exist in M
-private [coulomb] trait InsertSortedUnitSig[U, P, M] {
+trait InsertSortedUnitSig[U, P, M] {
   type Out
 }
-private [coulomb] object InsertSortedUnitSig {
+object InsertSortedUnitSig {
   type Aux[U, P, M, O] = InsertSortedUnitSig[U, P, M] { type Out = O }
 
   implicit def evidence0[U, P]: Aux[U, P, HNil, (U, P) :: HNil] =
@@ -38,12 +38,12 @@ private [coulomb] object InsertSortedUnitSig {
 
 }
 
-private [coulomb] trait SortUnitSigCall[M, N, D] {
+trait SortUnitSigCall[M, N, D] {
   type OutN
   type OutD
 }
 
-private [coulomb] object SortUnitSigCall {
+object SortUnitSigCall {
   type Aux[M, N, D, ON, OD] = SortUnitSigCall[M, N, D] { type OutN = ON; type OutD = OD }
 
   implicit def evidence0[N, D]: Aux[HNil, N, D, N, D] =
@@ -63,11 +63,11 @@ private [coulomb] object SortUnitSigCall {
     new SortUnitSigCall[(U, P) :: MT, N, D] { type OutN = NF; type OutD = DF }
 }
 
-private [coulomb] trait SortUnitSig[S] {
+trait SortUnitSig[S] {
   type OutN
   type OutD
 }
-private [coulomb] object SortUnitSig {
+object SortUnitSig {
   type Aux[S, ON, OD] = SortUnitSig[S] { type OutN = ON; type OutD = OD }
 
   implicit def evidence[S, ON, OD](implicit ssc: SortUnitSigCall.Aux[S, HNil, HNil, ON, OD]): Aux[S, ON, OD] =

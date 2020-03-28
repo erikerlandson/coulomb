@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import singleton.ops._
 
 import coulomb._
 
-private [coulomb] trait SigToUnit[S] {
+trait SigToUnit[S] {
   type Out
 }
-private [coulomb] object SigToUnit {
+object SigToUnit {
   type Aux[S, U] = SigToUnit[S] { type Out = U }
   implicit def evidence0: Aux[HNil, Unitless] = new SigToUnit[HNil] { type Out = Unitless }
 
@@ -45,10 +45,10 @@ private [coulomb] object SigToUnit {
     new SigToUnit[(U, P) :: ST] { type Out = %^[U, P] }
 }
 
-private [coulomb] trait ResTypeCase[NS, DS] {
+trait ResTypeCase[NS, DS] {
   type Out
 }
-private [coulomb] object ResTypeCase {
+object ResTypeCase {
   type Aux[NS, DS, O] = ResTypeCase[NS, DS] { type Out = O }
 
   implicit def evidence0: Aux[HNil, HNil, Unitless] =
@@ -73,10 +73,10 @@ private [coulomb] object ResTypeCase {
     new ResTypeCase[NS, DS] { type Out = %/[NU, DU] }
 }
 
-private [coulomb] trait ResType[S] {
+trait ResType[S] {
   type Out
 }
-private [coulomb] object ResType {
+object ResType {
   type Aux[S, O] = ResType[S] { type Out = O }
   implicit def evidence[S, NS, DS, RT](implicit
       ss: SortUnitSig.Aux[S, NS, DS],
@@ -84,10 +84,10 @@ private [coulomb] object ResType {
     new ResType[S] { type Out = RT }
 }
 
-private [coulomb] trait MulResultType[LU, RU] {
+trait MulResultType[LU, RU] {
   type Out
 }
-private [coulomb] object MulResultType {
+object MulResultType {
   type Aux[LU, RU, O] = MulResultType[LU, RU] { type Out = O }
 
   implicit def result[LU, RU, OL, OR, OU, RT](implicit
@@ -98,10 +98,10 @@ private [coulomb] object MulResultType {
     new MulResultType[LU, RU] { type Out = RT }
 }
 
-private [coulomb] trait DivResultType[LU, RU] {
+trait DivResultType[LU, RU] {
   type Out
 }
-private [coulomb] object DivResultType {
+object DivResultType {
   type Aux[LU, RU, O] = DivResultType[LU, RU] { type Out = O }
 
   implicit def result[LU, RU, OL, OR, OU, RT](implicit
@@ -112,10 +112,10 @@ private [coulomb] object DivResultType {
     new DivResultType[LU, RU] { type Out = RT }
 }
 
-private [coulomb] trait PowResultType[U, P] {
+trait PowResultType[U, P] {
   type Out
 }
-private [coulomb] object PowResultType {
+object PowResultType {
   type Aux[U, P, O] = PowResultType[U, P] { type Out = O }
   implicit def evidence[U, P, SS, AP, RT](implicit
       ss: StandardSig.Aux[U, SS],

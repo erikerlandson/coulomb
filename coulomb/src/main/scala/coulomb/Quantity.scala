@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import unitops._
 
 /**
  * A numeric quantity with an associated unit
- * @tparam N The numeric type (Double, Int, etc)
+ * @tparam N The value type (Double, Int, etc)
  * @tparam U The unit type (Second, Byte, Byte %/ Second, etc)
  * @param value the raw (unitless) value stored by this quantity
  */
@@ -45,124 +45,124 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
   def showUnitFull(implicit ustr: UnitString[U]): String = ustr.full
 
   /** Obtain a quantity with the same unit but negated numeric value */
-  def unary_-() (implicit n: Numeric[N]): Quantity[N, U] =
-    new Quantity[N, U](n.negate(value))
+  def unary_-() (implicit n: UnitNeg[N]): Quantity[N, U] =
+    new Quantity[N, U](n.vneg(value))
 
   /**
    * Compute the sum of two quantities
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity in the sum.
    * @return this+rhs, expressed in units (N,U).
    */
-  def +[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N, U] =
-    new Quantity[N, U](uc.n1.plus(value, uc.cv21(rhs.value)))
+  def +[N2, U2](rhs: Quantity[N2, U2])(implicit ua: UnitAdd[N, U, N2, U2]): Quantity[N, U] =
+    new Quantity[N, U](ua.vadd(value, rhs.value))
 
   /**
    * Compute the difference of two quantities
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity in the difference.
    * @return this-rhs, expressed in units (N,U).
    */
-  def -[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N, U] =
-    new Quantity[N, U](uc.n1.minus(value, uc.cv21(rhs.value)))
+  def -[N2, U2](rhs: Quantity[N2, U2])(implicit us: UnitSub[N, U, N2, U2]): Quantity[N, U] =
+    new Quantity[N, U](us.vsub(value, rhs.value))
 
   /**
    * Compute the product of two quantities
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity.
    * @param rhs the right hand quantity in the product.
-   * @return this*rhs, with numeric type N and unit type U*U2.
+   * @return this*rhs, with value type N and unit type U*U2.
    */
-  def *[N2, U2](rhs: Quantity[N2, U2])(implicit um: UnitMultiply[N, U, N2, U2]): Quantity[N, um.RT12] =
-    new Quantity[N, um.RT12](um.n1.times(value, um.cn21(rhs.value)))
+  def *[N2, U2](rhs: Quantity[N2, U2])(implicit um: UnitMul[N, U, N2, U2]): Quantity[N, um.RT] =
+    new Quantity[N, um.RT](um.vmul(value, rhs.value))
 
   /**
    * Divide this quantity by another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity.
    * @param rhs the right hand quantity.
-   * @return this/rhs, with numeric type N and unit type U/U2.
+   * @return this/rhs, with value type N and unit type U/U2.
    */
-  def /[N2, U2](rhs: Quantity[N2, U2])(implicit ud: UnitDivide[N, U, N2, U2]): Quantity[N, ud.RT12] =
-    new Quantity[N, ud.RT12](ud.n1.div(value, ud.cn21(rhs.value)))
+  def /[N2, U2](rhs: Quantity[N2, U2])(implicit ud: UnitDiv[N, U, N2, U2]): Quantity[N, ud.RT] =
+    new Quantity[N, ud.RT](ud.vdiv(value, rhs.value))
 
   /**
    * Raise this quantity to an integer power
    * @tparam P the literal type representing the integer exponent
    * @return this quantity raised to power P, with unit type U^P
    */
-  def pow[P](implicit up: UnitPower[N, U, P]): Quantity[N, up.PowRT] =
-    new Quantity[N, up.PowRT](up.n.pow(value, up.p))
+  def pow[P](implicit up: UnitPow[N, U, P]): Quantity[N, up.RT] =
+    new Quantity[N, up.RT](up.vpow(value))
 
   /**
    * Test if two quantities are equal
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
    * @return true if rhs is equal to this quantity (after conversion to types N,U), false otherwise
    */
-  def ===[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) == 0
+  def ===[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitOrd[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) == 0
 
   /**
    * Test if two quantities are not equal
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
    * @return true if rhs is not equal to this quantity (after conversion to types N,U), false otherwise
    */
-  def =!=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) != 0
+  def =!=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitOrd[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) != 0
 
   /**
    * Test if this quantity is less than another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
    * @return true if this quantity is less than the right quantity (after conversion to types N,U), false otherwise
    */
-  def <[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) < 0
+  def <[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitOrd[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) < 0
 
   /**
    * Test if this quantity is less than or equal to another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
    * @return true if this quantity is less than or equal to the right quantity (after conversion to types N,U), false otherwise
    */
-  def <=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) <= 0
+  def <=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitOrd[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) <= 0
 
   /**
    * Test if this quantity is greater than another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
    * @return true if this quantity is greater than the right quantity (after conversion to types N,U), false otherwise
    */
-  def >[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) > 0
+  def >[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitOrd[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) > 0
 
   /**
    * Test if this quantity is greater than or equal to another
-   * @tparam N2 the numeric type of the rhs quantity
+   * @tparam N2 the value type of the rhs quantity
    * @tparam U2 the unit type of the rhs quantity. Must be convertable to U, or a compile-time type
    * error will result.
    * @param rhs the right hand quantity.
    * @return true if this quantity is greater than or equal to the right quantity (after conversion to types N,U), false otherwise
    */
-  def >=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitConverter[N, U, N2, U2]): Boolean =
-    uc.n1.compare(value, uc.cv21(rhs.value)) >= 0
+  def >=[N2, U2](rhs: Quantity[N2, U2])(implicit uc: UnitOrd[N, U, N2, U2]): Boolean =
+    uc.vcmp(value, rhs.value) >= 0
 
   /**
    * Obtain a quantity that is equivalent to this but with different compatible units
@@ -171,30 +171,30 @@ class Quantity[N, U](val value: N) extends AnyVal with Serializable {
    * @return a quantity equivalent to this, but with units U2
    */
   def toUnit[U2](implicit uc: UnitConverter[N, U, N, U2]): Quantity[N, U2] =
-    new Quantity[N, U2](uc.cv12(value))
+    new Quantity[N, U2](uc.vcnv(value))
 
   /**
-   * Obtain a quantity equivalent to this but with a different numeric type
-   * @tparam N2 the numeric type to convert to.
-   * @return a quantity equivalent to this but with numeric type N2 and units U
+   * Obtain a quantity equivalent to this but with a different value type
+   * @tparam N2 the value type to convert to.
+   * @return a quantity equivalent to this but with value type N2 and units U
    */
-  def toNumeric[N2](implicit uc: UnitConverter[N, U, N2, U]): Quantity[N2, U] =
-    new Quantity[N2, U](uc.cv12(value))
+  def toValue[N2](implicit uc: UnitConverter[N, U, N2, U]): Quantity[N2, U] =
+    new Quantity[N2, U](uc.vcnv(value))
 
   /**
-   * Equivalent to this.toUnit[U2].toNumeric[N2]
-   * @tparam N2 the numeric type to convert to.
+   * Equivalent to this.toUnit[U2].toValue[N2]
+   * @tparam N2 the value type to convert to.
    * @tparam U2 the new units to convert to.  Must be convertable to U, or a compile-time type
    * error will result.
-   * @return a quantity equivalent to this but with numeric type N2 and units U2
+   * @return a quantity equivalent to this but with value type N2 and units U2
    */
   def to[N2, U2](implicit uc: UnitConverter[N, U, N2, U2]): Quantity[N2, U2] =
-    new Quantity[N2, U2](uc.cv12(value))
+    new Quantity[N2, U2](uc.vcnv(value))
 }
 
 /** static methods for quantities with units */
 object Quantity {
-  /** Create a new quantity with numeric type N and unit type U */
+  /** Create a new quantity with value type N and unit type U */
   def apply[N, U](v: N) = new Quantity[N, U](v)
 
   /** Obtain the coefficient of conversion from unit U1 to U2. U1 and U2 must be
@@ -209,5 +209,5 @@ object Quantity {
 
   implicit def implicitlyConvertQuantity[N1, U1, N2, U2](q1: Quantity[N1, U1])(implicit
       uc: UnitConverter[N1, U1, N2, U2]): Quantity[N2, U2] =
-    new Quantity[N2, U2](uc.cv12(q1.value))
+    new Quantity[N2, U2](uc.vcnv(q1.value))
 }

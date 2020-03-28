@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ limitations under the License.
 package coulomb
 
 import scala.language.implicitConversions
-
-import scala.reflect.runtime.universe.TypeTag
 
 import org.apache.avro.generic.GenericData
 import org.apache.avro.Schema

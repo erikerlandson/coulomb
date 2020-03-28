@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package coulomb.typesafeconfig
 import scala.language.implicitConversions
 import scala.util.Try
 
-import scala.reflect.runtime.universe.TypeTag
+import scala.reflect.runtime.universe.WeakTypeTag
 
 import com.typesafe.config.Config
 
@@ -53,7 +53,7 @@ case class CoulombConfig(conf: Config, qp: QuantityParser) {
    * @param key the Config key to look up
    * @return a Quantity[N, U] parsed from value at the key, wrapped in a Try
    */
-  def getQuantity[N :TypeTag, U :UnitTypeString](key: String) = {
+  def getQuantity[N :WeakTypeTag, U :UnitTypeString](key: String) = {
     for {
       raw <- Try { conf.getString(key) }
       qv <- qp[N, U](raw)

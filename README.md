@@ -38,9 +38,9 @@ package is also a dependency, but is included transitively via `spire`.
 resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb" % "0.3.6",
+  "com.manyangled" %% "coulomb" % "0.4.0",
   "org.typelevel" %% "spire" % "0.17.0-M1",
-  "eu.timepit" %% "singleton-ops" % "0.4.0"
+  "eu.timepit" %% "singleton-ops" % "0.4.3"
 )
 ```
 
@@ -49,50 +49,24 @@ separate sub-packages.
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-si-units" % "0.3.6",        // The seven SI units: meter, second, kilogram, etc
-  "com.manyangled" %% "coulomb-accepted-units" % "0.3.6",  // Common non-SI metric: liter, centimeter, gram, etc
-  "com.manyangled" %% "coulomb-time-units" % "0.3.6",      // minute, hour, day, week
-  "com.manyangled" %% "coulomb-info-units" % "0.3.6",      // bit, byte, nat
-  "com.manyangled" %% "coulomb-mks-units" % "0.3.6",       // MKS units: Joule, Newton, Watt, Volt, etc
-  "com.manyangled" %% "coulomb-customary-units" % "0.3.6", // non-metric units: foot, mile, pound, gallon, pint, etc
-  "com.manyangled" %% "coulomb-temp-units" % "0.3.6"       // Celsius and Fahrenheit temperature scales
+  "com.manyangled" %% "coulomb-si-units" % "0.4.0",        // The seven SI units: meter, second, kilogram, etc
+  "com.manyangled" %% "coulomb-accepted-units" % "0.4.0",  // Common non-SI metric: liter, centimeter, gram, etc
+  "com.manyangled" %% "coulomb-time-units" % "0.4.0",      // minute, hour, day, week
+  "com.manyangled" %% "coulomb-info-units" % "0.4.0",      // bit, byte, nat
+  "com.manyangled" %% "coulomb-mks-units" % "0.4.0",       // MKS units: Joule, Newton, Watt, Volt, etc
+  "com.manyangled" %% "coulomb-customary-units" % "0.4.0", // non-metric units: foot, mile, pound, gallon, pint, etc
+  "com.manyangled" %% "coulomb-temp-units" % "0.4.0"       // Celsius and Fahrenheit temperature scales
 )
 ```
 
-This project also provides a parsing facility, `QuantityParser`, that can parse a
-unit expression language into properly typed `Quantity` objects. This tool can be
-used for extending standard configuration systems with type-safe unit quantities.
+#### Other coulomb packages
 
-```scala
-libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-parser" % "0.3.6",                    // QuantityParser
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"   // %Provided parser dependency
-)
-```
+In addition to core functionality and fundamental units, coulomb provides the following packages.
 
-The package `coulomb-typesafe-config` provides an integration of unit parsing with the Typesafe Config.
-```scala
-libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-typesafe-config" % "0.3.6"
-  "com.manyangled" %% "coulomb-parser" % "0.3.6",
-  "com.typesafe" % "config" % "1.3.4",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
-)
-```
-
-The package `coulomb-avro` provides an integration of unit parsing with Avro schemas:
-```scala
-libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-avro" % "0.3.6",
-  "com.manyangled" %% "coulomb-parser" % "0.3.6",
-  "org.apache.avro" % "avro" % "1.9.1",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
-)
-```
-
-The package `coulomb-pureconfig` provides an integration with pureconfig configurations:
-
-https://github.com/erikerlandson/coulomb/tree/develop/coulomb-pureconfig
+* [coulomb-parser](coulomb-parser/) - parsing a DSL for unit expressions into typed unit Quantity
+* [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
+* [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
+* [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
 
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
@@ -116,24 +90,34 @@ Any violations of this code of conduct should be reported to [the author](https:
 * [Unitless Quantities](#unitless-quantities)
 * [Unit Prefixes](#unit-prefixes)
 * [Using `WithUnit`](#using-withunit)
-* [Quantity Parsing](#quantity-parsing)
 * [Type Safe Configurations](#type-safe-configurations)
-* [Temperature Values](#temperature-values)
-* [Type Parameter Integrations](#type-parameter-integrations)
+* [Absolute Temperature and Time Values](#absolute-temperature-and-time-values)
+* [Working with Type Parameters and Type-Classes](#working-with-type-parameters-and-type-classes)
+* [Compute Model for Quantity Operations](#compute-model-for-quantity-operations)
+* [Unit Conversions for Custom Value Types](#unit-conversions-for-custom-value-types)
 
 #### Running Tutorial Examples
 
 Except where otherwise noted, the following tutorial examples can be run in a scala REPL as follows:
-```
+```bash
 % cd /path/to/scala
 % sbt coulomb_tests/console
-
+```
+```scala
 scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.mks._, coulomb.time._, coulomb.info._, coulomb.binprefix._, coulomb.accepted._, coulomb.us._, coulomb.temp._, coulomb.define._, coulomb.parser._
+```
+
+Examples making use of numeric quantity operations depend on corresponding typeclasses for numeric algebras.
+Alebras for the common scala and spire numeric types can be obtained this way:
+
+```scala
+scala> import spire.std.any._     // import algebras for common numeric types
+scala> import spire.std.double._  // import algebras for Double
 ```
 
 #### Features
 
-The `coulomb` provides the following features:
+The `coulomb` libraries provide the following features:
 
 Allow a programmer to associate unit analysis with values, in the form of static types
 ```scala
@@ -175,8 +159,9 @@ implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](9.
 `coulomb` defines the
 [class `Quantity`](https://erikerlandson.github.io/coulomb/latest/api/coulomb/Quantity.html)
 for representing values with associated units.
-Quantities are represented by their two type parameters: A numeric representation parameter `N`
-(e.g. Int or Double) and a unit type `U` which represents the unit associated with the value.
+Quantities are represented by their two type parameters: A value type `N`
+(typically a numeric type such as Int or Double)
+and a unit type `U` which represents the unit associated with the value.
 Here are some simple declarations of `Quantity` objects:
 ```scala
 import coulomb._
@@ -216,8 +201,23 @@ val raw: Int = memory.value              // memory's raw integer value
 ```
 
 Standard Scala types `Float`, `Double`, `Int` and `Long` are supported, as well as
-any other numeric type `N` for which the `spire` implicit `Numeric[N]` is defined,
+any other numeric type `N` for which `spire` algebra typeclasses are defined,
 for example `BigDecimal` or `spire` `Rational`.
+Algebra typeclasses for standard value types may be imported via `import spire.std.any._`
+
+Operations on coulomb Quantity objects require only the typeclasses they need to operate.
+If you wish to work with operations that do not require algebras, then these typeclasses
+do not need to exist:
+
+```scala
+scala> import coulomb._, coulomb.si._
+
+scala> case class Foo(foo: String)  // no algebras are defined for this type
+defined class Foo
+
+scala> Foo("goo").withUnit[Meter].show  // 'show' requires no algebra typeclass
+res0: String = Foo(goo) m
+```
 
 #### String representations
 The `show` method can be used to obtain a human-readable string that represents a quantity's
@@ -386,13 +386,36 @@ object NewUnits {
   // Define an abbreviation "g"
   trait EarthGravity
   implicit val defineUnitEG = DerivedUnit[EarthGravity, Meter %/ (Second %^ 2)](coef = 9.807, abbv = "g")
+
+  // The maximum ping time to the moon
+  // https://twitter.com/cmuratori/status/1219847348433481729
+  trait MoonUnit
+  implicit val defineUnitMoonUnit = DerivedUnit[MoonUnit, Second](coef = 2.71321035034, abbv = "moo")
 }
 ```
 
-Notice that there are no constraints or requrements associated with the unit types `Scoville`, `Furlong`, etc.
+Notice that there are no constraints or requirements associated with the unit types `Scoville`, `Furlong`, etc.
 These may simply be declared, as shown above, however they _may also be pre-existing types_.
 In other words, you may define any type, pre-existing or otherwise, to be a `coulomb` unit by declaring the
 appropriate implicit value.
+
+Newer versions of coulomb allow Base Units to be implicitly inferred for any type,
+even if no BaseUnit object has been specifically declared, by importing the `undeclaredBaseUnits` policy:
+
+```scala
+scala> import coulomb.policy.undeclaredBaseUnits._
+import coulomb.policy.undeclaredBaseUnits._
+
+scala> case class Foo(goo: String)
+defined class Foo
+
+scala> (1.withUnit[Foo] + 1.withUnit[Kilo %* Foo]).show
+res1: String = 1001 Foo
+
+scala> (10.withUnit[Seq[Int]] / 5.withUnit[Second]).show
+res2: String = 2 Seq[Int]/s
+```
+
 
 #### Unitless Quantities
 
@@ -468,153 +491,44 @@ def f2(duration: Float WithUnit Second) = duration + 1f.withUnit[Minute]
 
 There is a similar `WithTemperature` alias for working with `Temperature` values.
 
-#### Quantity Parsing
-The `coulomb` package `coulomb-parser` provides a utility for parsing a quantity expression DSL into
-correctly typed `Quantity` values, called `QuantityParser`.
-A `QuantityParser` is instantiated with a list of types that it will recognize.
-This example shows a quantity parser that can recognize values in bytes, seconds,
-and the two prefixes mega and giga:
-```scala
-scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.info._, coulomb.time._, coulomb.parser._
-
-scala> val qp = QuantityParser[Byte :: Second :: Giga :: Mega :: HNil]
-qp: coulomb.parser.QuantityParser = coulomb.parser.QuantityParser@43356dd9
-```
-
-Parsing an expression requires an expected numeric and unit type.
-Here we see a quantity given in seconds, successfully being parsed and converted to minutes:
-```scala
-scala> qp[Double, Minute]("60 second")
-res1: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] = Success(Quantity(1.0))
-```
-
-A quantity parser recognizes and understands how to interpret prefix units, as well as
-compound unit expressions:
-```scala
-scala> qp[Double, Mega %* Byte %/ Second]("1.0 gigabyte/second").get.show
-res2: String = 1000.0 MB/s
-```
-
-The quantity parser in this example was not created to recognize minutes inside the DSL, and so
-the following parse will fail.
-```scala
-scala> qp[Double, Minute]("60 minute")
-res3: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] = Failure(coulomb.parser.QPLexingException: ')' expected but 'm' found)
-```
-
-As usual, incompatible units will also cause a parsing error:
-```scala
-scala> qp[Double, Minute]("60 byte")
-res4: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] =
-Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed ...
-```
-
 #### Type Safe Configurations
-As an example of `coulomb` applied to unit type safety for application configuration
-settings, the following demonstrates the `coulomb.typesafeconfig` integration of the
-[Typesafe `config` package](https://github.com/lightbend/config)
-with `coulomb` unit analysis, using `QuantityParser`.
 
-To see this in action, build the examples and load the demo into a REPL:
+One of the significant use cases for coulomb is adding unit type awareness to software configurations "at the edge."
+The coulomb libraries include some integrations with popular configuration libraries:
 
-```scala
-% cd /path/to/coulomb
-% xsbt coulomb_tests/test:console
-Welcome to Scala 2.13.0-M5 (OpenJDK 64-Bit Server VM, Java 1.8.0_201).
+* [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
+* [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
+* [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
 
-scala>
+#### Absolute Temperature and Time Values
 
+In coulomb, both time and temperature units can serve as units in Quantity values,
+but they can also serve as measures against an absolute offset.
+
+In the case of temperature units, the `Temperature` type represents absolute temperature values, with respect to absolute zero.
+The type `EpochTime` represents absolute date/time moments, based on the unix epoch: midnight of Jan 1, 1970.
+EpochTime is similar to `java.time.Instant`, and can interoperate with it.
+
+Temperature and EpochTime are both specializations of `OffsetQuantity[N, U]`.
+These obey somewhat different laws than Quantity:
 ```
-First import a selection of `coulomb` units, and the demo objects:
-
-```scala
-scala> import shapeless._, coulomb._, coulomb.si._, coulomb.siprefix._, coulomb.info._, coulomb.time._, coulomb.parser._
-
-scala> import ConfigIntegration._, scala.collection.JavaConverters._
-```
-
-The demo pre-defines a simple configuration object:
-```scala
-scala> confTS.entrySet().asScala.map { e => s"${e.getKey()} = ${e.getValue()}" }.mkString("\n")
-res0: String =
-bandwidth = Quoted("10 megabyte / second")
-memory = Quoted("100 gigabyte")
-duration = Quoted("60 second")
+OffsetQuantity - OffsetQuantity => Quantity  // e.g. EpochTime - EpochTime => Quantity
+OffsetQuantity + Quantity => OffsetQuantity  // e.g. Temperature + Quantity => Temperature
+OffsetQuantity - Quantity => OffsetQuantity
 ```
 
-It also imports definitions from the `coulomb-typesafe-config` sub-package,
-which defines [CoulombConfig](https://erikerlandson.github.io/coulomb/latest/api/coulomb/typesafeconfig/CoulombConfig.html),
-and a new method `getQuantity`.
-This new getter method applies a `QuantityParser` like the one above to transform the configuration values into a
-`Quantity` expression:
-```scala
-scala> conf.getQuantity[Double, Minute]("duration").get.show
-res1: String = 1.0 min
+* Temperature units are documented with examples at [coulomb-temp-units](coulomb-temp-units/)
+* Time unit examples are documented under [coulomb-time-units](coulomb-time-units/)
 
-scala> conf.getQuantity[Int, Mega %* Byte]("memory").get.show
-res2: String = 100000 MB
-
-scala> conf.getQuantity[Float, Giga %* Bit %/ Second]("bandwidth").get.show
-res3: String = 0.08 Gb/s
-```
-
-If we ask for a unit type that is incompatible with the configuration, an error is returned:
-```scala
-scala> conf.getQuantity[Int, Giga %* Bit]("bandwidth")
-res4: scala.util.Try[coulomb.Quantity[Int,coulomb.siprefix.Giga %* coulomb.info.Bit]] =
-Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed...
-```
-
-#### Temperature Values
-
-In `coulomb` you can also work with [`Temperature` values](https://erikerlandson.github.io/coulomb/latest/api/coulomb/temp/index.html).
-A temperature object has a unit type like `Quantity`, but it is constrained to be a unit of temperature, for example
-Kelvin, Celsius or Fahrenheit.
-Another difference is that `Temperature` values convert between temperature units using the temperature scale offsets.
-They are not just quantities of temperature, but temperature values:
-```scala
-import coulomb._, coulomb.si._, coulomb.temp._
-
-scala> 212f.withTemperature[Fahrenheit].toUnit[Celsius].show
-res1: String = 100.0 °C
-
-scala> 0f.withTemperature[Celsius].toUnit[Fahrenheit].show
-res2: String = 32.0 °F
-```
-
-You can add or subtract a convertable temperature `Quantity` from a `Temperature`, and get a new `Temperature` value.
-Conversely, if you subtract one `Temperature` from another, you will get a `Quantity`.
-```scala
-// Add a quantity to a temperature to get a new temperature
-scala> val t1 = 50f.withTemperature[Fahrenheit] + 1f.withUnit[Celsius]
-t1: coulomb.temp.Temperature[Float,coulomb.temp.Fahrenheit] = Temperature(51.8)
-
-scala> t1.show
-res3: String = 51.8 °F
-
-// subtract a quantity from a temperature to get a new temperature
-scala> val t2 = 50f.withTemperature[Fahrenheit] - 1f.withUnit[Celsius]
-t2: coulomb.temp.Temperature[Float,coulomb.temp.Fahrenheit] = Temperature(48.2)
-
-scala> t2.toStrFull
-res4: String = 48.2 fahrenheit
-
-// subtract two temperatures to get a quantity
-scala> val q = t1 - t2
-q: coulomb.Quantity[Float,coulomb.temp.Fahrenheit] = Quantity(3.6)
-
-scala> q.show
-res5: String = 3.6 °F
-```
-
-#### Type Parameter Integrations
+#### Working with Type Parameters and Type-Classes
 
 Previous topics have focused on how to work with specific `Quantity` and unit expressions.
 However, suppose you wish to write your own "generic" functions or classes, where `Quantity` values
-have parameterized types? For these situations, `coulomb` provides a set of type-classes that
+have parameterized types? For these situations, `coulomb` provides a set of implicit type-classes that
 allow `Quantity` operations to be supported with type parameters.
+These typeclasses can be accessed via `import coulomb.unitops._`
 
-The `UnitString` type class supports unit names and abbreviations:
+The `UnitString` type-class supports unit names and abbreviations:
 ```scala
 scala> import coulomb.unitops._
 
@@ -624,40 +538,188 @@ uname: [N, U](q: coulomb.Quantity[N,U])(implicit us: coulomb.unitops.UnitString[
 scala> uname(3.withUnit[Meter %/ Second])
 res0: String = meter/second
 ```
+The various numeric operations are supported by a set of typeclasses, summarized in the following table.
 
-The `UnitConverter` type class supports unit (and numeric) conversions, in addition to
-subtraction, addition, and ordering predicates `<`, `>`, etc:
-```scala
-scala> def convert[N1, U1, N2, U2](q1: Quantity[N1, U1], q2: Quantity[N2, U2])(implicit
-    s1: UnitString[U1], s2: UnitString[U2],
-    uc: UnitConverter[N1, U1, N2, U2]) = {
-  val r1 = q1.to[N2, U2]
-  val r2 = q1 + q2
-  (r1.show, r2.show)
-}
+<table style="width:90%">
+<tr><th>operation</th><th>implicit class</th><th>algebra</th></tr>
+<tr><td> < <= > >= === =:= </td><td>UnitOrd[N1,U1,N2,U2]</td><td>Order[N1]</td></tr>
+<tr><td>+</td><td>UnitAdd[N1,U1,N2,U2]</td><td>AdditiveSemigroup[N1]</td></tr>
+<tr><td>-</td><td>UnitSub[N1,U1,N2,U2]</td><td>AdditiveGroup[N1]</td></tr>
+<tr><td>*</td><td>UnitMul[N1,U1,N2,U2]</td><td>MultiplicativeSemigroup[N1]</td></tr>
+<tr><td>/</td><td>UnitDiv[N1,U1,N2,U2]</td><td>MultiplicativeGroup[N1]</td></tr>
+<tr><td>pow</td><td>UnitPow[N, U, P]</td><td>MultiplicativeSemigroup[N]</td></tr>
+<tr><td>unary -</td><td>UnitNeg[N]</td><td>AdditiveGroup[N]</td></tr>
+</table>
 
-scala> convert(2f.withUnit[Mile], 1f.withUnit[Kilo %* Meter])
-res1: (String, String) = (3.218688 km,2.6213713 mi)
-```
+For common numeric types, the various algebras in the table above can be obtained via `import spire.std.any._`, or individually as in `import spire.std.double._`.
+The following code block shows an example of using typeclasses to support some numeric Quantity operations:
 
-The three typeclasses `UnitMultiply`, `UnitDivide` and `UnitPower` support quantity operations
-`*`, `/` and `pow`, respectively:
 ```scala
 scala> def operate[N1, U1, N2, U2](q1: Quantity[N1, U1], q2: Quantity[N2, U2])(implicit
-    mul: UnitMultiply[N1, U1, N2, U2],
-    div: UnitDivide[N1, U1, N2, U2],
-    pow: UnitPower[N1, U1, 3]) = {
-  val r1 = q1 * q2
-  val r2 = q1 / q2
+    add: UnitAdd[N1, U1, N2, U2],
+    mul: UnitMul[N1, U1, N2, U2],
+    pow: UnitPow[N1, U1, 3],
+    ord: UnitOrd[N1, U1, N2, U2]) = {
+  val r1 = q1 + q2
+  val r2 = q1 * q2
   val r3 = q1.pow[3]
-  (r1, r2, r3)
+  val r4 = q1 < q2
+  (r1, r2, r3, r4)
 }
 
-scala> val (q1, q2, q3) = operate(3f.withUnit[Meter], 3f.withUnit[Meter])
-q1: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(2)] = Quantity(9.0)
-q2: coulomb.Quantity[Float,coulomb.Unitless] = Quantity(1.0)
-q3: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(3)] = Quantity(27.0)
+scala> val (r1, r2, r3, r4) = operate(2f.withUnit[Meter], 3f.withUnit[Meter])
+r1: coulomb.Quantity[Float,coulomb.si.Meter] = Quantity(5.0)
+r2: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(2)] = Quantity(6.0)
+r3: coulomb.Quantity[Float,coulomb.si.Meter %^ Int(3)] = Quantity(8.0)
+r4: Boolean = true
 
-scala> List(q1.show, q2.show, q3.show)
-res3: List[String] = List(9.0 m^2, 1.0 unitless, 27.0 m^3)
+scala> List(r1.show, r2.show, r3.show, r4.toString)
+res1: List[String] = List(5.0 m, 6.0 m^2, 8.0 m^3, true)
+```
+
+The ability to convert between unit quantities is represented by the `UnitConverter` typeclass.
+This example illustrates the use of `UnitConverter`:
+
+```scala
+scala> def pints[U](beer: Quantity[Double, U])(implicit
+    cnv: UnitConverter[Double, U, Double, Pint]): Unit = {
+  val pintsOfBeer = beer.toUnit[Pint]
+  print(s"I have so much beer: ${pintsOfBeer.showFull}")
+}
+
+scala> pints(500D.withUnit[Milli %* Liter])
+I have so much beer: 1.0566882094325938 pint
+```
+
+The `UnitConverter` typeclass is also used by default typeclasses for `UnitAdd`, `UnitMul` and the other numeric operations above.
+This typeclass can be extended by adding [unit converter policies](#unit-conversions-for-custom-value-types).
+
+#### Compute Model for Quantity Operations
+
+Previous sections have disussed the various operations that can be performed on `Quantity` objects.
+As mentioned in the section on [unit operations](#unit-operations),
+the quantity result type of binary operations is governed by the left-hand-side of an exression:
+```scala
+scala> (1.withUnit[Foot] + 1.withUnit[Yard]).show
+res0: String = 4 ft
+```
+As described in the previous section on
+[operation typeclasses](#working-with-type-parameters-and-type-classes)
+the `UnitAdd` typeclass implements unit quantity addition.
+Here is the code for `UnitAdd`:
+```scala
+trait UnitAdd[N1, U1, N2, U2] {
+  def vadd(v1: N1, v2: N2): N1
+}
+object UnitAdd {
+  implicit def evidenceASG0[N1, U1, N2, U2](implicit
+      as1: AdditiveSemigroup[N1],
+      uc: UnitConverter[N2, U2, N1, U1]): UnitAdd[N1, U1, N2, U2] =
+    new UnitAdd[N1, U1, N2, U2] {
+      def vadd(v1: N1, v2: N2): N1 = as1.plus(v1, uc.vcnv(v2))
+    }
+}
+```
+As the above code suggests, all quantity operations by convention first convert the RHS value to the value and unit type of the left hand side,
+and then use the appropriate algebra (in this example `AdditiveSemigroup`) to perform that operation with respect to the LHS value and unit.
+Note that this means only the LHS value type requires this algebra to exist.
+
+The full set of Quantity operation typeclasses are defined in
+[unitops.scala](https://github.com/erikerlandson/coulomb/blob/develop/coulomb/src/main/scala/coulomb/unitops/unitops.scala).
+
+How do unit conversions operate?
+Here is the default implementation of `UnitConverter`:
+```scala
+trait UnitConverter[N1, U1, N2, U2] {
+  def vcnv(v: N1): N2
+}
+trait UnitConverterDefaultPriority {
+  implicit def witness[N1, U1, N2, U2](implicit
+      cu: ConvertableUnits[U1, U2],
+      cf1: ConvertableFrom[N1],
+      ct2: ConvertableTo[N2]): UnitConverter[N1, U1, N2, U2] =
+    new UnitConverter[N1, U1, N2, U2] {
+      def vcnv(v: N1): N2 = ct2.fromType[Rational](cf1.toType[Rational](v) * cu.coef)
+    }
+}
+```
+As the above code illustrates, a standard unit conversion proceeds by:
+1. Converting the input type to `Rational`
+1. Multiply by the unit conversion coefficient (also a Rational)
+1. Converting the result to the output type.
+
+Coulomb uses the `Rational` type as the intermediary because it can operate lossessly on integer values,
+and it can accommodate most numeric repesentations with zero or minimal loss.
+Note that any numeric precision loss in this process is most likely to occur during the final conversion to the LHS value type.
+
+The potential for precision loss is greatest when working with integer value types, and particuarly when the
+LHS unit is larger than the RHS unit, as in the second conversion below:
+
+```scala
+scala> ((100.withUnit[Meter]) + (1.withUnit[Kilo %* Meter])).show
+res0: String = 1100 m
+
+scala> ((1.withUnit[Kilo %* Meter]) + (100.withUnit[Meter])).show
+res1: String = 1 km
+```
+
+Some unit conversion specializations are applied.
+For example, in the case that both LHS and RHS units and value types are the same, the fast and lossless identity function is applied:
+```scala
+implicit def witnessIdentity[N, U]: UnitConverter[N, U, N, U] = {
+  new UnitConverter[N, U, N, U] {
+    @inline def vcnv(v: N): N = v
+  }
+}
+```
+
+Another example is the case of `Double` value types, where preconverting the conversion coefficient to `Double` is efficient while
+maintaining `Double` accuracy:
+```scala
+implicit def witnessDouble[U1, U2](implicit
+    cu: ConvertableUnits[U1, U2]): UnitConverter[Double, U1, Double, U2] = {
+  val coef = cu.coef.toDouble
+  new UnitConverter[Double, U1, Double, U2] {
+    @inline def vcnv(v: Double): Double = v * coef
+  }
+}
+```
+
+`UnitConverter` and its full set of typeclass rules are defined in
+[unitops.scala](https://github.com/erikerlandson/coulomb/blob/develop/coulomb/src/main/scala/coulomb/unitops/unitops.scala).
+
+#### Unit Conversions for Custom Value Types
+
+Coulomb's typeclass rules can be extended to support new value types.
+
+There are two components to a custom extension.
+The first is to define any desired algebras on the new value type.
+Defining algebras is optional, if no numeric operations need to be supported.
+
+The second customization component is to define what it means to multiply a value by a conversion coefficient.
+This can be accomplished using the `UnitConverterPolicy` typeclass, defined in `coulomb.unitops`.
+
+In the following example, coulomb is extended to support the spire `Complex` type.
+In the case of `Complex`, algebras such as additive and multiplicative (semi)groups are already defined.
+
+```scala
+scala> import coulomb.unitops._, spire.math.Complex, spire.algebra._
+
+// define what it means to apply unit conversion coefficients to Complex
+scala> implicit def complexPolicy[U1, U2]: UnitConverterPolicy[Complex[Double], U1, Complex[Double], U2] =
+  new UnitConverterPolicy[Complex[Double], U1, Complex[Double], U2] {
+    def convert(v: Complex[Double], cu: ConvertableUnits[U1, U2]): Complex[Double] = v * cu.coef.toDouble
+  }
+
+scala> q.show
+res0: String = (1.0 + 2.0i) m
+
+scala> q.toUnit[Foot].show
+res1: String = (3.2808398950131235 + 6.561679790026247i) ft
+
+scala> (q * q).show
+res2: String = (-3.0 + 4.0i) m^2
+
+scala> (q + q).show
+res3: String = (2.0 + 4.0i) m
 ```

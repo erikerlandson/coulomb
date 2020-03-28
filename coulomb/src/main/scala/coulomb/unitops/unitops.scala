@@ -1,5 +1,5 @@
 /*
-Copyright 2017 Erik Erlandson
+Copyright 2017-2020 Erik Erlandson
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,7 +20,8 @@ import shapeless._
 import shapeless.syntax.singleton._
 import singleton.ops._
 
-import spire.math._
+import spire.math.{ Rational, ConvertableFrom, ConvertableTo }
+import spire.algebra._
 
 import coulomb.infra._
 
@@ -57,26 +58,23 @@ object UnitString {
  * @tparam N2 numeric type of a RHS quantity value
  * @tparam U2 unit expression type of the RHS quantity
  */
-trait UnitMultiply[N1, U1, N2, U2] {
-  /** the `Numeric` implicit for quantity numeric type N1 */
-  def n1: Numeric[N1]
-  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
-  def cn21(x: N2): N1
+trait UnitMul[N1, U1, N2, U2] {
+  /** multiply numeric values, returning "left hand" type N1 */
+  def vmul(v1: N1, v2: N2): N1
   /** a type representing the unit product `U1*U2` */
-  type RT12
+  type RT
 }
-object UnitMultiply {
-  type Aux[N1, U1, N2, U2, R12] = UnitMultiply[N1, U1, N2, U2] {
-    type RT12 = R12
+object UnitMul {
+  type Aux[N1, U1, N2, U2, R12] = UnitMul[N1, U1, N2, U2] {
+    type RT = R12
   }
-  implicit def evidence[N1, U1, N2, U2](implicit
-      nn1: Numeric[N1],
-      nn2: Numeric[N2],
+  implicit def evidenceMSG1[N1, U1, N2, U2](implicit
+      ms1: MultiplicativeSemigroup[N1],
+      uc: UnitConverter[N2, U2, N1, U2],
       mrt12: MulResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
-    new UnitMultiply[N1, U1, N2, U2] {
-      val n1 = nn1
-      def cn21(x: N2): N1 = n1.fromType[N2](x)
-      type RT12 = mrt12.Out
+    new UnitMul[N1, U1, N2, U2] {
+      def vmul(v1: N1, v2: N2): N1 = ms1.times(v1, uc.vcnv(v2))
+      type RT = mrt12.Out
     }
 }
 
@@ -87,26 +85,36 @@ object UnitMultiply {
  * @tparam N2 numeric type of a RHS quantity value
  * @tparam U2 unit expression type of the RHS quantity
  */
-trait UnitDivide[N1, U1, N2, U2] {
-  /** the `Numeric` implicit for quantity numeric type N1 */
-  def n1: Numeric[N1]
-  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
-  def cn21(x: N2): N1
+trait UnitDiv[N1, U1, N2, U2] {
+  /** divide numeric values, returning "left hand" type N1 */
+  def vdiv(v1: N1, v2: N2): N1
   /** a type representing the unit division `U1/U2` */
-  type RT12
+  type RT
 }
-object UnitDivide {
-  type Aux[N1, U1, N2, U2, R12] = UnitDivide[N1, U1, N2, U2] {
-    type RT12 = R12
+trait UnitDivP1 {
+  type Aux[N1, U1, N2, U2, R12] = UnitDiv[N1, U1, N2, U2] {
+    type RT = R12
   }
-  implicit def evidence[N1, U1, N2, U2](implicit
-      nn1: Numeric[N1],
-      nn2: Numeric[N2],
-      drt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, drt12.Out] =
-    new UnitDivide[N1, U1, N2, U2] {
-      val n1 = nn1
-      def cn21(x: N2): N1 = n1.fromType[N2](x)
-      type RT12 = drt12.Out
+  // Spire does not recognize integer division as a "true" division group
+  // I will support it for purposes of backward compatibility on coulomb,
+  // but I might be convinced to make it a special import someday.
+  implicit def evidenceTD[N1, U1, N2, U2](implicit
+      mg1: TruncatedDivision[N1],
+      uc: UnitConverter[N2, U2, N1, U2],
+      mrt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
+    new UnitDiv[N1, U1, N2, U2] {
+      def vdiv(v1: N1, v2: N2): N1 = mg1.tquot(v1, uc.vcnv(v2))
+      type RT = mrt12.Out
+    }
+}
+object UnitDiv extends UnitDivP1 {
+  implicit def evidenceMG1[N1, U1, N2, U2](implicit
+      mg1: MultiplicativeGroup[N1],
+      uc: UnitConverter[N2, U2, N1, U2],
+      mrt12: DivResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
+    new UnitDiv[N1, U1, N2, U2] {
+      def vdiv(v1: N1, v2: N2): N1 = mg1.div(v1, uc.vcnv(v2))
+      type RT = mrt12.Out
     }
 }
 
@@ -116,24 +124,98 @@ object UnitDivide {
  * @tparam U the unit expression type of the quantity
  * @tparam P a literal type representing an integer exponent
  */
-trait UnitPower[N, U, P] {
-  /** the `Numeric` implicit for quantity numeric type N */
-  def n: Numeric[N]
-  /** the integer value of literal type exponent P */
-  def p: Int
+trait UnitPow[N, U, P] {
+  /** returns a value raised to the power P */
+  def vpow(v: N): N
   /** a unit type corresponding to `U^P` */
-  type PowRT
+  type RT
 }
-object UnitPower {
-  type Aux[N, U, P, PRT] = UnitPower[N, U, P] { type PowRT = PRT }
-  implicit def evidence[N, U, P](implicit
-      nn: Numeric[N],
+object UnitPow {
+  type Aux[N, U, P, PRT] = UnitPow[N, U, P] { type RT = PRT }
+  // a pure semigroup will fail for p <= 0, but
+  // this also includes monoids (allows p=0) and groups (p<0)
+  implicit def evidenceMSG0[N, U, P](implicit
+      ms: MultiplicativeSemigroup[N],
       xivP: XIntValue[P],
       prt: PowResultType[U, P]): Aux[N, U, P, prt.Out] =
-    new UnitPower[N, U, P] {
-      type PowRT = prt.Out
-      val n = nn
-      val p = xivP.value
+    new UnitPow[N, U, P] {
+      type RT = prt.Out
+      def vpow(v: N): N = ms.pow(v, xivP.value)
+    }
+}
+
+/**
+ * An implicit trait that supports compile-time unit quantity addition
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
+trait UnitAdd[N1, U1, N2, U2] {
+  /** convert value v2 to units of (U1,N1) (if necessary), and add to v1  */
+  def vadd(v1: N1, v2: N2): N1
+}
+object UnitAdd {
+  implicit def evidenceASG0[N1, U1, N2, U2](implicit
+      as1: AdditiveSemigroup[N1],
+      uc: UnitConverter[N2, U2, N1, U1]): UnitAdd[N1, U1, N2, U2] =
+    new UnitAdd[N1, U1, N2, U2] {
+      def vadd(v1: N1, v2: N2): N1 = as1.plus(v1, uc.vcnv(v2))
+    }
+}
+
+/**
+ * An implicit trait that supports compile-time unit quantity subtraction
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
+trait UnitSub[N1, U1, N2, U2] {
+  /** convert value v2 to units of (U1,N1) (if necessary), and subtract from v1 */
+  def vsub(v1: N1, v2: N2): N1
+}
+object UnitSub {
+  implicit def evidence[N1, U1, N2, U2](implicit
+      ag1: AdditiveGroup[N1],
+      uc: UnitConverter[N2, U2, N1, U1]): UnitSub[N1, U1, N2, U2] =
+    new UnitSub[N1, U1, N2, U2] {
+      def vsub(v1: N1, v2: N2): N1 = ag1.minus(v1, uc.vcnv(v2))
+    }
+}
+
+/**
+ * An implicit trait that supports compile-time unit quantity negation
+ * @tparam N the numeric type of the quantity value
+ */
+trait UnitNeg[N] {
+  /** negate the unit's value */
+  def vneg(v: N): N
+}
+object UnitNeg {
+  implicit def evidence[N](implicit ag: AdditiveGroup[N]): UnitNeg[N] =
+    new UnitNeg[N] {
+      def vneg(v: N): N = ag.negate(v)
+    }
+}
+
+/**
+ * An implicit trait that supports compile-time unit comparisons / ordering
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expresion type of the quantity
+ * @tparam N2 numeric type of a RHS quantity value
+ * @tparam U2 unit expression type of the RHS quantity
+ */
+trait UnitOrd[N1, U1, N2, U2] {
+  /** convert value v2 to units of (U1,N1) (if necessary), and compare to v1 */
+  def vcmp(v1: N1, v2: N2): Int
+}
+object UnitOrd {
+  implicit def evidence[N1, U1, N2, U2](implicit
+      ord1: Order[N1],
+      uc: UnitConverter[N2, U2, N1, U1]): UnitOrd[N1, U1, N2, U2] =
+    new UnitOrd[N1, U1, N2, U2] {
+      def vcmp(v1: N1, v2: N2): Int = ord1.compare(v1, uc.vcnv(v2))
     }
 }
 
@@ -153,69 +235,91 @@ object ConvertableUnits {
 }
 
 /**
- * An implicit trait that supports compile-time unit quantity conversion, when possible.
- * Also used to support addition, subtraction and comparisons of quantities.
- * This implicit will not exist if U1 and U2 are not convertable to one another.
+ * Define a customizable unit conversion policy.
+ * If such an implicitly defined policy exists, it will override
+ * any built-in policies defined for UnitConverter.
  * @tparam N1 the numeric type of the quantity value
- * @tparam U1 the unit expresion type of the quantity
+ * @tparam U1 the unit expression type of the quantity
+ * @tparam N2 numeric type of another quantity value
+ * @tparam U2 unit expression type of the other quantity
+ */
+trait UnitConverterPolicy[N1, U1, N2, U2] {
+  /**
+   * a conversion from value with type `(N1,U1)` to type `(N2,U2)`, given
+   * the conversion factor supplied on `cu`
+   */
+  def convert(v: N1, cu: ConvertableUnits[U1, U2]): N2
+}
+
+/**
+ * An implicit trait that supports compile-time unit quantity conversion, when possible.
+ * Also implements conversion from N1 to N2.
+ * This implicit will not exist if U1 and U2 are not convertable to one another.
+ * It will also not exist if there is no defined conversion from N1 to N2.
+ * @tparam N1 the numeric type of the quantity value
+ * @tparam U1 the unit expression type of the quantity
  * @tparam N2 numeric type of another quantity value
  * @tparam U2 unit expression type of the other quantity
  */
 trait UnitConverter[N1, U1, N2, U2] {
-  /** the `Numeric` implicit for quantity numeric type N1 */
-  def n1: Numeric[N1]
-  /** the `Numeric` implicit for quantity numeric type N2 */
-  def n2: Numeric[N2]
   /** a conversion from value with type `(N1,U1)` to type `(N2,U2)` */
-  def cv12(v: N1): N2
-  /** a conversion from value with type `(N2,U2)` to type `(N1,U1)` */
-  def cv21(v: N2): N1
+  def vcnv(v: N1): N2
 }
 trait UnitConverterDefaultPriority {
-  // This should be specialized for efficiency, however this rule would give an accurate conversion for any type
+  // This could be specialized for efficiency, however this rule will
+  // give an accurate conversion for any types N1 and N2 with Numeric typeclass
   implicit def witness[N1, U1, N2, U2](implicit
       cu: ConvertableUnits[U1, U2],
-      nN1: Numeric[N1],
-      nN2: Numeric[N2]): UnitConverter[N1, U1, N2, U2] =
+      cf1: ConvertableFrom[N1],
+      ct2: ConvertableTo[N2]): UnitConverter[N1, U1, N2, U2] =
     new UnitConverter[N1, U1, N2, U2] {
-      val n1 = nN1
-      val n2 = nN2
-      def cv12(v: N1): N2 = nN2.fromType[Rational](nN1.toType[Rational](v) * cu.coef)
-      def cv21(v: N2): N1 = nN1.fromType[Rational](nN2.toType[Rational](v) / cu.coef)
+      def vcnv(v: N1): N2 = ct2.fromType[Rational](cf1.toType[Rational](v) * cu.coef)
     }
 }
-trait UnitConverterP1 extends UnitConverterDefaultPriority {
+trait UnitConverterP2 extends UnitConverterDefaultPriority {
   implicit def witnessDouble[U1, U2](implicit
-      cu: ConvertableUnits[U1, U2],
-      n: Numeric[Double]): UnitConverter[Double, U1, Double, U2] = {
+      cu: ConvertableUnits[U1, U2]): UnitConverter[Double, U1, Double, U2] = {
     val coef = cu.coef.toDouble
     new UnitConverter[Double, U1, Double, U2] {
-      val n1 = n
-      val n2 = n
-      @inline def cv12(v: Double): Double = v * coef
-      @inline def cv21(v: Double): Double = v / coef
+      @inline def vcnv(v: Double): Double = v * coef
     }
   }
   implicit def witnessFloat[U1, U2](implicit
-      cu: ConvertableUnits[U1, U2],
-      n: Numeric[Float]): UnitConverter[Float, U1, Float, U2] = {
+      cu: ConvertableUnits[U1, U2]): UnitConverter[Float, U1, Float, U2] = {
     val coef = cu.coef.toFloat
     new UnitConverter[Float, U1, Float, U2] {
-      val n1 = n
-      val n2 = n
-      @inline def cv12(v: Float): Float = v * coef
-      @inline def cv21(v: Float): Float = v / coef
+      @inline def vcnv(v: Float): Float = v * coef
     }
   }
 }
-object UnitConverter extends UnitConverterP1 {
-  implicit def witnessIdentity[N, U](implicit
-      n: Numeric[N]): UnitConverter[N, U, N, U] = {
+trait UnitConverterP1 extends UnitConverterP2 {
+  // the unit doesn't change - this is a purely numeric-value conversion
+  implicit def witnessNumeric[N1, N2, U](implicit
+      cf1: ConvertableFrom[N1],
+      ct2: ConvertableTo[N2]): UnitConverter[N1, U, N2, U] = {
+    new UnitConverter[N1, U, N2, U] {
+      @inline def vcnv(v: N1): N2 = ct2.fromType[N1](v)
+    }
+  }
+}
+trait UnitConverterP0 extends UnitConverterP1 {
+  // I previously had this switched with identity below, however
+  // in cases where N1==N2 and U1==U2, it was causing an ambigous implicit failure
+  // so for some reason the priority of subclasses was not disambiguating.
+  // So far, making the identity rule highest priority has been stable
+  implicit def witnessCustomPolicy[N1, U1, N2, U2](implicit
+      cu: ConvertableUnits[U1, U2],
+      ucp: UnitConverterPolicy[N1, U1, N2, U2]): UnitConverter[N1, U1, N2, U2] = {
+    new UnitConverter[N1, U1, N2, U2] {
+      def vcnv(v: N1): N2 = ucp.convert(v, cu)
+    }
+  }
+}
+object UnitConverter extends UnitConverterP0 {
+  // when neither unit nor number type change, conversion is just identity function
+  implicit def witnessIdentity[N, U]: UnitConverter[N, U, N, U] = {
     new UnitConverter[N, U, N, U] {
-      val n1 = n
-      val n2 = n
-      @inline def cv12(v: N): N = v
-      @inline def cv21(v: N): N = v
+      @inline def vcnv(v: N): N = v
     }
   }
 }
