@@ -4,8 +4,8 @@
 def commonSettings = Seq(
   organization := "com.manyangled",
   version := "0.4.1-SNAPSHOT",
-  scalaVersion := "2.13.0",
-  crossScalaVersions := Seq("2.13.0"),
+  scalaVersion := "2.13.1",
+  crossScalaVersions := Seq("2.13.1"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
