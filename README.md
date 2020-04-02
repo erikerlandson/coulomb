@@ -40,7 +40,7 @@ resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb" % "0.4.0",
   "org.typelevel" %% "spire" % "0.17.0-M1",
-  "eu.timepit" %% "singleton-ops" % "0.4.3"
+  "eu.timepit" %% "singleton-ops" % "0.4.4"
 )
 ```
 
