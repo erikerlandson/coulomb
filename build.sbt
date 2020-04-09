@@ -13,7 +13,7 @@ def commonSettings = Seq(
   ),
   libraryDependencies ++= Seq(
     "org.typelevel" %% "spire" % "0.17.0-M1" % Provided,
-    "eu.timepit" %% "singleton-ops" % "0.4.4" % Provided,
+    "eu.timepit" %% "singleton-ops" % "0.5.0" % Provided,
     "com.lihaoyi" %% "utest" % "0.7.4" % Test
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
