@@ -115,7 +115,8 @@ lazy val coulomb_avro = (project in file("coulomb-avro"))
   .settings(libraryDependencies ++= coulombAvroDeps)
 
 def coulombPureConfigDeps = Seq(
-  "com.github.pureconfig" %% "pureconfig" % "0.12.3" % Provided
+  "com.github.pureconfig" %% "pureconfig-core" % "0.12.3" % Provided,
+  "com.github.pureconfig" %% "pureconfig-generic" % "0.12.3" % Provided
 )
 
 lazy val coulomb_pureconfig = (project in file("coulomb-pureconfig"))
