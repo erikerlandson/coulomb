@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
   // coulomb and core dependencies
   "com.manyangled" %% "coulomb" % "0.4.0",
   "org.typelevel" %% "spire" % "0.17.0-M1",
-  "eu.timepit" %% "singleton-ops" % "0.4.4"
+  "eu.timepit" %% "singleton-ops" % "0.5.0"
   // coulomb-parser and deps
   "com.manyangled" %% "coulomb-parser" % "0.4.0",                    // QuantityParser
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"   // %Provided parser dependency
