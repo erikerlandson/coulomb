@@ -369,14 +369,15 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
 
   case class CoulombRefinedException(msg: String) extends Exception(msg)
 
-  implicit class EnhanceWithRefineQ[V, U](q: Quantity[V, U]) {
+  implicit class EnhanceWithToRefined[V, U](q: Quantity[V, U]) {
     import coulomb._
-    @inline def refineQ[P](implicit vv: Validate[V, P]): Quantity[Refined[V, P], U] =
+    @inline def toRefined[P](implicit vv: Validate[V, P]): Quantity[Refined[V, P], U] =
       q.value.toRefined[P].withUnit[U]
   }
-  implicit class EnhanceWithRefineVU[V](value: V) {
+
+  implicit class EnhanceWithRefinedUnit[V](value: V) {
     import coulomb._
-    @inline def refineVU[P, U](implicit vv: Validate[V, P]): Quantity[Refined[V, P], U] =
+    @inline def withRefinedUnit[P, U](implicit vv: Validate[V, P]): Quantity[Refined[V, P], U] =
       value.toRefined[P].withUnit[U]
   }
 
