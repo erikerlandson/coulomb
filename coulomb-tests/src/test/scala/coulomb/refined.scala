@@ -33,20 +33,52 @@ import coulomb.validators.CoulombValidators._
 
 object RefinedTests extends TestSuite {
   val tests = Tests {
-    test("refined NonNegative") {
-      val q1 = refineMV[NonNegative](0.0).withUnit[Meter]
-      val q2 = refineMV[NonNegative](0.0).withUnit[Foot]
-      assert(q1.isValidQ[Refined[Double, NonNegative], Meter](0))
-      assert(q2.isValidQ[Refined[Double, NonNegative], Foot](0))
-      val q3 = refineMV[NonNegative](1.0).withUnit[Meter]
+    test("toRefined") {
+      assert(1.withUnit[Meter].toRefined[Positive].isValidQ[Refined[Int, Positive], Meter](1))
+      intercept[CoulombRefinedException] { 0.withUnit[Meter].toRefined[Positive] }
+    }
+
+    test("withRefinedUnit") {
+      assert(1.withRefinedUnit[Positive, Meter].isValidQ[Refined[Int, Positive], Meter](1))
+      intercept[CoulombRefinedException] { 0.withRefinedUnit[Positive, Meter] }
+    }
+
+    test("refined addition") {
+      val q3 = refineMV[Positive](1.0).withUnit[Meter]
       val q4 = refineMV[NonNegative](1.0).withUnit[Foot]
-      val q5 = refineMV[NonNegative](2.0).withUnit[Foot]
-      assert((q3 + q4).isValidQ[Refined[Double, NonNegative], Meter](1.3048))
+      assert((q3 + q4).isValidQ[Refined[Double, Positive], Meter](1.3048))
       assert((q4 + q3).isValidQ[Refined[Double, NonNegative], Foot](4.2808))
+    }
+
+    test("refined subtraction") {
+      val q3 = refineMV[Positive](1.0).withUnit[Meter]
+      val q4 = refineMV[Negative](-1.0).withUnit[Foot]
+      assert((q3 - q4).isValidQ[Refined[Double, Positive], Meter](1.3048))
+    }
+
+    test("refined multiplication") {
+      val q1 = refineMV[NonNegative](0.0).withUnit[Meter]
+      val q3 = refineMV[Positive](1.0).withUnit[Meter]
+      val q5 = refineMV[Positive](2.0).withUnit[Foot]
       assert((q1 * q3).isValidQ[Refined[Double, NonNegative], Meter %^ 2](0))
+      assert((q3 * q5).isValidQ[Refined[Double, Positive], Meter %* Foot](2))
+    }
+
+    test("refined division") {
+      val q1 = refineMV[NonNegative](0.0).withUnit[Meter]
+      val q3 = refineMV[Positive](1.0).withUnit[Meter]
+      val q5 = refineMV[Positive](2.0).withUnit[Foot]
       assert((q1 / q3).isValidQ[Refined[Double, NonNegative], Unitless](0))
-      assert((q3 * q5).isValidQ[Refined[Double, NonNegative], Meter %* Foot](2))
-      assert((q3 / q5).isValidQ[Refined[Double, NonNegative], Meter %/ Foot](0.5))
+      assert((q3 / q5).isValidQ[Refined[Double, Positive], Meter %/ Foot](0.5))
+    }
+
+    test("refined power") {
+      assert(2f.withRefinedUnit[Positive, Second].pow[3]
+        .isValidQ[Refined[Float, Positive], Second %^ 3](8))
+      assert(0f.withRefinedUnit[NonNegative, Second].pow[2]
+        .isValidQ[Refined[Float, NonNegative], Second %^ 2](0))
+      assert(2f.withRefinedUnit[Positive, Second].pow[-3]
+        .isValidQ[Refined[Float, Positive], Second %^ -3](1.0/8.0))
     }
   }
 }
