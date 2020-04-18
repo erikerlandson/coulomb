@@ -132,8 +132,8 @@ package refined.infra {
   }
 
   object enhance {
-    implicit class EnhanceWithToRefined[V](v: V) {
-      @inline def toRefined[P](implicit vvp: Validate[V, P]) = refineV[P](v) match {
+    implicit class EnhanceWithApplyPred[V](v: V) {
+      @inline def applyPred[P](implicit vvp: Validate[V, P]) = refineV[P](v) match {
         case Left(err) => throw CoulombRefinedException(err)
         case Right(ref) => ref
       }
@@ -270,7 +270,7 @@ package refined.infra {
         add: UnitAdd[V1, U1, V2, U2]): UnitAdd[Refined[V1, P1], U1, V2, U2] =
       new UnitAdd[Refined[V1, P1], U1, V2, U2] {
         def vadd(v1: Refined[V1, P1], v2: V2): Refined[V1, P1] = {
-          add.vadd(v1.value, v2).toRefined[P1]
+          add.vadd(v1.value, v2).applyPred[P1]
         }
       }
 
@@ -288,7 +288,7 @@ package refined.infra {
         sub: UnitSub[V1, U1, V2, U2]): UnitSub[Refined[V1, P1], U1, V2, U2] =
       new UnitSub[Refined[V1, P1], U1, V2, U2] {
         def vsub(v1: Refined[V1, P1], v2: V2): Refined[V1, P1] = {
-          sub.vsub(v1.value, v2).toRefined[P1]
+          sub.vsub(v1.value, v2).applyPred[P1]
         }
       }
 
@@ -308,7 +308,7 @@ package refined.infra {
       new UnitMul[Refined[V1, P1], U1, V2, U2] {
         type RT = ORT
         def vmul(v1: Refined[V1, P1], v2: V2): Refined[V1, P1] = {
-          mul.vmul(v1.value, v2).toRefined[P1]
+          mul.vmul(v1.value, v2).applyPred[P1]
         }
       }
 
@@ -328,7 +328,7 @@ package refined.infra {
       new UnitDiv[Refined[V1, P1], U1, V2, U2] {
         type RT = ORT
         def vdiv(v1: Refined[V1, P1], v2: V2): Refined[V1, P1] = {
-          div.vdiv(v1.value, v2).toRefined[P1]
+          div.vdiv(v1.value, v2).applyPred[P1]
         }
       }
 
@@ -338,7 +338,7 @@ package refined.infra {
         cnv: UnitConverter[V1, U1, V2, U2]): UnitConverter[V1, U1, Refined[V2, P2], U2] =
       new UnitConverter[V1, U1, Refined[V2, P2], U2] {
         def vcnv(v: V1): Refined[V2, P2] = {
-          cnv.vcnv(v).toRefined[P2]
+          cnv.vcnv(v).applyPred[P2]
         }
       }
 
@@ -372,13 +372,19 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
   implicit class EnhanceWithToRefined[V, U](q: Quantity[V, U]) {
     import coulomb._
     @inline def toRefined[P](implicit vv: Validate[V, P]): Quantity[Refined[V, P], U] =
-      q.value.toRefined[P].withUnit[U]
+      refineV[P](q.value) match {
+        case Left(err) => throw CoulombRefinedException(err)
+        case Right(ref) => ref.withUnit[U]
+      }
   }
 
   implicit class EnhanceWithRefinedUnit[V](value: V) {
     import coulomb._
     @inline def withRefinedUnit[P, U](implicit vv: Validate[V, P]): Quantity[Refined[V, P], U] =
-      value.toRefined[P].withUnit[U]
+      refineV[P](value) match {
+        case Left(err) => throw CoulombRefinedException(err)
+        case Right(ref) => ref.withUnit[U]
+      }
   }
 
   implicit def addRefinedSound[V1, P1, U1, V2, P2, U2](implicit
@@ -387,7 +393,7 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
       add: UnitAdd[V1, U1, V2, U2]): UnitAdd[Refined[V1, P1], U1, Refined[V2, P2], U2] =
     new UnitAdd[Refined[V1, P1], U1, Refined[V2, P2], U2] {
       def vadd(v1: Refined[V1, P1], v2: Refined[V2, P2]): Refined[V1, P1] = {
-        add.vadd(v1.value, v2.value).toRefined[P1]
+        add.vadd(v1.value, v2.value).applyPred[P1]
       }
     }
 
@@ -397,7 +403,7 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
       sub: UnitSub[V1, U1, V2, U2]): UnitSub[Refined[V1, P1], U1, Refined[V2, P2], U2] =
     new UnitSub[Refined[V1, P1], U1, Refined[V2, P2], U2] {
       def vsub(v1: Refined[V1, P1], v2: Refined[V2, P2]): Refined[V1, P1] = {
-        sub.vsub(v1.value, v2.value).toRefined[P1]
+        sub.vsub(v1.value, v2.value).applyPred[P1]
       }
     }
 
@@ -408,7 +414,7 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
     new UnitMul[Refined[V1, P1], U1, Refined[V2, P2], U2] {
       type RT = ORT
       def vmul(v1: Refined[V1, P1], v2: Refined[V2, P2]): Refined[V1, P1] = {
-        mul.vmul(v1.value, v2.value).toRefined[P1]
+        mul.vmul(v1.value, v2.value).applyPred[P1]
       }
     }
 
@@ -419,7 +425,7 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
     new UnitDiv[Refined[V1, P1], U1, Refined[V2, P2], U2] {
       type RT = ORT
       def vdiv(v1: Refined[V1, P1], v2: Refined[V2, P2]): Refined[V1, P1] = {
-        div.vdiv(v1.value, v2.value).toRefined[P1]
+        div.vdiv(v1.value, v2.value).applyPred[P1]
       }
     }
 
@@ -430,7 +436,7 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
     new UnitPow[Refined[V, P], U, E] {
       type RT = ORT
       def vpow(v: Refined[V, P]): Refined[V, P] = {
-        pow.vpow(v.value).toRefined[P]
+        pow.vpow(v.value).applyPred[P]
       }
     }
 
@@ -440,7 +446,7 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
       cnv: UnitConverter[V1, U1, V2, U2]): UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] =
     new UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] {
       def vcnv(v: Refined[V1, P1]): Refined[V2, P2] = {
-        cnv.vcnv(v.value).toRefined[P2]
+        cnv.vcnv(v.value).applyPred[P2]
       }
     }
 
@@ -451,7 +457,7 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
       cnv: UnitConverter[V1, U1, V2, U2]): UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] =
     new UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] {
       def vcnv(v: Refined[V1, P1]): Refined[V2, P2] = {
-        cnv.vcnv(v.value).toRefined[P2]
+        cnv.vcnv(v.value).applyPred[P2]
       }
     }
 }
