@@ -24,6 +24,7 @@ import spire.algebra._
 import eu.timepit.refined._
 import eu.timepit.refined.api._
 import eu.timepit.refined.numeric._
+import eu.timepit.refined.boolean.{ And, Not }
 
 import coulomb._
 import coulomb.si._
@@ -47,15 +48,25 @@ object RefinedTests extends TestSuite {
       assert((1D.withRefinedUnit[Positive, Meter] + 1D.withRefinedUnit[NonNegative, Foot])
         .isValidQ[Refined[Double, Positive], Meter](1.3048))
 
-      assert((1D.withRefinedUnit[NonNegative, Foot] + 1D.withRefinedUnit[Positive, Meter])
+      assert((1D.withRefinedUnit[NonNegative, Foot] + 1f.withRefinedUnit[Positive, Meter])
         .isValidQ[Refined[Double, NonNegative], Foot](4.2808))
 
       assert((1f.withUnit[Meter] + 1D.withRefinedUnit[Positive, Foot])
         .isValidQ[Float, Meter](1.3048))
 
+      assert((1D.withRefinedUnit[Not[Less[-100D]], Meter] + 1D.withRefinedUnit[Greater[0.999], Foot])
+        .isValidQ[Refined[Double, Not[Less[-100D]]], Meter](1.3048))
+
+      assert(((-1D).withRefinedUnit[Negative, Meter] + (-1D).withRefinedUnit[NonPositive, Foot])
+        .isValidQ[Refined[Double, Negative], Meter](-1.3048))
+
+      assert(((-1D).withRefinedUnit[Less[10D], Meter] + (-1f).withRefinedUnit[Less[-0.25f], Foot])
+        .isValidQ[Refined[Double, Less[10D]], Meter](-1.3048))
+
       // unsound compile errors by default
       compileError("1D.withRefinedUnit[Positive, Meter] + 1f.withUnit[Foot]")
       compileError("1D.withRefinedUnit[Positive, Foot] + 1f.withRefinedUnit[Greater[-10f], Meter]")
+      compileError("(-1D).withRefinedUnit[Negative, Foot] + (-1f).withRefinedUnit[Less[10f], Meter]")
 
       // enable unsound
       import coulomb.refined.policy.unsoundRefinedConversions._
@@ -69,6 +80,9 @@ object RefinedTests extends TestSuite {
 
       assert((1D.withRefinedUnit[Positive, Foot] + 1f.withRefinedUnit[Greater[-10f], Meter])
         .isValidQ[Refined[Double, Positive], Foot](4.2808))
+
+      assert(((-1D).withRefinedUnit[Negative, Foot] + (-1f).withRefinedUnit[Less[10f], Meter])
+        .isValidQ[Refined[Double, Negative], Foot](-4.2808))
 
       intercept[CoulombRefinedException] {
         1D.withRefinedUnit[Positive, Foot] + (-1f).withRefinedUnit[Greater[-10f], Meter]
