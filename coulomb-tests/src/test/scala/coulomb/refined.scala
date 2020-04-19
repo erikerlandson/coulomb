@@ -238,12 +238,34 @@ object RefinedTests extends TestSuite {
     }
 
     test("refined power") {
-      assert(2f.withRefinedUnit[Positive, Second].pow[3]
-        .isValidQ[Refined[Float, Positive], Second %^ 3](8))
       assert(0f.withRefinedUnit[NonNegative, Second].pow[2]
         .isValidQ[Refined[Float, NonNegative], Second %^ 2](0))
+
       assert(2f.withRefinedUnit[Positive, Second].pow[-3]
         .isValidQ[Refined[Float, Positive], Second %^ -3](1.0/8.0))
+
+      assert(2f.withRefinedUnit[Greater[1f], Second].pow[3]
+        .isValidQ[Refined[Float, Greater[1f]], Second %^ 3](8))
+
+      compileError("2f.withRefinedUnit[NonNegative, Second].pow[-3]")
+      compileError("2f.withRefinedUnit[Greater[-1f], Second].pow[3]")
+
+      // enable unsound
+      import coulomb.refined.policy.unsoundRefinedConversions._
+
+      assert((2f.withRefinedUnit[NonNegative, Second].pow[-3])
+        .isValidQ[Refined[Float, NonNegative], Second %^ -3](1.0/8.0))
+
+      assert((2f.withRefinedUnit[Greater[-1f], Second].pow[3])
+        .isValidQ[Refined[Float, Greater[-1f]], Second %^ 3](8.0))
+
+      intercept[Exception] {
+        0.withRefinedUnit[NonNegative, Second].pow[-3]
+      }
+
+      intercept[CoulombRefinedException] {
+        (0.5).withRefinedUnit[Greater[0.4], Second].pow[3]
+      }
     }
   }
 }

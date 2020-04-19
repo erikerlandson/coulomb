@@ -240,9 +240,16 @@ package refined.infra {
     }
 
     trait PowSoundnessPolicy[P, E]
-    trait PowSoundnessPolicyP1 {
+    trait PowSoundnessPolicyP2 {
       implicit def unsoundPow[P, E](implicit
           enable: EnableUnsoundRefinedConversions): PowSoundnessPolicy[P, E] =
+        new PowSoundnessPolicy[P, E] {}
+    }
+    trait PowSoundnessPolicyP1 extends PowSoundnessPolicyP2 {
+      implicit def soundPowIncreasing[P, E](implicit
+          nub1: NoUpperBound[P],
+          gez1: P ==> Not[Less[_1]],          
+          epos: OpAuxBoolean[E >= 1, true]): PowSoundnessPolicy[P, E] =
         new PowSoundnessPolicy[P, E] {}
     }
     object PowSoundnessPolicy extends PowSoundnessPolicyP1 {
