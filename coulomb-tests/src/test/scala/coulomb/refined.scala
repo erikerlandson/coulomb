@@ -135,11 +135,59 @@ object RefinedTests extends TestSuite {
     }
 
     test("refined multiplication") {
-      val q1 = refineMV[NonNegative](0.0).withUnit[Meter]
-      val q3 = refineMV[Positive](1.0).withUnit[Meter]
-      val q5 = refineMV[Positive](2.0).withUnit[Foot]
-      assert((q1 * q3).isValidQ[Refined[Double, NonNegative], Meter %^ 2](0))
-      assert((q3 * q5).isValidQ[Refined[Double, Positive], Meter %* Foot](2))
+      assert((2D.withRefinedUnit[Positive, Meter] * 2D.withRefinedUnit[GreaterEqual[1D], Meter])
+        .isValidQ[Refined[Double, Positive], Meter %^ 2](4))
+
+      assert((2D.withRefinedUnit[NonNegative, Meter] * 2D.withRefinedUnit[Greater[1D], Meter])
+        .isValidQ[Refined[Double, NonNegative], Meter %^ 2](4))
+
+      assert(((-2D).withRefinedUnit[Negative, Meter] * 2D.withRefinedUnit[Greater[1D], Meter])
+        .isValidQ[Refined[Double, Negative], Meter %^ 2](-4))
+
+      assert(((-2D).withRefinedUnit[NonPositive, Meter] * 2D.withRefinedUnit[GreaterEqual[1D], Meter])
+        .isValidQ[Refined[Double, NonPositive], Meter %^ 2](-4))
+
+      assert(((2D).withRefinedUnit[Greater[1D], Meter] * 2D.withRefinedUnit[GreaterEqual[1D], Meter])
+        .isValidQ[Refined[Double, Greater[1D]], Meter %^ 2](4))
+
+      assert(((-2D).withRefinedUnit[Less[-1D], Meter] * 2D.withRefinedUnit[Greater[1D], Meter])
+        .isValidQ[Refined[Double, Less[-1D]], Meter %^ 2](-4))
+
+      assert((2D.withUnit[Meter] * 2D.withRefinedUnit[GreaterEqual[1D], Meter])
+        .isValidQ[Double, Meter %^ 2](4))      
+
+      // soundness abstraction leaks on underflow
+      intercept[CoulombRefinedException] {
+        (1e-300).withRefinedUnit[Positive, Meter] * (1e-300).withRefinedUnit[Positive, Meter]
+      }
+
+      compileError("2D.withRefinedUnit[Positive, Meter] * 2D.withRefinedUnit[GreaterEqual[0D], Meter]")
+      compileError("2D.withRefinedUnit[Greater[1D], Meter] * 2D.withRefinedUnit[Positive, Meter]")
+      compileError("2D.withRefinedUnit[Positive, Meter] * 2D.withUnit[Meter]")
+
+      // enable unsound
+      import coulomb.refined.policy.unsoundRefinedConversions._
+
+      assert((2D.withRefinedUnit[Positive, Meter] * 2D.withUnit[Meter])
+        .isValidQ[Refined[Double, Positive], Meter %^ 2](4))
+
+      assert((2D.withRefinedUnit[Positive, Meter] * 2D.withRefinedUnit[GreaterEqual[0D], Meter])
+        .isValidQ[Refined[Double, Positive], Meter %^ 2](4))
+
+      assert((2D.withRefinedUnit[Greater[1D], Meter] * 2D.withRefinedUnit[Positive, Meter])
+        .isValidQ[Refined[Double, Greater[1D]], Meter %^ 2](4))
+
+      intercept[CoulombRefinedException] {
+        2D.withRefinedUnit[Positive, Meter] * 0D.withUnit[Meter]
+      }
+
+      intercept[CoulombRefinedException] {
+        2D.withRefinedUnit[Positive, Meter] * (-1D).withRefinedUnit[GreaterEqual[-1D], Meter]
+      }
+
+      intercept[CoulombRefinedException] {
+        2D.withRefinedUnit[Greater[1D], Meter] * (0.1).withRefinedUnit[Positive, Meter]
+      }
     }
 
     test("refined division") {
