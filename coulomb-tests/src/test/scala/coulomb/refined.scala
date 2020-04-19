@@ -26,6 +26,8 @@ import eu.timepit.refined.api._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.boolean.{ And, Not }
 
+import shapeless.nat.{ _0, _1 }
+
 import coulomb._
 import coulomb.si._
 import coulomb.us._
@@ -191,11 +193,48 @@ object RefinedTests extends TestSuite {
     }
 
     test("refined division") {
-      val q1 = refineMV[NonNegative](0.0).withUnit[Meter]
-      val q3 = refineMV[Positive](1.0).withUnit[Meter]
-      val q5 = refineMV[Positive](2.0).withUnit[Foot]
-      assert((q1 / q3).isValidQ[Refined[Double, NonNegative], Unitless](0))
-      assert((q3 / q5).isValidQ[Refined[Double, Positive], Meter %/ Foot](0.5))
+      assert(((1D).withRefinedUnit[Positive, Meter] / (2D).withRefinedUnit[Not[Less[_1]], Second])
+        .isValidQ[Refined[Double, Positive], Meter %/ Second](0.5))
+
+      assert(((1D).withRefinedUnit[NonNegative, Meter] / (2D).withRefinedUnit[Greater[_1], Second])
+        .isValidQ[Refined[Double, NonNegative], Meter %/ Second](0.5))
+
+      assert(((-1D).withRefinedUnit[Negative, Meter] / (2D).withRefinedUnit[Not[Less[_1]], Second])
+        .isValidQ[Refined[Double, Negative], Meter %/ Second](-0.5))
+
+      assert(((-1D).withRefinedUnit[NonPositive, Meter] / (2D).withRefinedUnit[Greater[_1], Second])
+        .isValidQ[Refined[Double, NonPositive], Meter %/ Second](-0.5))
+
+      // underflow leaks through soundness
+      intercept[CoulombRefinedException] {
+        (1e-300).withRefinedUnit[Positive, Meter] / (1e300).withRefinedUnit[Positive, Second]
+      }
+
+      compileError("(1D).withRefinedUnit[Positive, Meter] / 2D.withUnit[Second]")
+      compileError("(1D).withRefinedUnit[NonNegative, Meter] / (2D).withRefinedUnit[Greater[-1D], Second]")
+      compileError("(-1D).withRefinedUnit[Negative, Meter] / (2D).withRefinedUnit[Not[Less[-1D]], Second]")
+
+      // enable unsound
+      import coulomb.refined.policy.unsoundRefinedConversions._
+
+      assert(((1D).withRefinedUnit[Positive, Meter] / 2D.withUnit[Second])
+        .isValidQ[Refined[Double, Positive], Meter %/ Second](0.5))
+
+      assert(((1D).withRefinedUnit[NonNegative, Meter] / (2D).withRefinedUnit[Greater[-1D], Second])
+        .isValidQ[Refined[Double, NonNegative], Meter %/ Second](0.5))
+
+      assert(((-1D).withRefinedUnit[Negative, Meter] / (2D).withRefinedUnit[Not[Less[-1D]], Second])
+        .isValidQ[Refined[Double, Negative], Meter %/ Second](-0.5))
+
+      intercept[CoulombRefinedException] {
+        (1D).withRefinedUnit[Positive, Meter] / (-2D).withUnit[Second]
+      }
+      intercept[CoulombRefinedException] {
+        (1D).withRefinedUnit[NonNegative, Meter] / (-0.5D).withRefinedUnit[Greater[-1D], Second]
+      }
+      intercept[CoulombRefinedException] {
+        (-1D).withRefinedUnit[Negative, Meter] / (-1D).withRefinedUnit[Not[Less[-1D]], Second]
+      }
     }
 
     test("refined power") {
