@@ -90,9 +90,48 @@ object RefinedTests extends TestSuite {
     }
 
     test("refined subtraction") {
-      val q3 = refineMV[Positive](1.0).withUnit[Meter]
-      val q4 = refineMV[Negative](-1.0).withUnit[Foot]
-      assert((q3 - q4).isValidQ[Refined[Double, Positive], Meter](1.3048))
+      assert((1D.withRefinedUnit[Positive, Meter] - (-1D).withRefinedUnit[NonPositive, Foot])
+        .isValidQ[Refined[Double, Positive], Meter](1.3048))
+
+      assert((1D.withRefinedUnit[NonNegative, Foot] - (-1f).withRefinedUnit[Negative, Meter])
+        .isValidQ[Refined[Double, NonNegative], Foot](4.2808))
+
+      assert((1f.withUnit[Meter] - (-1D).withRefinedUnit[Negative, Foot])
+        .isValidQ[Float, Meter](1.3048))
+
+      assert((1D.withRefinedUnit[Not[Less[-100D]], Meter] - (-1D).withRefinedUnit[Less[-0.999], Foot])
+        .isValidQ[Refined[Double, Not[Less[-100D]]], Meter](1.3048))
+
+      assert(((-1D).withRefinedUnit[Negative, Meter] - (1D).withRefinedUnit[NonNegative, Foot])
+        .isValidQ[Refined[Double, Negative], Meter](-1.3048))
+
+      assert(((-1D).withRefinedUnit[Less[10D], Meter] - (1f).withRefinedUnit[Greater[0.25f], Foot])
+        .isValidQ[Refined[Double, Less[10D]], Meter](-1.3048))
+
+      // unsound compile errors by default
+      compileError("1D.withRefinedUnit[Positive, Meter] - 1f.withUnit[Foot]")
+      compileError("1D.withRefinedUnit[Positive, Foot] - (-1f).withRefinedUnit[Less[10f], Meter]")
+      compileError("(-1D).withRefinedUnit[Negative, Foot] - (1f).withRefinedUnit[Greater[-10f], Meter]")
+
+      // enable unsound
+      import coulomb.refined.policy.unsoundRefinedConversions._
+
+      assert((1D.withRefinedUnit[Positive, Foot] - (-1f).withUnit[Meter])
+        .isValidQ[Refined[Double, Positive], Foot](4.2808))
+
+      intercept[CoulombRefinedException] {
+        1D.withRefinedUnit[Positive, Foot] - (1f).withUnit[Meter]
+      }
+
+      assert((1D.withRefinedUnit[Positive, Foot] - (-1f).withRefinedUnit[Less[10f], Meter])
+        .isValidQ[Refined[Double, Positive], Foot](4.2808))
+
+      assert(((-1D).withRefinedUnit[Negative, Foot] - (1f).withRefinedUnit[Greater[-10f], Meter])
+        .isValidQ[Refined[Double, Negative], Foot](-4.2808))
+
+      intercept[CoulombRefinedException] {
+        1D.withRefinedUnit[Positive, Foot] - (1f).withRefinedUnit[Less[10f], Meter]
+      }
     }
 
     test("refined multiplication") {
