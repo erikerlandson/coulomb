@@ -23,6 +23,8 @@ import eu.timepit.refined.api._
 import eu.timepit.refined.numeric._
 import eu.timepit.refined.boolean.{ And, Not }
 
+import shapeless.{ =:!= }
+
 import coulomb.unitops._
 import coulomb.infra.NoImplicit
 
@@ -273,7 +275,7 @@ package refined.infra {
     }
   }
 
-  trait CoulombRefinedP1 {
+  trait CoulombRefinedP2 {
     implicit def addRefinedRHS[V1, U1, V2, P2, U2](implicit
         add: UnitAdd[V1, U1, V2, U2]): UnitAdd[V1, U1, Refined[V2, P2], U2] =
       new UnitAdd[V1, U1, Refined[V2, P2], U2] {
@@ -384,6 +386,18 @@ package refined.infra {
         }
       }
   }
+
+  trait CoulombRefinedP1 extends CoulombRefinedP2 {
+    implicit def unsoundRefToRef[V1, P1, U1, V2, P2, U2](implicit
+        enable: EnableUnsoundRefinedConversions,
+        vv2: Validate[V2, P2],
+        cnv: UnitConverter[V1, U1, V2, U2]): UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] =
+      new UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] {
+        def vcnv(v: Refined[V1, P1]): Refined[V2, P2] = {
+          cnv.vcnv(v.value).applyPred[P2]
+        }
+      }  
+  }
 }
 
 package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
@@ -492,22 +506,33 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
       }
     }
 
-  implicit def soundRefToRef[V1, P1, U1, V2, P2, U2](implicit
-      s12: P1 ==> P2,
-      vv2: Validate[V2, P2],
-      cnv: UnitConverter[V1, U1, V2, U2]): UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] =
-    new UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] {
-      def vcnv(v: Refined[V1, P1]): Refined[V2, P2] = {
-        cnv.vcnv(v.value).applyPred[P2]
+  implicit def soundRefToRefNon[V1, P1, U1, V2, U2](implicit
+      du: U1 =:!= U2,
+      s1: P1 ==> NonNegative,
+      vv2: Validate[V2, NonNegative],
+      cnv: UnitConverter[V1, U1, V2, U2]): UnitConverter[Refined[V1, P1], U1, Refined[V2, NonNegative], U2] =
+    new UnitConverter[Refined[V1, P1], U1, Refined[V2, NonNegative], U2] {
+      def vcnv(v: Refined[V1, P1]): Refined[V2, NonNegative] = {
+        cnv.vcnv(v.value).applyPred[NonNegative]
       }
     }
 
-  implicit def unsoundRefToRef[V1, P1, U1, V2, P2, U2](implicit
-      enable: EnableUnsoundRefinedConversions,
-      u12: NoImplicit[P1 ==> P2],
+  implicit def soundRefToRefPos[V1, P1, U1, V2, U2](implicit
+      du: U1 =:!= U2,
+      s1: P1 ==> Positive,
+      vv2: Validate[V2, Positive],
+      cnv: UnitConverter[V1, U1, V2, U2]): UnitConverter[Refined[V1, P1], U1, Refined[V2, Positive], U2] =
+    new UnitConverter[Refined[V1, P1], U1, Refined[V2, Positive], U2] {
+      def vcnv(v: Refined[V1, P1]): Refined[V2, Positive] = {
+        cnv.vcnv(v.value).applyPred[Positive]
+      }
+    }
+
+  implicit def soundRefToRefNoUnit[V1, P1, V2, P2, U](implicit
+      s12: P1 ==> P2,
       vv2: Validate[V2, P2],
-      cnv: UnitConverter[V1, U1, V2, U2]): UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] =
-    new UnitConverter[Refined[V1, P1], U1, Refined[V2, P2], U2] {
+      cnv: UnitConverter[V1, U, V2, U]): UnitConverter[Refined[V1, P1], U, Refined[V2, P2], U] =
+    new UnitConverter[Refined[V1, P1], U, Refined[V2, P2], U] {
       def vcnv(v: Refined[V1, P1]): Refined[V2, P2] = {
         cnv.vcnv(v.value).applyPred[P2]
       }

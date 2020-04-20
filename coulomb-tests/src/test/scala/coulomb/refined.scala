@@ -295,5 +295,55 @@ object RefinedTests extends TestSuite {
 
       assert((1D).withRefinedUnit[Positive, Foot] < (1f).withUnit[Meter])
     }
+
+    test("refined conversion") {
+      // when units are not changing, only require that P1 ==> P2
+      assert(((5D).withRefinedUnit[Not[Less[4D]], Meter].toValue[Refined[Float, Greater[_1]]])
+        .isValidQ[Refined[Float, Greater[_1]], Meter](5))
+
+      // unit conversions are only sound for pos and non-neg outputs
+      // since conversion factors can be arbitrarily small
+      assert(((1D).withRefinedUnit[NonNegative, Meter].toUnit[Foot])
+        .isValidQ[Refined[Double, NonNegative], Foot](3.2808))
+
+      assert(((1D).withRefinedUnit[Positive, Meter].toUnit[Foot])
+        .isValidQ[Refined[Double, Positive], Foot](3.2808))
+
+      assert(((1D).withRefinedUnit[Greater[0.9], Meter].to[Refined[Float, NonNegative], Foot])
+        .isValidQ[Refined[Float, NonNegative], Foot](3.2808))
+
+      assert(((1D).withRefinedUnit[Greater[0.9], Meter].to[Refined[Float, Positive], Foot])
+        .isValidQ[Refined[Float, Positive], Foot](3.2808))
+
+      // stripping refined always sound
+      assert(((1D).withRefinedUnit[NonNegative, Meter].to[Float, Foot])
+        .isValidQ[Float, Foot](3.2808))
+
+      compileError("(1D).withRefinedUnit[NonNegative, Meter].toValue[Refined[Float, Positive]]")
+      compileError("(1D).withUnit[Meter].toValue[Refined[Float, Positive]]")
+      compileError("(1D).withRefinedUnit[Greater[-1D], Meter].to[Refined[Float, NonNegative], Foot]")
+
+      // enable unsound
+      import coulomb.refined.policy.unsoundRefinedConversions._
+
+      assert(((1D).withRefinedUnit[NonNegative, Meter].toValue[Refined[Float, Positive]])
+        .isValidQ[Refined[Float, Positive], Meter](1))
+
+      assert(((1D).withUnit[Meter].toValue[Refined[Float, Positive]])
+        .isValidQ[Refined[Float, Positive], Meter](1))
+
+      assert(((1D).withRefinedUnit[Greater[-1D], Meter].to[Refined[Float, NonNegative], Foot])
+        .isValidQ[Refined[Float, NonNegative], Foot](3.2808))
+
+      intercept[CoulombRefinedException] {
+        (0D).withRefinedUnit[NonNegative, Meter].toValue[Refined[Float, Positive]]
+      }
+      intercept[CoulombRefinedException] {
+        (0D).withUnit[Meter].toValue[Refined[Float, Positive]]
+      }
+      intercept[CoulombRefinedException] {
+        (-0.5D).withRefinedUnit[Greater[-1D], Meter].to[Refined[Float, NonNegative], Foot]
+      }
+    }
   }
 }
