@@ -282,5 +282,18 @@ object RefinedTests extends TestSuite {
         -(2.withRefinedUnit[NonNegative, Meter])
       }
     }
+
+    test("refined orderings") {
+      // there are no unsound ordering comparisons
+      assert((3D).withRefinedUnit[Positive, Foot] === (1f).withRefinedUnit[Not[Less[_1]], Yard])
+
+      assert((1D).withRefinedUnit[Positive, Meter] > (1f).withRefinedUnit[Not[Less[_1]], Foot])
+
+      assert((1D).withRefinedUnit[Positive, Foot] < (1f).withRefinedUnit[Not[Less[_1]], Meter])
+
+      assert((1D).withUnit[Meter] >= (1f).withRefinedUnit[Not[Less[_1]], Foot])
+
+      assert((1D).withRefinedUnit[Positive, Foot] < (1f).withUnit[Meter])
+    }
   }
 }

@@ -350,6 +350,22 @@ package refined.infra {
         }
       }
 
+    implicit def ordRefinedRHS[V1, U1, V2, P2, U2](implicit
+        ord: UnitOrd[V1, U1, V2, U2]): UnitOrd[V1, U1, Refined[V2, P2], U2] =
+      new UnitOrd[V1, U1, Refined[V2, P2], U2] {
+        def vcmp(v1: V1, v2: Refined[V2, P2]): Int = {
+          ord.vcmp(v1, v2.value)
+        }
+      }
+
+    implicit def ordRefinedLHS[V1, P1, U1, V2, U2](implicit
+        ord: UnitOrd[V1, U1, V2, U2]): UnitOrd[Refined[V1, P1], U1, V2, U2] =
+      new UnitOrd[Refined[V1, P1], U1, V2, U2] {
+        def vcmp(v1: Refined[V1, P1], v2: V2): Int = {
+          ord.vcmp(v1.value, v2)
+        }
+      }
+
     implicit def valueToRefined[V1, U1, V2, P2, U2](implicit
         enable: EnableUnsoundRefinedConversions,
         vv2: Validate[V2, P2],
@@ -465,6 +481,14 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
     new UnitNeg[Refined[V, P]] {
       def vneg(v: Refined[V, P]): Refined[V, P] = {
         neg.vneg(v.value).applyPred[P]
+      }
+    }
+
+  implicit def ordRefRef[V1, P1, U1, V2, P2, U2](implicit
+      ord: UnitOrd[V1, U1, V2, U2]): UnitOrd[Refined[V1, P1], U1, Refined[V2, P2], U2] =
+    new UnitOrd[Refined[V1, P1], U1, Refined[V2, P2], U2] {
+      def vcmp(v1: Refined[V1, P1], v2: Refined[V2, P2]): Int = {
+        ord.vcmp(v1.value, v2.value)
       }
     }
 
