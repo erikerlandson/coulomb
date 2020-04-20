@@ -260,6 +260,17 @@ package refined.infra {
       implicit def soundPowGTZ[E]: PowSoundnessPolicy[Positive, E] =
         new PowSoundnessPolicy[Positive, E] {}
     }
+
+    trait NegSoundnessPolicy[P]
+    trait NegSoundnessPolicyP1 {
+      implicit def unsoundNeg[P](implicit
+          enable: EnableUnsoundRefinedConversions): NegSoundnessPolicy[P] =
+        new NegSoundnessPolicy[P] {}
+    }
+    object NegSoundnessPolicy extends NegSoundnessPolicyP1 {
+      // currently placeholder - intervals symmetric about zero would
+      // be sound under negation, if/when I work on support for refined intervals
+    }
   }
 
   trait CoulombRefinedP1 {
@@ -444,6 +455,16 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
       type RT = ORT
       def vpow(v: Refined[V, P]): Refined[V, P] = {
         pow.vpow(v.value).applyPred[P]
+      }
+    }
+
+  implicit def negRefinedSound[V, P](implicit
+      sp: NegSoundnessPolicy[P],
+      vv: Validate[V, P],
+      neg: UnitNeg[V]): UnitNeg[Refined[V, P]] =
+    new UnitNeg[Refined[V, P]] {
+      def vneg(v: Refined[V, P]): Refined[V, P] = {
+        neg.vneg(v.value).applyPred[P]
       }
     }
 

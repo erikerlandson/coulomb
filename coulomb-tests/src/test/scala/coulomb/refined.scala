@@ -267,5 +267,20 @@ object RefinedTests extends TestSuite {
         (0.5).withRefinedUnit[Greater[0.4], Second].pow[3]
       }
     }
+
+    test("refined negative") {
+      // currently no refined constraints my integrations recognize
+      // are sound under negation.  Symmetric intervals would be.
+
+      // enable unsound
+      import coulomb.refined.policy.unsoundRefinedConversions._
+
+      assert((-(2.withRefinedUnit[Less[10], Meter]))
+        .isValidQ[Refined[Int, Less[10]], Meter](-2))
+
+      intercept[CoulombRefinedException] {
+        -(2.withRefinedUnit[NonNegative, Meter])
+      }
+    }
   }
 }
