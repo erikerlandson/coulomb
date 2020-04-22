@@ -115,35 +115,43 @@ lazy val coulomb_avro = (project in file("coulomb-avro"))
   .settings(docDepSettings :_*)
   .settings(libraryDependencies ++= coulombAvroDeps)
 
-def coulombRefinedDeps = Seq(
-  "eu.timepit" %% "refined" % "0.9.13" % Provided
-)
-
-lazy val coulomb_refined = (project in file("coulomb-refined"))
-  .aggregate(coulomb, coulomb_parser)
-  .dependsOn(coulomb, coulomb_parser)
-  .settings(name := "coulomb-refined")
-  .settings(commonSettings :_*)
-  .settings(docDepSettings :_*)
-  .settings(libraryDependencies ++= coulombRefinedDeps)
-
 def coulombPureConfigDeps = Seq(
   "com.github.pureconfig" %% "pureconfig-core" % "0.12.3" % Provided,
   "com.github.pureconfig" %% "pureconfig-generic" % "0.12.3" % Provided,
-  "eu.timepit" %% "refined-pureconfig" % "0.9.13" % Provided
 )
 
 lazy val coulomb_pureconfig = (project in file("coulomb-pureconfig"))
-  .aggregate(coulomb, coulomb_parser, coulomb_refined)
-  .dependsOn(coulomb, coulomb_parser, coulomb_refined)
+  .aggregate(coulomb, coulomb_parser)
+  .dependsOn(coulomb, coulomb_parser)
   .settings(name := "coulomb-pureconfig")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
   .settings(libraryDependencies ++= coulombPureConfigDeps)
 
+def coulombRefinedDeps = Seq(
+  "eu.timepit" %% "refined" % "0.9.13" % Provided
+)
+
+lazy val coulomb_refined = (project in file("coulomb-refined"))
+  .aggregate(coulomb)
+  .dependsOn(coulomb)
+  .settings(name := "coulomb-refined")
+  .settings(commonSettings :_*)
+  .settings(docDepSettings :_*)
+  .settings(libraryDependencies ++= coulombRefinedDeps)
+
+lazy val coulomb_pureconfig_refined = (project in file("coulomb-pureconfig-refined"))
+  .aggregate(coulomb, coulomb_parser, coulomb_pureconfig, coulomb_refined)
+  .dependsOn(coulomb, coulomb_parser, coulomb_pureconfig, coulomb_refined)
+  .settings(name := "coulomb-pureconfig-refined")
+  .settings(commonSettings :_*)
+  .settings(docDepSettings :_*)
+  .settings(libraryDependencies ++= coulombPureConfigDeps)
+  .settings(libraryDependencies ++= coulombRefinedDeps)
+
 lazy val coulomb_tests = (project in file("coulomb-tests"))
-  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined)
-  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined)
+  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined)
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
   .settings(libraryDependencies ++= coulombParserDeps)
