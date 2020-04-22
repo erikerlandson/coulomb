@@ -58,27 +58,45 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
       ntt: WeakTypeTag[N],
       uts: UnitTypeString[U]): Try[Quantity[N, U]] = {
     val tpeN = weakTypeOf[N]
-    val cast = s".toUnit[${uts.expr}].toValue[$tpeN]"
+    val cast = s".to[$tpeN, ${uts.expr}]"
     for {
       tok <- lex(quantityExpr)
       ast <- parse(tok).toTry
-      code <- Try { s"($ast)${cast}" }
-      qeTree <- Try { toolbox.parse(code) }
-      qeEval <- Try { toolbox.eval(qeTree) }
-      qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
+      qret <- Try {
+        val code = s"($ast)${cast}"
+        toolbox.eval(toolbox.parse(code)).asInstanceOf[Quantity[N, U]]
+      }
     } yield {
       qret
     }
   }
 
-  def coefficient[U2](u1: String)(implicit ut2: UnitTypeString[U2]): Try[Rational] = {
+  def applyUnitExpr[V, U2](v: V, u1: String)(implicit
+    vtt: WeakTypeTag[V],
+    ut2: UnitTypeString[U2]
+  ): Try[Quantity[V, U2]] = {
+    val tpeV = weakTypeOf[V]
     for {
-      tok1 <- lex(u1)
-      ast1 <- parse.parseUnit(tok1).toTry
-      code <- Try { s"coulomb.Quantity.coefficient[${ast1},${ut2.expr}]" }
-      qeTree <- Try { toolbox.parse(code) }
-      qeEval <- Try { toolbox.eval(qeTree) }
-      qret <- Try { qeEval.asInstanceOf[Rational] }
+      tok <- lex(u1)
+      ut1 <- parse.parseUnit(tok).toTry
+      v2q <- Try {
+        val code = s"(v: $tpeV) => (coulomb.Quantity[$tpeV, $ut1](v)).toUnit[${ut2.expr}]"
+        toolbox.eval(toolbox.parse(code)).asInstanceOf[V => Quantity[V, U2]]
+      }
+    } yield {
+      v2q(v)
+    }
+  }
+
+  def coefficient[U2](u1: String)(implicit
+    ut2: UnitTypeString[U2]): Try[Rational] = {
+    for {
+      tok <- lex(u1)
+      ut1 <- parse.parseUnit(tok).toTry
+      qret <- Try {
+        val code = s"coulomb.Quantity.coefficient[$ut1, ${ut2.expr}]"
+        toolbox.eval(toolbox.parse(code)).asInstanceOf[Rational]
+      }
     } yield {
       qret
     }
