@@ -223,6 +223,6 @@ coulomb.refined.package$CoulombRefinedException: Predicate failed: (0 > 0).
 ```
 
 Type soundness leaks primarily (always?) occur at open-interval boundaries.
-In other words, predicates involving `>' or `<`.
+In other words, predicates involving `>` or `<`.
 Predicates involving `>=` or `<=`, such as `NonNegative` or `GreaterEqual`,
 are not as vulnerable to type soundness leaks.
