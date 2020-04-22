@@ -18,19 +18,21 @@ package coulomb.refined
 
 import utest._
 
-import spire.std.any._
-import spire.algebra._
+import spire.std.double._
+import spire.std.float._
+import spire.std.int._
+import spire.std.long._
 
 import eu.timepit.refined._
 import eu.timepit.refined.api._
 import eu.timepit.refined.numeric._
-import eu.timepit.refined.boolean.{ And, Not }
+import eu.timepit.refined.boolean.Not
 
 import shapeless.nat.{ _0, _1 }
 
 import coulomb._
-import coulomb.si._
-import coulomb.us._
+import coulomb.si.{ Meter, Second }
+import coulomb.us.{ Foot, Yard }
 
 import coulomb.validators.CoulombValidators._
 

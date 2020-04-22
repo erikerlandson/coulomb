@@ -14,9 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import spire.math.{ Rational, ConvertableFrom, ConvertableTo }
-import spire.util.Opt
-import spire.algebra._
+package coulomb
 
 import eu.timepit.refined._
 import eu.timepit.refined.api._
@@ -27,8 +25,6 @@ import shapeless.{ =:!= }
 
 import coulomb.unitops._
 import coulomb.infra.NoImplicit
-
-package coulomb {
 
 package refined.infra {
   import singleton.ops._
@@ -537,5 +533,4 @@ package object refined extends coulomb.refined.infra.CoulombRefinedP1 {
         cnv.vcnv(v.value).applyPred[P2]
       }
     }
-}
 }
