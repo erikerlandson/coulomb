@@ -19,7 +19,7 @@ package coulomb
 import scala.util.{ Try, Success, Failure }
 import scala.reflect.runtime.universe.WeakTypeTag
 
-import _root_.pureconfig.{ConfigConvert, ConfigCursor}
+import _root_.pureconfig.{ConfigReader, ConfigWriter, ConfigCursor}
 import _root_.pureconfig.error.{CannotConvert, ConfigReaderFailures, ConvertFailure}
 
 import com.typesafe.config.ConfigValue
@@ -42,18 +42,25 @@ package object pureconfig {
   import coulomb.infra.NoImplicit
   import coulomb.pureconfig.infra._
 
-  /** implicit materializer for saving and loading coulomb Quantity fields */
-  implicit def coulombQuantityConfigConvert[V, U](implicit
+  implicit def coulombQuantityConfigWriter[V, U](implicit
     ovr: NoImplicit[CoulombPureconfigOverride[V]],
-    qcc: ConfigConvert[ConfigQuantity[V]],
+    qcw: ConfigWriter[ConfigQuantity[V]],
+    ustr: UnitString[U]
+  ): ConfigWriter[Quantity[V, U]] = new ConfigWriter[Quantity[V, U]] {
+    def to(q: Quantity[V, U]): ConfigValue =
+      qcw.to(ConfigQuantity(q.value, q.showUnitFull))
+  }
+
+  implicit def coulombQuantityConfigReader[V, U](implicit
+    ovr: NoImplicit[CoulombPureconfigOverride[V]],
+    qcr: ConfigReader[ConfigQuantity[V]],
     qp: QuantityParser,
     ntt: WeakTypeTag[V],
     qtt: WeakTypeTag[Quantity[V, U]],
-    ustr: UnitString[U],
     uts: UnitTypeString[U]
-  ): ConfigConvert[Quantity[V, U]] = new ConfigConvert[Quantity[V, U]] {
+  ): ConfigReader[Quantity[V, U]] = new ConfigReader[Quantity[V, U]] {
     def from(cur: ConfigCursor): Either[ConfigReaderFailures, Quantity[V, U]] = {
-      qcc.from(cur) match {
+      qcr.from(cur) match {
         case Left(readFailure) => Left(readFailure)
         case Right(ConfigQuantity(value, unit)) => {
           qp.applyUnitExpr[V, U](value, unit) match {
@@ -68,8 +75,5 @@ package object pureconfig {
         }
       }
     }
-
-    def to(q: Quantity[V, U]): ConfigValue =
-      qcc.to(ConfigQuantity(q.value, q.showUnitFull))
-  }
+  }  
 }

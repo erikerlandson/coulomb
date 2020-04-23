@@ -18,7 +18,7 @@ package coulomb.pureconfig
 
 import scala.reflect.runtime.universe.WeakTypeTag
 
-import _root_.pureconfig.{ConfigConvert, ConfigCursor}
+import _root_.pureconfig.{ConfigReader, ConfigWriter, ConfigCursor}
 import _root_.pureconfig.error.{CannotConvert, ConfigReaderFailures, ConvertFailure}
 
 import com.typesafe.config.ConfigValue
@@ -35,6 +35,40 @@ package object refined {
   implicit def overridePureconfigRefined[V, P]: CoulombPureconfigOverride[Refined[V, P]] =
     new CoulombPureconfigOverride[Refined[V, P]] {}
 
+  implicit def coulombRefinedConfigWriter[V, P, U](implicit
+    qcw: ConfigWriter[Quantity[V, U]]
+  ): ConfigWriter[Quantity[Refined[V, P], U]] = new ConfigWriter[Quantity[Refined[V, P], U]] {
+    def to(q: Quantity[Refined[V, P], U]): ConfigValue =
+      qcw.to(Quantity[V, U](q.value.value))
+  }
+
+  implicit def coulombRefinedConfigReader[V, P, U](implicit
+    qcr: ConfigReader[Quantity[V, U]],
+    qpv: Validate[V, P],
+    qtt: WeakTypeTag[Quantity[Refined[V, P], U]]
+  ): ConfigReader[Quantity[Refined[V, P], U]] = new ConfigReader[Quantity[Refined[V, P], U]] {
+    def from(cur: ConfigCursor): Either[ConfigReaderFailures, Quantity[Refined[V, P], U]] = {
+      qcr.from(cur) match {
+        case Left(readFailure) => Left(readFailure)
+        case Right(q) => {
+          refineV[P](q.value) match {
+            case Right(rval) => Right(rval.withUnit[U])
+            case Left(because) => Left(
+              ConfigReaderFailures(
+                ConvertFailure(
+                  reason = CannotConvert(
+                    value = cur.value.render(),
+                    toType = qtt.tpe.toString,
+                    because = because
+                  ),
+                  cur = cur)))
+          }
+        }
+      }
+    }
+  }
+
+/*
   /** materializer for saving and loading `Quantity[Refined[V, P], U]` */
   implicit def coulombRefinedConfigConvert[V, P, U](implicit
     qcc: ConfigConvert[Quantity[V, U]],
@@ -64,4 +98,5 @@ package object refined {
     def to(q: Quantity[Refined[V, P], U]): ConfigValue =
       qcc.to(Quantity[V, U](q.value.value))
   }
+*/
 }
