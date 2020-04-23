@@ -67,6 +67,8 @@ In addition to core functionality and fundamental units, coulomb provides the fo
 * [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
 * [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
 * [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
+* [coulomb-refined](coulomb-refined/) - integrates coulomb Quantity with Refined values
+* [coulomb-pureconfig-refined](coulomb-pureconfig-refined/) - integrate coulomb + pureconfig + refined
 
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
