@@ -73,6 +73,7 @@ object QuantityParserTests extends TestSuite {
       assert(try1.isInstanceOf[scala.util.Failure[_]])
     }
 
+    // this is also testing empty prefix-unit list, which exposed a bug
     test("customizing with applyUnitExpr and withImports") {
       import spire.math.Complex, spire.algebra._, spire.std.any._
       val v = Complex[Double](1, 2)
