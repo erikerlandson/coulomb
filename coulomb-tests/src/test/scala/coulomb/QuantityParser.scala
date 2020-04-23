@@ -2,24 +2,16 @@ package coulomb.parser
 
 import shapeless.{ ::, HNil }
 
-import spire.math._
 import spire.std.any._
-
-import singleton.ops._
 
 import utest._
 
 import coulomb._
-import coulomb.unitops._
-import coulomb.si._
-import coulomb.siprefix._
-import coulomb.mks._
-import coulomb.accepted._
-import coulomb.time._
-import coulomb.info._
-import coulomb.binprefix._
-import coulomb.us._
-import coulomb.temp._
+import coulomb.si.{ Second, Meter }
+import coulomb.siprefix.{ Mega, Giga }
+import coulomb.time.Minute
+import coulomb.info.{ Byte, Bit }
+import coulomb.us.Foot
 
 import coulomb.validators.CoulombValidators._
 
