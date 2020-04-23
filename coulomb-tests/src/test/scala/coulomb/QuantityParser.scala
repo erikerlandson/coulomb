@@ -39,6 +39,14 @@ object ConfigIntegration {
   val conf = confTS.withQuantityParser(qp)
 }
 
+object ComplexTest {
+  import coulomb.unitops._, spire.math.Complex, spire.algebra._, spire.std.any._
+  implicit def complexPolicy[U1, U2]: UnitConverterPolicy[Complex[Double], U1, Complex[Double], U2] =
+     new UnitConverterPolicy[Complex[Double], U1, Complex[Double], U2] {
+       def convert(v: Complex[Double], cu: ConvertableUnits[U1, U2]): Complex[Double] = v * cu.coef.toDouble
+     }
+}
+
 object QuantityParserTests extends TestSuite {
   import coulomb.parser.QuantityParser
   import ConfigIntegration._
@@ -63,6 +71,17 @@ object QuantityParserTests extends TestSuite {
     test("fail on incompatible units") {
       val try1 = conf.getQuantity[Double, Meter]("duration")
       assert(try1.isInstanceOf[scala.util.Failure[_]])
+    }
+
+    test("customizing with applyUnitExpr and withImports") {
+      import spire.math.Complex, spire.algebra._, spire.std.any._
+      val v = Complex[Double](1, 2)
+      val qpw = QuantityParser.withImports[Foot :: Meter :: HNil]("coulomb.parser.ComplexTest._")
+      val res = qpw.applyUnitExpr[Complex[Double], Foot](v, "meter")
+      assert(res.isInstanceOf[scala.util.Success[_]])
+      val q = res.toOption.get
+      assert(scala.math.abs(q.value.real - 3.28084) < 1e-4)
+      assert(scala.math.abs(q.value.imag - 6.56168) < 1e-4)
     }
 
     test("support ser/de") {
