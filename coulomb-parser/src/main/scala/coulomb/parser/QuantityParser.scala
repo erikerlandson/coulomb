@@ -34,14 +34,18 @@ import coulomb.parser.unitops.UnitTypeString
  * val speed = qp[Double, Mile %/ Hour]("10.0 kilometer / second") // prefix units are parsed
  * }}}
  */
-class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) extends Serializable {
+class QuantityParser private (
+    private val qpp: coulomb.parser.infra.QPP[_],
+    private val iseq: Seq[String]) extends Serializable {
   import scala.reflect.runtime.universe.{ Try => _, _ }
   import scala.tools.reflect.ToolBox
 
   @transient private lazy val lex = new coulomb.parser.lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
   @transient private lazy val parse = new coulomb.parser.parser.UnitDSLParser(qpp.nameToType)
 
-  @transient lazy val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
+  @transient private lazy val imports = iseq.map(i => s"import $i\n").mkString("")
+
+  @transient private lazy val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
 
   /**
    * Parse an expression into a unit typed Quantity
@@ -63,7 +67,7 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
       tok <- lex(quantityExpr)
       ast <- parse(tok).toTry
       qret <- Try {
-        val code = s"($ast)${cast}"
+        val code = s"${imports}($ast)${cast}"
         toolbox.eval(toolbox.parse(code)).asInstanceOf[Quantity[N, U]]
       }
     } yield {
@@ -80,7 +84,7 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
       tok <- lex(u1)
       ut1 <- parse.parseUnit(tok).toTry
       v2q <- Try {
-        val code = s"(v: $tpeV) => (coulomb.Quantity[$tpeV, $ut1](v)).toUnit[${ut2.expr}]"
+        val code = s"${imports}(v: $tpeV) => (coulomb.Quantity[$tpeV, $ut1](v)).toUnit[${ut2.expr}]"
         toolbox.eval(toolbox.parse(code)).asInstanceOf[V => Quantity[V, U2]]
       }
     } yield {
@@ -94,7 +98,7 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
       tok <- lex(u1)
       ut1 <- parse.parseUnit(tok).toTry
       qret <- Try {
-        val code = s"coulomb.Quantity.coefficient[$ut1, ${ut2.expr}]"
+        val code = s"${imports}coulomb.Quantity.coefficient[$ut1, ${ut2.expr}]"
         toolbox.eval(toolbox.parse(code)).asInstanceOf[Rational]
       }
     } yield {
@@ -113,7 +117,13 @@ object QuantityParser {
    * val qp = QuantityParser[Meter :: Second :: Kilo :: HNil]
    * }}}
    */
-  def apply[UL <: shapeless.HList](implicit qpp: coulomb.parser.infra.QPP[UL]): QuantityParser = {
-    new QuantityParser(qpp)
+  def apply[UL <: shapeless.HList](implicit
+      qpp: coulomb.parser.infra.QPP[UL]): QuantityParser = {
+    new QuantityParser(qpp, List.empty[String])
+  }
+
+  def withImports[UL <: shapeless.HList](ilist: String*)(implicit
+      qpp: coulomb.parser.infra.QPP[UL]): QuantityParser = {
+    new QuantityParser(qpp, ilist)
   }
 }
