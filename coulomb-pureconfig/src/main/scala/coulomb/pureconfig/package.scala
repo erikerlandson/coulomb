@@ -36,12 +36,13 @@ package pureconfig.infra {
 }
 
 /**
- * Defines implicit ConfigConvert materializers to save and load coulomb Quantity fields
+ * Defines ConfigReader and ConfigWriter to save and load coulomb Quantity fields
  */
 package object pureconfig {
   import coulomb.infra.NoImplicit
   import coulomb.pureconfig.infra._
 
+  /** Manifest a ConfigWriter for `Quantity[V, U]` */
   implicit def coulombQuantityConfigWriter[V, U](implicit
     ovr: NoImplicit[CoulombPureconfigOverride[V]],
     qcw: ConfigWriter[ConfigQuantity[V]],
@@ -51,6 +52,7 @@ package object pureconfig {
       qcw.to(ConfigQuantity(q.value, q.showUnitFull))
   }
 
+  /** Manifest a ConfigReader for `Quantity[V, U]` */
   implicit def coulombQuantityConfigReader[V, U](implicit
     ovr: NoImplicit[CoulombPureconfigOverride[V]],
     qcr: ConfigReader[ConfigQuantity[V]],

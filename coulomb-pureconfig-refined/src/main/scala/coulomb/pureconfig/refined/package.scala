@@ -35,6 +35,7 @@ package object refined {
   implicit def overridePureconfigRefined[V, P]: CoulombPureconfigOverride[Refined[V, P]] =
     new CoulombPureconfigOverride[Refined[V, P]] {}
 
+  /** Manifest a ConfigWriter for `Quantity[Refined[P, V], U]` */
   implicit def coulombRefinedConfigWriter[V, P, U](implicit
     qcw: ConfigWriter[Quantity[V, U]]
   ): ConfigWriter[Quantity[Refined[V, P], U]] = new ConfigWriter[Quantity[Refined[V, P], U]] {
@@ -42,6 +43,7 @@ package object refined {
       qcw.to(Quantity[V, U](q.value.value))
   }
 
+  /** Manifest a ConfigReader for `Quantity[Refined[P, V], U]` */
   implicit def coulombRefinedConfigReader[V, P, U](implicit
     qcr: ConfigReader[Quantity[V, U]],
     qpv: Validate[V, P],
@@ -67,36 +69,4 @@ package object refined {
       }
     }
   }
-
-/*
-  /** materializer for saving and loading `Quantity[Refined[V, P], U]` */
-  implicit def coulombRefinedConfigConvert[V, P, U](implicit
-    qcc: ConfigConvert[Quantity[V, U]],
-    qpv: Validate[V, P],
-    qtt: WeakTypeTag[Quantity[Refined[V, P], U]]
-  ): ConfigConvert[Quantity[Refined[V, P], U]] = new ConfigConvert[Quantity[Refined[V, P], U]] {
-    def from(cur: ConfigCursor): Either[ConfigReaderFailures, Quantity[Refined[V, P], U]] = {
-      qcc.from(cur) match {
-        case Left(readFailure) => Left(readFailure)
-        case Right(q) => {
-          refineV[P](q.value) match {
-            case Right(rval) => Right(rval.withUnit[U])
-            case Left(because) => Left(
-              ConfigReaderFailures(
-                ConvertFailure(
-                  reason = CannotConvert(
-                    value = cur.value.render(),
-                    toType = qtt.tpe.toString,
-                    because = because
-                  ),
-                  cur = cur)))
-          }
-        }
-      }
-    }
-
-    def to(q: Quantity[Refined[V, P], U]): ConfigValue =
-      qcc.to(Quantity[V, U](q.value.value))
-  }
-*/
 }
