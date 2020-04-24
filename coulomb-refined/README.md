@@ -26,6 +26,9 @@ libraryDependencies ++= Seq(
 ```
 
 ### How to import
+
+The following examples can be run with these imports:
+
 ```scala
 import eu.timepit.refined._
 import eu.timepit.refined.api._
@@ -40,6 +43,10 @@ import spire.std.int._
 
 import coulomb._
 import coulomb.refined._
+
+import coulomb.si.{ Kilogram, Meter, Second }
+import coulomb.siprefix.Kilo
+import coulomb.us.Mile
 ```
 
 ### Examples

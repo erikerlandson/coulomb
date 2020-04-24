@@ -5,6 +5,7 @@ To learn more ...
 * [coulomb](../README.md#tutorial)
 * [coulomb-pureconfig](../coulomb-pureconfig/README.md)
 * [coulomb-refined](../coulomb-refined/README.md)
+* [coulomb-parser](../coulomb-parser/README.md)
 
 The coulomb libraries include most dependencies `%Provided` to allow maximum flexibility
 of binary compatible dependency versions:
@@ -31,9 +32,12 @@ libraryDependencies ++= Seq(
 
 ### How to import:
 
+The examples that follow can be run with the following imports:
+
 ```scala
 import _root_.pureconfig._
 import _root_.pureconfig.generic.auto._
+import _root_.pureconfig.syntax._
 
 import eu.timepit.refined._
 import eu.timepit.refined.api._
@@ -41,8 +45,15 @@ import eu.timepit.refined.numeric._
 
 import coulomb._
 import coulomb.pureconfig._
+import coulomb.parser.QuantityParser
+
+import shapeless.{ ::, HNil }
+
 import coulomb.refined._
 import coulomb.pureconfig.refined._
+
+import coulomb.si.{ Meter, Second }
+import coulomb.us.Foot
 ```
 
 ### Examples
@@ -54,13 +65,10 @@ In other words, pureconfig for objects of the form `Quantity[Refined[Value, Pred
 The following example shows pureconfig output for such an object:
 
 ```scala
-scala> def write[V](v: V)(implicit w: ConfigWriter[V]) = w.to(v)
-def write[V](v: V)(implicit w: pureconfig.ConfigWriter[V]): com.typesafe.config.ConfigValue
-
 scala> val q = 1.withRefinedUnit[Positive, Meter]
 val q: coulomb.Quantity[eu.timepit.refined.api.Refined[Int,eu.timepit.refined.numeric.Positive],coulomb.si.Meter] = Quantity(1)
 
-scala> val conf = write(q)
+scala> val conf = q.toConfig
 val conf: com.typesafe.config.ConfigValue = SimpleConfigObject({"unit":"meter","value":1})
 ```
 
@@ -69,50 +77,48 @@ In pureconfig, `Refined` values are stored without the predicate information.
 A value may be re-loaded with any predicate type, and is checked for correctness when it is loaded.
 
 The example continues by re-loading a `ConfigValue` back into a quantity.
-Note that the value is being loaded using a different value type, a different predicate and also different (but convertable) unit.
+Loading values from a configuration requires a `QuantityParser` that is aware of the units
+appearing in the configuration (in this case, only Meter).
+The value is being loaded using a different value type (Float),
+a different predicate (NonNegative) and also different unit (Foot):
 
 ```scala
-scala> def read[V](conf: com.typesafe.config.ConfigValue)(implicit r: ConfigReader[V]) = r.from(conf)
-def read[V](conf: com.typesafe.config.ConfigValue)(implicit r: pureconfig.ConfigReader[V]): pureconfig.ConfigReader.Result[V]
-
-scala> implicit val qp = QuantityParser[Meter :: Foot :: HNil]
+scala> implicit val qp = QuantityParser[Meter :: HNil]
 val qp: coulomb.parser.QuantityParser = coulomb.parser.QuantityParser@7177604e
 
-scala> val qread = read[Quantity[Refined[Float, NonNegative], Foot]](conf)
-val qread: pureconfig.ConfigReader.Result[coulomb.Quantity[eu.timepit.refined.api.Refined[Float,eu.timepit.refined.numeric.NonNegative],coulomb.us.Foot]] = Right(Quantity(3.28084))
+scala> val qread = conf.toOrThrow[Quantity[Refined[Float, NonNegative], Foot]]
+val qread: coulomb.Quantity[eu.timepit.refined.api.Refined[Float,eu.timepit.refined.numeric.NonNegative],coulomb.us.Foot] = Quantity(3.28084)
 
-scala> qread.isRight
-val res1: Boolean = true
-
-scala> qread.toOption.get.show
-val res2: String = 3.28084 ft
+scala> qread.show
+val res0: String = 3.28084 ft
 ```
 
 If the value being read does not satisfy the Refined predicate, it is an i/o error:
 
 ```scala
-scala> val qread = read[Quantity[Refined[Float, Negative], Foot]](conf)
-val qread: pureconfig.ConfigReader.Result[coulomb.Quantity[eu.timepit.refined.api.Refined[Float,eu.timepit.refined.numeric.Negative],coulomb.us.Foot]] =
-Left(ConfigReaderFailures(ConvertFailure(CannotConvert({
-    # hardcoded value
-    "unit" : "meter",
-    # hardcoded value
-    "value" : 1
-}
-,coulomb.Quantity[eu.timepit.refined.api.Refined[Float,eu.timepit.refined.numeric.Negative],coulomb.us.Foot],Predicate failed: (3.28084 < 0.0).),None,),List()))
-
+scala> val qread = conf.toOrThrow[Quantity[Refined[Float, Negative], Foot]]
+pureconfig.error.ConfigReaderException: Cannot convert configuration to a coulomb.Quantity. Failures are:
+  at the root:
+    - Cannot convert '{
+          # hardcoded value
+          "unit" : "meter",
+          # hardcoded value
+          "value" : 1
+      }
+      ' to coulomb.Quantity[eu.timepit.refined.api.Refined[Float,eu.timepit.refined.numeric.Negative],coulomb.us.Foot]: Predicate failed: (3.28084 < 0.0)..
 ```
 
 Similarly, attempting to load with an incompatible unit is an error:
 
 ```scala
-scala> val qread = read[Quantity[Refined[Float, NonNegative], Second]](conf)
-val qread: pureconfig.ConfigReader.Result[coulomb.Quantity[eu.timepit.refined.api.Refined[Float,eu.timepit.refined.numeric.NonNegative],coulomb.si.Second]] =
-Left(ConfigReaderFailures(ConvertFailure(CannotConvert({
-    # hardcoded value
-    "unit" : "meter",
-    # hardcoded value
-    "value" : 1
-}
-,coulomb.Quantity[Float,coulomb.si.Second],Failed to parse (1.0, meter) ==> coulomb.si.Second),None,),List()))
+scala> val qread = conf.toOrThrow[Quantity[Refined[Float, NonNegative], Second]]
+pureconfig.error.ConfigReaderException: Cannot convert configuration to a coulomb.Quantity. Failures are:
+  at the root:
+    - Cannot convert '{
+          # hardcoded value
+          "unit" : "meter",
+          # hardcoded value
+          "value" : 1
+      }
+      ' to coulomb.Quantity[Float,coulomb.si.Second]: Failed to parse (1.0, meter) ==> coulomb.si.Second.
 ```
