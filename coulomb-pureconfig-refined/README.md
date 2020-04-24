@@ -105,7 +105,7 @@ pureconfig.error.ConfigReaderException: Cannot convert configuration to a coulom
           # hardcoded value
           "value" : 1
       }
-      ' to coulomb.Quantity[eu.timepit.refined.api.Refined[Float,eu.timepit.refined.numeric.Negative],coulomb.us.Foot]: Predicate failed: (3.28084 < 0.0)..
+      'to coulomb.Quantity[eu.timepit.refined.api.Refined[Float,eu.timepit.refined.numeric.Negative],coulomb.us.Foot]: Predicate failed: (3.28084 < 0.0)..
 ```
 
 Similarly, attempting to load with an incompatible unit is an error:
@@ -120,5 +120,5 @@ pureconfig.error.ConfigReaderException: Cannot convert configuration to a coulom
           # hardcoded value
           "value" : 1
       }
-      ' to coulomb.Quantity[Float,coulomb.si.Second]: Failed to parse (1.0, meter) ==> coulomb.si.Second.
+      'to coulomb.Quantity[Float,coulomb.si.Second]: Failed to parse (1.0, meter) ==> coulomb.si.Second.
 ```
