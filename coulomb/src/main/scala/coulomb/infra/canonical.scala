@@ -25,6 +25,27 @@ import spire.math._
 import coulomb._
 import coulomb.define._
 
+trait ImplicitExists[T] {
+  type Out
+}
+trait ImplicitExistsP1 {
+  type Aux[T, O] = ImplicitExists[T] { type Out = O }
+  implicit def implicitExistsFalse[T]: Aux[T, false] =
+    new ImplicitExists[T] { type Out = false }
+}
+object ImplicitExists extends ImplicitExistsP1 {
+  implicit def implicitExistsTrue[T](implicit t: T): Aux[T, true] =
+    new ImplicitExists[T] { type Out = true }
+}
+
+trait NoImplicit[T]
+object NoImplicit {
+  implicit def noSuchImplicit[T, Q](implicit
+      testIE: ImplicitExists.Aux[T, Q],
+      notQ: Q =:!= true): NoImplicit[T] =
+    new NoImplicit[T] {}
+}
+
 object TypeString {
   import scala.reflect.runtime.universe._
   def typeString[T :WeakTypeTag]: String = {

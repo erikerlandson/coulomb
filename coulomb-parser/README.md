@@ -23,15 +23,17 @@ libraryDependencies ++= Seq(
 )
 ```
 
-The `coulomb` package `coulomb-parser` provides a utility for parsing a quantity expression DSL into
+The `coulomb-parser` package provides a utility for parsing a quantity expression DSL into
 correctly typed `Quantity` values, called `QuantityParser`.
 The following coulomb packages make use of QuantityParser:
 
 * [coulomb-avro](../coulomb-avro/)
 * [coulomb-pureconfig](../coulomb-pureconfig/)
+* [coulomb-pureconfig-refined](../coulomb-pureconfig-refined/)
 * [coulomb-typesafe-config](../coulomb-typesafe-config/)
 
 ### Examples
+
 A `QuantityParser` is instantiated with a list of types that it will recognize.
 This example shows a quantity parser that can recognize values in bytes, seconds,
 and the two prefixes mega and giga:
@@ -69,3 +71,52 @@ scala> qp[Double, Minute]("60 byte")
 res4: scala.util.Try[coulomb.Quantity[Double,coulomb.time.Minute]] =
 Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed ...
 ```
+
+A quantity parser can be used to generate coefficients of conversion between
+unit expression strings and a unit type, using the `coefficient` method.
+Coulomb uses spire `Rational` as its internal representation of coefficients.
+Incompatible units will result in a compile failure:
+
+```scala
+
+scala> val coef = qp.coefficient[Nat]("byte")
+val coef: scala.util.Try[spire.math.Rational] = Success(18014398509481984/3248660424303251)
+
+scala> coef.get
+val res14: spire.math.Rational = 18014398509481984/3248660424303251
+
+scala> val coef = qp.coefficient[Nat]("second")
+val coef: scala.util.Try[spire.math.Rational] =
+Failure(scala.tools.reflect.ToolBoxError: reflective compilation has failed:
+```
+
+Quantity parsers can be used to apply units to a raw value, using the `applyUnitExpr` method.
+This method can be useful when writing i/o routines.
+
+```scala
+scala> val qv = qp.applyUnitExpr[Float, Minute](1f, "second")
+val qv: scala.util.Try[coulomb.Quantity[Float,coulomb.time.Minute]] = Success(Quantity(0.016666668))
+
+scala> qv.get.show
+val res13: String = 0.016666668 min
+```
+
+#### include files
+
+A QuantityParser is typically aware of necessary implicit definitions at global scope,
+however in some scenarios it may not see needed definitions.
+For example, this can happen with
+[customized definitions](../README.md#unit-conversions-for-custom-value-types).
+You can create a QuantityParser with additional imports using the `withImports` method:
+
+```scala
+val qp = QuantityParser.withImports[Foot :: Meter :: HNil]("my.custom1._", "my.custom2._", ...)
+```
+
+#### serialization
+
+`QuantityParser` is `<: Serializable`.
+Once created, these objects can be serialized and deserialized for use in
+multiple contexts.
+An example of "ser/de" can be seen in the quantity parser
+[unit tests](../coulomb-tests/src/test/scala/coulomb/QuantityParser.scala)

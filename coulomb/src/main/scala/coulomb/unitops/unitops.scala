@@ -68,13 +68,13 @@ object UnitMul {
   type Aux[N1, U1, N2, U2, R12] = UnitMul[N1, U1, N2, U2] {
     type RT = R12
   }
-  implicit def evidenceMSG1[N1, U1, N2, U2](implicit
+  implicit def evidenceMSG1[N1, U1, N2, U2, ORT](implicit
       ms1: MultiplicativeSemigroup[N1],
       uc: UnitConverter[N2, U2, N1, U2],
-      mrt12: MulResultType[U1, U2]): Aux[N1, U1, N2, U2, mrt12.Out] =
+      mrt12: MulResultType.Aux[U1, U2, ORT]): Aux[N1, U1, N2, U2, ORT] =
     new UnitMul[N1, U1, N2, U2] {
       def vmul(v1: N1, v2: N2): N1 = ms1.times(v1, uc.vcnv(v2))
-      type RT = mrt12.Out
+      type RT = ORT
     }
 }
 

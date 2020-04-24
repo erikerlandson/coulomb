@@ -18,34 +18,24 @@ package coulomb.pureconfig
 
 import shapeless.{ ::, HNil }
 
-import spire.math._
-
-import singleton.ops._
-
 import utest._
-
-import coulomb._
-import coulomb.unitops._
-import coulomb.si._
-import coulomb.siprefix._
-import coulomb.mks._
-import coulomb.accepted._
-import coulomb.time._
-import coulomb.info._
-import coulomb.binprefix._
-import coulomb.us._
-import coulomb.temp._
-import coulomb.parser.QuantityParser
-
-import com.typesafe.config.ConfigFactory
 
 import _root_.pureconfig._
 import _root_.pureconfig.generic.auto._
 
+import com.typesafe.config.ConfigFactory
+
+import coulomb._
+import coulomb.si.{ Meter, Second }
+import coulomb.siprefix.{ Giga, Mega }
+import coulomb.time.Hour
+import coulomb.info.Byte
+
+import coulomb.parser.QuantityParser
+
 import coulomb.validators.CoulombValidators._
 
 object PureconfigTests extends TestSuite {
-  case class QC(duration: Quantity[Double, Second], memory: Quantity[Double, Mega %* Byte], regular: Int)
 
   implicit val qp = QuantityParser[Second :: Byte :: Hour :: Giga :: HNil]
 
@@ -56,7 +46,11 @@ object PureconfigTests extends TestSuite {
   }""")
 
   val tests = Tests {
-    test("load a pureconfic case class with unit conversions") {
+    test("load a case class with Quantity unit conversions") {
+      case class QC(duration: Quantity[Double, Second],
+                    memory: Quantity[Double, Mega %* Byte],
+                    regular: Int)
+
       val qc = ConfigSource.fromConfig(conf).load[QC].toOption.get
       assert(
         qc.duration.isValidQ[Double, Second](3600.0),
@@ -66,7 +60,42 @@ object PureconfigTests extends TestSuite {
     }
 
     test("fail on incompatible units") {
-      case class Wrong(duration: Quantity[Double, Meter], memory: Quantity[Double, Mega %* Byte])
+      case class Wrong(duration: Quantity[Double, Meter],      // oh no!
+                       memory: Quantity[Double, Mega %* Byte],
+                       regular: Int)
+
+      val qc = ConfigSource.fromConfig(conf).load[Wrong]
+      assert(qc.isLeft)
+    }
+
+    test("load a case class with a refined Quantity") {
+      import eu.timepit.refined._
+      import eu.timepit.refined.api._
+      import eu.timepit.refined.numeric._
+      import coulomb.pureconfig.refined._
+
+      case class QC(duration: Quantity[Refined[Double, Positive], Second],
+                    memory: Quantity[Double, Mega %* Byte],
+                    regular: Int)
+
+      val qc = ConfigSource.fromConfig(conf).load[QC].toOption.get
+      assert(
+        qc.duration.isValidQ[Refined[Double, Positive], Second](3600.0),
+        qc.memory.isValidQ[Double, Mega %* Byte](1000.0),
+        qc.regular == 42
+      )
+    }
+
+    test("fail on un-validated refined predicate") {
+      import eu.timepit.refined._
+      import eu.timepit.refined.api._
+      import eu.timepit.refined.numeric._
+      import coulomb.pureconfig.refined._
+
+      case class Wrong(duration: Quantity[Refined[Double, Negative], Second], // oh no!
+                       memory: Quantity[Double, Mega %* Byte],
+                       regular: Int)
+
       val qc = ConfigSource.fromConfig(conf).load[Wrong]
       assert(qc.isLeft)
     }

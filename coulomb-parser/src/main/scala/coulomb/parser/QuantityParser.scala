@@ -34,14 +34,18 @@ import coulomb.parser.unitops.UnitTypeString
  * val speed = qp[Double, Mile %/ Hour]("10.0 kilometer / second") // prefix units are parsed
  * }}}
  */
-class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) extends Serializable {
+class QuantityParser private (
+    private val qpp: coulomb.parser.infra.QPP[_],
+    private val iseq: Seq[String]) extends Serializable {
   import scala.reflect.runtime.universe.{ Try => _, _ }
   import scala.tools.reflect.ToolBox
 
   @transient private lazy val lex = new coulomb.parser.lexer.UnitDSLLexer(qpp.unames, qpp.pfnames)
   @transient private lazy val parse = new coulomb.parser.parser.UnitDSLParser(qpp.nameToType)
 
-  @transient lazy val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
+  @transient private lazy val imports = iseq.map(i => s"import $i\n").mkString("")
+
+  @transient private lazy val toolbox = runtimeMirror(getClass.getClassLoader).mkToolBox()
 
   /**
    * Parse an expression into a unit typed Quantity
@@ -58,27 +62,61 @@ class QuantityParser private (private val qpp: coulomb.parser.infra.QPP[_]) exte
       ntt: WeakTypeTag[N],
       uts: UnitTypeString[U]): Try[Quantity[N, U]] = {
     val tpeN = weakTypeOf[N]
-    val cast = s".toUnit[${uts.expr}].toValue[$tpeN]"
+    val cast = s".to[$tpeN, ${uts.expr}]"
     for {
       tok <- lex(quantityExpr)
       ast <- parse(tok).toTry
-      code <- Try { s"($ast)${cast}" }
-      qeTree <- Try { toolbox.parse(code) }
-      qeEval <- Try { toolbox.eval(qeTree) }
-      qret <- Try { qeEval.asInstanceOf[Quantity[N, U]] }
+      qret <- Try {
+        val code = s"${imports}($ast)${cast}"
+        toolbox.eval(toolbox.parse(code)).asInstanceOf[Quantity[N, U]]
+      }
     } yield {
       qret
     }
   }
 
-  def coefficient[U2](u1: String)(implicit ut2: UnitTypeString[U2]): Try[Rational] = {
+  /**
+   * Parse a unit expression and apply it to a value
+   * @tparam V the value type
+   * @tparam U2 the output unit type
+   * @param v the raw value
+   * @param u1 the unit expression string, encodes a unit type `U1`
+   * e.g. "meter / (second &#94; 2)"
+   * @return a Try value wrapping `Quantity[V, U2]`.
+   * Effectively, generates `v.withUnit[U1].toUnit[U2]`
+   */
+  def applyUnitExpr[V, U2](v: V, u1: String)(implicit
+    vtt: WeakTypeTag[V],
+    ut2: UnitTypeString[U2]
+  ): Try[Quantity[V, U2]] = {
+    val tpeV = weakTypeOf[V]
     for {
-      tok1 <- lex(u1)
-      ast1 <- parse.parseUnit(tok1).toTry
-      code <- Try { s"coulomb.Quantity.coefficient[${ast1},${ut2.expr}]" }
-      qeTree <- Try { toolbox.parse(code) }
-      qeEval <- Try { toolbox.eval(qeTree) }
-      qret <- Try { qeEval.asInstanceOf[Rational] }
+      tok <- lex(u1)
+      ut1 <- parse.parseUnit(tok).toTry
+      v2q <- Try {
+        val code = s"${imports}(v: $tpeV) => (coulomb.Quantity[$tpeV, $ut1](v)).toUnit[${ut2.expr}]"
+        toolbox.eval(toolbox.parse(code)).asInstanceOf[V => Quantity[V, U2]]
+      }
+    } yield {
+      v2q(v)
+    }
+  }
+
+  /**
+   * Parse a unit expression and obtain the conversion coefficient to another unit
+   * @tparam U2 the unit being converted to
+   * @param u1 the unit expression string, encodes a unit type `U1`
+   * @return a Try value wrapping the coefficient from U1 -> U2
+   */
+  def coefficient[U2](u1: String)(implicit
+    ut2: UnitTypeString[U2]): Try[Rational] = {
+    for {
+      tok <- lex(u1)
+      ut1 <- parse.parseUnit(tok).toTry
+      qret <- Try {
+        val code = s"${imports}coulomb.Quantity.coefficient[$ut1, ${ut2.expr}]"
+        toolbox.eval(toolbox.parse(code)).asInstanceOf[Rational]
+      }
     } yield {
       qret
     }
@@ -89,13 +127,35 @@ object QuantityParser {
   /**
    * Construct a QuantityParser instance that recognizes a given list of units.
    * @tparam UL a list of unit types to expect, as a shapeless HList
+   * @return a QuantityParser object that is aware of the units in `UL`
    * {{{
    * // declare a quantity parser that will recognize "meter", "second" and prefix unit "kilo"
    * // prefix units are automatically detected and parsed as prefixes, e.g. "kilometer"
    * val qp = QuantityParser[Meter :: Second :: Kilo :: HNil]
    * }}}
    */
-  def apply[UL <: shapeless.HList](implicit qpp: coulomb.parser.infra.QPP[UL]): QuantityParser = {
-    new QuantityParser(qpp)
+  def apply[UL <: shapeless.HList](implicit
+      qpp: coulomb.parser.infra.QPP[UL]): QuantityParser = {
+    new QuantityParser(qpp, List.empty[String])
+  }
+
+  /**
+   * Similar to `apply[UL]` method but also accepts a list of imports for
+   * expression compiling.
+   * Used for importing implicits that may not be picked up
+   * by default global scope.
+   * @tparam UL a list of unit types to expect, as a shapeless HList
+   * @param ilist a variable arg list of strings representing imports.
+   * Example `"org.custom.algebras._"`
+   * @return a QuantityParser object that is aware of the units in `UL`
+   * and will `import` the expressions given on `ilist` before
+   * parsing unit expressions
+   * {{{
+   * val qp = QuantityParser[Meter :: Second :: Kilo :: HNil]("org.custom.algebras._", ...)
+   * }}}
+   */
+  def withImports[UL <: shapeless.HList](ilist: String*)(implicit
+      qpp: coulomb.parser.infra.QPP[UL]): QuantityParser = {
+    new QuantityParser(qpp, ilist)
   }
 }

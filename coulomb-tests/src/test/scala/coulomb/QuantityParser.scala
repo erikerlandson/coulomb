@@ -2,24 +2,16 @@ package coulomb.parser
 
 import shapeless.{ ::, HNil }
 
-import spire.math._
 import spire.std.any._
-
-import singleton.ops._
 
 import utest._
 
 import coulomb._
-import coulomb.unitops._
-import coulomb.si._
-import coulomb.siprefix._
-import coulomb.mks._
-import coulomb.accepted._
-import coulomb.time._
-import coulomb.info._
-import coulomb.binprefix._
-import coulomb.us._
-import coulomb.temp._
+import coulomb.si.{ Second, Meter }
+import coulomb.siprefix.{ Mega, Giga }
+import coulomb.time.Minute
+import coulomb.info.{ Byte, Bit }
+import coulomb.us.Foot
 
 import coulomb.validators.CoulombValidators._
 
@@ -37,6 +29,14 @@ object ConfigIntegration {
   private val qp = QuantityParser[Byte :: Second :: Giga :: Mega :: HNil]
 
   val conf = confTS.withQuantityParser(qp)
+}
+
+object ComplexTest {
+  import coulomb.unitops._, spire.math.Complex, spire.algebra._, spire.std.any._
+  implicit def complexPolicy[U1, U2]: UnitConverterPolicy[Complex[Double], U1, Complex[Double], U2] =
+     new UnitConverterPolicy[Complex[Double], U1, Complex[Double], U2] {
+       def convert(v: Complex[Double], cu: ConvertableUnits[U1, U2]): Complex[Double] = v * cu.coef.toDouble
+     }
 }
 
 object QuantityParserTests extends TestSuite {
@@ -63,6 +63,18 @@ object QuantityParserTests extends TestSuite {
     test("fail on incompatible units") {
       val try1 = conf.getQuantity[Double, Meter]("duration")
       assert(try1.isInstanceOf[scala.util.Failure[_]])
+    }
+
+    // this is also testing empty prefix-unit list, which exposed a bug
+    test("customizing with applyUnitExpr and withImports") {
+      import spire.math.Complex, spire.algebra._, spire.std.any._
+      val v = Complex[Double](1, 2)
+      val qpw = QuantityParser.withImports[Foot :: Meter :: HNil]("coulomb.parser.ComplexTest._")
+      val res = qpw.applyUnitExpr[Complex[Double], Foot](v, "meter")
+      assert(res.isInstanceOf[scala.util.Success[_]])
+      val q = res.toOption.get
+      assert(scala.math.abs(q.value.real - 3.28084) < 1e-4)
+      assert(scala.math.abs(q.value.imag - 6.56168) < 1e-4)
     }
 
     test("support ser/de") {

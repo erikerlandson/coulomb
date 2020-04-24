@@ -17,53 +17,65 @@ limitations under the License.
 package coulomb
 
 import scala.util.{ Try, Success, Failure }
-
-import _root_.pureconfig.{ConfigConvert, ConfigCursor}
-import _root_.pureconfig.error.{CannotConvert, ConfigReaderFailures, ConvertFailure}
-import com.typesafe.config.ConfigValue
 import scala.reflect.runtime.universe.WeakTypeTag
+
+import _root_.pureconfig.{ConfigReader, ConfigWriter, ConfigCursor}
+import _root_.pureconfig.error.{CannotConvert, ConfigReaderFailures, ConvertFailure}
+
+import com.typesafe.config.ConfigValue
 
 import coulomb.unitops.UnitString
 import coulomb.parser.unitops.UnitTypeString
 import coulomb.parser.QuantityParser
 
+package pureconfig.infra {
+  // other libs can override with more specific pureconfig rules
+  trait CoulombPureconfigOverride[V]
+
+  case class ConfigQuantity[V](value: V, unit: String)
+}
+
 /**
- * Defines implicit ConfigConvert materializers to save and load coulomb Quantity fields
+ * Defines ConfigReader and ConfigWriter to save and load coulomb Quantity fields
  */
 package object pureconfig {
-  case class ConfigCoulomb[N](value: N, unit: String)
+  import coulomb.infra.NoImplicit
+  import coulomb.pureconfig.infra._
 
-  object ConfigCoulomb {
-    def apply[N, U](q: Quantity[N, U])(implicit ustr: UnitString[U]): ConfigCoulomb[N] =
-      ConfigCoulomb(q.value, q.showUnitFull)
+  /** Manifest a ConfigWriter for `Quantity[V, U]` */
+  implicit def coulombQuantityConfigWriter[V, U](implicit
+    ovr: NoImplicit[CoulombPureconfigOverride[V]],
+    qcw: ConfigWriter[ConfigQuantity[V]],
+    ustr: UnitString[U]
+  ): ConfigWriter[Quantity[V, U]] = new ConfigWriter[Quantity[V, U]] {
+    def to(q: Quantity[V, U]): ConfigValue =
+      qcw.to(ConfigQuantity(q.value, q.showUnitFull))
   }
 
-  /** implicit materializer for saving and loading coulomb Quantity fields */
-  implicit def coulombQuantityConfigConvert[N, U](implicit
-    ntt: WeakTypeTag[N],
-    qtt: WeakTypeTag[Quantity[N, U]],
-    ustr: UnitString[U],
-    uts: UnitTypeString[U],
+  /** Manifest a ConfigReader for `Quantity[V, U]` */
+  implicit def coulombQuantityConfigReader[V, U](implicit
+    ovr: NoImplicit[CoulombPureconfigOverride[V]],
+    qcr: ConfigReader[ConfigQuantity[V]],
     qp: QuantityParser,
-    coulombConvert: ConfigConvert[ConfigCoulomb[N]]
-  ): ConfigConvert[Quantity[N, U]] = new ConfigConvert[Quantity[N, U]] {
-    def from(cur: ConfigCursor): Either[ConfigReaderFailures, Quantity[N, U]] = {
-      coulombConvert.from(cur) match {
+    ntt: WeakTypeTag[V],
+    qtt: WeakTypeTag[Quantity[V, U]],
+    uts: UnitTypeString[U]
+  ): ConfigReader[Quantity[V, U]] = new ConfigReader[Quantity[V, U]] {
+    def from(cur: ConfigCursor): Either[ConfigReaderFailures, Quantity[V, U]] = {
+      qcr.from(cur) match {
         case Left(readFailure) => Left(readFailure)
-        case Right(ConfigCoulomb(value, unit)) => {
-          qp[N, U](s"$value $unit") match {
+        case Right(ConfigQuantity(value, unit)) => {
+          qp.applyUnitExpr[V, U](value, unit) match {
             case Success(q) => Right(q)
-            case Failure(parseFailure) => Left(ConfigReaderFailures(ConvertFailure(
+            case Failure(_) => Left(ConfigReaderFailures(ConvertFailure(
               reason = CannotConvert(
                 value = cur.value.render(),
                 toType = qtt.tpe.toString,
-                because = s"Incompatible unit: $unit"),
+                because = s"Failed to parse ($value, $unit) ==> ${uts.expr}"),
               cur = cur)))
           }
         }
       }
     }
-
-    def to(q: Quantity[N, U]): ConfigValue = coulombConvert.to(ConfigCoulomb(q))
-  }
+  }  
 }

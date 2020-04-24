@@ -41,13 +41,16 @@ object lexer {
     override val whiteSpace = "[ \t]+".r
 
     val unitRE = {
-      val t = (pfunits ++ units).mkString("|")
+      // use space if length is zero because it cannot match
+      val upfu = pfunits ++ units
+      val t = if (upfu.length > 0) upfu.mkString("|") else " "
       (s"($t)").r
     }
 
     val pfunitRE = {
-      val t1 = pfunits.mkString("|")
-      val t2 = units.mkString("|")
+      // use space if length is zero because it cannot match
+      val t1 = if (pfunits.length > 0) pfunits.mkString("|") else " "
+      val t2 = if (units.length > 0) units.mkString("|") else " "
       (s"($t1)($t2)").r
     }
 
