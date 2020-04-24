@@ -1,7 +1,9 @@
 # Integration with refined
 
-To learn more about coulomb in general refer to the
-[coulomb tutorial](../README.md#tutorial)
+Learn more:
+
+* [coulomb tutorial](../README.md#tutorial)
+* [coulomb-pureconfig-refined](../coulomb-pureconfig-refined/README.md)
 
 ### How to include in your project
 
