@@ -97,7 +97,7 @@ pureconfig.error.ConfigReaderException: Cannot convert configuration to a coulom
           # hardcoded value
           "value" : 1
       }
-      ' to coulomb.Quantity[Float,coulomb.si.Meter %/ (coulomb.si.Second %^ Int(3))]: Failed to parse (1.0, (mile/hour)/minute) ==> coulomb.%/[coulomb.si.Meter, coulomb.%^[coulomb.si.Second, 3]].
+      'to coulomb.Quantity[Float,coulomb.si.Meter %/ (coulomb.si.Second %^ Int(3))]: Failed to parse (1.0, (mile/hour)/minute) ==> coulomb.%/[coulomb.si.Meter, coulomb.%^[coulomb.si.Second, 3]].
 ```
 
 A common use case for `pureconfig` is loading configurations into well typed case classes.
