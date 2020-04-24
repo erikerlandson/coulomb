@@ -26,7 +26,7 @@ libraryDependencies ++= Seq(
   "com.github.pureconfig" %% "pureconfig-generic" % "0.12.3",
   // refined integration
   "com.manyangled" %% "coulomb-refined" % "0.4.0",  
-  "eu.timepit" %% "refined" % "0.9.13"
+  "eu.timepit" %% "refined" % "0.9.14"
 )
 ```
 
