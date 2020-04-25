@@ -3,7 +3,7 @@
 
 def commonSettings = Seq(
   organization := "com.manyangled",
-  version := "0.4.6-SNAPSHOT",
+  version := "0.4.6",
   scalaVersion := "2.13.2",
   crossScalaVersions := Seq("2.13.2"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
