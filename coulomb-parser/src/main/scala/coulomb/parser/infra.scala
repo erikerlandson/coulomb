@@ -52,27 +52,7 @@ object unitops {
 
 object infra {
   import coulomb.parser.unitops._
-
-  trait Evidence[T] {
-    type Out
-  }
-  trait EvidenceLowPriority {
-    type Aux[T, O] = Evidence[T] { type Out = O }
-    implicit def evidenceFalse[T]: Aux[T, false] =
-      new Evidence[T] { type Out = false }
-  }
-  object Evidence extends EvidenceLowPriority {
-    implicit def evidenceTrue[T](implicit t: T): Aux[T, true] =
-      new Evidence[T] { type Out = true }
-  }
-
-  trait NoEvidence[T]
-  object NoEvidence {
-    // Note: if you try to directly ask for Evidence.Aux[T, false], it will match the
-    // low-priority rule above, and this won't work right.
-    implicit def evidence0[T, V](implicit no: Evidence.Aux[T, V], vf: V =:= false): NoEvidence[T] =
-      new NoEvidence[T] {}
-  }
+  import coulomb.infra.NoImplicit
 
   trait FilterPrefixUnits[S] {
     type Out
@@ -86,7 +66,7 @@ object infra {
       new FilterPrefixUnits[U :: T] { type Out = U :: TF }
     }
     implicit def evidence2[U, T <: HList, TF <: HList](implicit
-        npfu: NoEvidence[DerivedUnit[U, Unitless]],
+        npfu: NoImplicit[DerivedUnit[U, Unitless]],
         tf: Aux[T, TF]): Aux[U :: T, TF] = {
       new FilterPrefixUnits[U :: T] { type Out = TF }
     }
@@ -106,7 +86,7 @@ object infra {
     implicit def evidence0: Aux[HNil, HNil] = new FilterNonPrefixUnits[HNil] { type Out = HNil }
     implicit def evidence1[U, T <: HList, TF <: HList](implicit
         pfu: DerivedUnit[U, _],
-        npfu: NoEvidence[DerivedUnit[U, Unitless]],
+        npfu: NoImplicit[DerivedUnit[U, Unitless]],
         tf: Aux[T, TF]): Aux[U :: T, U :: TF] = {
       new FilterNonPrefixUnits[U :: T] { type Out = U :: TF }
     }
