@@ -22,6 +22,7 @@ import utest._
 
 import _root_.pureconfig._
 import _root_.pureconfig.generic.auto._
+import _root_.pureconfig.syntax._
 
 import com.typesafe.config.ConfigFactory
 
@@ -34,6 +35,11 @@ import coulomb.info.Byte
 import coulomb.parser.QuantityParser
 
 import coulomb.validators.CoulombValidators._
+
+object CaseClassTest {
+  case class Author(name: String)
+  case class Book(title: String, author: String)
+}
 
 object PureconfigTests extends TestSuite {
 
@@ -98,6 +104,23 @@ object PureconfigTests extends TestSuite {
 
       val qc = ConfigSource.fromConfig(conf).load[Wrong]
       assert(qc.isLeft)
+    }
+
+    test("undeclared base units") {
+      import coulomb.policy.undeclaredBaseUnits._
+      import CaseClassTest._
+
+      val conf = (3.withUnit[Book], 5.withUnit[Author]).toConfig
+      assert(conf.toString == """SimpleConfigList([{"unit":"Book","value":3},{"unit":"Author","value":5}])""")
+
+      implicit val qp = QuantityParser.withImports[Book :: Author :: HNil]("coulomb.policy.undeclaredBaseUnits._")
+      val load = conf.toOrThrow[(Quantity[Float, Book], Quantity[Int, Author])]
+      assert(load._1.isValidQ[Float, Book](3))
+      assert(load._2.isValidQ[Int, Author](5))
+
+      intercept[Exception] {
+        conf.toOrThrow[(Quantity[Int, Author], Quantity[Int, Book])]
+      }
     }
   }
 }
