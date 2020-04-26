@@ -6,22 +6,14 @@
  [![Join the chat at https://gitter.im/erikerlandson/community](https://badges.gitter.im/erikerlandson/community.svg)](https://gitter.im/erikerlandson/coulomb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### Documentation
-API documentation for `coulomb` is available at: https://erikerlandson.github.io/coulomb/latest/api/
 
-There is also a [tutorial](#tutorial) below.
-
-Blog post: Preventing configuration errors with
-[unit types](http://erikerlandson.github.io/blog/2019/05/09/preventing-configuration-errors-with-unit-types/).
-
-Blog post: Integrating Apache Avro
-[with coulomb](http://erikerlandson.github.io/blog/2019/05/23/unit-types-for-avro-schema-integrating-avro-with-coulomb/).
-
-Blog post: The logical representation coulomb uses for
-[units and unit analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/).
-
-Talk:
-["Why Your Data Schema Should Include Units"](https://www.youtube.com/watch?v=qrQmB2KFKE8)
-at Berlin Buzzwords 2019.
+* [API documentation for `coulomb`](https://erikerlandson.github.io/coulomb/latest/api/)
+* [`coulomb` tutorial](#tutorial)
+* [Your Data Type is a Unit](http://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/)
+* [Why Your Data Schema Should Include Units](https://www.youtube.com/watch?v=qrQmB2KFKE8)
+* [Preventing Configuration Errors With Unit Types](http://erikerlandson.github.io/blog/2019/05/09/preventing-configuration-errors-with-unit-types/)
+* [Unit Types for Avro Schema: Integrating Avro with Coulomb](http://erikerlandson.github.io/blog/2019/05/23/unit-types-for-avro-schema-integrating-avro-with-coulomb/)
+* [Algorithmic Unit Analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/)
 
 ### Scala Requirements
 
