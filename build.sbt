@@ -1,11 +1,13 @@
 // xsbt clean unidoc previewSite
 // xsbt clean unidoc ghpagesPushSite
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 def commonSettings = Seq(
   organization := "com.manyangled",
   version := "0.4.7-SNAPSHOT",
-  scalaVersion := "2.13.2",
-  crossScalaVersions := Seq("2.13.2"),
+  scalaVersion := "2.13.3",
+  crossScalaVersions := Seq("2.13.3"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
