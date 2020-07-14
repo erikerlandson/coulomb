@@ -47,21 +47,7 @@ object NoImplicit {
 }
 
 object TypeString {
-  import scala.reflect.runtime.universe._
-  def typeString[T :WeakTypeTag]: String = {
-    def work(t: Type): String = {
-      t match { case TypeRef(pre, sym, args) =>
-        val ss = sym.toString
-                    .stripPrefix("free ")
-                    .stripPrefix("trait ")
-                    .stripPrefix("class ")
-                    .stripPrefix("type ")
-        val as = args.map(work)
-        if (args.length <= 0) ss else (ss + "[" + as.mkString(",") + "]")
-      }
-    }
-    work(weakTypeOf[T])
-  }
+  def typeString[T :Typeable]: String = Typeable[T].describe
 }
 
 trait IsUnitExpr[T] {
@@ -91,13 +77,12 @@ trait GetBaseUnit[U] {
   def bu: BaseUnit[U]
 }
 trait GetBaseUnitP1 {
-  import scala.reflect.runtime.universe._
 
   implicit def undeclared[T, TUE](implicit
       enabled: coulomb.policy.EnableUndeclaredBaseUnits,
       testUE: IsUnitExpr.Aux[T, TUE],
       notUE: TUE =:!= true,
-      tt: WeakTypeTag[T]): GetBaseUnit[T] = {
+      tt: Typeable[T]): GetBaseUnit[T] = {
     val name = TypeString.typeString[T]
     new GetBaseUnit[T] {
       val bu = new BaseUnit[T](name, name)

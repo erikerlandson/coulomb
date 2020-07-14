@@ -17,7 +17,6 @@ limitations under the License.
 package coulomb.define
 
 import scala.language.implicitConversions
-import scala.reflect.runtime.universe._
 
 import spire.math._
 import shapeless._
@@ -58,8 +57,8 @@ object BaseUnit {
    * @param name the full name of the unit, e.g. "meter"
    * @param abbv an abbreviation for the unit, e.g. "m"
    */
-  def apply[U](name: String = "", abbv: String = "")(implicit ut: WeakTypeTag[U]): BaseUnit[U] = {
-    val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
+  def apply[U](name: String = "", abbv: String = "")(implicit ut: Typeable[U]): BaseUnit[U] = {
+    val n = if (name != "") name else ut.describe.toLowerCase()
     val a = if (abbv != "") abbv else n.take(1)
     new BaseUnit[U](n, a)
   }
@@ -90,9 +89,9 @@ object DerivedUnit {
    * @param abbv an abbreviation for the unit, e.g. "l"
    */
   def apply[U, D](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit
-      ut: WeakTypeTag[U]): DerivedUnit[U, D] = {
+      ut: Typeable[U]): DerivedUnit[U, D] = {
     require(coef > 0, "Unit coefficients must be strictly > 0")
-    val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
+    val n = if (name != "") name else ut.describe.toLowerCase()
     val a = if (abbv != "") abbv else n.take(1)
     new DerivedUnit[U, D](coef, n, a)
   }
@@ -108,6 +107,6 @@ object PrefixUnit {
    * @param abbv an abbreviation for the unit, e.g. "k"
    */
   def apply[U](coef: Rational = Rational(1), name: String = "", abbv: String = "")(implicit
-      ut: WeakTypeTag[U]): DerivedUnit[U, Unitless] =
+      ut: Typeable[U]): DerivedUnit[U, Unitless] =
     DerivedUnit[U, Unitless](coef, name, abbv)
 }

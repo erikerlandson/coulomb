@@ -16,11 +16,10 @@ limitations under the License.
 
 package coulomb.offset.define
 
-import scala.reflect.runtime.universe.WeakTypeTag
-
 import spire.math._
 
 import coulomb.define._
+import shapeless.Typeable
 
 /**
  * An offset unit extends derived unit, with an offset as well as a coefficient
@@ -48,9 +47,9 @@ object OffsetUnit {
    * @param abbv an abbreviation for the offset unit, e.g. "C"
    */
   def apply[U, D](coef: Rational = Rational(1), off: Rational = Rational(0), name: String = "", abbv: String = "")(implicit
-      ut: WeakTypeTag[U]): OffsetUnit[U, D] = {
+      ut: Typeable[U]): OffsetUnit[U, D] = {
     require(coef > 0, "Unit coefficients must be strictly > 0")
-    val n = if (name != "") name else ut.tpe.typeSymbol.name.toString.toLowerCase
+    val n = if (name != "") name else ut.describe
     val a = if (abbv != "") abbv else n.take(1)
     new OffsetUnit[U, D](coef, off, n, a)
   }
