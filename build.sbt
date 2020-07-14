@@ -14,7 +14,7 @@ def commonSettings = Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "spire" % "0.17.0-M1" % Provided,
+    "org.typelevel" %% "spire" % "0.17.0-RC1" % Provided,
     "eu.timepit" %% "singleton-ops" % "0.5.1" % Provided,
     "eu.timepit" %% "refined" % "0.9.14" % Provided,
     "com.lihaoyi" %% "utest" % "0.7.4" % Test
