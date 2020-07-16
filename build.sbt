@@ -1,6 +1,8 @@
 // xsbt clean unidoc previewSite
 // xsbt clean unidoc ghpagesPushSite
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 def commonSettings = Seq(
   organization := "com.manyangled",
   version := "0.4.7-SNAPSHOT",
@@ -120,6 +122,32 @@ def coulombPureConfigDeps = Seq(
   "com.github.pureconfig" %% "pureconfig-generic" % "0.13.0" % Provided,
 )
 
+def coulombCatsDeps = Seq(
+  "org.typelevel" %% "cats-core" % "2.1.1" % Provided
+)
+
+lazy val coulomb_cats = (project in file("coulomb-cats"))
+  .aggregate(coulomb)
+  .dependsOn(coulomb)
+  .settings(name := "coulomb-cats")
+  .settings(commonSettings :_*)
+  .settings(docDepSettings :_*)
+  .settings(libraryDependencies ++= coulombCatsDeps)
+
+def coulombTestkitDeps = Seq(
+   "org.typelevel" %% "cats-testkit" % "2.1.1" % Provided,
+   "org.typelevel" %% "cats-testkit-scalatest" % "1.0.1" % Provided
+)
+
+lazy val coulomb_testkit = (project in file("coulomb-testkit"))
+  .aggregate(coulomb, coulomb_si_units, coulomb_cats)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_cats)
+  .settings(name := "coulomb-testkit")
+  .settings(commonSettings :_*)
+  .settings(docDepSettings :_*)
+  .settings(libraryDependencies ++= coulombCatsDeps)
+  .settings(libraryDependencies ++= coulombTestkitDeps)
+
 lazy val coulomb_pureconfig = (project in file("coulomb-pureconfig"))
   .aggregate(coulomb, coulomb_parser)
   .dependsOn(coulomb, coulomb_parser)
@@ -150,8 +178,8 @@ lazy val coulomb_pureconfig_refined = (project in file("coulomb-pureconfig-refin
   .settings(libraryDependencies ++= coulombRefinedDeps)
 
 lazy val coulomb_tests = (project in file("coulomb-tests"))
-  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined)
-  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined)
+  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined, coulomb_cats, coulomb_testkit)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined, coulomb_cats, coulomb_testkit)
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
   .settings(libraryDependencies ++= coulombParserDeps)
