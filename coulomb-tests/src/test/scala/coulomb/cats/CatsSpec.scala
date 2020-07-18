@@ -9,7 +9,7 @@ import coulomb.si._
 import coulomb.siprefix._
 
 final class CatsSpec extends CatsSuite {
-  import coulomb.arb.ArbQuantity._
+  import coulomb.scalacheck.ArbQuantity._
 
   type Units = (Kilo %* Meter) %/ Second
 

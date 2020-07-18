@@ -25,4 +25,4 @@ before_cache:
 script:
   - sbt ++${TRAVIS_SCALA_VERSION} clean &&
     sbt ++${TRAVIS_SCALA_VERSION} compile &&
-    sbt ++${TRAVIS_SCALA_VERSION} coulomb_tests/test coulomb_testkit/test
+    sbt ++${TRAVIS_SCALA_VERSION} coulomb_tests/test

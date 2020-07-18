@@ -16,3 +16,7 @@ project/metals.sbt
 # Scala-IDE specific
 .scala_dependencies
 .worksheet
+.bloop/
+.metals/
+.idea/
+.hydra/
