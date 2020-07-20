@@ -94,7 +94,7 @@ res7: Boolean = true
 
 Convertible units can be compared too 
 ```scala
-@ @ a.eqv(c)
+@ a.eqv(c)
   res9: Boolean = true
 ```
 
