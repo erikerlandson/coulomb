@@ -15,9 +15,9 @@ def commonSettings = Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies ++= Seq(
-    "org.typelevel" %% "spire" % "0.17.0-RC1" % Provided,
-    "eu.timepit" %% "singleton-ops" % "0.5.1" % Provided,
-    "com.lihaoyi" %% "utest" % "0.7.4" % Test
+    "org.typelevel" %%% "spire" % "0.17.0-RC1" % Provided,
+    "eu.timepit" %%% "singleton-ops" % "0.5.1" % Provided,
+    "com.lihaoyi" %%% "utest" % "0.7.4" % Test
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
@@ -27,55 +27,64 @@ def docDepSettings = Seq(
   previewSite := {}
 )
 
-lazy val coulomb = (project in file("coulomb"))
+lazy val coulomb = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("coulomb"))
   .settings(name := "coulomb")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
-lazy val coulomb_si_units = (project in file("coulomb-si-units"))
-  .aggregate(coulomb)
+lazy val coulomb_si_units = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-si-units"))
   .dependsOn(coulomb)
   .settings(name := "coulomb-si-units")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
-lazy val coulomb_temp_units = (project in file("coulomb-temp-units"))
-  .aggregate(coulomb, coulomb_si_units)
+lazy val coulomb_temp_units = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-temp-units"))
   .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-temp-units")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
-lazy val coulomb_mks_units = (project in file("coulomb-mks-units"))
-  .aggregate(coulomb, coulomb_si_units)
+lazy val coulomb_mks_units = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-mks-units"))
   .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-mks-units")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
-lazy val coulomb_accepted_units = (project in file("coulomb-accepted-units"))
-  .aggregate(coulomb, coulomb_si_units)
+lazy val coulomb_accepted_units = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-accepted-units"))
   .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-accepted-units")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
-lazy val coulomb_time_units = (project in file("coulomb-time-units"))
-  .aggregate(coulomb, coulomb_si_units)
+lazy val coulomb_time_units = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-time-units"))
   .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-time-units")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
-lazy val coulomb_info_units = (project in file("coulomb-info-units"))
-  .aggregate(coulomb, coulomb_si_units)
+lazy val coulomb_info_units = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-info-units"))
   .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-info-units")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
-lazy val coulomb_customary_units = (project in file("coulomb-customary-units"))
-  .aggregate(coulomb, coulomb_si_units)
+lazy val coulomb_customary_units = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-customary-units"))
   .dependsOn(coulomb, coulomb_si_units)
   .settings(name := "coulomb-customary-units")
   .settings(commonSettings :_*)
@@ -86,8 +95,7 @@ def coulombParserDeps = Seq(
 )
 
 lazy val coulomb_parser = (project in file("coulomb-parser"))
-  .aggregate(coulomb)
-  .dependsOn(coulomb)
+  .dependsOn(coulomb.jvm)
   .settings(name := "coulomb-parser")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
@@ -98,8 +106,7 @@ def coulombTypesafeConfigDeps = Seq(
 )
 
 lazy val coulomb_typesafe_config = (project in file("coulomb-typesafe-config"))
-  .aggregate(coulomb, coulomb_parser)
-  .dependsOn(coulomb, coulomb_parser)
+  .dependsOn(coulomb.jvm, coulomb_parser)
   .settings(name := "coulomb-typesafe-config")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
@@ -110,8 +117,7 @@ def coulombAvroDeps = Seq(
 )
 
 lazy val coulomb_avro = (project in file("coulomb-avro"))
-  .aggregate(coulomb, coulomb_parser)
-  .dependsOn(coulomb, coulomb_parser)
+  .dependsOn(coulomb.jvm, coulomb_parser)
   .settings(name := "coulomb-avro")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
@@ -122,76 +128,88 @@ def coulombPureConfigDeps = Seq(
   "com.github.pureconfig" %% "pureconfig-generic" % "0.13.0" % Provided,
 )
 
-def coulombCatsDeps = Seq(
-  "org.typelevel" %% "cats-core" % "2.1.1" % Provided
-)
+def coulombCatsDeps = Def.setting(Seq(
+  "org.typelevel" %%% "cats-core" % "2.1.1" % Provided
+))
 
-lazy val coulomb_cats = (project in file("coulomb-cats"))
-  .aggregate(coulomb)
+lazy val coulomb_cats = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-cats"))
   .dependsOn(coulomb)
   .settings(name := "coulomb-cats")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
-  .settings(libraryDependencies ++= coulombCatsDeps)
+  .settings(libraryDependencies ++= coulombCatsDeps.value)
 
-def coulombScalacheckDeps = Seq(
-   "org.typelevel" %% "cats-testkit" % "2.1.1" % Provided,
-   "org.typelevel" %% "cats-testkit-scalatest" % "1.0.1" % Test
-)
+def coulombScalacheckDeps = Def.setting(Seq(
+   "org.typelevel" %%% "cats-testkit" % "2.1.1" % Provided,
+   "org.typelevel" %%% "cats-testkit-scalatest" % "1.0.1" % Test
+))
 
-lazy val coulomb_scalacheck = (project in file("coulomb-scalacheck"))
-  .aggregate(coulomb, coulomb_si_units, coulomb_cats)
+lazy val coulomb_scalacheck = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-scalacheck"))
   .dependsOn(coulomb, coulomb_si_units, coulomb_cats)
   .settings(name := "coulomb-scalacheck")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
-  .settings(libraryDependencies ++= coulombCatsDeps)
-  .settings(libraryDependencies ++= coulombScalacheckDeps)
+  .settings(libraryDependencies ++= coulombCatsDeps.value)
+  .settings(libraryDependencies ++= coulombScalacheckDeps.value)
 
 lazy val coulomb_pureconfig = (project in file("coulomb-pureconfig"))
-  .aggregate(coulomb, coulomb_parser)
-  .dependsOn(coulomb, coulomb_parser)
+  .dependsOn(coulomb.jvm, coulomb_parser)
   .settings(name := "coulomb-pureconfig")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
   .settings(libraryDependencies ++= coulombPureConfigDeps)
 
-def coulombRefinedDeps = Seq(
-  "eu.timepit" %% "refined" % "0.9.15" % Provided
+def coulombRefinedDeps = Def.setting(Seq(
+  "eu.timepit" %%% "refined" % "0.9.14" % Provided)
 )
 
-lazy val coulomb_refined = (project in file("coulomb-refined"))
-  .aggregate(coulomb)
+lazy val coulomb_refined = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-refined"))
   .dependsOn(coulomb)
   .settings(name := "coulomb-refined")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
-  .settings(libraryDependencies ++= coulombRefinedDeps)
+  .settings(libraryDependencies ++= coulombRefinedDeps.value)
 
 lazy val coulomb_pureconfig_refined = (project in file("coulomb-pureconfig-refined"))
-  .aggregate(coulomb, coulomb_parser, coulomb_pureconfig, coulomb_refined)
-  .dependsOn(coulomb, coulomb_parser, coulomb_pureconfig, coulomb_refined)
+  .dependsOn(coulomb.jvm, coulomb_parser, coulomb_pureconfig, coulomb_refined.jvm)
   .settings(name := "coulomb-pureconfig-refined")
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
   .settings(libraryDependencies ++= coulombPureConfigDeps)
-  .settings(libraryDependencies ++= coulombRefinedDeps)
+  .settings(libraryDependencies ++= coulombRefinedDeps.value)
 
-lazy val coulomb_tests = (project in file("coulomb-tests"))
-  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined, coulomb_cats, coulomb_scalacheck)
-  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined, coulomb_cats, coulomb_scalacheck)
+def javaTimeJSDeps = Def.setting(Seq(
+  "io.github.cquiroz" %%% "scala-java-time" % "2.0.0" % Provided)
+)
+
+lazy val coulomb_tests = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Full)
+  .in(file("coulomb-tests"))
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_refined, coulomb_cats, coulomb_scalacheck)
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
   .settings(libraryDependencies ++= coulombParserDeps)
   .settings(libraryDependencies ++= coulombTypesafeConfigDeps)
   .settings(libraryDependencies ++= coulombAvroDeps)
-  .settings(libraryDependencies ++= coulombRefinedDeps)
+  .settings(libraryDependencies ++= coulombRefinedDeps.value)
   .settings(libraryDependencies ++= coulombPureConfigDeps)
-  .settings(libraryDependencies ++= coulombScalacheckDeps)
+  .settings(libraryDependencies ++= coulombCatsDeps.value)
+  .settings(libraryDependencies ++= coulombScalacheckDeps.value)
+  .jvmConfigure(_.dependsOn(coulomb_avro))
+  .jvmConfigure(_.dependsOn(coulomb_typesafe_config))
+  .jvmConfigure(_.dependsOn(coulomb_parser))
+  .jvmConfigure(_.dependsOn(coulomb_pureconfig))
+  .jvmConfigure(_.dependsOn(coulomb_pureconfig_refined))
+  .jsSettings(libraryDependencies ++= javaTimeJSDeps.value)
 
 lazy val coulomb_docs = (project in file("."))
-  .aggregate(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined, coulomb_cats, coulomb_scalacheck)
-  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined, coulomb_pureconfig_refined, coulomb_cats, coulomb_scalacheck)
+  .dependsOn(coulomb.jvm, coulomb_si_units.jvm, coulomb_mks_units.jvm, coulomb_accepted_units.jvm, coulomb_time_units.jvm, coulomb_info_units.jvm, coulomb_customary_units.jvm, coulomb_temp_units.jvm, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined.jvm, coulomb_pureconfig_refined, coulomb_cats.jvm, coulomb_scalacheck.jvm)
   .settings(name := "coulomb-docs")
   .settings(commonSettings :_*)
 

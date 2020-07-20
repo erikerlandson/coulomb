@@ -19,7 +19,6 @@ package coulomb
 import scala.language.implicitConversions
 
 import spire.math.Rational
-
 import unitops._
 
 /**

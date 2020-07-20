@@ -1,6 +1,5 @@
 package coulomb.validators
 
-import scala.reflect.runtime.universe._
 import scala.language.implicitConversions
 
 import spire.math.ConvertableFrom
@@ -29,18 +28,18 @@ object CoulombValidators {
   }
 
   implicit class WithQuantityShouldMethods[V, U](q: Quantity[V, U])(implicit
-      ttV: WeakTypeTag[V],
-      ttU: WeakTypeTag[U],
+      ttV: UnitTypeName[V],
+      ttU: UnitTypeName[U],
       cdV: Castable[V, Double]) {
     def isValidQ[VR, UR](tval: Double, f: Int = 1, tolerant: Boolean = true)(implicit
-        ttVR: WeakTypeTag[VR],
-        ttUR: WeakTypeTag[UR]): Boolean = {
-      (weakTypeOf[V], weakTypeOf[U]) match {
-        case (tn, _) if (!(tn =:= weakTypeOf[VR])) =>
-          throw new Exception(s"Value type $tn did not match target ${weakTypeOf[VR]}")
+        ttVR: UnitTypeName[VR],
+        ttUR: UnitTypeName[UR]): Boolean = {
+      (UnitTypeName[V], UnitTypeName[U]) match {
+        case (tn, _) if (!(tn =:= UnitTypeName[VR])) =>
+          throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
           false
-        case (_, tu) if (!(tu =:= weakTypeOf[UR])) =>
-          throw new Exception(s"Unit type $tu did not match target ${weakTypeOf[UR]}")
+        case (_, tu) if (!(tu =:= UnitTypeName[UR])) =>
+          throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
           false
         case _ => {
           val tv = if (f == 1) tval else ((tval * f.toDouble).toInt).toDouble
@@ -54,18 +53,18 @@ object CoulombValidators {
   }
 
   implicit class WithTemperatureShouldMethods[V, U](t: Temperature[V, U])(implicit
-      ttV: WeakTypeTag[V],
-      ttU: WeakTypeTag[U],
+      ttV: UnitTypeName[V],
+      ttU: UnitTypeName[U],
       cdV: Castable[V, Double]) {
     def isValidT[VR, UR](tval: Double, tolerant: Boolean = true)(implicit
-        ttVR: WeakTypeTag[VR],
-        ttUR: WeakTypeTag[UR]): Boolean = {
-      (weakTypeOf[V], weakTypeOf[U]) match {
-        case (tn, _) if (!(tn =:= weakTypeOf[VR])) =>
-          throw new Exception(s"Value type $tn did not match target ${weakTypeOf[VR]}")
+        ttVR: UnitTypeName[VR],
+        ttUR: UnitTypeName[UR]): Boolean = {
+      (UnitTypeName[V], UnitTypeName[U]) match {
+        case (tn, _) if (!(tn =:= UnitTypeName[VR])) =>
+          throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
           false
-        case (_, tu) if (!(tu =:= weakTypeOf[UR])) =>
-          throw new Exception(s"Unit type $tu did not match target ${weakTypeOf[UR]}")
+        case (_, tu) if (!(tu =:= UnitTypeName[UR])) =>
+          throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
           false
         case _ => {
           val tv = cdV.cast(t.value)
@@ -78,18 +77,18 @@ object CoulombValidators {
   }
 
   implicit class WithOffsetQuantityValidateMethods[V, U](q: OffsetQuantity[V, U])(implicit
-      ttV: WeakTypeTag[V],
-      ttU: WeakTypeTag[U],
+      ttV: UnitTypeName[V],
+      ttU: UnitTypeName[U],
       cdV: Castable[V, Double]) {
     def isValidOQ[VR, UR](tval: Double, tolerant: Boolean = true)(implicit
-        ttVR: WeakTypeTag[VR],
-        ttUR: WeakTypeTag[UR]): Boolean = {
-      (weakTypeOf[V], weakTypeOf[U]) match {
-        case (tn, _) if (!(tn =:= weakTypeOf[VR])) =>
-          throw new Exception(s"Value type $tn did not match target ${weakTypeOf[VR]}")
+        ttVR: UnitTypeName[VR],
+        ttUR: UnitTypeName[UR]): Boolean = {
+      (UnitTypeName[V], UnitTypeName[U]) match {
+        case (tn, _) if (!(tn =:= UnitTypeName[VR])) =>
+          throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
           false
-        case (_, tu) if (!(tu =:= weakTypeOf[UR])) =>
-          throw new Exception(s"Unit type $tu did not match target ${weakTypeOf[UR]}")
+        case (_, tu) if (!(tu =:= UnitTypeName[UR])) =>
+          throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
           false
         case _ => {
           val qv = cdV.cast(q.value)
