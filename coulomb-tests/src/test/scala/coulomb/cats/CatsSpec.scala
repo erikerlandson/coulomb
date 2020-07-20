@@ -6,7 +6,7 @@ import cats.implicits._
 import cats.kernel.laws.discipline._
 import cats.data.NonEmptyList
 import coulomb._
-import coulomb.implicits._
+import coulomb.cats.implicits._
 import coulomb.si._
 import coulomb.siprefix._
 import utest._

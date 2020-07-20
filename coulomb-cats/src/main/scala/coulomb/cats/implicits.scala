@@ -1,4 +1,4 @@
-package coulomb
+package coulomb.cats
 
 import cats.{ Eq, Order }
 import cats.implicits._
