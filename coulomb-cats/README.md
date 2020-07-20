@@ -45,7 +45,7 @@ import cats.implicits._
 
 import coulomb._
 // Cats instances
-import coulomb.implicits._
+import coulomb.cats.implicits._
 
 import coulomb.si._
 import coulomb.siprefix._
