@@ -2,9 +2,7 @@ package coulomb
 
 import scala.language.experimental.macros
 
-import scala.reflect.macros.whitebox
-
-import scala.reflect.macros.blackbox.Context
+import scala.reflect.macros.whitebox.Context
 
 trait UnitTypeName[T] {
   def name: String // typeName
