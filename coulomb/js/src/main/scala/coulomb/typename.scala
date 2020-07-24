@@ -7,7 +7,6 @@ import scala.reflect.macros.whitebox.Context
 trait UnitTypeName[T] {
   def name: String // typeName
   def typeString: String
-  def =:=[U](t: UnitTypeName[U]): Boolean
 }
 
 object UnitTypeName {
@@ -40,7 +39,6 @@ object UnitTypeName {
       new _root_.coulomb.UnitTypeName[$aType] {
         def name: String = $tpeName
         def typeString: String = name
-        def =:=[U](t: UnitTypeName[U]): Boolean = name == t.name
       }
     """
 

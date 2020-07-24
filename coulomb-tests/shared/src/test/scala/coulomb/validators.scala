@@ -35,10 +35,10 @@ object CoulombValidators {
         ttVR: UnitTypeName[VR],
         ttUR: UnitTypeName[UR]): Boolean = {
       (UnitTypeName[V], UnitTypeName[U]) match {
-        case (tn, _) if (!(tn =:= UnitTypeName[VR])) =>
+        case (tn, _) if (!(tn.name == UnitTypeName[VR].name)) =>
           throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
           false
-        case (_, tu) if (!(tu =:= UnitTypeName[UR])) =>
+        case (_, tu) if (!(tu.name == UnitTypeName[UR].name)) =>
           throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
           false
         case _ => {
@@ -60,10 +60,10 @@ object CoulombValidators {
         ttVR: UnitTypeName[VR],
         ttUR: UnitTypeName[UR]): Boolean = {
       (UnitTypeName[V], UnitTypeName[U]) match {
-        case (tn, _) if (!(tn =:= UnitTypeName[VR])) =>
+        case (tn, _) if (!(tn.name == UnitTypeName[VR].name)) =>
           throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
           false
-        case (_, tu) if (!(tu =:= UnitTypeName[UR])) =>
+        case (_, tu) if (!(tu.name == UnitTypeName[UR].name)) =>
           throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
           false
         case _ => {
@@ -84,10 +84,10 @@ object CoulombValidators {
         ttVR: UnitTypeName[VR],
         ttUR: UnitTypeName[UR]): Boolean = {
       (UnitTypeName[V], UnitTypeName[U]) match {
-        case (tn, _) if (!(tn =:= UnitTypeName[VR])) =>
+        case (tn, _) if (!(tn.name == UnitTypeName[VR].name)) =>
           throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
           false
-        case (_, tu) if (!(tu =:= UnitTypeName[UR])) =>
+        case (_, tu) if (!(tu.name == UnitTypeName[UR].name)) =>
           throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
           false
         case _ => {
