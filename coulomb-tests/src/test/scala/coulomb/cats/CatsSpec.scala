@@ -4,6 +4,7 @@ import cats.tests.CatsSuite
 import cats._
 import cats.implicits._
 import cats.kernel.laws.discipline._
+import cats.laws.discipline._
 import cats.data.NonEmptyList
 import coulomb._
 import coulomb.cats.implicits._
@@ -47,4 +48,8 @@ final class CatsSpec extends CatsSuite {
 
   checkAll("EqTest", EqTests[Quantity[Int, MetersPerSecond]].eqv)
   checkAll("OrderTest", OrderTests[Quantity[Int, MetersPerSecond]].order)
+  checkAll("FunctorTest", FunctorTests[Quantity[*, MetersPerSecond]].functor[Int, Double, Int])
+  checkAll("TraverseTest", TraverseTests[Quantity[*, KilometersPerSecond]].traverse[Int, Int, Int, Int, Option, Option])
+  checkAll("CommutativeMonadTest", CommutativeMonadTests[Quantity[*, KilometersPerSecond]].commutativeMonad[Int, Int, Int])
+  checkAll("MonoidTest", MonoidTests[Quantity[Double, KilometersPerSecond]].monoid)
 }

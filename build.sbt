@@ -9,6 +9,7 @@ def commonSettings = Seq(
   scalaVersion := "2.13.3",
   crossScalaVersions := Seq("2.13.3"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
+  addCompilerPlugin("org.typelevel" % "kind-projector_2.13.3" % "0.11.0"),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
