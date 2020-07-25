@@ -46,10 +46,6 @@ object NoImplicit {
     new NoImplicit[T] {}
 }
 
-object TypeString {
-  def typeString[T: UnitTypeName]: String = UnitTypeName[T].typeString
-}
-
 trait IsUnitExpr[T] {
   type Out
 }
@@ -77,13 +73,12 @@ trait GetBaseUnit[U] {
   def bu: BaseUnit[U]
 }
 trait GetBaseUnitP1 {
-
   implicit def undeclared[T, TUE](implicit
       enabled: coulomb.policy.EnableUndeclaredBaseUnits,
       testUE: IsUnitExpr.Aux[T, TUE],
       notUE: TUE =:!= true,
       tt: UnitTypeName[T]): GetBaseUnit[T] = {
-    val name = TypeString.typeString[T]
+    val name = tt.typeString
     new GetBaseUnit[T] {
       val bu = new BaseUnit[T](name, name)
     }
