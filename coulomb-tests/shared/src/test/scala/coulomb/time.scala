@@ -27,12 +27,12 @@ object TimeTests extends TestSuite {
       val t1 = 1D.withEpochTime[Minute]
       val t2 = 1D.withEpochTime[Second]
       assert((t2 - t1).isValidQ[Double, Second](-59))
-      assert((t1 - t2).isValidQ[Double, Minute](0.98333))      
+      assert((t1 - t2).isValidQ[Double, Minute](0.98333))
       assert((t1 + 1D.withUnit[Hour]).isValidOQ[Double, Minute](61))
       assert((t1 - 1D.withUnit[Hour]).isValidOQ[Double, Minute](-59))
       assert(t1 > t2)
       assert(t2 < t1)
-      assert(t1.show == "1.0 min")
+      assert(t1.show == "1.0 min" || t1.show == "1 min")
     }
 
     test("integrate Duration with coulomb") {
@@ -49,7 +49,7 @@ object TimeTests extends TestSuite {
       assert(dur.getSeconds() == 3600L)
       assert(dur.getNano() == 777)
       assert(1f.withUnit[Second].plus(Duration.ofSeconds(10, 777000000)).isValidQ[Float, Second](11.777))
-      assert(1f.withUnit[Minute].minus(Duration.ofSeconds(10, 777000000)).isValidQ[Float, Minute](0.82038))      
+      assert(1f.withUnit[Minute].minus(Duration.ofSeconds(10, 777000000)).isValidQ[Float, Minute](0.82038))
     }
 
     test("integrate Instant with coulomb") {

@@ -43,7 +43,7 @@ import org.apache.avro.generic._
 import coulomb.validators.CoulombValidators._
 
 object AvroIntegrationTests extends TestSuite {
-  val schema1 = new Schema.Parser().parse(new java.io.File("coulomb-tests/src/test/scala/coulomb/test1.avsc"))
+  val schema1 = new Schema.Parser().parse(new java.io.File("coulomb-tests/jvm/src/test/scala/coulomb/test1.avsc"))
 
   val record1 = {
     val rec = new GenericData.Record(schema1)
