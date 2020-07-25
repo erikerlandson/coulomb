@@ -5,9 +5,17 @@ import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 
 trait UnitTypeName[T] {
-  def name: String // typeName
+  /** the name of type.path.Foo[Int] is 'Foo' */
+  def name: String
+  /**
+   * NOTE: typeString in scala.js does not currently have parity with jvm, for
+   * types having type parameters.
+   */
   def typeString: String
+
   override def toString(): String = typeString
+  def ==(that: UnitTypeName[_]): Boolean =
+    typeString == that.typeString
 }
 
 object UnitTypeName {

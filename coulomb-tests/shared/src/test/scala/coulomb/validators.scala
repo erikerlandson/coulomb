@@ -34,12 +34,12 @@ object CoulombValidators {
     def isValidQ[VR, UR](tval: Double, f: Int = 1, tolerant: Boolean = true)(implicit
         ttVR: UnitTypeName[VR],
         ttUR: UnitTypeName[UR]): Boolean = {
-      (UnitTypeName[V], UnitTypeName[U]) match {
-        case (tn, _) if (!(tn.name == UnitTypeName[VR].name)) =>
-          throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
+      (ttV, ttU) match {
+        case (tv, _) if (!(tv == ttVR)) =>
+          throw new Exception(s"Value type $tv did not match target $ttVR")
           false
-        case (_, tu) if (!(tu.name == UnitTypeName[UR].name)) =>
-          throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
+        case (_, tu) if (!(tu == ttUR)) =>
+          throw new Exception(s"Unit type $tu did not match target $ttUR")
           false
         case _ => {
           val tv = if (f == 1) tval else ((tval * f.toDouble).toInt).toDouble
@@ -59,12 +59,12 @@ object CoulombValidators {
     def isValidT[VR, UR](tval: Double, tolerant: Boolean = true)(implicit
         ttVR: UnitTypeName[VR],
         ttUR: UnitTypeName[UR]): Boolean = {
-      (UnitTypeName[V], UnitTypeName[U]) match {
-        case (tn, _) if (!(tn.name == UnitTypeName[VR].name)) =>
-          throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
+      (ttV, ttU) match {
+        case (tv, _) if (!(tv == ttVR)) =>
+          throw new Exception(s"Value type $tv did not match target $ttVR")
           false
-        case (_, tu) if (!(tu.name == UnitTypeName[UR].name)) =>
-          throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
+        case (_, tu) if (!(tu == ttUR)) =>
+          throw new Exception(s"Unit type $tu did not match target $ttUR")
           false
         case _ => {
           val tv = cdV.cast(t.value)
@@ -83,12 +83,12 @@ object CoulombValidators {
     def isValidOQ[VR, UR](tval: Double, tolerant: Boolean = true)(implicit
         ttVR: UnitTypeName[VR],
         ttUR: UnitTypeName[UR]): Boolean = {
-      (UnitTypeName[V], UnitTypeName[U]) match {
-        case (tn, _) if (!(tn.name == UnitTypeName[VR].name)) =>
-          throw new Exception(s"Value type $tn did not match target ${UnitTypeName[VR]}")
+      (ttV, ttU) match {
+        case (tv, _) if (!(tv == ttVR)) =>
+          throw new Exception(s"Value type $tv did not match target $ttVR")
           false
-        case (_, tu) if (!(tu.name == UnitTypeName[UR].name)) =>
-          throw new Exception(s"Unit type $tu did not match target ${UnitTypeName[UR]}")
+        case (_, tu) if (!(tu == ttUR)) =>
+          throw new Exception(s"Unit type $tu did not match target $ttUR")
           false
         case _ => {
           val qv = cdV.cast(q.value)
