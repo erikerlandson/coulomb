@@ -1,5 +1,6 @@
-// xsbt clean unidoc previewSite
-// xsbt clean unidoc ghpagesPushSite
+// git clean -fdx
+// sbt clean unidoc previewSite
+// sbt clean unidoc ghpagesPushSite
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -23,6 +24,7 @@ def commonSettings = Seq(
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
 
+// prevents previewSite from trying to run on all packages simultaneously
 def docDepSettings = Seq(
   previewSite := {}
 )
@@ -212,6 +214,13 @@ lazy val coulomb_docs = (project in file("."))
   .dependsOn(coulomb.jvm, coulomb_si_units.jvm, coulomb_mks_units.jvm, coulomb_accepted_units.jvm, coulomb_time_units.jvm, coulomb_info_units.jvm, coulomb_customary_units.jvm, coulomb_temp_units.jvm, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined.jvm, coulomb_pureconfig_refined, coulomb_cats.jvm, coulomb_scalacheck.jvm)
   .settings(name := "coulomb-docs")
   .settings(commonSettings :_*)
+  .settings(
+    // unidoc needs to be told explicitly to ignore JS projects
+    unidocProjectFilter in ( ScalaUnidoc, unidoc ) := inAnyProject -- inProjects(
+      coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js,
+      coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js
+    )
+  )
 
 enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
