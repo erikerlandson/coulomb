@@ -7,6 +7,7 @@ import scala.reflect.macros.whitebox.Context
 trait UnitTypeName[T] {
   def name: String // typeName
   def typeString: String
+  override def toString(): String = typeString
 }
 
 object UnitTypeName {
