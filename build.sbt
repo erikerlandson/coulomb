@@ -1,12 +1,13 @@
-// git clean -fdx
 // sbt clean unidoc previewSite
 // sbt clean unidoc ghpagesPushSite
+// sbt coulomb_testsJVM/test
+// sbt coulomb_testsJS/test
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 def commonSettings = Seq(
   organization := "com.manyangled",
-  version := "0.4.7-SNAPSHOT",
+  version := "0.5.0-SNAP4",
   scalaVersion := "2.13.3",
   crossScalaVersions := Seq("2.13.3"),
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
@@ -196,6 +197,8 @@ lazy val coulomb_tests = crossProject(JVMPlatform, JSPlatform)
   .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_refined, coulomb_cats, coulomb_scalacheck)
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
+  .settings(publish := {})
+  .settings(publishLocal := {})
   .settings(libraryDependencies ++= coulombParserDeps)
   .settings(libraryDependencies ++= coulombTypesafeConfigDeps)
   .settings(libraryDependencies ++= coulombAvroDeps)
@@ -210,17 +213,25 @@ lazy val coulomb_tests = crossProject(JVMPlatform, JSPlatform)
   .jvmConfigure(_.dependsOn(coulomb_pureconfig_refined))
   .jsSettings(libraryDependencies ++= javaTimeJSDeps.value)
 
-lazy val coulomb_docs = (project in file("."))
-  .dependsOn(coulomb.jvm, coulomb_si_units.jvm, coulomb_mks_units.jvm, coulomb_accepted_units.jvm, coulomb_time_units.jvm, coulomb_info_units.jvm, coulomb_customary_units.jvm, coulomb_temp_units.jvm, coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_refined.jvm, coulomb_pureconfig_refined, coulomb_cats.jvm, coulomb_scalacheck.jvm)
-  .settings(name := "coulomb-docs")
-  .settings(commonSettings :_*)
+// I define this mostly to support 'publish' and 'unidoc'
+lazy val coulomb_root = (project in file("."))
+  .dependsOn(
+    coulomb.jvm, coulomb_si_units.jvm, coulomb_mks_units.jvm, coulomb_accepted_units.jvm, coulomb_time_units.jvm, coulomb_info_units.jvm, coulomb_customary_units.jvm, coulomb_temp_units.jvm, coulomb_refined.jvm, coulomb_cats.jvm, coulomb_scalacheck.jvm,
+    coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js,
+    coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_pureconfig_refined
+  )
+  .aggregate(
+    coulomb.jvm, coulomb_si_units.jvm, coulomb_mks_units.jvm, coulomb_accepted_units.jvm, coulomb_time_units.jvm, coulomb_info_units.jvm, coulomb_customary_units.jvm, coulomb_temp_units.jvm, coulomb_refined.jvm, coulomb_cats.jvm, coulomb_scalacheck.jvm,
+    coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js,
+    coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_pureconfig_refined
+  )
   .settings(
     // unidoc needs to be told explicitly to ignore JS projects
-    unidocProjectFilter in ( ScalaUnidoc, unidoc ) := inAnyProject -- inProjects(
-      coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js,
-      coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js
-    )
-  )
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js))
+  .settings(name := "coulomb-root")
+  .settings(commonSettings :_*)
+  .settings(publish := {})
+  .settings(publishLocal := {})
 
 enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
