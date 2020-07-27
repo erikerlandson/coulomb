@@ -1,7 +1,11 @@
+// preview and publish docs
 // sbt clean unidoc previewSite
 // sbt clean unidoc ghpagesPushSite
+// unit tests
 // sbt coulomb_testsJVM/test
 // sbt coulomb_testsJS/test
+// update version in README
+// git sed 's/0\.4\.6/0.5.0/'
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
