@@ -54,6 +54,8 @@ libraryDependencies ++= Seq(
 
 In addition to core functionality and fundamental units, coulomb provides the following packages.
 
+* [coulomb-cats](coulomb-cats/) - define some cats typeclass integrations for Quantity
+* [coulomb-scalacheck](coulomb-scalacheck/) - scalacheck Arbitrary and Cogen for Quantity
 * [coulomb-parser](coulomb-parser/) - parsing a DSL for unit expressions into typed unit Quantity
 * [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
 * [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
