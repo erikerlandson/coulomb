@@ -1,4 +1,4 @@
-# Integration with cats
+# Integration with scalacheck
 
 Learn more:
 
