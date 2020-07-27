@@ -6,11 +6,44 @@
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 def commonSettings = Seq(
+  //---------------------------------
+  // publishing configurations
+  //---------------------------------
   organization := "com.manyangled",
-  version := "0.5.0-SNAP4",
+  version := "0.5.0-RC2",
+  //isSnapshot := true,
+  //publishConfiguration := publishConfiguration.value.withOverwrite(true),
+  publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
   scalaVersion := "2.13.3",
   crossScalaVersions := Seq("2.13.3"),
+  pomIncludeRepository := { _ => false },
+  publishMavenStyle := true,
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value)
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  },
   licenses += ("Apache-2.0", url("http://opensource.org/licenses/Apache-2.0")),
+  homepage := Some(url("https://github.com/erikerlandson/coulomb")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/erikerlandson/coulomb"),
+      "scm:git@github.com:erikerlandson/coulomb.git"
+    )
+  ),
+  developers := List(
+    Developer(
+      id    = "erikerlandson",
+      name  = "Erik Erlandson",
+      email = "eje@redhat.com",
+      url   = url("https://erikerlandson.github.io/")
+    )
+  ),
+  //---------------------------------
+  // build configurations
+  //---------------------------------
   addCompilerPlugin("org.typelevel" % "kind-projector_2.13.3" % "0.11.0"),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
@@ -23,7 +56,8 @@ def commonSettings = Seq(
   ),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
-  scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt"))
+  scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt")
+)
 
 // prevents previewSite from trying to run on all packages simultaneously
 def docDepSettings = Seq(
