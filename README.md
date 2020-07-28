@@ -2,7 +2,6 @@
 
  [![Build Status](https://travis-ci.org/erikerlandson/coulomb.svg?branch=develop)](https://travis-ci.org/erikerlandson/coulomb)
  [![Scala Steward badge](https://img.shields.io/badge/Scala_Steward-helping-brightgreen.svg?style=flat&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAQCAMAAAARSr4IAAAAVFBMVEUAAACHjojlOy5NWlrKzcYRKjGFjIbp293YycuLa3pYY2LSqql4f3pCUFTgSjNodYRmcXUsPD/NTTbjRS+2jomhgnzNc223cGvZS0HaSD0XLjbaSjElhIr+AAAAAXRSTlMAQObYZgAAAHlJREFUCNdNyosOwyAIhWHAQS1Vt7a77/3fcxxdmv0xwmckutAR1nkm4ggbyEcg/wWmlGLDAA3oL50xi6fk5ffZ3E2E3QfZDCcCN2YtbEWZt+Drc6u6rlqv7Uk0LdKqqr5rk2UCRXOk0vmQKGfc94nOJyQjouF9H/wCc9gECEYfONoAAAAASUVORK5CYII=)](https://scala-steward.org)
- [ ![Download](https://api.bintray.com/packages/manyangled/maven/coulomb/images/download.svg) ](https://bintray.com/manyangled/maven/coulomb/_latestVersion)
  [![Join the chat at https://gitter.im/erikerlandson/community](https://badges.gitter.im/erikerlandson/community.svg)](https://gitter.im/erikerlandson/coulomb?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### Documentation
@@ -30,8 +29,8 @@ package is also a dependency, but is included transitively via `spire`.
 resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb" % "0.4.6",
-  "org.typelevel" %% "spire" % "0.17.0-M1",
+  "com.manyangled" %% "coulomb" % "0.5.0",
+  "org.typelevel" %% "spire" % "0.17.0-RC1",
   "eu.timepit" %% "singleton-ops" % "0.5.0"
 )
 ```
@@ -41,13 +40,13 @@ separate sub-packages.
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-si-units" % "0.4.6",        // The seven SI units: meter, second, kilogram, etc
-  "com.manyangled" %% "coulomb-accepted-units" % "0.4.6",  // Common non-SI metric: liter, centimeter, gram, etc
-  "com.manyangled" %% "coulomb-time-units" % "0.4.6",      // minute, hour, day, week
-  "com.manyangled" %% "coulomb-info-units" % "0.4.6",      // bit, byte, nat
-  "com.manyangled" %% "coulomb-mks-units" % "0.4.6",       // MKS units: Joule, Newton, Watt, Volt, etc
-  "com.manyangled" %% "coulomb-customary-units" % "0.4.6", // non-metric units: foot, mile, pound, gallon, pint, etc
-  "com.manyangled" %% "coulomb-temp-units" % "0.4.6"       // Celsius and Fahrenheit temperature scales
+  "com.manyangled" %% "coulomb-si-units" % "0.5.0",        // The seven SI units: meter, second, kilogram, etc
+  "com.manyangled" %% "coulomb-accepted-units" % "0.5.0",  // Common non-SI metric: liter, centimeter, gram, etc
+  "com.manyangled" %% "coulomb-time-units" % "0.5.0",      // minute, hour, day, week
+  "com.manyangled" %% "coulomb-info-units" % "0.5.0",      // bit, byte, nat
+  "com.manyangled" %% "coulomb-mks-units" % "0.5.0",       // MKS units: Joule, Newton, Watt, Volt, etc
+  "com.manyangled" %% "coulomb-customary-units" % "0.5.0", // non-metric units: foot, mile, pound, gallon, pint, etc
+  "com.manyangled" %% "coulomb-temp-units" % "0.5.0"       // Celsius and Fahrenheit temperature scales
 )
 ```
 
@@ -55,12 +54,30 @@ libraryDependencies ++= Seq(
 
 In addition to core functionality and fundamental units, coulomb provides the following packages.
 
+* [coulomb-cats](coulomb-cats/) - define some cats typeclass integrations for Quantity
+* [coulomb-refined](coulomb-refined/) - integrates coulomb Quantity with Refined values
+* [coulomb-scalacheck](coulomb-scalacheck/) - scalacheck Arbitrary and Cogen for Quantity
 * [coulomb-parser](coulomb-parser/) - parsing a DSL for unit expressions into typed unit Quantity
 * [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
 * [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
-* [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
-* [coulomb-refined](coulomb-refined/) - integrates coulomb Quantity with Refined values
 * [coulomb-pureconfig-refined](coulomb-pureconfig-refined/) - integrate coulomb + pureconfig + refined
+* [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
+
+#### scala.js support
+
+The core coulomb package and several other sub-packages are cross-published to scala.js
+
+* [coulomb](#scala-js-support)
+* [coulomb-cats](coulomb-cats/)
+* [coulomb-scalacheck](coulomb-scalacheck/)
+* [coulomb-refined](coulomb-refined/)
+* [coulomb-si-units](coulomb-si-units/)
+* [coulomb-mks-units](coulomb-mks-units/)
+* [coulomb-accepted-units](coulomb-accepted-units/)
+* [coulomb-time-units](coulomb-time-units/)
+* [coulomb-temp-units](coulomb-temp-units/)
+* [coulomb-info-units](coulomb-info-units/)
+* [coulomb-customary-units](coulomb-customary-units/)
 
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);

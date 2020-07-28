@@ -18,11 +18,11 @@ resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
 
 libraryDependencies ++= Seq(
   // basic coulomb dependencies
-  "com.manyangled" %% "coulomb" % "0.4.6",
-  "org.typelevel" %% "spire" % "0.17.0-M1",
+  "com.manyangled" %% "coulomb" % "0.5.0",
+  "org.typelevel" %% "spire" % "0.17.0-RC1",
   "eu.timepit" %% "singleton-ops" % "0.5.0",
   // refined dependencies
-  "com.manyangled" %% "coulomb-refined" % "0.4.6",  
+  "com.manyangled" %% "coulomb-refined" % "0.5.0",  
   "eu.timepit" %% "refined" % "0.9.15"
 )
 ```
