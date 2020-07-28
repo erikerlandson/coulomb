@@ -14,7 +14,7 @@ def commonSettings = Seq(
   // publishing configurations
   //---------------------------------
   organization := "com.manyangled",
-  version := "0.5.0-RC2",
+  version := "0.5.0",
   //isSnapshot := true,
   //publishConfiguration := publishConfiguration.value.withOverwrite(true),
   publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
