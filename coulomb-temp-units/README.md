@@ -12,8 +12,6 @@ The coulomb libraries include most dependencies `%Provided` to allow maximum fle
 of binary compatible dependency versions.
 
 ```scala
-resolvers += "manyangled" at "https://dl.bintray.com/manyangled/maven/"
-
 libraryDependencies ++= Seq(
   // coulomb libraries used by temperature units
   "com.manyangled" %% "coulomb" % "0.5.0",
