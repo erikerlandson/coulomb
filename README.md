@@ -55,13 +55,29 @@ libraryDependencies ++= Seq(
 In addition to core functionality and fundamental units, coulomb provides the following packages.
 
 * [coulomb-cats](coulomb-cats/) - define some cats typeclass integrations for Quantity
+* [coulomb-refined](coulomb-refined/) - integrates coulomb Quantity with Refined values
 * [coulomb-scalacheck](coulomb-scalacheck/) - scalacheck Arbitrary and Cogen for Quantity
 * [coulomb-parser](coulomb-parser/) - parsing a DSL for unit expressions into typed unit Quantity
 * [coulomb-avro](coulomb-avro/) - an integration package with Apache Avro schema and i/o
 * [coulomb-pureconfig](coulomb-pureconfig/) - extends the pureconfig with awareness of unit Quantity
-* [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
-* [coulomb-refined](coulomb-refined/) - integrates coulomb Quantity with Refined values
 * [coulomb-pureconfig-refined](coulomb-pureconfig-refined/) - integrate coulomb + pureconfig + refined
+* [coulomb-typesafe-config](coulomb-typesafe-config/) - unit awareness for the typesafe config library
+
+#### scala.js support
+
+The core coulomb package and several other sub-packages are cross-published to scala.js
+
+* [coulomb](#scala-js-support)
+* [coulomb-cats](coulomb-cats/)
+* [coulomb-scalacheck](coulomb-scalacheck/)
+* [coulomb-refined](coulomb-refined/)
+* [coulomb-si-units](coulomb-si-units/)
+* [coulomb-mks-units](coulomb-mks-units/)
+* [coulomb-accepted-units](coulomb-accepted-units/)
+* [coulomb-time-units](coulomb-time-units/)
+* [coulomb-temp-units](coulomb-temp-units/)
+* [coulomb-info-units](coulomb-info-units/)
+* [coulomb-customary-units](coulomb-customary-units/)
 
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
