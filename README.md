@@ -112,7 +112,7 @@ Any violations of this code of conduct should be reported to [the author](https:
 
 Except where otherwise noted, the following tutorial examples can be run in a scala REPL as follows:
 ```bash
-% cd /path/to/scala
+% cd /path/to/coulomb/repo
 % sbt coulomb_testsJVM/console
 ```
 ```scala
