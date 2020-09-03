@@ -1,7 +1,7 @@
 package coulomb.cats
 
 import cats._
-import cats.implicits._
+import cats.syntax.all._
 import coulomb._
 import scala.annotation.tailrec
 
