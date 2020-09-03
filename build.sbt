@@ -170,7 +170,7 @@ def coulombPureConfigDeps = Seq(
 )
 
 def coulombCatsDeps = Def.setting(Seq(
-  "org.typelevel" %%% "cats-core" % "2.1.1" % Provided
+  "org.typelevel" %%% "cats-core" % "2.2.0" % Provided
 ))
 
 lazy val coulomb_cats = crossProject(JVMPlatform, JSPlatform)
@@ -183,7 +183,7 @@ lazy val coulomb_cats = crossProject(JVMPlatform, JSPlatform)
   .settings(libraryDependencies ++= coulombCatsDeps.value)
 
 def coulombScalacheckDeps = Def.setting(Seq(
-   "org.typelevel" %%% "cats-testkit" % "2.1.1" % Provided,
+   "org.typelevel" %%% "cats-testkit" % "2.2.0" % Provided,
    "org.typelevel" %%% "cats-testkit-scalatest" % "2.0.0" % Test
 ))
 
