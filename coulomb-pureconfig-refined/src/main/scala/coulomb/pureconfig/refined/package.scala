@@ -59,7 +59,7 @@ package object refined {
               ConfigReaderFailures(
                 ConvertFailure(
                   reason = CannotConvert(
-                    value = cur.value.render(),
+                    value = s"$q",
                     toType = qtt.tpe.toString,
                     because = because
                   ),

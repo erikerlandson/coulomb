@@ -64,12 +64,12 @@ package object pureconfig {
     def from(cur: ConfigCursor): Either[ConfigReaderFailures, Quantity[V, U]] = {
       qcr.from(cur) match {
         case Left(readFailure) => Left(readFailure)
-        case Right(ConfigQuantity(value, unit)) => {
+        case Right(cq @ ConfigQuantity(value, unit)) => {
           qp.applyUnitExpr[V, U](value, unit) match {
             case Success(q) => Right(q)
             case Failure(_) => Left(ConfigReaderFailures(ConvertFailure(
               reason = CannotConvert(
-                value = cur.value.render(),
+                value = s"$cq",
                 toType = qtt.tpe.toString,
                 because = s"Failed to parse ($value, $unit) ==> ${uts.expr}"),
               cur = cur)))
