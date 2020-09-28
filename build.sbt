@@ -205,7 +205,7 @@ lazy val coulomb_pureconfig = (project in file("coulomb-pureconfig"))
   .settings(libraryDependencies ++= coulombPureConfigDeps)
 
 def coulombRefinedDeps = Def.setting(Seq(
-  "eu.timepit" %%% "refined" % "0.9.16" % Provided)
+  "eu.timepit" %%% "refined" % "0.9.17" % Provided)
 )
 
 lazy val coulomb_refined = crossProject(JVMPlatform, JSPlatform)
