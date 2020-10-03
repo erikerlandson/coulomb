@@ -131,6 +131,14 @@ lazy val coulomb_customary_units = crossProject(JVMPlatform, JSPlatform)
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
 
+lazy val coulomb_physical_constants = crossProject(JVMPlatform, JSPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("coulomb-physical-constants"))
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units)
+  .settings(name := "coulomb-physical-constants")
+  .settings(commonSettings :_*)
+  .settings(docDepSettings :_*)
+
 def coulombParserDeps = Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2" % Provided
 )
@@ -232,7 +240,7 @@ def javaTimeJSDeps = Def.setting(Seq(
 lazy val coulomb_tests = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Full)
   .in(file("coulomb-tests"))
-  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_refined, coulomb_cats, coulomb_scalacheck)
+  .dependsOn(coulomb, coulomb_si_units, coulomb_mks_units, coulomb_accepted_units, coulomb_time_units, coulomb_info_units, coulomb_customary_units, coulomb_temp_units, coulomb_refined, coulomb_cats, coulomb_scalacheck, coulomb_physical_constants)
   .settings(name := "coulomb-tests")
   .settings(commonSettings :_*)
   .settings(publish := {})
@@ -256,16 +264,16 @@ lazy val coulomb_root = (project in file("."))
   .dependsOn(
     coulomb.jvm, coulomb_si_units.jvm, coulomb_mks_units.jvm, coulomb_accepted_units.jvm, coulomb_time_units.jvm, coulomb_info_units.jvm, coulomb_customary_units.jvm, coulomb_temp_units.jvm, coulomb_refined.jvm, coulomb_cats.jvm, coulomb_scalacheck.jvm,
     coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js,
-    coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_pureconfig_refined
+    coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_pureconfig_refined, coulomb_physical_constants.jvm, coulomb_physical_constants.js
   )
   .aggregate(
     coulomb.jvm, coulomb_si_units.jvm, coulomb_mks_units.jvm, coulomb_accepted_units.jvm, coulomb_time_units.jvm, coulomb_info_units.jvm, coulomb_customary_units.jvm, coulomb_temp_units.jvm, coulomb_refined.jvm, coulomb_cats.jvm, coulomb_scalacheck.jvm,
     coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js,
-    coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_pureconfig_refined
+    coulomb_parser, coulomb_typesafe_config, coulomb_avro, coulomb_pureconfig, coulomb_pureconfig_refined, coulomb_physical_constants.jvm, coulomb_physical_constants.js
   )
   .settings(
     // unidoc needs to be told explicitly to ignore JS projects
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js))
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js, coulomb_physical_constants.js))
   .settings(name := "coulomb-root")
   .settings(commonSettings :_*)
   .settings(publish := {})

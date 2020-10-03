@@ -61,4 +61,7 @@ package object mks {
 
   trait Henry
   implicit val defineUnitHenry = DerivedUnit[Henry, Weber %/ Ampere](abbv = "H")
+
+  trait Siemens
+  implicit val defineUnitSiemens = DerivedUnit[Siemens, (Second %^ 3) %* (Ampere %^ 2) %/ (Kilogram %* (Meter %^ 2))](abbv = "S")
 }
