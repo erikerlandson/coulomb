@@ -22,6 +22,14 @@ object PhysicalConstantsSuite extends TestSuite {
       assert(josephsonConstant[Double].show == "4.835978484E14 Hz/V")
       assert(vonKlitzingConstant[Double].show == "25812.80745 Ω")
       assert(magneticFluxQuantum[Double].show == "2.067833848E-15 Wb")
+      assert(inverseConductanceQuantum[Double].show == "12906.40372 Ω")
+      assert(bohrMagneton[Double].show == "9.2740100783E-24 J/T")
+      assert(nuclearMagneton[Double].show == "5.0507837461E-27 J/T")
+      assert(fineStructureConstant[Double].show == "0.0072973525693 unitless")
+      assert(inverseFineStructureConstant[Double].show == "137.035999084 unitless")
+      assert(electronMass[Double].show == "9.1093837015E-31 kg")
+      assert(protonMass[Double].show == "1.67262192369E-27 kg")
+      assert(neutronMass[Double].show == "1.67492749804E-27 kg")
     }
   }
 }
