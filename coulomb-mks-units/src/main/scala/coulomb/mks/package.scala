@@ -20,6 +20,7 @@ import singleton.ops._
 
 import coulomb.define._
 import coulomb.si._
+import spire.math.Rational
 
 /** MKS (Meter, Kilogram, Second) unit definitions (Newton, Joule, Watt, etc) */
 package object mks {
@@ -64,4 +65,11 @@ package object mks {
 
   trait Siemens
   implicit val defineUnitSiemens = DerivedUnit[Siemens, (Second %^ 3) %* (Ampere %^ 2) %/ (Kilogram %* (Meter %^ 2))](abbv = "S")
+
+  trait ElectronVolt
+  implicit val defineUnitElectronVolt = {
+    val denom = Rational(10).pow(19)
+    val num = Rational(1602176634L) / Rational(10).pow(9)
+    DerivedUnit[ElectronVolt, Joule](abbv = "eV", coef = num / denom)
+  }
 }

@@ -62,23 +62,37 @@ package object physicalconstants {
 
   def neutronMass[V](implicit pcq: PhysicalConstantQuantity[V, NeutronMass]): Quantity[V, pcq.QU] = pcq.q
 
+  def bohrRadius[V](implicit pcq: PhysicalConstantQuantity[V, BohrRadius]): Quantity[V, pcq.QU] = pcq.q
+
+  def classicalElectronRadius[V](implicit pcq: PhysicalConstantQuantity[V, ClassicalElectronRadius]): Quantity[V, pcq.QU] = pcq.q
+
+  def electronGFactor[V](implicit pcq: PhysicalConstantQuantity[V, ElectronGFactor]): Quantity[V, pcq.QU] = pcq.q
+
+  def fermiCouplingConstant[V](implicit pcq: PhysicalConstantQuantity[V, FermiCouplingConstant]): Quantity[V, pcq.QU] = pcq.q
+
+  def hartreeEnergy[V](implicit pcq: PhysicalConstantQuantity[V, HartreeEnergy]): Quantity[V, pcq.QU] = pcq.q
+
+  def quantumOfReaction[V](implicit pcq: PhysicalConstantQuantity[V, QuantumOfCirculation]): Quantity[V, pcq.QU] = pcq.q
+
 }
 
 package physicalconstants {
+
+import coulomb.siprefix.Giga
 
   // actual unit defs in a subpackage
   object units {
     // define physical constants as derived units
     trait SpeedOfLightInVacuum
     implicit val defineSpeedOfLightInVacuum =
-      DerivedUnit[SpeedOfLightInVacuum, Meter %/ Second](coef = 299792458, name= "speed-of-light", abbv = "c")
+      DerivedUnit[SpeedOfLightInVacuum, Meter %/ Second](coef = 299792458, name = "speed-of-light", abbv = "c")
 
     trait PlanckConstant
     implicit val definePlanckConstant = {
       // original value = 6.62607015×10−34 J⋅s
       val denom = Rational(10).pow(34)
       val num = Rational(62607015) / Rational(10).pow(7)
-      DerivedUnit[PlanckConstant, Joule %* Second](coef = num / denom, name= "planck-constant", abbv = "ℎ")
+      DerivedUnit[PlanckConstant, Joule %* Second](coef = num / denom, name = "planck-constant", abbv = "ℎ")
     }
 
     trait ReducedPlanckConstant
@@ -86,7 +100,7 @@ package physicalconstants {
       // original value = 1.054571817×10−34 J⋅s
       val denom = Rational(10).pow(34)
       val num = Rational(1054571817) / Rational(10).pow(9)
-      DerivedUnit[ReducedPlanckConstant, Joule %* Second](coef = num / denom, name= "reduced-planck-constant", abbv = "ℏ")
+      DerivedUnit[ReducedPlanckConstant, Joule %* Second](coef = num / denom, name = "reduced-planck-constant", abbv = "ℏ")
     }
 
     trait NewtonianConstantOfGravitation
@@ -94,7 +108,7 @@ package physicalconstants {
       // original value = 6.67430(15)×10−11 m3⋅kg−1⋅s−2
       val denom = Rational(10).pow(11)
       val num = Rational(667430) / Rational(10).pow(5)
-      DerivedUnit[NewtonianConstantOfGravitation, (Meter %^ 3) %/ (Kilogram %* (Second %^ 2))](coef = num / denom, name= "gravitational-constant", abbv = "G")
+      DerivedUnit[NewtonianConstantOfGravitation, (Meter %^ 3) %/ (Kilogram %* (Second %^ 2))](coef = num / denom, name = "gravitational-constant", abbv = "G")
     }
 
     trait VacuumElectricPermittivity
@@ -102,7 +116,7 @@ package physicalconstants {
       // original value = 8.8541878128(13)×10−12 F⋅m−1
       val denom = Rational(10).pow(12)
       val num = Rational(88541878128L) / Rational(10).pow(10)
-      DerivedUnit[VacuumElectricPermittivity, Farad %/ Meter](coef = num / denom, name= "vacuum-electric-permittivity", abbv = "ε₀")
+      DerivedUnit[VacuumElectricPermittivity, Farad %/ Meter](coef = num / denom, name = "vacuum-electric-permittivity", abbv = "ε₀")
     }
 
     trait VacuumMagneticPermeability
@@ -110,14 +124,14 @@ package physicalconstants {
       // original value = 1.25663706212(19)×10−6 N⋅A−2
       val denom = Rational(10).pow(6)
       val num = Rational(125663706212L) / Rational(10).pow(11)
-      DerivedUnit[VacuumMagneticPermeability, Newton %/ (Ampere %^ 2)](coef = num / denom, name= "vacuum-magnetic-permeability", abbv = "μ₀")
+      DerivedUnit[VacuumMagneticPermeability, Newton %/ (Ampere %^ 2)](coef = num / denom, name = "vacuum-magnetic-permeability", abbv = "μ₀")
     }
 
     trait CharacteristicImpedanceOfVacuum
     implicit val defineCharacteristicImpedanceOfVacuum = {
       // original value = 376.730313668(57) Ω
       val coef = Rational(376730313668L) / Rational(10).pow(9)
-      DerivedUnit[CharacteristicImpedanceOfVacuum, Ohm](coef = coef, name= "characteristic-impedance-of-vacuum", abbv = "Z₀")
+      DerivedUnit[CharacteristicImpedanceOfVacuum, Ohm](coef = coef, name = "characteristic-impedance-of-vacuum", abbv = "Z₀")
     }
 
     trait ElementaryCharge
@@ -125,13 +139,13 @@ package physicalconstants {
       // original value = 1.602176634×10−19 C
       val denom = Rational(10).pow(19)
       val num = Rational(1602176634L) / Rational(10).pow(9)
-      DerivedUnit[ElementaryCharge, Coulomb](coef = num / denom, name= "elementary-charge", abbv = "e")
+      DerivedUnit[ElementaryCharge, Coulomb](coef = num / denom, name = "elementary-charge", abbv = "e")
     }
 
     trait HyperfineTransitionFrequencyOfCs133
     implicit val defineHyperfineTransitionFrequencyOfCs133 = {
       // original value = 9192631770 Hz
-      DerivedUnit[HyperfineTransitionFrequencyOfCs133, Hertz](coef = 9192631770L, name= "hyperfine-transition-frequency-of-cs-133", abbv = "∆Cs")
+      DerivedUnit[HyperfineTransitionFrequencyOfCs133, Hertz](coef = 9192631770L, name = "hyperfine-transition-frequency-of-cs-133", abbv = "∆Cs")
     }
 
     trait AvogadroConstant
@@ -139,7 +153,7 @@ package physicalconstants {
       // original value = 6.02214076×1023 mol-1
       val denom = Rational(10).pow(23)
       val num = Rational(602214076L) / Rational(10).pow(8)
-      DerivedUnit[AvogadroConstant, Mole %^ -1](coef = num / denom, name= "avogadro-constant", abbv = "Nₐ")
+      DerivedUnit[AvogadroConstant, Mole %^ -1](coef = num / denom, name = "avogadro-constant", abbv = "Nₐ")
     }
 
     trait BoltzmannConstant
@@ -147,7 +161,7 @@ package physicalconstants {
       // original value = 1.380649×10−23 J⋅K−1
       val denom = Rational(10).pow(23)
       val num = Rational(1380649L) / Rational(10).pow(6)
-      DerivedUnit[BoltzmannConstant, Joule %/ Kelvin](coef = num / denom, name= "boltzmann-constant", abbv = "k")
+      DerivedUnit[BoltzmannConstant, Joule %/ Kelvin](coef = num / denom, name = "boltzmann-constant", abbv = "k")
     }
 
     trait ConductanceQuantum
@@ -155,7 +169,7 @@ package physicalconstants {
       // original value = 7.748091729...×10−5
       val denom = Rational(10).pow(5)
       val num = Rational(7748091729L) / Rational(10).pow(9)
-      DerivedUnit[ConductanceQuantum, Siemens](coef = num / denom, name= "conductance-quantum", abbv = "G₀")
+      DerivedUnit[ConductanceQuantum, Siemens](coef = num / denom, name = "conductance-quantum", abbv = "G₀")
     }
 
     trait JosephsonConstant
@@ -164,14 +178,14 @@ package physicalconstants {
       //
       val factor = Rational(10).pow(9)
       val num = Rational(4835978484L) / Rational(10).pow(4)
-      DerivedUnit[JosephsonConstant, Hertz %/ Volt](coef = num * factor, name= "josephson-constant", abbv = "Kⱼ")
+      DerivedUnit[JosephsonConstant, Hertz %/ Volt](coef = num * factor, name = "josephson-constant", abbv = "Kⱼ")
     }
 
     trait VonKlitzingConstant
     implicit val defineVonKlitzingConstant = {
       // original value = 25812.80745... Ω
       val coef = Rational(2581280745L) / Rational(10).pow(5)
-      DerivedUnit[VonKlitzingConstant, Ohm](coef = coef, name= "von-klitzing-constant", abbv = "Rₖ")
+      DerivedUnit[VonKlitzingConstant, Ohm](coef = coef, name = "von-klitzing-constant", abbv = "Rₖ")
     }
 
     trait MagneticFluxQuantum
@@ -179,14 +193,14 @@ package physicalconstants {
       // original value = 2.067833848...×10−15 Wb
       val denom = Rational(10).pow(15)
       val num = Rational(2067833848L) / Rational(10).pow(9)
-      DerivedUnit[MagneticFluxQuantum, Weber](coef = num / denom, name= "magnetic-flux-quantum", abbv = "Φ₀")
+      DerivedUnit[MagneticFluxQuantum, Weber](coef = num / denom, name = "magnetic-flux-quantum", abbv = "Φ₀")
     }
 
     trait InverseConductanceQuantum
     implicit val defineInverseConductanceQuantum = {
       // original value = 12906.40372... Ω
       val coef = Rational(1290640372L) / Rational(10).pow(5)
-      DerivedUnit[InverseConductanceQuantum, Ohm](coef = coef, name= "inverse-conductance-quantum", abbv = "G₀")
+      DerivedUnit[InverseConductanceQuantum, Ohm](coef = coef, name = "inverse-conductance-quantum", abbv = "G₀")
     }
 
     trait BohrMagneton
@@ -194,7 +208,7 @@ package physicalconstants {
       // original value = 9.2740100783(28)×10−24 J⋅T−1
       val denom = Rational(10).pow(24)
       val num = Rational(92740100783L) / Rational(10).pow(10)
-      DerivedUnit[BohrMagneton, Joule %/ Tesla](coef = num / denom, name= "bohr-magneton", abbv = "μB")
+      DerivedUnit[BohrMagneton, Joule %/ Tesla](coef = num / denom, name = "bohr-magneton", abbv = "μB")
     }
 
     trait NuclearMagneton
@@ -202,7 +216,7 @@ package physicalconstants {
       // original value = 5.0507837461(15)×10−27 J⋅T−1
       val denom = Rational(10).pow(27)
       val num = Rational(50507837461L) / Rational(10).pow(10)
-      DerivedUnit[NuclearMagneton, Joule %/ Tesla](coef = num / denom, name= "nuclear-magneton", abbv = "μₙ")
+      DerivedUnit[NuclearMagneton, Joule %/ Tesla](coef = num / denom, name = "nuclear-magneton", abbv = "μₙ")
     }
 
     trait FineStructureConstant
@@ -210,14 +224,14 @@ package physicalconstants {
       // original value = 7.2973525693(11)×10−3
       val denom = Rational(10).pow(3)
       val num = Rational(72973525693L) / Rational(10).pow(10)
-      DerivedUnit[FineStructureConstant, Unitless](coef = num / denom, name= "fine-structure-constant", abbv = "α")
+      DerivedUnit[FineStructureConstant, Unitless](coef = num / denom, name = "fine-structure-constant", abbv = "α")
     }
 
     trait InverseFineStructureConstant
     implicit val defineInverseFineStructureConstant = {
       // original value = 137.035999084
       val coef = Rational(137035999084L) / Rational(10).pow(9)
-      DerivedUnit[InverseFineStructureConstant, Unitless](coef = coef, name= "inverse-fine-structure-constant", abbv = "α⁻ⁱ")
+      DerivedUnit[InverseFineStructureConstant, Unitless](coef = coef, name = "inverse-fine-structure-constant", abbv = "α⁻ⁱ")
     }
 
     trait ElectronMass
@@ -225,7 +239,7 @@ package physicalconstants {
       // original value = 9.1093837015(28)×10−31 kg
       val denom = Rational(10).pow(31)
       val num = Rational(91093837015L) / Rational(10).pow(10)
-      DerivedUnit[ElectronMass, Kilogram](coef = num / denom, name= "electron-mass", abbv = "mₑ")
+      DerivedUnit[ElectronMass, Kilogram](coef = num / denom, name = "electron-mass", abbv = "mₑ")
     }
 
     trait ProtonMass
@@ -233,7 +247,7 @@ package physicalconstants {
       // original value = 1.67262192369(51)×10−27 kg
       val denom = Rational(10).pow(27)
       val num = Rational(167262192369L) / Rational(10).pow(11)
-      DerivedUnit[ProtonMass, Kilogram](coef = num / denom, name= "proton-mass", abbv = "mₚ")
+      DerivedUnit[ProtonMass, Kilogram](coef = num / denom, name = "proton-mass", abbv = "mₚ")
     }
 
     trait NeutronMass
@@ -241,7 +255,54 @@ package physicalconstants {
       // original value = 1.67492749804(95)×10−27 k
       val denom = Rational(10).pow(27)
       val num = Rational(167492749804L) / Rational(10).pow(11)
-      DerivedUnit[NeutronMass, Kilogram](coef = num / denom, name= "neutron-mass", abbv = "mₚ")
+      DerivedUnit[NeutronMass, Kilogram](coef = num / denom, name = "neutron-mass", abbv = "mₚ")
+    }
+
+    trait BohrRadius
+    implicit val defineBohrRadius = {
+      // original value = 5.29177210903(80)×10−11 m
+      val denom = Rational(10).pow(11)
+      val num = Rational(529177210903L) / Rational(10).pow(11)
+      DerivedUnit[BohrRadius, Meter](coef = num / denom, name = "bohr-radius", abbv = "a₀")
+    }
+
+    trait ClassicalElectronRadius
+    implicit val defineClassicalElectronRadius = {
+      // original value = 2.8179403262(13)×10−15 m
+      val denom = Rational(10).pow(15)
+      val num = Rational(28179403262L) / Rational(10).pow(10)
+      DerivedUnit[ClassicalElectronRadius, Meter](coef = num / denom, name = "classical-electron-radius", abbv = "rₑ")
+    }
+
+    trait ElectronGFactor
+    implicit val defineElectronGFactor = {
+      // original value = −2.00231930436256(35)
+      val coef = Rational(200231930436256L) / Rational(10).pow(14)
+      DerivedUnit[ElectronGFactor, Unitless](coef = coef, name = "electron-g-factor", abbv = "rₑ")
+    }
+
+    trait FermiCouplingConstant
+    implicit val defineFermiCouplingConstant = {
+      // original value = 1.1663787(6)×10−5 GeV−2
+      val denom = Rational(10).pow(5)
+      val num = Rational(11663787L) / Rational(10).pow(7)
+      DerivedUnit[FermiCouplingConstant, (Giga %* ElectronVolt) %^ -2](coef = num / denom, name = "fermi-coupling-constant", abbv = "GF")
+    }
+
+    trait HartreeEnergy
+    implicit val defineHartreeEnergy = {
+      // original value = 4.3597447222071(85)×10−18 J
+      val denom = Rational(10).pow(18)
+      val num = Rational(43597447222071L) / Rational(10).pow(13)
+      DerivedUnit[HartreeEnergy, Joule](coef = num / denom, name = "hartree-energy", abbv = "Eₕ")
+    }
+
+    trait QuantumOfCirculation
+    implicit val defineQuantumOfCirculation = {
+      // original value = 3.6369475516(11)×10−4 m2⋅s−1
+      val denom = Rational(10).pow(4)
+      val num = Rational(36369475516L) / Rational(10).pow(10)
+      DerivedUnit[QuantumOfCirculation, (Meter %^ 2) %/ Second](coef = num / denom, name = "quantum-of-reaction", abbv = "ℎ/2mₑ")
     }
 
   }
