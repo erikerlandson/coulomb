@@ -27,6 +27,9 @@ package object mks {
   trait Radian
   implicit val defineUnitRadian = DerivedUnit[Radian, Unitless](abbv = "rad")
 
+  trait Steradian
+  implicit val defineUnitSteradian = DerivedUnit[Steradian, Unitless](abbv = "sr")
+
   trait Hertz
   implicit val defineUnitHertz = DerivedUnit[Hertz, Second %^ -1](abbv = "Hz")
 
