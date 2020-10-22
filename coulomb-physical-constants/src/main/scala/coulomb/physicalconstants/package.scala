@@ -5,6 +5,7 @@ import coulomb.si._
 import coulomb.mks._
 import spire.math.Rational
 import spire.math.ConvertableTo
+import coulomb.unitops.UnitNeg
 
 package object physicalconstants {
   import infra._
@@ -66,7 +67,7 @@ package object physicalconstants {
 
   def classicalElectronRadius[V](implicit pcq: PhysicalConstantQuantity[V, ClassicalElectronRadius]): Quantity[V, pcq.QU] = pcq.q
 
-  def electronGFactor[V](implicit pcq: PhysicalConstantQuantity[V, ElectronGFactor]): Quantity[V, pcq.QU] = pcq.q
+  def electronGFactor[V: UnitNeg](implicit pcq: PhysicalConstantQuantity[V, ElectronGFactor]): Quantity[V, pcq.QU] = -pcq.q
 
   def fermiCouplingConstant[V](implicit pcq: PhysicalConstantQuantity[V, FermiCouplingConstant]): Quantity[V, pcq.QU] = pcq.q
 
@@ -116,6 +117,13 @@ import coulomb.siprefix.Giga
 
   // actual unit defs in a subpackage
   object units {
+    trait ElectronVolt
+    implicit val defineUnitElectronVolt = {
+      val denom = Rational(10).pow(19)
+      val num = Rational(1602176634L) / Rational(10).pow(9)
+      DerivedUnit[ElectronVolt, Joule](abbv = "eV", coef = num / denom)
+    }
+
     // define physical constants as derived units
     trait SpeedOfLightInVacuum
     implicit val defineSpeedOfLightInVacuum =

@@ -2,6 +2,8 @@ package coulomb.physical
 
 import coulomb._
 import coulomb.physicalconstants._
+import coulomb.unitops._
+import spire.std.double._
 import utest._
 
 object PhysicalConstantsSuite extends TestSuite {
@@ -32,7 +34,7 @@ object PhysicalConstantsSuite extends TestSuite {
       assert(neutronMass[Double].show == "1.67492749804E-27 kg")
       assert(bohrRadius[Double].show == "5.29177210903E-11 m")
       assert(classicalElectronRadius[Double].show == "2.8179403262E-15 m")
-      assert(electronGFactor[Double].show == "2.00231930436256 unitless")
+      assert(electronGFactor[Double].show == "-2.00231930436256 unitless")
       assert(fermiCouplingConstant[Double].show == "1.1663787E-5 GeV^(-2)")
       assert(hartreeEnergy[Double].show == "4.3597447222071E-18 J")
       assert(quantumOfReaction[Double].show == "3.6369475516E-4 m^2/s")
