@@ -20,3 +20,5 @@ project/metals.sbt
 .metals/
 .idea/
 .hydra/
+.bsp/
+project/project

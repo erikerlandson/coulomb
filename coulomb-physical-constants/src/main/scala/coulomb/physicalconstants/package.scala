@@ -3,9 +3,10 @@ package coulomb
 import coulomb.define.DerivedUnit
 import coulomb.si._
 import coulomb.mks._
+import coulomb.unitops.UnitNeg
+import scala.BigDecimal
 import spire.math.Rational
 import spire.math.ConvertableTo
-import coulomb.unitops.UnitNeg
 
 package object physicalconstants {
   import infra._

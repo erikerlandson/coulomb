@@ -6,7 +6,7 @@ import coulomb.unitops._
 import spire.std.double._
 import utest._
 
-object PhysicalConstantsSuite extends TestSuite {
+object PhysicalConstantsShowSuite extends TestSuite {
   val tests =  Tests {
     test("physical constants") {
       assert(speedOfLightInVacuum[Int].show == "299792458 m/s")
