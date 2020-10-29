@@ -20,11 +20,15 @@ import singleton.ops._
 
 import coulomb.define._
 import coulomb.si._
+import spire.math.Rational
 
 /** MKS (Meter, Kilogram, Second) unit definitions (Newton, Joule, Watt, etc) */
 package object mks {
   trait Radian
   implicit val defineUnitRadian = DerivedUnit[Radian, Unitless](abbv = "rad")
+
+  trait Steradian
+  implicit val defineUnitSteradian = DerivedUnit[Steradian, Unitless](abbv = "sr")
 
   trait Hertz
   implicit val defineUnitHertz = DerivedUnit[Hertz, Second %^ -1](abbv = "Hz")
@@ -61,4 +65,8 @@ package object mks {
 
   trait Henry
   implicit val defineUnitHenry = DerivedUnit[Henry, Weber %/ Ampere](abbv = "H")
+
+  trait Siemens
+  implicit val defineUnitSiemens = DerivedUnit[Siemens, (Second %^ 3) %* (Ampere %^ 2) %/ (Kilogram %* (Meter %^ 2))](abbv = "S")
+
 }
