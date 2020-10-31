@@ -32,7 +32,7 @@ package is also a dependency, but is included transitively via `spire`.
 libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb" % "0.5.0",
   "org.typelevel" %% "spire" % "0.17.0",
-  "eu.timepit" %% "singleton-ops" % "0.5.0"
+  "eu.timepit" %% "singleton-ops" % "0.5.2"
 )
 ```
 

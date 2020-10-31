@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb-temp-units" % "0.5.0",
   // coulomb external %Provided deps
   "org.typelevel" %% "spire" % "0.17.0",
-  "eu.timepit" %% "singleton-ops" % "0.5.0"
+  "eu.timepit" %% "singleton-ops" % "0.5.2"
 )
 ```
 
