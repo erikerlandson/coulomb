@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
   "eu.timepit" %% "singleton-ops" % "0.5.2",
   // refined dependencies
   "com.manyangled" %% "coulomb-refined" % "0.5.0",  
-  "eu.timepit" %% "refined" % "0.9.15"
+  "eu.timepit" %% "refined" % "0.9.17"
 )
 ```
 
