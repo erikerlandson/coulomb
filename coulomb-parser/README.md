@@ -14,11 +14,11 @@ of binary compatible dependency versions.
 ```scala
 libraryDependencies ++= Seq(
   // coulomb and core dependencies
-  "com.manyangled" %% "coulomb" % "0.5.0",
+  "com.manyangled" %% "coulomb" % "0.5.5",
   "org.typelevel" %% "spire" % "0.17.0",
   "eu.timepit" %% "singleton-ops" % "0.5.2"
   // coulomb-parser and deps
-  "com.manyangled" %% "coulomb-parser" % "0.5.0",                    // QuantityParser
+  "com.manyangled" %% "coulomb-parser" % "0.5.5",                    // QuantityParser
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"   // %Provided parser dependency
 )
 ```

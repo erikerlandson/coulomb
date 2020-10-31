@@ -14,8 +14,8 @@ of binary compatible dependency versions.
 The package `coulomb-avro` provides an integration of unit parsing with Avro schemas:
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-avro" % "0.5.0",
-  "com.manyangled" %% "coulomb-parser" % "0.5.0",
+  "com.manyangled" %% "coulomb-avro" % "0.5.5",
+  "com.manyangled" %% "coulomb-parser" % "0.5.5",
   "org.apache.avro" % "avro" % "1.10.0",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
 )

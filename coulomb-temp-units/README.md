@@ -14,9 +14,9 @@ of binary compatible dependency versions.
 ```scala
 libraryDependencies ++= Seq(
   // coulomb libraries used by temperature units
-  "com.manyangled" %% "coulomb" % "0.5.0",
-  "com.manyangled" %% "coulomb-si-units" % "0.5.0",
-  "com.manyangled" %% "coulomb-temp-units" % "0.5.0",
+  "com.manyangled" %% "coulomb" % "0.5.5",
+  "com.manyangled" %% "coulomb-si-units" % "0.5.5",
+  "com.manyangled" %% "coulomb-temp-units" % "0.5.5",
   // coulomb external %Provided deps
   "org.typelevel" %% "spire" % "0.17.0",
   "eu.timepit" %% "singleton-ops" % "0.5.2"
