@@ -15,7 +15,7 @@ of binary compatible dependency versions.
 libraryDependencies ++= Seq(
   // coulomb and core dependencies
   "com.manyangled" %% "coulomb" % "0.5.0",
-  "org.typelevel" %% "spire" % "0.17.0-RC1",
+  "org.typelevel" %% "spire" % "0.17.0",
   "eu.timepit" %% "singleton-ops" % "0.5.0"
   // coulomb-parser and deps
   "com.manyangled" %% "coulomb-parser" % "0.5.0",                    // QuantityParser
