@@ -6,6 +6,7 @@
 // sbt coulomb_testsJS/test
 // update version in README
 // git sed 's/0\.4\.6/0.5.0/'
+// review sonatype here: https://oss.sonatype.org/#stagingRepositories
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
