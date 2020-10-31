@@ -20,8 +20,8 @@ libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb-pureconfig" % "0.5.0",
   "com.manyangled" %% "coulomb-parser" % "0.5.0",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
-  "com.github.pureconfig" %% "pureconfig-core" % "0.12.3",
-  "com.github.pureconfig" %% "pureconfig-generic" % "0.12.3",
+  "com.github.pureconfig" %% "pureconfig-core" % "0.14.0",
+  "com.github.pureconfig" %% "pureconfig-generic" % "0.14.0",
   // refined integration
   "com.manyangled" %% "coulomb-refined" % "0.5.0",  
   "eu.timepit" %% "refined" % "0.9.15"
