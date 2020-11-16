@@ -1,0 +1,20 @@
+name: build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 100
+      - name: Fetch tags
+        run: git fetch --depth=100 origin +refs/tags/*:refs/tags/*
+      - uses: coursier/cache-action@v3
+      - name: Setup Scala
+        uses: olafurpg/setup-scala@v7
+      - name: Run tests and documentation
+        run: |
+          csbt +coulomb_testsJVM/test +coulomb_testsJS/test
