@@ -1,6 +1,5 @@
 package coulomb.cats
 
-import cats.tests.CatsSuite
 import cats._
 import cats.implicits._
 import cats.kernel.laws.discipline._
@@ -10,9 +9,8 @@ import coulomb._
 import coulomb.cats.implicits._
 import coulomb.si._
 import coulomb.siprefix._
-import utest._
 
-final class CatsSpec extends CatsSuite {
+final class CatsSuite extends munit.DisciplineSuite {
   import coulomb.scalacheck.ArbQuantity._
 
   type MetersPerSecond = Meter %/ Second
@@ -29,7 +27,7 @@ final class CatsSpec extends CatsSuite {
     // Convertible units and value types
     assert(eqdms.eqv(aq, cq))
     // Incompatible units won't compile
-    compileError("eqdms.eqv(aq, dq)")
+    assert(compileErrors("eqdms.eqv(aq, dq)").nonEmpty)
   }
 
   test("order") {
@@ -41,9 +39,9 @@ final class CatsSpec extends CatsSuite {
     // You can sort equivalent units if you specify the type which will auto convert
     assert(NonEmptyList.of[Quantity[Double, MetersPerSecond]](aq, cq2).sorted === NonEmptyList.of[Quantity[Double, MetersPerSecond]](cq2, aq))
     // This can't compile, the type of the list has a mix of all the units
-    compileError("NonEmptyList.of(aq, cq2).sorted")
+    assert(compileErrors("NonEmptyList.of(aq, cq2).sorted").nonEmpty)
     // This can't compile, the quantitys are not comparable
-    compileError("NonEmptyList.of(aq, dq).sorted")
+    assert(compileErrors("NonEmptyList.of(aq, dq).sorted").nonEmpty)
   }
 
   checkAll("EqTest", EqTests[Quantity[Int, MetersPerSecond]].eqv)

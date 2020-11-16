@@ -18,8 +18,6 @@ package coulomb.pureconfig
 
 import shapeless.{ ::, HNil }
 
-import utest._
-
 import _root_.pureconfig._
 import _root_.pureconfig.generic.auto._
 import _root_.pureconfig.syntax._
@@ -41,7 +39,7 @@ object CaseClassTest {
   case class Book(title: String, author: String)
 }
 
-object PureconfigTests extends TestSuite {
+class PureconfigTests extends munit.FunSuite {
 
   implicit val qp = QuantityParser[Second :: Byte :: Hour :: Giga :: HNil]
 
@@ -51,76 +49,70 @@ object PureconfigTests extends TestSuite {
     "regular": 42
   }""")
 
-  val tests = Tests {
-    test("load a case class with Quantity unit conversions") {
-      case class QC(duration: Quantity[Double, Second],
-                    memory: Quantity[Double, Mega %* Byte],
-                    regular: Int)
+  test("load a case class with Quantity unit conversions") {
+    case class QC(duration: Quantity[Double, Second],
+                  memory: Quantity[Double, Mega %* Byte],
+                  regular: Int)
 
-      val qc = ConfigSource.fromConfig(conf).load[QC].toOption.get
-      assert(
-        qc.duration.isValidQ[Double, Second](3600.0),
-        qc.memory.isValidQ[Double, Mega %* Byte](1000.0),
-        qc.regular == 42
-      )
-    }
-
-    test("fail on incompatible units") {
-      case class Wrong(duration: Quantity[Double, Meter],      // oh no!
-                       memory: Quantity[Double, Mega %* Byte],
-                       regular: Int)
-
-      val qc = ConfigSource.fromConfig(conf).load[Wrong]
-      assert(qc.isLeft)
-    }
-
-    test("load a case class with a refined Quantity") {
-      import eu.timepit.refined._
-      import eu.timepit.refined.api._
-      import eu.timepit.refined.numeric._
-      import coulomb.pureconfig.refined._
-
-      case class QC(duration: Quantity[Refined[Double, Positive], Second],
-                    memory: Quantity[Double, Mega %* Byte],
-                    regular: Int)
-
-      val qc = ConfigSource.fromConfig(conf).load[QC].toOption.get
-      assert(
-        qc.duration.isValidQ[Refined[Double, Positive], Second](3600.0),
-        qc.memory.isValidQ[Double, Mega %* Byte](1000.0),
-        qc.regular == 42
-      )
-    }
-
-    test("fail on un-validated refined predicate") {
-      import eu.timepit.refined._
-      import eu.timepit.refined.api._
-      import eu.timepit.refined.numeric._
-      import coulomb.pureconfig.refined._
-
-      case class Wrong(duration: Quantity[Refined[Double, Negative], Second], // oh no!
-                       memory: Quantity[Double, Mega %* Byte],
-                       regular: Int)
-
-      val qc = ConfigSource.fromConfig(conf).load[Wrong]
-      assert(qc.isLeft)
-    }
-
-    test("undeclared base units") {
-      import coulomb.policy.undeclaredBaseUnits._
-      import CaseClassTest._
-
-      val conf = (3.withUnit[Book], 5.withUnit[Author]).toConfig
-      assert(conf.toString == """SimpleConfigList([{"unit":"Book","value":3},{"unit":"Author","value":5}])""")
-
-      implicit val qp = QuantityParser.withImports[Book :: Author :: HNil]("coulomb.policy.undeclaredBaseUnits._")
-      val load = conf.toOrThrow[(Quantity[Float, Book], Quantity[Int, Author])]
-      assert(load._1.isValidQ[Float, Book](3))
-      assert(load._2.isValidQ[Int, Author](5))
-
-      intercept[Exception] {
-        conf.toOrThrow[(Quantity[Int, Author], Quantity[Int, Book])]
-      }
-    }
+    val qc = ConfigSource.fromConfig(conf).load[QC].toOption.get
+    assert(qc.duration.isValidQ[Double, Second](3600.0))
+    assert(qc.memory.isValidQ[Double, Mega %* Byte](1000.0))
+    assertEquals(qc.regular, 42)
   }
+
+  test("fail on incompatible units") {
+    case class Wrong(duration: Quantity[Double, Meter],      // oh no!
+                      memory: Quantity[Double, Mega %* Byte],
+                      regular: Int)
+
+    val qc = ConfigSource.fromConfig(conf).load[Wrong]
+    assert(qc.isLeft)
+  }
+
+  test("load a case class with a refined Quantity") {
+    import eu.timepit.refined._
+    import eu.timepit.refined.api._
+    import eu.timepit.refined.numeric._
+    import coulomb.pureconfig.refined._
+
+    case class QC(duration: Quantity[Refined[Double, Positive], Second],
+                  memory: Quantity[Double, Mega %* Byte],
+                  regular: Int)
+
+    val qc = ConfigSource.fromConfig(conf).load[QC].toOption.get
+    assert(qc.duration.isValidQ[Refined[Double, Positive], Second](3600.0))
+    assert(qc.memory.isValidQ[Double, Mega %* Byte](1000.0))
+    assertEquals(qc.regular, 42)
+  }
+
+  test("fail on un-validated refined predicate") {
+    import eu.timepit.refined._
+    import eu.timepit.refined.api._
+    import eu.timepit.refined.numeric._
+    import coulomb.pureconfig.refined._
+
+    case class Wrong(duration: Quantity[Refined[Double, Negative], Second], // oh no!
+                      memory: Quantity[Double, Mega %* Byte],
+                      regular: Int)
+
+    val qc = ConfigSource.fromConfig(conf).load[Wrong]
+    assert(qc.isLeft)
+  }
+
+  test("undeclared base units") {
+    import coulomb.policy.undeclaredBaseUnits._
+    import CaseClassTest._
+
+    val conf = (3.withUnit[Book], 5.withUnit[Author]).toConfig
+    assert(conf.toString == """SimpleConfigList([{"unit":"Book","value":3},{"unit":"Author","value":5}])""")
+
+    implicit val qp = QuantityParser.withImports[Book :: Author :: HNil]("coulomb.policy.undeclaredBaseUnits._")
+    val load = conf.toOrThrow[(Quantity[Float, Book], Quantity[Int, Author])]
+    assert(load._1.isValidQ[Float, Book](3))
+    assert(load._2.isValidQ[Int, Author](5))
+
+    intercept[Exception] {
+      conf.toOrThrow[(Quantity[Int, Author], Quantity[Int, Book])]
+    }
+}
 }

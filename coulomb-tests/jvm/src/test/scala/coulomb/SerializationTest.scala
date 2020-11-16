@@ -7,29 +7,25 @@ import spire.std.any._
 
 import singleton.ops._
 
-import utest._
-
 import coulomb.si._
 import coulomb.temp._
 
 import coulomb.validators.CoulombValidators._
 
-object SerializationTests extends TestSuite {
-  val tests = Tests {
-    test("quantity be serializable") {
-      import coulomb.scalatest.serde._
-      val qs = Quantity[Int, Meter %/ Second](10)
-      val qd = roundTripSerDe(qs)
-      assert(qd.isValidQ[Int, Meter %/ Second](10))
-      assert(qd === qs)
-    }
+class SerializationTests extends munit.FunSuite {
+  test("quantity be serializable") {
+    import coulomb.scalatest.serde._
+    val qs = Quantity[Int, Meter %/ Second](10)
+    val qd = roundTripSerDe(qs)
+    assert(qd.isValidQ[Int, Meter %/ Second](10))
+    assertEquals(qd, qs)
+  }
 
-    test("temperature be serializable") {
-      import coulomb.scalatest.serde._
-      val ts = Temperature[Int, Celsius](100)
-      val td = roundTripSerDe(ts)
-      assert(td.isValidT[Int, Celsius](100))
-      assert(td === ts)
-    }
+  test("temperature be serializable") {
+    import coulomb.scalatest.serde._
+    val ts = Temperature[Int, Celsius](100)
+    val td = roundTripSerDe(ts)
+    assert(td.isValidT[Int, Celsius](100))
+    assertEquals(td, ts)
   }
 }

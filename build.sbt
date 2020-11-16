@@ -57,9 +57,11 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "spire" % "0.17.0" % Provided,
     "eu.timepit" %%% "singleton-ops" % "0.5.2" % Provided,
-    "com.lihaoyi" %%% "utest" % "0.7.5" % Test
+    "org.scalameta" %%% "munit" % "0.7.17" % Test,
+    "org.typelevel" %%% "discipline-munit" % "1.0.2" % Test,
+    "org.scalameta" %%% "munit-scalacheck" % "0.7.17" % Test,
   ),
-  testFrameworks += new TestFramework("utest.runner.Framework"),
+  testFrameworks += new TestFramework("munit.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt")
 )
@@ -179,7 +181,10 @@ def coulombPureConfigDeps = Seq(
 )
 
 def coulombCatsDeps = Def.setting(Seq(
-  "org.typelevel" %%% "cats-core" % "2.2.0" % Provided
+  "org.typelevel" %%% "cats-core" % "2.2.0" % Provided,
+  "org.typelevel" %%% "cats-testkit" % "2.2.0" % Provided,
+  "org.scalacheck" %%% "scalacheck" % "1.15.1" % Provided
+    // "org.typelevel" %%% "discipline-core" % "1.1.2" % Test
 ))
 
 lazy val coulomb_cats = crossProject(JVMPlatform, JSPlatform)
@@ -191,11 +196,6 @@ lazy val coulomb_cats = crossProject(JVMPlatform, JSPlatform)
   .settings(docDepSettings :_*)
   .settings(libraryDependencies ++= coulombCatsDeps.value)
 
-def coulombScalacheckDeps = Def.setting(Seq(
-   "org.typelevel" %%% "cats-testkit" % "2.2.0" % Provided,
-   "org.typelevel" %%% "cats-testkit-scalatest" % "2.0.0" % Test
-))
-
 lazy val coulomb_scalacheck = crossProject(JVMPlatform, JSPlatform)
   .crossType(CrossType.Pure)
   .in(file("coulomb-scalacheck"))
@@ -204,7 +204,6 @@ lazy val coulomb_scalacheck = crossProject(JVMPlatform, JSPlatform)
   .settings(commonSettings :_*)
   .settings(docDepSettings :_*)
   .settings(libraryDependencies ++= coulombCatsDeps.value)
-  .settings(libraryDependencies ++= coulombScalacheckDeps.value)
 
 lazy val coulomb_pureconfig = (project in file("coulomb-pureconfig"))
   .dependsOn(coulomb.jvm, coulomb_parser)
@@ -252,13 +251,15 @@ lazy val coulomb_tests = crossProject(JVMPlatform, JSPlatform)
   .settings(libraryDependencies ++= coulombRefinedDeps.value)
   .settings(libraryDependencies ++= coulombPureConfigDeps)
   .settings(libraryDependencies ++= coulombCatsDeps.value)
-  .settings(libraryDependencies ++= coulombScalacheckDeps.value)
   .jvmConfigure(_.dependsOn(coulomb_avro))
   .jvmConfigure(_.dependsOn(coulomb_typesafe_config))
   .jvmConfigure(_.dependsOn(coulomb_parser))
   .jvmConfigure(_.dependsOn(coulomb_pureconfig))
   .jvmConfigure(_.dependsOn(coulomb_pureconfig_refined))
-  .jsSettings(libraryDependencies ++= javaTimeJSDeps.value)
+  .jsSettings(
+    libraryDependencies ++= javaTimeJSDeps.value,
+    scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
+  )
 
 // I define this mostly to support 'publish' and 'unidoc'
 lazy val coulomb_root = (project in file("."))
