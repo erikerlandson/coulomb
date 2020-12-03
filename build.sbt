@@ -165,7 +165,7 @@ lazy val coulomb_typesafe_config = (project in file("coulomb-typesafe-config"))
   .settings(libraryDependencies ++= coulombTypesafeConfigDeps)
 
 def coulombAvroDeps = Seq(
-  "org.apache.avro" % "avro" % "1.10.0" % Provided
+  "org.apache.avro" % "avro" % "1.10.1" % Provided
 )
 
 lazy val coulomb_avro = (project in file("coulomb-avro"))
