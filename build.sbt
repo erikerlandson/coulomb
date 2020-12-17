@@ -57,9 +57,9 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "spire" % "0.17.0" % Provided,
     "eu.timepit" %%% "singleton-ops" % "0.5.2" % Provided,
-    "org.scalameta" %%% "munit" % "0.7.19" % Test,
+    "org.scalameta" %%% "munit" % "0.7.20" % Test,
     "org.typelevel" %%% "discipline-munit" % "1.0.3" % Test,
-    "org.scalameta" %%% "munit-scalacheck" % "0.7.19" % Test,
+    "org.scalameta" %%% "munit-scalacheck" % "0.7.20" % Test,
   ),
   testFrameworks += new TestFramework("munit.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
