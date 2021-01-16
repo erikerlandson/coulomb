@@ -49,7 +49,7 @@ def commonSettings = Seq(
   //---------------------------------
   // build configurations
   //---------------------------------
-  addCompilerPlugin("org.typelevel" % "kind-projector_2.13.3" % "0.11.2"),
+  addCompilerPlugin("org.typelevel" % "kind-projector_2.13.3" % "0.11.3"),
   resolvers ++= Seq(
     Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
