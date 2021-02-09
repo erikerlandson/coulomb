@@ -22,7 +22,7 @@ libraryDependencies ++= Seq(
   "eu.timepit" %% "singleton-ops" % "0.5.2",
   // cats dependencies
   "com.manyangled" %% "coulomb-cats" % "0.5.5",  
-  "org.typelevel" %% "cats-core" % "2.3.1"
+  "org.typelevel" %% "cats-core" % "2.4.0"
 )
 ```
 
