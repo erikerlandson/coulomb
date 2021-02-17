@@ -14,8 +14,8 @@ of binary compatible dependency versions.
 The package `coulomb-typesafe-config` provides an integration of unit parsing with the Typesafe Config.
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-typesafe-config" % "0.5.5"
-  "com.manyangled" %% "coulomb-parser" % "0.5.5",
+  "com.manyangled" %% "coulomb-typesafe-config" % "0.5.6"
+  "com.manyangled" %% "coulomb-parser" % "0.5.6",
   "com.typesafe" % "config" % "1.4.1",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
 )
