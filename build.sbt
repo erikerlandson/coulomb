@@ -57,9 +57,9 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "spire" % "0.17.0" % Provided,
     "eu.timepit" %%% "singleton-ops" % "0.5.2" % Provided,
-    "org.scalameta" %%% "munit" % "0.7.21" % Test,
-    "org.typelevel" %%% "discipline-munit" % "1.0.5" % Test,
-    "org.scalameta" %%% "munit-scalacheck" % "0.7.21" % Test,
+    "org.scalameta" %%% "munit" % "0.7.22" % Test,
+    "org.typelevel" %%% "discipline-munit" % "1.0.6" % Test,
+    "org.scalameta" %%% "munit-scalacheck" % "0.7.22" % Test,
   ),
   testFrameworks += new TestFramework("munit.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
@@ -183,7 +183,7 @@ def coulombPureConfigDeps = Seq(
 def coulombCatsDeps = Def.setting(Seq(
   "org.typelevel" %%% "cats-core" % "2.4.2" % Provided,
   "org.typelevel" %%% "cats-testkit" % "2.4.2" % Provided,
-  "org.scalacheck" %%% "scalacheck" % "1.15.2" % Provided
+  "org.scalacheck" %%% "scalacheck" % "1.15.3" % Provided
     // "org.typelevel" %%% "discipline-core" % "1.1.2" % Test
 ))
 
