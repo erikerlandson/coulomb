@@ -11,6 +11,7 @@
 
 * [API documentation for `coulomb`](https://erikerlandson.github.io/coulomb/latest/api/)
 * [`coulomb` tutorial](#tutorial)
+* [github discussions](https://github.com/erikerlandson/coulomb/discussions)
 * [Your Data Type is a Unit](http://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/)
 * [Why Your Data Schema Should Include Units](https://www.youtube.com/watch?v=qrQmB2KFKE8)
 * [Preventing Configuration Errors With Unit Types](http://erikerlandson.github.io/blog/2019/05/09/preventing-configuration-errors-with-unit-types/)
