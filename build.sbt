@@ -58,7 +58,7 @@ def commonSettings = Seq(
     "org.typelevel" %%% "spire" % "0.17.0" % Provided,
     "eu.timepit" %%% "singleton-ops" % "0.5.2" % Provided,
     "org.scalameta" %%% "munit" % "0.7.23" % Test,
-    "org.typelevel" %%% "discipline-munit" % "1.0.6" % Test,
+    "org.typelevel" %%% "discipline-munit" % "1.0.7" % Test,
     "org.scalameta" %%% "munit-scalacheck" % "0.7.23" % Test,
   ),
   testFrameworks += new TestFramework("munit.Framework"),
