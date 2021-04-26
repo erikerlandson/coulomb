@@ -57,9 +57,9 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "spire" % "0.17.0" % Provided,
     "eu.timepit" %%% "singleton-ops" % "0.5.2" % Provided,
-    "org.scalameta" %%% "munit" % "0.7.23" % Test,
+    "org.scalameta" %%% "munit" % "0.7.25" % Test,
     "org.typelevel" %%% "discipline-munit" % "1.0.8" % Test,
-    "org.scalameta" %%% "munit-scalacheck" % "0.7.23" % Test,
+    "org.scalameta" %%% "munit-scalacheck" % "0.7.25" % Test,
   ),
   testFrameworks += new TestFramework("munit.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
@@ -176,8 +176,8 @@ lazy val coulomb_avro = (project in file("coulomb-avro"))
   .settings(libraryDependencies ++= coulombAvroDeps)
 
 def coulombPureConfigDeps = Seq(
-  "com.github.pureconfig" %% "pureconfig-core" % "0.14.1" % Provided,
-  "com.github.pureconfig" %% "pureconfig-generic" % "0.14.1" % Provided,
+  "com.github.pureconfig" %% "pureconfig-core" % "0.15.0" % Provided,
+  "com.github.pureconfig" %% "pureconfig-generic" % "0.15.0" % Provided,
 )
 
 def coulombCatsDeps = Def.setting(Seq(
