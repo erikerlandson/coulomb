@@ -58,7 +58,7 @@ def commonSettings = Seq(
     "org.typelevel" %%% "spire" % "0.17.0" % Provided,
     "eu.timepit" %%% "singleton-ops" % "0.5.2" % Provided,
     "org.scalameta" %%% "munit" % "0.7.25" % Test,
-    "org.typelevel" %%% "discipline-munit" % "1.0.7" % Test,
+    "org.typelevel" %%% "discipline-munit" % "1.0.8" % Test,
     "org.scalameta" %%% "munit-scalacheck" % "0.7.25" % Test,
   ),
   testFrameworks += new TestFramework("munit.Framework"),
@@ -181,9 +181,9 @@ def coulombPureConfigDeps = Seq(
 )
 
 def coulombCatsDeps = Def.setting(Seq(
-  "org.typelevel" %%% "cats-core" % "2.5.0" % Provided,
-  "org.typelevel" %%% "cats-testkit" % "2.5.0" % Provided,
-  "org.scalacheck" %%% "scalacheck" % "1.15.4" % Provided
+  "org.typelevel" %%% "cats-core" % "2.6.0" % Provided,
+  "org.typelevel" %%% "cats-testkit" % "2.6.0" % Provided,
+  "org.scalacheck" %%% "scalacheck" % "1.15.3" % Provided
     // "org.typelevel" %%% "discipline-core" % "1.1.2" % Test
 ))
 
