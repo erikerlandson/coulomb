@@ -19,7 +19,7 @@ libraryDependencies ++= Seq(
   "eu.timepit" %% "singleton-ops" % "0.5.2"
   // coulomb-parser and deps
   "com.manyangled" %% "coulomb-parser" % "0.5.6",                    // QuantityParser
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"   // %Provided parser dependency
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.0.0"   // %Provided parser dependency
 )
 ```
 
