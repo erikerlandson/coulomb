@@ -17,6 +17,7 @@
 * [Preventing Configuration Errors With Unit Types](http://erikerlandson.github.io/blog/2019/05/09/preventing-configuration-errors-with-unit-types/)
 * [Unit Types for Avro Schema: Integrating Avro with Coulomb](http://erikerlandson.github.io/blog/2019/05/23/unit-types-for-avro-schema-integrating-avro-with-coulomb/)
 * [Algorithmic Unit Analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/)
+* [A Unit Analysis of Linear Regression](http://erikerlandson.github.io/blog/2020/05/06/unit-analysis-for-linear-regression/)
 
 ### Scala Requirements
 
