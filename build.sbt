@@ -57,13 +57,13 @@ def commonSettings = Seq(
   libraryDependencies ++= Seq(
     "org.typelevel" %%% "spire" % "0.17.0" % Provided,
     "eu.timepit" %%% "singleton-ops" % "0.5.2" % Provided,
-    "org.scalameta" %%% "munit" % "0.7.26" % Test,
+    "org.scalameta" %%% "munit" % "0.7.27" % Test,
     "org.typelevel" %%% "discipline-munit" % "1.0.9" % Test,
-    "org.scalameta" %%% "munit-scalacheck" % "0.7.26" % Test,
+    "org.scalameta" %%% "munit-scalacheck" % "0.7.27" % Test,
   ),
   testFrameworks += new TestFramework("munit.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
-  scalacOptions in (Compile, doc) ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt")
+  Compile / doc /scalacOptions ++= Seq("-doc-root-content", baseDirectory.value+"/root-doc.txt")
 )
 
 // prevents previewSite from trying to run on all packages simultaneously
@@ -275,7 +275,7 @@ lazy val coulomb_root = (project in file("."))
   )
   .settings(
     // unidoc needs to be told explicitly to ignore JS projects
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js, coulomb_physical_constants.js))
+    ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(coulomb.js, coulomb_si_units.js, coulomb_mks_units.js, coulomb_accepted_units.js, coulomb_time_units.js, coulomb_info_units.js, coulomb_customary_units.js, coulomb_temp_units.js, coulomb_refined.js, coulomb_cats.js, coulomb_scalacheck.js, coulomb_physical_constants.js))
   .settings(name := "coulomb-root")
   .settings(commonSettings :_*)
   .settings(publish := {})
@@ -283,8 +283,8 @@ lazy val coulomb_root = (project in file("."))
 
 enablePlugins(ScalaUnidocPlugin, GhpagesPlugin)
 
-siteSubdirName in ScalaUnidoc := "latest/api"
+ScalaUnidoc / siteSubdirName := "latest/api"
 
-addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), siteSubdirName in ScalaUnidoc)
+addMappingsToSiteDir(ScalaUnidoc / packageDoc / mappings, ScalaUnidoc / siteSubdirName)
 
 git.remoteRepo := "git@github.com:erikerlandson/coulomb.git"
