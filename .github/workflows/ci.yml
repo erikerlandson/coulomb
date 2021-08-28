@@ -17,4 +17,4 @@ jobs:
         uses: olafurpg/setup-scala@v10
       - name: Run tests and documentation
         run: |
-          csbt +coulomb_testsJVM/test +coulomb_testsJS/test
+          sbt +coulomb_testsJVM/test +coulomb_testsJS/test
