@@ -17,11 +17,11 @@ of binary compatible dependency versions:
 ```scala
 libraryDependencies ++= Seq(
   // basic coulomb dependencies
-  "com.manyangled" %% "coulomb" % "0.5.6",
+  "com.manyangled" %% "coulomb" % "0.5.7",
   "org.typelevel" %% "spire" % "0.17.0",
   "eu.timepit" %% "singleton-ops" % "0.5.2",
   // cats dependencies
-  "com.manyangled" %% "coulomb-cats" % "0.5.6",  
+  "com.manyangled" %% "coulomb-cats" % "0.5.7",
   "org.typelevel" %% "cats-core" % "2.6.1"
 )
 ```
