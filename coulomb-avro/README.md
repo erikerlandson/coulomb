@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb-avro" % "0.5.7",
   "com.manyangled" %% "coulomb-parser" % "0.5.7",
   "org.apache.avro" % "avro" % "1.10.2",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.0.0"
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0"
 )
 ```
 

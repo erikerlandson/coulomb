@@ -143,7 +143,7 @@ lazy val coulomb_physical_constants = crossProject(JVMPlatform, JSPlatform)
   .settings(docDepSettings :_*)
 
 def coulombParserDeps = Seq(
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.0.0" % Provided
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0" % Provided
 )
 
 lazy val coulomb_parser = (project in file("coulomb-parser"))
