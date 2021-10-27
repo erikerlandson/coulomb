@@ -16,7 +16,7 @@ The package `coulomb-avro` provides an integration of unit parsing with Avro sch
 libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb-avro" % "0.5.7",
   "com.manyangled" %% "coulomb-parser" % "0.5.7",
-  "org.apache.avro" % "avro" % "1.10.2",
+  "org.apache.avro" % "avro" % "1.11.0",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0"
 )
 ```
