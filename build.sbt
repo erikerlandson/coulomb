@@ -19,8 +19,8 @@ def commonSettings = Seq(
   //isSnapshot := true,
   //publishConfiguration := publishConfiguration.value.withOverwrite(true),
   publishLocalConfiguration := publishLocalConfiguration.value.withOverwrite(true),
-  scalaVersion := "2.13.7",
-  crossScalaVersions := Seq("2.13.7"),
+  scalaVersion := "2.13.8",
+  crossScalaVersions := Seq("2.13.8"),
   pomIncludeRepository := { _ => false },
   publishMavenStyle := true,
   publishTo := {
