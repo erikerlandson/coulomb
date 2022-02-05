@@ -32,8 +32,8 @@ package is also a dependency, but is included transitively via `spire`.
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb" % "0.5.7",
-  "org.typelevel" %% "spire" % "0.17.0",
+  "com.manyangled" %% "coulomb" % "0.5.8",
+  "org.typelevel" %% "spire" % "0.18.0-M3",
   "eu.timepit" %% "singleton-ops" % "0.5.2"
 )
 ```
@@ -43,13 +43,13 @@ separate sub-packages.
 
 ```scala
 libraryDependencies ++= Seq(
-  "com.manyangled" %% "coulomb-si-units" % "0.5.7",        // The seven SI units: meter, second, kilogram, etc
-  "com.manyangled" %% "coulomb-accepted-units" % "0.5.7",  // Common non-SI metric: liter, centimeter, gram, etc
-  "com.manyangled" %% "coulomb-time-units" % "0.5.7",      // minute, hour, day, week
-  "com.manyangled" %% "coulomb-info-units" % "0.5.7",      // bit, byte, nat
-  "com.manyangled" %% "coulomb-mks-units" % "0.5.7",       // MKS units: Joule, Newton, Watt, Volt, etc
-  "com.manyangled" %% "coulomb-customary-units" % "0.5.7", // non-metric units: foot, mile, pound, gallon, pint, etc
-  "com.manyangled" %% "coulomb-temp-units" % "0.5.7"       // Celsius and Fahrenheit temperature scales
+  "com.manyangled" %% "coulomb-si-units" % "0.5.8",        // The seven SI units: meter, second, kilogram, etc
+  "com.manyangled" %% "coulomb-accepted-units" % "0.5.8",  // Common non-SI metric: liter, centimeter, gram, etc
+  "com.manyangled" %% "coulomb-time-units" % "0.5.8",      // minute, hour, day, week
+  "com.manyangled" %% "coulomb-info-units" % "0.5.8",      // bit, byte, nat
+  "com.manyangled" %% "coulomb-mks-units" % "0.5.8",       // MKS units: Joule, Newton, Watt, Volt, etc
+  "com.manyangled" %% "coulomb-customary-units" % "0.5.8", // non-metric units: foot, mile, pound, gallon, pint, etc
+  "com.manyangled" %% "coulomb-temp-units" % "0.5.8"       // Celsius and Fahrenheit temperature scales
 )
 ```
 

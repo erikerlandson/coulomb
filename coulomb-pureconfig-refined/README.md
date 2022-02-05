@@ -13,17 +13,17 @@ of binary compatible dependency versions:
 ```scala
 libraryDependencies ++= Seq(
   // basic coulomb dependencies
-  "com.manyangled" %% "coulomb" % "0.5.7",
-  "org.typelevel" %% "spire" % "0.17.0",
+  "com.manyangled" %% "coulomb" % "0.5.8",
+  "org.typelevel" %% "spire" % "0.18.0-M3",
   "eu.timepit" %% "singleton-ops" % "0.5.2",
   // pureconfig integration:
-  "com.manyangled" %% "coulomb-pureconfig" % "0.5.7",
-  "com.manyangled" %% "coulomb-parser" % "0.5.7",
+  "com.manyangled" %% "coulomb-pureconfig" % "0.5.8",
+  "com.manyangled" %% "coulomb-parser" % "0.5.8",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0",
   "com.github.pureconfig" %% "pureconfig-core" % "0.17.1",
   "com.github.pureconfig" %% "pureconfig-generic" % "0.17.1",
   // refined integration
-  "com.manyangled" %% "coulomb-refined" % "0.5.7",
+  "com.manyangled" %% "coulomb-refined" % "0.5.8",
   "eu.timepit" %% "refined" % "0.9.28"
 )
 ```
