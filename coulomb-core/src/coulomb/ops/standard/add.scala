@@ -23,6 +23,96 @@ object addmeta:
                     type UO = U
                     def apply(vl: Double, vr: Double): Double = vl + vr
             }
+            case (typeDouble(), typeFloat()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Double
+                    type UO = U
+                    def apply(vl: Double, vr: Float): Double = vl + vr
+            }
+            case (typeDouble(), typeLong()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Double
+                    type UO = U
+                    def apply(vl: Double, vr: Long): Double = vl + vr
+            }
+            case (typeDouble(), typeInt()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Double
+                    type UO = U
+                    def apply(vl: Double, vr: Int): Double = vl + vr
+            }
+            case (typeFloat(), typeDouble()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Double
+                    type UO = U
+                    def apply(vl: Float, vr: Double): Double = vl + vr
+            }
+            case (typeFloat(), typeFloat()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Float
+                    type UO = U
+                    def apply(vl: Float, vr: Float): Float = vl + vr
+            }
+            case (typeFloat(), typeLong()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Float
+                    type UO = U
+                    def apply(vl: Float, vr: Long): Float = vl + vr
+            }
+            case (typeFloat(), typeInt()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Float
+                    type UO = U
+                    def apply(vl: Float, vr: Int): Float = vl + vr
+            }
+            case (typeLong(), typeDouble()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Double
+                    type UO = U
+                    def apply(vl: Long, vr: Double): Double = vl + vr
+            }
+            case (typeLong(), typeFloat()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Float
+                    type UO = U
+                    def apply(vl: Long, vr: Float): Float = vl + vr
+            }
+            case (typeLong(), typeLong()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Long
+                    type UO = U
+                    def apply(vl: Long, vr: Long): Long = vl + vr
+            }
+            case (typeLong(), typeInt()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Long
+                    type UO = U
+                    def apply(vl: Long, vr: Int): Long = vl + vr
+            }
+            case (typeInt(), typeDouble()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Double
+                    type UO = U
+                    def apply(vl: Int, vr: Double): Double = vl + vr
+            }
+            case (typeInt(), typeFloat()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Float
+                    type UO = U
+                    def apply(vl: Int, vr: Float): Float = vl + vr
+            }
+            case (typeInt(), typeLong()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Long
+                    type UO = U
+                    def apply(vl: Int, vr: Long): Long = vl + vr
+            }
+            case (typeInt(), typeInt()) => '{
+                new Add[VL, U, VR, U]:
+                    type VO = Int
+                    type UO = U
+                    def apply(vl: Int, vr: Int): Int = vl + vr
+            }
             case _ =>
                 report.error(s"addition not defined for these types")
                 '{ new Add[VL, U, VR, U] { type VO = Int; type UO = Nothing; def apply(vl: VL, vr: VR): VO = 0 } }
