@@ -37,11 +37,3 @@ abstract class Pow[V, U, P]:
     type VO
     type UO
     def apply(v: V): VO
-
-@implicitNotFound("Unit string not defined in scope for ${U}")
-abstract class Show[U]:
-    val value: String
-
-@implicitNotFound("Full Unit string not defined in scope for ${U}")
-abstract class ShowFull[U]:
-    val value: String

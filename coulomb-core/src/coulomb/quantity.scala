@@ -62,6 +62,7 @@ object quantity:
 end quantity
 
 import coulomb.ops.*
+import coulomb.ops.show.*
 import scala.annotation.implicitNotFound
 
 extension[VL, UL](ql: Quantity[VL, UL])
