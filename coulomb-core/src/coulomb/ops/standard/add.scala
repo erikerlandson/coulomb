@@ -4,12 +4,12 @@ import coulomb.*
 import coulomb.ops.*
 
 transparent inline given addStandard1U[VL, VR, U]: Add[VL, U, VR, U] =
-    ${ meta.addStandard1U[VL, VR, U] }
+    ${ addmeta.addStandard1U[VL, VR, U] }
 
 transparent inline given addStandard2U[VL, UL, VR, UR]: Add[VL, UL, VR, UR] =
-    ${ meta.addStandard2U[VL, UL, VR, UR] }
+    ${ addmeta.addStandard2U[VL, UL, VR, UR] }
 
-object meta:
+object addmeta:
     import scala.quoted.*
     import coulomb.infra.meta.*
 
