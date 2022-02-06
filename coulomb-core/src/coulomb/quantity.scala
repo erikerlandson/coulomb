@@ -71,6 +71,21 @@ extension[VL, UL](ql: Quantity[VL, UL])
     transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
         add(ql.value, qr.value).withUnit[add.UO]
 
+    transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: Sub[VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
+        sub(ql.value, qr.value).withUnit[sub.UO]
+
+    transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[VL, UL, VR, UR]): Quantity[mul.VO, mul.UO] =
+        mul(ql.value, qr.value).withUnit[mul.UO]
+
+    transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[VL, UL, VR, UR]): Quantity[div.VO, div.UO] =
+        div(ql.value, qr.value).withUnit[div.UO]
+
+    transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
+        pow(ql.value).withUnit[pow.UO]
+
+    transparent inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
+        neg(ql.value).withUnit[UL]
+
     transparent inline def to[V, U](using
         conv: coulomb.conversion.Conversion[VL, UL, V, U]): Quantity[V, U] = conv(ql.value).withUnit[U]
     transparent inline def toValue[V](using
