@@ -206,7 +206,7 @@ object meta:
                 case iss: ImplicitSearchSuccess =>
                     val AppliedType(_, List(_, d)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
                     val (dcoef, dsig) = cansig(d)
-                    val du = iss.tree.asExpr.asInstanceOf[Expr[DerivedUnit[_, _]]]
+                    val du = iss.tree.asExpr.asInstanceOf[Expr[DerivedUnit[?, ?]]]
                     val ucoef = if (coefIs1(dcoef)) '{ ${du}.coef } else '{ $dcoef * ${du}.coef }
                     Some((ucoef, dsig))
                 case _ => None

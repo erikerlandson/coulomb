@@ -7,7 +7,7 @@ trait UnitTypeName[T]:
   def typeString: String
 
   override def toString(): String = typeString
-  def ==(that: UnitTypeName[_]): Boolean =
+  def ==(that: UnitTypeName[?]): Boolean =
     typeString == that.typeString
 
 object UnitTypeName:
