@@ -4,6 +4,7 @@ ThisBuild / tlBaseVersion := "0.6"
 ThisBuild / developers += tlGitHubDev("erikerlandson", "Erik Erlandson")
 ThisBuild / organization := "com.manyangled"
 ThisBuild / organizationName := "Erik Erlandson"
+ThisBuild / startYear := Some("2022")
 
 // ci settings
 ThisBuild / tlCiReleaseBranches := Seq("scala3")
