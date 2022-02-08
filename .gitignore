@@ -1,3 +1,11 @@
 *.class
 *.log
 out/*
+
+target/
+
+.metals/
+.bsp/
+.bloop/
+metals.sbt
+.vscode
