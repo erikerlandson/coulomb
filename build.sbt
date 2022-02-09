@@ -9,7 +9,7 @@ ThisBuild / tlBaseVersion := "0.6"
 ThisBuild / developers += tlGitHubDev("erikerlandson", "Erik Erlandson")
 ThisBuild / organization := "com.manyangled"
 ThisBuild / organizationName := "Erik Erlandson"
-ThisBuild / licenses := List("Apache-2.0" -> url("http://opensource.org/licenses/Apache-2.0"))
+ThisBuild / licenses := List("Apache-2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0.txt"))
 ThisBuild / startYear := Some(2022)
 
 // ci settings
@@ -41,7 +41,7 @@ lazy val all = project
   .in(file("all")) // sbt will create this - it is unused
   .dependsOn(core.jvm, units.jvm) // scala repl only needs JVMPlatform subproj builds
   .settings(name := "coulomb-all")
-  .settings(publish := {}, publishLocal := {}) // don't publish
+  .enablePlugins(NoPublishPlugin) // don't publish
 
 lazy val docs = project.in(file("site"))
   .enablePlugins(TypelevelSitePlugin)
