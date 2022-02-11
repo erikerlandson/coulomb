@@ -103,8 +103,6 @@ extension[VL, UL](ql: Quantity[VL, UL])
     transparent inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
         neg(ql.value).withUnit[UL]
 
-    transparent inline def to[V, U](using
-        conv: coulomb.conversion.Conversion[VL, UL, V, U]): Quantity[V, U] = conv(ql.value).withUnit[U]
     transparent inline def toValue[V](using
         conv: coulomb.conversion.Conversion[VL, UL, V, UL]): Quantity[V, UL] = conv(ql.value).withUnit[UL]
     transparent inline def toUnit[U](using
