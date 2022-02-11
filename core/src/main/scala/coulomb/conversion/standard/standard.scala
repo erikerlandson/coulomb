@@ -27,7 +27,7 @@ given ValueConversion[Double, Double] with
     def apply(v: Double): Double = v
 
 
-transparent inline given [Double, UF, UT](using coef: Coefficient[UF, UT]):
+transparent inline given ctx[Double, UF, UT](using coef: Coefficient[UF, UT]):
         UnitConversion[Double, UF, UT] =
     new UnitConversion[Double, UF, UT]:
         val c = coef.toDouble
