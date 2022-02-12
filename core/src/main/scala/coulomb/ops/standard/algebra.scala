@@ -28,7 +28,7 @@ abstract class Algebra[V]:
     def pow(v: V, p: Rational): V
 
 object Algebra:
-    given Algebra[Double] with
+    given ctx_alg_Double: Algebra[Double] with
         def add(vl: Double, vr: Double): Double = vl + vr
         def sub(vl: Double, vr: Double): Double = vl - vr
         def mul(vl: Double, vr: Double): Double = vl * vr
@@ -36,7 +36,7 @@ object Algebra:
         def neg(v: Double): Double = -v
         def pow(v: Double, p: Rational): Double = scala.math.pow(v, p.toDouble)
 
-    given Algebra[Float] with
+    given ctx_alg_Float: Algebra[Float] with
         def add(vl: Float, vr: Float): Float = vl + vr
         def sub(vl: Float, vr: Float): Float = vl - vr
         def mul(vl: Float, vr: Float): Float = vl * vr
@@ -44,7 +44,7 @@ object Algebra:
         def neg(v: Float): Float = -v
         def pow(v: Float, p: Rational): Float = scala.math.pow(v, p.toDouble).toFloat
 
-    given Algebra[Long] with
+    given ctx_alg_Long: Algebra[Long] with
         def add(vl: Long, vr: Long): Long = vl + vr
         def sub(vl: Long, vr: Long): Long = vl - vr
         def mul(vl: Long, vr: Long): Long = vl * vr
@@ -52,7 +52,7 @@ object Algebra:
         def neg(v: Long): Long = -v
         def pow(v: Long, p: Rational): Long = scala.math.pow(v.toDouble, p.toDouble).toLong
 
-    given Algebra[Int] with
+    given ctx_alg_Int: Algebra[Int] with
         def add(vl: Int, vr: Int): Int = vl + vr
         def sub(vl: Int, vr: Int): Int = vl - vr
         def mul(vl: Int, vr: Int): Int = vl * vr
