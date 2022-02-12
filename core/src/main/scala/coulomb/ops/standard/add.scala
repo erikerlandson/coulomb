@@ -20,6 +20,7 @@ import scala.util.NotGiven
 
 import coulomb.ops.{Add, Sub, Mul, Div, Neg, Pow}
 import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
+import coulomb.Coefficient
 
 // specialize these for efficiency, and as a
 // proof of concept that specializations can operate in this system
@@ -47,10 +48,27 @@ transparent inline given ctx_add_Int_1U[U]: Add[Int, U, Int, U] =
         type UO = U
         def apply(vl: Int, vr: Int): Int = vl + vr
 
-// this could also be specialized for numeric types but
-// the integrals specializations would have to live in the integral subpackage
-// for now I'm going to drive that policy via UnitConversion
-// as part of proof of concept
+transparent inline given ctx_add_Double_2U[UL, UR](using
+    neu: NotGiven[UL =:= UR],
+    coef: Coefficient[UR, UL]
+        ): Add[Double, UL, Double, UR] =
+    new Add[Double, UL, Double, UR]:
+        type VO = Double
+        type UO = UL
+        val c = coef.value.toDouble
+        def apply(vl: Double, vr: Double): Double = vl + (c * vr)
+
+transparent inline given ctx_add_Float_2U[UL, UR](using
+    neu: NotGiven[UL =:= UR],
+    coef: Coefficient[UR, UL]
+        ): Add[Float, UL, Float, UR] =
+    new Add[Float, UL, Float, UR]:
+        type VO = Float
+        type UO = UL
+        val c = coef.value.toFloat
+        def apply(vl: Float, vr: Float): Float = vl + (c * vr)
+
+// anything not specialized is handled by this context function
 transparent inline given ctx_add_1V2U[V, UL, UR](using
     neu: NotGiven[UL =:= UR],
     ucv: UnitConversion[V, UR, UL],
