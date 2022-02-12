@@ -129,12 +129,12 @@ given ctx_VC_Int_Int: ValueConversion[Int, Int] with
 // the 'integral' subpackage
 transparent inline given ctx_UC_Double[UF, UT](using coef: Coefficient[UF, UT]):
         UnitConversion[Double, UF, UT] =
+    val c = coef.value.toDouble
     new UnitConversion[Double, UF, UT]:
-        val c = coef.value.toDouble
         def apply(v: Double): Double = c * v
 
 transparent inline given ctx_UC_Float[UF, UT](using coef: Coefficient[UF, UT]):
         UnitConversion[Float, UF, UT] =
+    val c = coef.value.toFloat
     new UnitConversion[Float, UF, UT]:
-        val c = coef.value.toFloat
         def apply(v: Float): Float = c * v

@@ -34,12 +34,12 @@ given ctx_VC_Float_Int: ValueConversion[Float, Int] with
 
 transparent inline given ctx_UC_Long[UF, UT](using coef: Coefficient[UF, UT]):
         UnitConversion[Long, UF, UT] =
+    val c = coef.value
     new UnitConversion[Long, UF, UT]:
-        val c = coef.value
         def apply(v: Long): Long = (c * Rational(v)).toLong
 
 transparent inline given ctx_UC_Int[UF, UT](using coef: Coefficient[UF, UT]):
         UnitConversion[Int, UF, UT] =
+    val c = coef.value
     new UnitConversion[Int, UF, UT]:
-        val c = coef.value
         def apply(v: Int): Int = (c * Rational(v)).toInt 

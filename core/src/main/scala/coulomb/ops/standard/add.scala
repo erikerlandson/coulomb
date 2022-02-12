@@ -52,20 +52,20 @@ transparent inline given ctx_add_Double_2U[UL, UR](using
     neu: NotGiven[UL =:= UR],
     coef: Coefficient[UR, UL]
         ): Add[Double, UL, Double, UR] =
+    val c = coef.value.toDouble
     new Add[Double, UL, Double, UR]:
         type VO = Double
         type UO = UL
-        val c = coef.value.toDouble
         def apply(vl: Double, vr: Double): Double = vl + (c * vr)
 
 transparent inline given ctx_add_Float_2U[UL, UR](using
     neu: NotGiven[UL =:= UR],
     coef: Coefficient[UR, UL]
         ): Add[Float, UL, Float, UR] =
+    val c = coef.value.toFloat
     new Add[Float, UL, Float, UR]:
         type VO = Float
         type UO = UL
-        val c = coef.value.toFloat
         def apply(vl: Float, vr: Float): Float = vl + (c * vr)
 
 // anything not specialized is handled by this context function
