@@ -16,6 +16,8 @@
 
 package coulomb.ops.standard
 
+import coulomb.rational.Rational
+
 // could do most of this with scala.math.Numeric, but not powers
 abstract class Algebra[V]:
     def add(vl: V, vr: V): V
@@ -23,7 +25,7 @@ abstract class Algebra[V]:
     def mul(vl: V, vr: V): V
     def div(vl: V, vr: V): V
     def neg(v: V): V
-    def pow(v: V): V
+    def pow(v: V, p: Rational): V
 
 object Algebra:
     given Algebra[Double] with
@@ -32,7 +34,7 @@ object Algebra:
         def mul(vl: Double, vr: Double): Double = vl * vr
         def div(vl: Double, vr: Double): Double = vl / vr
         def neg(v: Double): Double = -v
-        def pow(v: Double): Double = scala.math.pow(v)
+        def pow(v: Double, p: Rational): Double = scala.math.pow(v, p.toDouble)
 
     given Algebra[Float] with
         def add(vl: Float, vr: Float): Float = vl + vr
@@ -40,7 +42,7 @@ object Algebra:
         def mul(vl: Float, vr: Float): Float = vl * vr
         def div(vl: Float, vr: Float): Float = vl / vr
         def neg(v: Float): Float = -v
-        def pow(v: Float): Float = scala.math.pow(v).toFloat
+        def pow(v: Float, p: Rational): Float = scala.math.pow(v, p.toDouble).toFloat
 
     given Algebra[Long] with
         def add(vl: Long, vr: Long): Long = vl + vr
@@ -48,7 +50,7 @@ object Algebra:
         def mul(vl: Long, vr: Long): Long = vl * vr
         def div(vl: Long, vr: Long): Long = vl / vr
         def neg(v: Long): Long = -v
-        def pow(v: Long): Long = scala.math.pow(v).toLong
+        def pow(v: Long, p: Rational): Long = scala.math.pow(v.toDouble, p.toDouble).toLong
 
     given Algebra[Int] with
         def add(vl: Int, vr: Int): Int = vl + vr
@@ -56,5 +58,5 @@ object Algebra:
         def mul(vl: Int, vr: Int): Int = vl * vr
         def div(vl: Int, vr: Int): Int = vl / vr
         def neg(v: Int): Int = -v
-        def pow(v: Int): Int = scala.math.pow(v).toInt
+        def pow(v: Int, p: Rational): Int = scala.math.pow(v, p.toDouble).toInt
 

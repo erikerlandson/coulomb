@@ -21,17 +21,6 @@ import scala.util.NotGiven
 import coulomb.ops.{Add, Sub, Mul, Div, Neg, Pow}
 import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
 
-abstract class Algebra[V]:
-    def add(vl: V, vr: V): V
-
-object Algebra:
-    given Algebra[Double] with
-        def add(vl: Double, vr: Double): Double = vl + vr
-    given Algebra[Float] with
-        def add(vl: Float, vr: Float): Float = vl + vr
-    given Algebra[Int] with
-        def add(vl: Int, vr: Int): Int = vl + vr
-
 // specialize these for efficiency, and as a
 // proof of concept that specializations can operate in this system
 transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
