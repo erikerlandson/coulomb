@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package coulomb.conversion.standard
+package coulomb.conversion.standard.integral
 
 import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
 import coulomb.Coefficient
