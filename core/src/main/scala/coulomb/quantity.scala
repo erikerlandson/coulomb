@@ -104,9 +104,9 @@ extension[VL, UL](ql: Quantity[VL, UL])
         neg(ql.value).withUnit[UL]
 
     transparent inline def toValue[V](using
-        conv: coulomb.conversion.Conversion[VL, UL, V, UL]): Quantity[V, UL] = conv(ql.value).withUnit[UL]
+        conv: coulomb.conversion.ValueConversion[VL, V]): Quantity[V, UL] = conv(ql.value).withUnit[UL]
     transparent inline def toUnit[U](using
-        conv: coulomb.conversion.Conversion[VL, UL, VL, U]): Quantity[VL, U] = conv(ql.value).withUnit[U]
+        conv: coulomb.conversion.UnitConversion[VL, UL, U]): Quantity[VL, U] = conv(ql.value).withUnit[U]
 
 def showUnit[U](using sh: Show[U]): String = sh.value
 def showUnitFull[U](using sh: ShowFull[U]): String = sh.value

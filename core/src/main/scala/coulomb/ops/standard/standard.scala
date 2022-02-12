@@ -16,28 +16,73 @@
 
 package coulomb.ops.standard
 
-import coulomb.ops.{Add,Sub,Mul,Div,Pow}
+import scala.util.NotGiven
 
-transparent inline given ctx1[VL, VR, U](using
+import coulomb.ops.{Add, Sub, Mul, Div, Neg, Pow}
+import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
+
+abstract class Algebra[V]:
+    def add(vl: V, vr: V): V
+
+object Algebra:
+    given Algebra[Double] with
+        def add(vl: Double, vr: Double): Double = vl + vr
+    given Algebra[Float] with
+        def add(vl: Float, vr: Float): Float = vl + vr
+    given Algebra[Int] with
+        def add(vl: Int, vr: Int): Int = vl + vr
+
+// specialize these for efficiency, and as a
+// proof of concept that specializations can operate in this system
+transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
+    new Add[Double, U, Double, U]:
+        type VO = Double
+        type UO = U
+        def apply(vl: Double, vr: Double): Double = vl + vr
+
+transparent inline given ctx_add_Float_1U[U]: Add[Float, U, Float, U] =
+    new Add[Float, U, Float, U]:
+        type VO = Float
+        type UO = U
+        def apply(vl: Float, vr: Float): Float = vl + vr
+
+// this could also be specialized for numeric types but
+// the integrals specializations would have to live in the integral subpackage
+// for now I'm going to drive that policy via UnitConversion
+// as part of proof of concept
+transparent inline given ctx_add_1V2U[V, UL, UR](using
+    neu: NotGiven[UL =:= UR],
+    ucv: UnitConversion[V, UR, UL],
+    num: Algebra[V]
+        ): Add[V, UL, V, UR] =
+    new Add[V, UL, V, UR]:
+        type VO = V
+        type UO = UL
+        def apply(vl: V, vr: V): VO = num.add(vl, ucv(vr))
+
+transparent inline given ctx_add_2V1U[VL, VR, U](using
+    nev: NotGiven[VL =:= VR],
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
-    num: scala.math.Numeric[vres.VO]
+    num: Algebra[vres.VO]
         ): Add[VL, U, VR, U] =
     new Add[VL, U, VR, U]:
         type VO = vres.VO
         type UO = U
-        def apply(vl: VL, vr: VR): VO = num.plus(vlvo(vl), vrvo(vr))
+        def apply(vl: VL, vr: VR): VO = num.add(vlvo(vl), vrvo(vr))
 
-transparent inline given ctx2[VL, UL, VR, UR](using
+transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
+    nev: NotGiven[VL =:= VR],
+    neu: NotGiven[UL =:= UR],
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
     ucvo: UnitConversion[vres.VO, UR, UL],
-    num: scala.math.Numeric[vres.VO]
+    num: Algebra[vres.VO]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = vres.VO
-        type UO = U
-        def apply(vl: VL, vr: VR): VO = num.plus(vlvo(vl), num.times(ucvo, vrvo(vr)))
+        type UO = UL
+        def apply(vl: VL, vr: VR): VO = num.add(vlvo(vl), ucvo(vrvo(vr)))
 

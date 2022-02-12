@@ -16,7 +16,7 @@
 
 package coulomb.conversion.standard.implicitConversion
 
-import coulomb.Quantity
+import coulomb.*
 import coulomb.conversion.{ValueConversion, UnitConversion}
 
 transparent inline given contextImplicitConversion[VF, UF, VT, UT](using
