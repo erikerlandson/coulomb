@@ -50,6 +50,7 @@ object Algebra:
         def mul(vl: Long, vr: Long): Long = vl * vr
         def div(vl: Long, vr: Long): Long = vl / vr
         def neg(v: Long): Long = -v
+        // compiler warns about loss of integer precision Long => Double here
         def pow(v: Long, p: Rational): Long = scala.math.pow(v.toDouble, p.toDouble).toLong
 
     given ctx_alg_Int: Algebra[Int] with

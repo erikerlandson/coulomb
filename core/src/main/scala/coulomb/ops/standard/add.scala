@@ -35,6 +35,18 @@ transparent inline given ctx_add_Float_1U[U]: Add[Float, U, Float, U] =
         type UO = U
         def apply(vl: Float, vr: Float): Float = vl + vr
 
+transparent inline given ctx_add_Long_1U[U]: Add[Long, U, Long, U] =
+    new Add[Long, U, Long, U]:
+        type VO = Long
+        type UO = U
+        def apply(vl: Long, vr: Long): Long = vl + vr
+
+transparent inline given ctx_add_Int_1U[U]: Add[Int, U, Int, U] =
+    new Add[Int, U, Int, U]:
+        type VO = Int
+        type UO = U
+        def apply(vl: Int, vr: Int): Int = vl + vr
+
 // this could also be specialized for numeric types but
 // the integrals specializations would have to live in the integral subpackage
 // for now I'm going to drive that policy via UnitConversion
