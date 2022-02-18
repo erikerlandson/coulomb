@@ -17,6 +17,7 @@
 package coulomb.infra
 
 import coulomb.rational.Rational
+import coulomb.rational.typeexpr.{RationalTE, BigIntTE}
 import coulomb.*
 import coulomb.define.*
 import coulomb.ops.*
@@ -29,6 +30,41 @@ final type %:[Head, Tail]
 object meta:
     import scala.quoted.*
     import scala.language.implicitConversions
+
+    def parseRationalTE[E](using Quotes, Type[E]): Expr[RationalTE[E]] =
+        import quotes.reflect.*
+        val rationalTE(v) = TypeRepr.of[E]
+        '{ new RationalTE[E] { val value = coulomb.rational.Rational(${Expr(v.n)}, ${Expr(v.d)}) } }
+
+    def parseBigIntTE[E](using Quotes, Type[E]): Expr[BigIntTE[E]] =
+        import quotes.reflect.*
+        val bigintTE(v) = TypeRepr.of[E]
+        '{ new BigIntTE[E] { val value = ${Expr(v)} } }
+
+    object rationalTE:
+        def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Rational] =
+            import quotes.reflect.*
+            tr match
+                case AppliedType(op, List(rationalTE(n), rationalTE(d))) if (op =:= TypeRepr.of[/]) =>
+                    Some(n / d)
+                case AppliedType(op, List(rationalTE(n), rationalTE(d))) if (op =:= TypeRepr.of[*]) =>
+                    Some(n * d)
+                case bigintTE(v) => Some(Rational(v, 1))
+                case ConstantType(DoubleConstant(v)) => Some(Rational(v))
+                case _ => None
+
+    object bigintTE:
+        def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[BigInt] =
+            import quotes.reflect.*
+            tr match
+                case AppliedType(op, List(bigintTE(lv), bigintTE(rv))) if (op =:= TypeRepr.of[*]) =>
+                    Some(lv * rv)
+                case AppliedType(op, List(bigintTE(b), intlt(e))) if (op =:= TypeRepr.of[^]) =>
+                    Some(b.pow(e))
+                case ConstantType(IntConstant(v)) => Some(BigInt(v))
+                case ConstantType(LongConstant(v)) => Some(BigInt(v))
+                case ConstantType(StringConstant(v)) => Some(BigInt(v))
+                case _ => None
 
     // Coefficient[U1, U2]
     def coefficient[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Coefficient[U1, U2]] =
@@ -319,6 +355,7 @@ object meta:
                 case intlt(n) => Some(Rational(n, 1))
                 case _ => None
 
+
     object ratlt:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[(Int, Int)] =
              import quotes.reflect.*
@@ -341,6 +378,13 @@ object meta:
                 case ConstantType(DoubleConstant(v)) => Some(v)
                 case _ => None
 
+    object strlt:
+        def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[String] =
+             import quotes.reflect.*
+             tr match
+                case ConstantType(StringConstant(v)) => Some(v)
+                case _ => None
+
     object typeDouble:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
             u =:= quotes.reflect.TypeRepr.of[Double]
@@ -356,6 +400,10 @@ object meta:
     object typeLong:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
             u =:= quotes.reflect.TypeRepr.of[Long]
+
+    object typeString:
+        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
+            u =:= quotes.reflect.TypeRepr.of[String]
 
     def typestr(using Quotes)(t: quotes.reflect.TypeRepr): Expr[String] =
         import quotes.reflect.*

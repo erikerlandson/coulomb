@@ -139,3 +139,24 @@ object Rational:
     given CanEqual[Rational, Int] = CanEqual.derived
     given CanEqual[Rational, Long] = CanEqual.derived
 end Rational
+
+
+/** type classes that are useful for testing rational type-expressions */
+object typeexpr:
+    import scala.annotation.implicitNotFound
+
+    @implicitNotFound("Cannot parse type ${E} into a Rational value")
+    abstract class RationalTE[E]:
+        val value: Rational
+
+    object RationalTE:
+        transparent inline given ctx_RationalTE[E]: RationalTE[E] =
+            ${ coulomb.infra.meta.parseRationalTE[E] }
+
+    @implicitNotFound("Cannot parse type ${E} into a BigInt value")
+    abstract class BigIntTE[E]:
+        val value: BigInt
+
+    object BigIntTE:
+        transparent inline given ctx_BigIntTE[E]: BigIntTE[E] =
+            ${ coulomb.infra.meta.parseBigIntTE[E] }
