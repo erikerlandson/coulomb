@@ -22,7 +22,7 @@ libraryDependencies ++= Seq(
   // pureconfig integration:
   "com.manyangled" %% "coulomb-pureconfig" % "0.5.8",
   "com.manyangled" %% "coulomb-parser" % "0.5.8",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.0",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "2.1.1",
   "com.github.pureconfig" %% "pureconfig-core" % "0.17.1",
   "com.github.pureconfig" %% "pureconfig-generic" % "0.17.1"
 )
