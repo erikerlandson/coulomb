@@ -53,6 +53,7 @@ object meta:
                     Some(b.pow(e))
                 case bigintTE(v) => Some(Rational(v, 1))
                 case ConstantType(DoubleConstant(v)) => Some(Rational(v))
+                case ConstantType(FloatConstant(v)) => Some(Rational(v))
                 case _ => None
 
     object bigintTE:
