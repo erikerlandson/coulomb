@@ -31,10 +31,17 @@ object meta:
     import scala.quoted.*
     import scala.language.implicitConversions
 
+    given RationalToExpr: ToExpr[Rational] with
+        def apply(r: Rational)(using Quotes): Expr[Rational] = r match
+            // Rational(1) is a useful special case to have predefined
+            // could we get clever with some kind of expression caching/sharing here?
+            case v if (v == 1) => '{ Rational.const1 }
+            case _ => '{ Rational(${Expr(r.n)}, ${Expr(r.d)}) }
+
     def parseRationalTE[E](using Quotes, Type[E]): Expr[RationalTE[E]] =
         import quotes.reflect.*
         val rationalTE(v) = TypeRepr.of[E]
-        '{ new RationalTE[E] { val value = coulomb.rational.Rational(${Expr(v.n)}, ${Expr(v.d)}) } }
+        '{ new RationalTE[E] { val value = ${Expr(v)} } }
 
     def parseBigIntTE[E](using Quotes, Type[E]): Expr[BigIntTE[E]] =
         import quotes.reflect.*
