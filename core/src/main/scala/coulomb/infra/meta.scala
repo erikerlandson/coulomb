@@ -49,6 +49,8 @@ object meta:
                     Some(n / d)
                 case AppliedType(op, List(rationalTE(n), rationalTE(d))) if (op =:= TypeRepr.of[*]) =>
                     Some(n * d)
+                case AppliedType(op, List(rationalTE(b), intlt(e))) if (op =:= TypeRepr.of[^]) =>
+                    Some(b.pow(e))
                 case bigintTE(v) => Some(Rational(v, 1))
                 case ConstantType(DoubleConstant(v)) => Some(Rational(v))
                 case _ => None
@@ -57,10 +59,6 @@ object meta:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[BigInt] =
             import quotes.reflect.*
             tr match
-                case AppliedType(op, List(bigintTE(lv), bigintTE(rv))) if (op =:= TypeRepr.of[*]) =>
-                    Some(lv * rv)
-                case AppliedType(op, List(bigintTE(b), intlt(e))) if (op =:= TypeRepr.of[^]) =>
-                    Some(b.pow(e))
                 case ConstantType(IntConstant(v)) => Some(BigInt(v))
                 case ConstantType(LongConstant(v)) => Some(BigInt(v))
                 case ConstantType(StringConstant(v)) => Some(BigInt(v))
