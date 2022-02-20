@@ -63,6 +63,11 @@ object meta:
                 case ConstantType(FloatConstant(v)) => Some(Rational(v))
                 case _ => None
 
+        def apply(using Quotes)(v: Rational): quotes.reflect.TypeRepr =
+            import quotes.reflect.*
+            if (v.d == 1) then bigintTE(v.n)
+            else TypeRepr.of[/].appliedTo(List(bigintTE(v.n), bigintTE(v.d)))
+ 
     object bigintTE:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[BigInt] =
             import quotes.reflect.*
@@ -71,6 +76,13 @@ object meta:
                 case ConstantType(LongConstant(v)) => Some(BigInt(v))
                 case ConstantType(StringConstant(v)) => Some(BigInt(v))
                 case _ => None
+
+        def apply(using Quotes)(v: BigInt): quotes.reflect.TypeRepr =
+            import quotes.reflect.*
+            v match
+                case _ if v.isValidInt => ConstantType(IntConstant(v.toInt))
+                case _ if v.isValidLong => ConstantType(LongConstant(v.toLong))
+                case _ => ConstantType(StringConstant(v.toString()))
 
     // Coefficient[U1, U2]
     def coefficient[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Coefficient[U1, U2]] =
@@ -116,14 +128,16 @@ object meta:
                 (lcoef / rcoef, usig)
             case AppliedType(op, List(b, p)) if (op =:= TypeRepr.of[^]) =>
                 val (bcoef, bsig) = cansig(b)
-                val ratexp(e) = p
+                val rationalTE(e) = p
                 if (e == 0) (Rational.const1, signil())
                 else if (e == 1) (bcoef, bsig)
-                else
+                else if (e.n.isValidInt && e.d.isValidInt)
                     val ucoef = if (e.d == 1) bcoef.pow(e.n.toInt)
                                 else bcoef.pow(e.n.toInt).root(e.d.toInt)
                     val usig = unifyPow(p, bsig)
                     (ucoef, usig)
+                else
+                    { report.error(s"bad exponent in cansig: $u"); csErr }
             case unitless() => (Rational.const1, signil())
             case unitconst(c) => (c, signil())
             case baseunit() => (Rational.const1, sigcons(u, Rational.const1, signil()))
@@ -148,12 +162,12 @@ object meta:
             case AppliedType(op, List(lu, ru)) if (op =:= TypeRepr.of[/]) =>
                 unifyOp(stdsig(lu), stdsig(ru), _ - _)
             case AppliedType(op, List(b, p)) if (op =:= TypeRepr.of[^]) =>
-                val ratexp(e) = p
+                val rationalTE(e) = p
                 if (e == 0) signil()
                 else if (e == 1) stdsig(b)
                 else unifyPow(p, stdsig(b))
             case unitless() => signil()
-            case unitconst(c) => sigcons(ratexp(c), Rational.const1, signil())
+            case unitconst(c) => sigcons(rationalTE(c), Rational.const1, signil())
             case baseunit() => sigcons(u, Rational.const1, signil())
             case derivedunit(_, _) => sigcons(u, Rational.const1, signil())
             case _ if (!strictunitexprs) =>
@@ -215,7 +229,7 @@ object meta:
 
     def uTerm(using Quotes)(u: quotes.reflect.TypeRepr, p: Rational): quotes.reflect.TypeRepr =
         import quotes.reflect.*
-        if (p == 1) u else TypeRepr.of[^].appliedTo(List(u, ratexp(p)))
+        if (p == 1) u else TypeRepr.of[^].appliedTo(List(u, rationalTE(p)))
 
     def strictunitexprs(using Quotes): Boolean =
         import quotes.reflect.*
@@ -231,9 +245,7 @@ object meta:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[Rational] =
             import quotes.reflect.*
             u match
-                case ratlt(n, d) => Some(Rational(n, d))
-                case intlt(n) => Some(Rational(n, 1))
-                case dbllt(v) => Some(Rational(v))
+                case rationalTE(v) => Some(v)
                 case _ => None
 
     object baseunit:
@@ -287,7 +299,7 @@ object meta:
             case _ => { report.error(s"Unsupported type ${sig.show}"); TypeRepr.of[Nothing] }
 
     def unifyPow(using Quotes)(power: quotes.reflect.TypeRepr, sig: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
-        val ratexp(e) = power
+        val rationalTE(e) = power
         if (e == 0) signil() else unifyPowTerm(e, sig)
 
     def unifyPowTerm(using Quotes)(e: Rational, sig: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
@@ -305,12 +317,12 @@ object meta:
 
     object sigcons:
         def apply(using Quotes)(u: quotes.reflect.TypeRepr, e: Rational, tail: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
-            sctc().appliedTo(List(t2tc().appliedTo(List(u, ratexp(e))), tail))
+            sctc().appliedTo(List(t2tc().appliedTo(List(u, rationalTE(e))), tail))
 
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[(quotes.reflect.TypeRepr, Rational, quotes.reflect.TypeRepr)] =
             import quotes.reflect.*
             tr match
-                case AppliedType(sctc(), List(AppliedType(t2tc(), List(u, ratexp(e))), tail)) =>
+                case AppliedType(sctc(), List(AppliedType(t2tc(), List(u, rationalTE(e))), tail)) =>
                     Some((u, e, tail))
                 case _ => None
 
@@ -325,30 +337,6 @@ object meta:
 
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Boolean =
             tr =:= quotes.reflect.TypeRepr.of[Tuple2]
-
-    object ratexp:
-        def apply(using Quotes)(e: Rational): quotes.reflect.TypeRepr =
-            import quotes.reflect.*
-            if (e.d == 1) then
-                ConstantType(IntConstant(e.n.toInt))
-            else
-                TypeRepr.of[/].appliedTo(List(ConstantType(IntConstant(e.n.toInt)), ConstantType(IntConstant(e.d.toInt))))
-
-        def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Rational] =
-            import quotes.reflect.*
-            tr match
-                case ratlt(n, d) => Some(Rational(n, d))
-                case intlt(n) => Some(Rational(n, 1))
-                case _ => None
-
-
-    object ratlt:
-        def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[(Int, Int)] =
-             import quotes.reflect.*
-             tr match
-                case AppliedType(tc, List(ConstantType(IntConstant(n)), ConstantType(IntConstant(d)))) if (tc =:= TypeRepr.of[/]) =>
-                    Some((n, d))
-                case _ => None
 
     object intlt:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Int] =

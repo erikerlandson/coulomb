@@ -114,9 +114,9 @@ object meta:
     def powstr(using Quotes)(p: quotes.reflect.TypeRepr): String =
         import quotes.reflect.*
         p match
-            case intlt(n) if (n >= 0) => n.toString
-            case intlt(n) if (n < 0) => s"(${n.toString})"
-            case ratlt(n, d) => s"(${n.toString}/${d.toString})"
+            case bigintTE(v) if (v >= 0) => v.toString
+            case bigintTE(v) if (v < 0) => s"(${v.toString})"
+            case rationalTE(v) => s"(${v.n.toString}/${v.d.toString})"
             case _ => "!!!"
 
     def paren(using Quotes)(u: quotes.reflect.TypeRepr, render: quotes.reflect.TypeRepr => String): String =
