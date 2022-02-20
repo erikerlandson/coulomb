@@ -16,29 +16,34 @@
 
 package coulomb.define
 
-import scala.language.implicitConversions
+/**
+ * @tparam Name unit name
+ * @tparam Abbv unit abbreviation
+ */
+abstract class NamedUnit[Name, Abbv]
 
-import coulomb.rational.Rational
+/**
+ * @tparam U unit type
+ * @tparam Name unit name
+ * @tparam Abbv unit abbreviation
+ */
+abstract class BaseUnit[U, Name, Abbv] extends NamedUnit[Name, Abbv]
 
-/** Methods and values common to all unit and temperature definitions */
-abstract class NamedUnit:
-    /** the full name of a unit, e.g. "meter" */
-    val name: String
-    /** the abbreviation of a unit, e.g. "m" for "meter" */
-    val abbv: String
+/**
+ * @tparam U unit type
+ * @tparam D unit it is derived from
+ * @tparam Coef unit coefficient, relative to `D`
+ * @tparam Name unit name
+ * @tparam Abbv unit abbreviation
+ */
+abstract class DerivedUnit[U, D, Coef, Name, Abbv] extends NamedUnit[Name, Abbv]
 
-abstract class BaseUnit[U] extends NamedUnit:
-    import coulomb.infra.*
-    override def toString = s"BaseUnit($name, $abbv)"
-
-abstract class DerivedUnit[U, D] extends NamedUnit:
-    import coulomb.infra.*
-    val coef: Rational
-    override def toString = s"DerivedUnit($coef, $name, $abbv)"
-
-// Not necessary, but allows meta-programming to be smarter with coefficients
-abstract class DerivedUnit1[U, D] extends DerivedUnit[U, D]:
-    val coef: Rational = Rational.const1
-
-// prefix units are derived units of 1 ('unitless')
-abstract class PrefixUnit[U] extends DerivedUnit[U, 1]
+/**
+ * Prefixed units are derived from `1` (the identity unit)
+ * 
+ * @tparam U unit type
+ * @tparam Coef unit coefficient
+ * @tparam Name unit name
+ * @tparam Abbv unit abbreviation
+ */
+abstract class PrefixUnit[U, Coef, Name, Abbv] extends DerivedUnit[U, 1, Coef, Name, Abbv]
