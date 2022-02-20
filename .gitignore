@@ -1,9 +1,9 @@
 *.class
 *.log
+*.swp
 out/*
-
 target/
-
+dumps/
 .metals/
 .bsp/
 .bloop/
