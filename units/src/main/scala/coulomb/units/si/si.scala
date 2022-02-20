@@ -17,18 +17,24 @@
 package coulomb.units.si
 
 import coulomb.define.*
-import coulomb.{`*`, `/`, `^`}
 
 final type Meter
-given ctx_Unit_Meter: BaseUnit[Meter, "meter", "m"] with {}
+given ctx_unit_Meter: BaseUnit[Meter, "meter", "m"] with {}
 
 final type Kilogram
-given ctx_Unit_Kilogram: BaseUnit[Kilogram, "kilogram", "kg"] with {}
+given ctx_unit_Kilogram: BaseUnit[Kilogram, "kilogram", "kg"] with {}
 
 final type Second
-given ctx_Unit_Second: BaseUnit[Second, "second", "s"] with {}
+given ctx_unit_Second: BaseUnit[Second, "second", "s"] with {}
 
-final type Minute
-given ctx_Unit_Minute: DerivedUnit[Minute, Second, 60, "minute", "min"] with {}
+final type Ampere
+given ctx_unit_Ampere: BaseUnit[Ampere, "ampere", "A"] with {}
 
+final type Mole
+given ctx_unit_Mole: BaseUnit[Mole, "mole", "mol"] with {}
 
+final type Candela
+given ctx_unit_Candela: BaseUnit[Candela, "candela", "cd"] with {}
+
+final type Kelvin
+given ctx_unit_Kelvin: BaseUnit[Kelvin, "Kelvin", "K"] with {}
