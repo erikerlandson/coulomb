@@ -17,38 +17,18 @@
 package coulomb.units.si
 
 import coulomb.define.*
+import coulomb.{`*`, `/`, `^`}
 
 final type Meter
-given BaseUnit[Meter] with
-    val name = "meter"
-    val abbv = "m"
+given ctx_Unit_Meter: BaseUnit[Meter, "meter", "m"] with {}
 
 final type Kilogram
-given BaseUnit[Kilogram] with
-    val name = "kilogram"
-    val abbv = "kg"
+given ctx_Unit_Kilogram: BaseUnit[Kilogram, "kilogram", "kg"] with {}
 
 final type Second
-given BaseUnit[Second] with
-    val name = "second"
-    val abbv = "s"
+given ctx_Unit_Second: BaseUnit[Second, "second", "s"] with {}
 
-final type Ampere
-given BaseUnit[Ampere] with
-    val name = "ampere"
-    val abbv = "A"
+final type Minute
+given ctx_Unit_Minute: DerivedUnit[Minute, Second, 60, "minute", "min"] with {}
 
-final type Mole
-given BaseUnit[Mole] with
-    val name = "mole"
-    val abbv = "mol"
 
-final type Candela
-given BaseUnit[Candela] with
-    val name = "candela"
-    val abbv = "cd"
-
-final type Kelvin
-given BaseUnit[Kelvin] with
-    val name = "Kelvin"
-    val abbv = "K"

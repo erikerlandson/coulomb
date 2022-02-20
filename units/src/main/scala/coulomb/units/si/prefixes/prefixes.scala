@@ -17,40 +17,22 @@
 package coulomb.units.si.prefixes
 
 import coulomb.define.*
-import coulomb.rational.Rational
+import coulomb.{`*`, `/`, `^`}
 
 final type Kilo
-given PrefixUnit[Kilo] with
-    val name = "kilo"
-    val abbv = "k"
-    val coef = Rational(1000)
+given ctx_Unit_Kilo: PrefixUnit[Kilo, 10 ^ 3, "kilo", "k"] with {}
 
 final type Mega
-given PrefixUnit[Mega] with
-    val name = "mega"
-    val abbv = "M"
-    val coef = Rational(1000).pow(2)
+given ctx_Unit_Mega: PrefixUnit[Mega, 10 ^ 6, "mega", "M"] with {}
 
 final type Giga
-given PrefixUnit[Giga] with
-    val name = "giga"
-    val abbv = "G"
-    val coef = Rational(1000).pow(3)
+given ctx_Unit_Giga: PrefixUnit[Giga, 10 ^ 9, "giga", "G"] with {}
 
 final type Milli
-given PrefixUnit[Milli] with
-    val name = "milli"
-    val abbv = "m"
-    val coef = Rational(1000).pow(-1)
+given ctx_Unit_Milli: PrefixUnit[Milli, 10 ^ -3, "milli", "m"] with {}
 
 final type Micro
-given PrefixUnit[Micro] with
-    val name = "micro"
-    val abbv = "μ"
-    val coef = Rational(1000).pow(-2)
+given ctx_Unit_Micro: PrefixUnit[Micro, 10 ^ -6, "micro", "μ"] with {}
 
 final type Nano
-given PrefixUnit[Nano] with
-    val name = "nano"
-    val abbv = "n"
-    val coef = Rational(1000).pow(-3)
+given ctx_Unit_Nano: PrefixUnit[Nano, 10 ^ -9, "nano", "n"] with {}
