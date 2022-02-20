@@ -56,8 +56,8 @@ object meta:
                     Some(n / d)
                 case AppliedType(op, List(rationalTE(n), rationalTE(d))) if (op =:= TypeRepr.of[*]) =>
                     Some(n * d)
-                case AppliedType(op, List(rationalTE(b), intlt(e))) if (op =:= TypeRepr.of[^]) =>
-                    Some(b.pow(e))
+                case AppliedType(op, List(rationalTE(b), bigintTE(e))) if (op =:= TypeRepr.of[^]) && e.isValidInt =>
+                    Some(b.pow(e.toInt))
                 case bigintTE(v) => Some(Rational(v, 1))
                 case ConstantType(DoubleConstant(v)) => Some(Rational(v))
                 case ConstantType(FloatConstant(v)) => Some(Rational(v))
@@ -337,20 +337,6 @@ object meta:
 
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Boolean =
             tr =:= quotes.reflect.TypeRepr.of[Tuple2]
-
-    object intlt:
-        def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Int] =
-             import quotes.reflect.*
-             tr match
-                case ConstantType(IntConstant(i)) => Some(i)
-                case _ => None
-
-    object dbllt:
-        def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Double] =
-             import quotes.reflect.*
-             tr match
-                case ConstantType(DoubleConstant(v)) => Some(v)
-                case _ => None
 
     object strlt:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[String] =
