@@ -16,10 +16,34 @@
 
 package coulomb.define
 
+/**
+ * @tparam Name unit name
+ * @tparam Abbv unit abbreviation
+ */
 abstract class NamedUnit[Name, Abbv]
 
+/**
+ * @tparam U unit type
+ * @tparam Name unit name
+ * @tparam Abbv unit abbreviation
+ */
 abstract class BaseUnit[U, Name, Abbv] extends NamedUnit[Name, Abbv]
 
+/**
+ * @tparam U unit type
+ * @tparam D unit it is derived from
+ * @tparam Coef unit coefficient, relative to `D`
+ * @tparam Name unit name
+ * @tparam Abbv unit abbreviation
+ */
 abstract class DerivedUnit[U, D, Coef, Name, Abbv] extends NamedUnit[Name, Abbv]
 
+/**
+ * Prefixed units are derived from `1` (the identity unit)
+ * 
+ * @tparam U unit type
+ * @tparam Coef unit coefficient
+ * @tparam Name unit name
+ * @tparam Abbv unit abbreviation
+ */
 abstract class PrefixUnit[U, Coef, Name, Abbv] extends DerivedUnit[U, 1, Coef, Name, Abbv]
