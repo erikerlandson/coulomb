@@ -20,6 +20,13 @@ ThisBuild / tlSitePublishBranch := Some("no-such-branch")
 
 ThisBuild / crossScalaVersions := Seq("3.1.1")
 
+// run tests sequentially for easier failure debugging
+Test / parallelExecution := false
+
+def commonSettings = Seq(
+    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
+)
+
 lazy val root = tlCrossRootProject
   .aggregate(core, units)
 
@@ -27,12 +34,14 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("core"))
   .settings(name := "coulomb-core")
+  .settings(commonSettings :_*)
 
 lazy val units = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("units"))
-  .dependsOn(core)
   .settings(name := "coulomb-units")
+  .dependsOn(core % "compile->compile;test->test")
+  .settings(commonSettings :_*)
 
 // a target for rolling up all subproject deps: a convenient
 // way to get a repl that has access to all subprojects
