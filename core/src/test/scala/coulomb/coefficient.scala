@@ -21,12 +21,33 @@ import coulomb.testing.CoulombSuite
 import coulomb.testing.units.{*,given}
 
 class CoefficientSuite extends CoulombSuite:
-    test("same base unit") {
-        val coef = summon[Coefficient[Meter, Meter]]
-        assert(coef.value eq Rational.const1)
+    test("identical units") {
+        assert(summon[Coefficient[Meter, Meter]].value eq Rational.const1)
+        assert(summon[Coefficient[Liter, Liter]].value eq Rational.const1)
+        assert(summon[Coefficient[Kilogram * Meter / (Second ^ 2),
+                                  Kilogram * Meter / (Second ^ 2)]].value eq Rational.const1)
     }
 
-    test("same derived unit") {
-        val coef = summon[Coefficient[Liter, Liter]]
-        assert(coef.value eq Rational.const1)
+    test("convertible units") {
+        assert(summon[Coefficient[Meter, Yard]].value == Rational(10000, 9144))
+        assert(summon[Coefficient[Meter ^ 3, Liter]].value == 1000)
+        assert(summon[Coefficient[Kilogram * Meter / (Second ^ 2),
+                                  Pound * Yard / (Minute ^ 2)]].value == Rational(50000000000000L,5760623099L))
+        assert(summon[Coefficient[Meter ^ 3, 1000 * Liter]].value == 1)
+        assert(summon[Coefficient[Meter, Kilo * Yard]].value == Rational(10, 9144))
+    }
+
+    test("non-convertible units") {
+        assert(compileErrors("summon[Coefficient[Meter, Second]]").nonEmpty)
+        assert(compileErrors("summon[Coefficient[Meter ^ 2, Liter]]").nonEmpty)
+        assert(compileErrors("summon[Coefficient[Kilogram * Meter / (Second ^ 2), Pound * Yard / (Minute ^ 3)]]").nonEmpty)
+    }
+
+    test("units with embedded coefficients") {
+        assert(summon[Coefficient[10 * Meter, Meter]].value == 10)
+        assert(summon[Coefficient[Meter, (1 / 3) * Meter]].value == 3)
+        assert(summon[Coefficient[(10 ^ 6) * Meter, Meter]].value == 1000000)
+        assert(summon[Coefficient[Meter,  1.5 * Meter]].value == Rational(2, 3))
+        assert(summon[Coefficient[Meter,  1.25f * Meter]].value == Rational(4, 5))
+        assert(summon[Coefficient[((1 / 3L) * (10L ^ 100)) * Meter, Meter]].value == Rational(1, 3) * Rational(10).pow(100))
     }
