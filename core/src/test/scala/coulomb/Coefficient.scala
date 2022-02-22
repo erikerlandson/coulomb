@@ -19,10 +19,10 @@ package coulomb.tests
 import coulomb.*
 import coulomb.rational.Rational
 
-import coulomb.testing.checks.*
+import coulomb.testing.CoulombSuite
 import coulomb.testing.units.{*,given}
 
-class CoefficientSuite extends munit.FunSuite:
+class CoefficientSuite extends CoulombSuite:
     test("same base unit") {
         val coef = summon[Coefficient[Meter, Meter]]
         assert(coef.value eq Rational.const1)
@@ -32,4 +32,9 @@ class CoefficientSuite extends munit.FunSuite:
         val coef = summon[Coefficient[Liter, Liter]]
         assert(coef.value eq Rational.const1)
     }
-
+    test("test") {
+        import coulomb.conversion.standard.given
+        val t = 1d.withUnit[Meter]
+        t.checkQ[Double, Meter](1.0, eps=0)
+    }
+end CoefficientSuite

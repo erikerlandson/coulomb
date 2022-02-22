@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package coulomb.testing.checks
+package coulomb.testing
 
-abstract class TypeString[T]:
-  /** the name of type.path.Foo[Int] is 'Foo' */
-  def name: String
-  /** the typeString of type.path.Foo[Int] is Foo[Int] */
-  def typeString: String
+import coulomb.Quantity
+import coulomb.conversion.ValueConversion
 
-  override def toString(): String = typeString
+abstract class CoulombSuite extends munit.FunSuite:
+    import coulomb.testing.types.*
 
-  def ==(that: TypeString[?]): Boolean =
-    typeString == that.typeString
+    extension[V, U](q: Quantity[V, U])
+        inline def checkQ[VT, UT](tval: Double, eps: Double = 1e-4)(using vc: ValueConversion[V, Double]): Unit =
+            assertEquals(typeStr[V], typeStr[VT])  
+            assertEquals(typeStr[U], typeStr[UT])
+            assertEqualsDouble(vc(q.value), tval, eps)
 
-object TypeString:
+object types:
     import scala.quoted.*
 
-    inline given [T]: TypeString[T] = ${ meta[T] }
+    /** typeStr(type.path.Foo[type.path.Bar]) => Foo[Bar] */
+    inline def typeStr[T]: String = ${ tsmeta[T] }
+    inline def typesEq[T1, T2]: Boolean = ${ temeta[T1, T2] }
 
-    private def meta[T](using Type[T], Quotes): Expr[TypeString[T]] =
+    private def tsmeta[T](using Type[T], Quotes): Expr[String] =
         import quotes.reflect.*
         def work(tr: TypeRepr): String = tr match
             case AppliedType(tc, ta) =>
@@ -42,28 +45,12 @@ object TypeString:
                     tcn + "[" + as.mkString(",") + "]"
             case t => t.typeSymbol.name
         val t = TypeRepr.of[T].dealias
-        val n = t.typeSymbol.name
         val ts = work(t)
-        '{ new TypeString[T] {
-               val name = ${Expr(n)}
-               val typeString = ${Expr(ts)}
-          }
-        }
+        Expr(ts)
 
-abstract class TypesEq[T1, T2]:
-    val value: Boolean
-
-object TypesEq:
-    import scala.quoted.*
-
-    inline given [T1, T2]: TypesEq[T1, T2] = ${ meta[T1, T2] }
-
-    private def meta[T1, T2](using Type[T1], Type[T2], Quotes): Expr[TypesEq[T1, T2]] =
+    private def temeta[T1, T2](using Type[T1], Type[T2], Quotes): Expr[Boolean] =
         import quotes.reflect.*
         val eql = TypeRepr.of[T1] =:= TypeRepr.of[T2]
-        '{ new TypesEq[T1, T2] {
-            val value = ${Expr(eql)}
-         }}
+        Expr(eql)
 
-def typesEQ[T1, T2](using te: TypesEq[T1, T2]): Boolean = te.value
 
