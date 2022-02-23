@@ -24,6 +24,8 @@ class QuantitySuite extends CoulombSuite:
     import coulomb.conversion.standard.given
 
     test("withUnit") {
-        val t = 1d.withUnit[Meter]
-        t.checkQ[Double, Meter](1.0, eps=0)
+        1d.withUnit[Meter].checkQ[Double, Meter](1.0, eps=0)
+        1f.withUnit[Second].checkQ[Float, Second](1.0, eps=0)
+        1L.withUnit[Kilogram].checkQ[Long, Kilogram](1.0, eps=0)
+        1.withUnit[Liter].checkQ[Int, Liter](1.0, eps=0)
     }
