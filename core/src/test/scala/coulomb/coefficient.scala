@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import coulomb.*
-import coulomb.rational.Rational
-
 import coulomb.testing.CoulombSuite
-import coulomb.testing.units.{*,given}
 
 class CoefficientSuite extends CoulombSuite:
+    import coulomb.*
+    import coulomb.testing.units.{*, given}
+    import coulomb.rational.Rational
+
     test("identical units") {
         assert(summon[Coefficient[Meter, Meter]].value eq Rational.const1)
         assert(summon[Coefficient[Liter, Liter]].value eq Rational.const1)
@@ -38,9 +38,9 @@ class CoefficientSuite extends CoulombSuite:
     }
 
     test("non-convertible units") {
-        assert(compileErrors("summon[Coefficient[Meter, Second]]").nonEmpty)
-        assert(compileErrors("summon[Coefficient[Meter ^ 2, Liter]]").nonEmpty)
-        assert(compileErrors("summon[Coefficient[Kilogram * Meter / (Second ^ 2), Pound * Yard / (Minute ^ 3)]]").nonEmpty)
+        assertCE("summon[Coefficient[Meter, Second]]")
+        assertCE("summon[Coefficient[Meter ^ 2, Liter]]")
+        assertCE("summon[Coefficient[Kilogram * Meter / (Second ^ 2), Pound * Yard / (Minute ^ 3)]]")
     }
 
     test("units with embedded coefficients") {

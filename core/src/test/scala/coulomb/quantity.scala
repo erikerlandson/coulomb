@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-import coulomb.*
-import coulomb.rational.Rational
-
 import coulomb.testing.CoulombSuite
-import coulomb.testing.units.{*,given}
 
 class QuantitySuite extends CoulombSuite:
+    import coulomb.*
+    import coulomb.testing.units.{*, given}
     import coulomb.conversion.standard.given
 
     test("lift via Quantity") {
@@ -45,4 +43,37 @@ class QuantitySuite extends CoulombSuite:
        37L.withUnit[Kilogram].value.assertVT[Long](37)
        13.withUnit[Liter].value.assertVT[Int](13)
        "foo".withUnit[Minute].value.assertVT[String]("foo")
+    }
+
+    test("toValue standard") {
+        1.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
+        1.withUnit[Meter].toValue[Long].assertQ[Long, Meter](1)
+        1.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
+        1.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
+        
+        1L.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
+        1L.withUnit[Meter].toValue[Long].assertQ[Long, Meter](1)
+        1L.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
+        1L.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
+
+        // fp to integral types is an error without importing integral rules
+        assertCE("1f.withUnit[Meter].toValue[Int]")
+        assertCE("1f.withUnit[Meter].toValue[Long]")
+        1f.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
+        1f.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
+
+        assertCE("1d.withUnit[Meter].toValue[Int]")
+        assertCE("1d.withUnit[Meter].toValue[Long]")
+        1d.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
+        1d.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
+    }
+
+    test("toValue standard integral") {
+        import coulomb.conversion.standard.integral.given
+
+        1.5f.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
+        0.999f.withUnit[Meter].toValue[Long].assertQ[Long, Meter](0)
+
+        1.5d.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
+        0.999d.withUnit[Meter].toValue[Long].assertQ[Long, Meter](0)
     }

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import coulomb.*
-
 import coulomb.testing.CoulombSuite
 
 class SIUnitsSuite extends CoulombSuite:
+    import coulomb.*
+    import coulomb.units.si.{*, given}
+
     test("defines si units") {
-        import coulomb.units.si.{*,given}
         1.withUnit[Meter].assertQ[Int, Meter](1)
         1L.withUnit[Kilogram].assertQ[Long, Kilogram](1)
         1f.withUnit[Second].assertQ[Float, Second](1)

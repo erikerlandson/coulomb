@@ -47,6 +47,9 @@ abstract class CoulombSuite extends munit.FunSuite:
             assertEquals(typeStr[V], typeStr[VT])
             assertEqualsDouble(vc(v), vt, eps)
 
+    inline def assertCE(inline code: String): Unit =
+        assert(compileErrors(code).nonEmpty)
+
 object types:
     import scala.quoted.*
 
