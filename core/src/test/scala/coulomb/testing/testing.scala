@@ -28,6 +28,11 @@ abstract class CoulombSuite extends munit.FunSuite:
             assertEquals(typeStr[U], typeStr[UT])
             assertEqualsDouble(vc(q.value), tval, eps)
 
+    extension[V](v: V)
+        inline def checkVT[VT](tval: Double, eps: Double = 1e-4)(using vc: ValueConversion[V, Double]): Unit =
+            assertEquals(typeStr[V], typeStr[VT])
+            assertEqualsDouble(vc(v), tval, eps)
+
 object types:
     import scala.quoted.*
 

@@ -29,3 +29,10 @@ class QuantitySuite extends CoulombSuite:
         1L.withUnit[Kilogram].checkQ[Long, Kilogram](1.0, eps=0)
         1.withUnit[Liter].checkQ[Int, Liter](1.0, eps=0)
     }
+
+    test("value") {
+       7d.withUnit[Meter].value.checkVT[Double](7.0, eps=0)
+       73f.withUnit[Second].value.checkVT[Float](73.0, eps=0)
+       37L.withUnit[Kilogram].value.checkVT[Long](37.0, eps=0)
+       13.withUnit[Liter].value.checkVT[Int](13.0, eps=0)
+    }
