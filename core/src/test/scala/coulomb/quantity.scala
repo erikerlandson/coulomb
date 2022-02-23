@@ -23,24 +23,26 @@ import coulomb.testing.units.{*,given}
 class QuantitySuite extends CoulombSuite:
     import coulomb.conversion.standard.given
 
-    test("Quantity lifter") {
-        Quantity[Meter](3.14).checkQ[Double, Meter](3.14, eps=0)
-        Quantity[Second](7.7f).checkQ[Float, Second](7.7f, eps=0)
-        Quantity[Kilogram](42L).checkQ[Long, Kilogram](42, eps=0)
-        Quantity[Liter](99).checkQ[Int, Liter](99, eps=0)
+    test("lift via Quantity") {
+        Quantity[Meter](3.14).assertQ[Double, Meter](3.14)
+        Quantity[Second](7.7f).assertQ[Float, Second](7.7f)
+        Quantity[Kilogram](42L).assertQ[Long, Kilogram](42)
+        Quantity[Liter](99).assertQ[Int, Liter](99)
+        Quantity[Minute]("foo").assertQ[String, Minute]("foo")
     }
 
-    test("withUnit lifter") {
-        1d.withUnit[Meter].checkQ[Double, Meter](1, eps=0)
-        1f.withUnit[Second].checkQ[Float, Second](1, eps=0)
-        1L.withUnit[Kilogram].checkQ[Long, Kilogram](1, eps=0)
-        1.withUnit[Liter].checkQ[Int, Liter](1, eps=0)
+    test("lift via withUnit") {
+        1d.withUnit[Meter].assertQ[Double, Meter](1)
+        1f.withUnit[Second].assertQ[Float, Second](1)
+        1L.withUnit[Kilogram].assertQ[Long, Kilogram](1)
+        1.withUnit[Liter].assertQ[Int, Liter](1)
+        "foo".withUnit[Minute].assertQ[String, Minute]("foo")
     }
 
     test("value") {
-       7d.withUnit[Meter].value.checkVT[Double](7, eps=0)
-       73f.withUnit[Second].value.checkVT[Float](73, eps=0)
-       37L.withUnit[Kilogram].value.checkVT[Long](37, eps=0)
-       13.withUnit[Liter].value.checkVT[Int](13, eps=0)
-       assertEquals("foo".withUnit[Minute].value, "foo")
+       7d.withUnit[Meter].value.assertVT[Double](7)
+       73f.withUnit[Second].value.assertVT[Float](73)
+       37L.withUnit[Kilogram].value.assertVT[Long](37)
+       13.withUnit[Liter].value.assertVT[Int](13)
+       "foo".withUnit[Minute].value.assertVT[String]("foo")
     }

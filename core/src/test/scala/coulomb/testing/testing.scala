@@ -23,22 +23,35 @@ abstract class CoulombSuite extends munit.FunSuite:
     import coulomb.testing.types.*
 
     extension[V, U](q: Quantity[V, U])
-        inline def checkQ[VT, UT](tval: Double, eps: Double = 1e-4)(using vc: ValueConversion[V, Double]): Unit =
-            assertEquals(typeStr[V], typeStr[VT])  
-            assertEquals(typeStr[U], typeStr[UT])
-            assertEqualsDouble(vc(q.value), tval, eps)
+        transparent inline def assertQ[VT, UT](vt: VT): Unit =
+            // checking types first
+            assert(typesEq[V, VT], s"type ${typeStr[V]} != ${typeStr[VT]}")
+            assert(typesEq[U, UT], s"type ${typeStr[U]} != ${typeStr[UT]}")
+            // if types check, then asInstanceOf should succeed
+            assertEquals(q.value.asInstanceOf[VT], vt)
+
+        transparent inline def assertQD[VT, UT](vt: Double, eps: Double = 1e-4)(using
+                vc: ValueConversion[V, Double]): Unit =
+            assert(typesEq[V, VT], s"type ${typeStr[V]} != ${typeStr[VT]}")
+            assert(typesEq[U, UT], s"type ${typeStr[U]} != ${typeStr[UT]}")
+            assertEqualsDouble(vc(q.value), vt, eps)
 
     extension[V](v: V)
-        inline def checkVT[VT](tval: Double, eps: Double = 1e-4)(using vc: ValueConversion[V, Double]): Unit =
-            assertEquals(typeStr[V], typeStr[VT])
-            assertEqualsDouble(vc(v), tval, eps)
+        transparent inline def assertVT[VT](vt: VT): Unit =
+            assert(typesEq[V, VT], s"type ${typeStr[V]} != ${typeStr[VT]}")
+            assertEquals(v.asInstanceOf[VT], vt)
+
+        transparent inline def assertVTD[VT](vt: Double, eps: Double = 1e-4)(using
+                vc: ValueConversion[V, Double]): Unit =
+            assert(typesEq[V, VT], s"type ${typeStr[V]} != ${typeStr[VT]}")
+            assertEqualsDouble(vc(v), vt, eps)
 
 object types:
     import scala.quoted.*
 
     /** typeStr(type.path.Foo[type.path.Bar]) => Foo[Bar] */
-    inline def typeStr[T]: String = ${ tsmeta[T] }
-    inline def typesEq[T1, T2]: Boolean = ${ temeta[T1, T2] }
+    transparent inline def typeStr[T]: String = ${ tsmeta[T] }
+    transparent inline def typesEq[T1, T2]: Boolean = ${ temeta[T1, T2] }
 
     private def tsmeta[T](using Type[T], Quotes): Expr[String] =
         import quotes.reflect.*
