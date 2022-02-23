@@ -50,7 +50,7 @@ class QuantitySuite extends CoulombSuite:
         1.withUnit[Meter].toValue[Long].assertQ[Long, Meter](1)
         1.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
         1.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
-        
+ 
         1L.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
         1L.withUnit[Meter].toValue[Long].assertQ[Long, Meter](1)
         1L.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
@@ -76,4 +76,19 @@ class QuantitySuite extends CoulombSuite:
 
         1.5d.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
         0.999d.withUnit[Meter].toValue[Long].assertQ[Long, Meter](0)
+    }
+
+    test("toUnit standard") {
+        1.5f.withUnit[Minute].toUnit[Second].assertQ[Float, Second](90)
+        1d.withUnit[Meter].toUnit[Yard].assertQD[Double, Yard](1.0936132983377078)
+        // conversions on integral types require importing integral conversion rules
+        assertCE("1.withUnit[Minute].toUnit[Second]")
+        assertCE("1L.withUnit[Yard].toUnit[Meter]")
+    }
+
+    test("toUnit standard integral") {
+        import coulomb.conversion.standard.integral.given
+
+        1.withUnit[Minute].toUnit[Second].assertQ[Int, Second](60)
+        1L.withUnit[Yard].toUnit[Meter].assertQ[Long, Meter](0)
     }

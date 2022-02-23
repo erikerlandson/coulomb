@@ -31,21 +31,24 @@ abstract class CoulombSuite extends munit.FunSuite:
             // if types check, then asInstanceOf should succeed
             assertEquals(q.value.asInstanceOf[VT], vt)
 
-        transparent inline def assertQD[VT, UT](vt: Double, eps: Double = 1e-4)(using
+        transparent inline def assertQD[VT, UT](vt: Double, eps: Option[Double] = None)(using
                 vc: ValueConversion[V, Double]): Unit =
             assertEquals(typeStr[V], typeStr[VT])
             assertEquals(typeStr[U], typeStr[UT])
-            assertEqualsDouble(vc(q.value), vt, eps)
+            // epsilon governed by V, but scale by |vt|
+            val e = math.abs(vt) * eps.getOrElse(typeEps[V])
+            assertEqualsDouble(vc(q.value), vt, e)
 
     extension[V](v: V)
         transparent inline def assertVT[VT](vt: VT): Unit =
             assertEquals(typeStr[V], typeStr[VT])
             assertEquals(v.asInstanceOf[VT], vt)
 
-        transparent inline def assertVTD[VT](vt: Double, eps: Double = 1e-4)(using
+        transparent inline def assertVTD[VT](vt: Double, eps: Option[Double] = None)(using
                 vc: ValueConversion[V, Double]): Unit =
             assertEquals(typeStr[V], typeStr[VT])
-            assertEqualsDouble(vc(v), vt, eps)
+            val e = math.abs(vt) * eps.getOrElse(typeEps[V])
+            assertEqualsDouble(vc(v), vt, e)
 
     inline def assertCE(inline code: String): Unit =
         assert(compileErrors(code).nonEmpty)
@@ -56,6 +59,14 @@ object types:
     /** typeStr(type.path.Foo[type.path.Bar]) => Foo[Bar] */
     transparent inline def typeStr[T]: String = ${ tsmeta[T] }
     transparent inline def typesEq[T1, T2]: Boolean = ${ temeta[T1, T2] }
+    transparent inline def typeEps[V]: Double = ${ tepsmeta[V] }
+
+    private def tepsmeta[V](using Type[V], Quotes): Expr[Double] =
+        import quotes.reflect.*
+        TypeRepr.of[V] match
+            case vt if vt =:= TypeRepr.of[Float] => Expr(1e-5)
+            case vt if vt =:= TypeRepr.of[Double] => Expr(1e-10)
+            case _ => Expr(0)
 
     private def tsmeta[T](using Type[T], Quotes): Expr[String] =
         import quotes.reflect.*
