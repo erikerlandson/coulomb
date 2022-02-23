@@ -25,25 +25,26 @@ abstract class CoulombSuite extends munit.FunSuite:
     extension[V, U](q: Quantity[V, U])
         transparent inline def assertQ[VT, UT](vt: VT): Unit =
             // checking types first
-            assert(typesEq[V, VT], s"type ${typeStr[V]} != ${typeStr[VT]}")
-            assert(typesEq[U, UT], s"type ${typeStr[U]} != ${typeStr[UT]}")
+            // checking in string form gives better idiomatic test failure outputs
+            assertEquals(typeStr[V], typeStr[VT])
+            assertEquals(typeStr[U], typeStr[UT])
             // if types check, then asInstanceOf should succeed
             assertEquals(q.value.asInstanceOf[VT], vt)
 
         transparent inline def assertQD[VT, UT](vt: Double, eps: Double = 1e-4)(using
                 vc: ValueConversion[V, Double]): Unit =
-            assert(typesEq[V, VT], s"type ${typeStr[V]} != ${typeStr[VT]}")
-            assert(typesEq[U, UT], s"type ${typeStr[U]} != ${typeStr[UT]}")
+            assertEquals(typeStr[V], typeStr[VT])
+            assertEquals(typeStr[U], typeStr[UT])
             assertEqualsDouble(vc(q.value), vt, eps)
 
     extension[V](v: V)
         transparent inline def assertVT[VT](vt: VT): Unit =
-            assert(typesEq[V, VT], s"type ${typeStr[V]} != ${typeStr[VT]}")
+            assertEquals(typeStr[V], typeStr[VT])
             assertEquals(v.asInstanceOf[VT], vt)
 
         transparent inline def assertVTD[VT](vt: Double, eps: Double = 1e-4)(using
                 vc: ValueConversion[V, Double]): Unit =
-            assert(typesEq[V, VT], s"type ${typeStr[V]} != ${typeStr[VT]}")
+            assertEquals(typeStr[V], typeStr[VT])
             assertEqualsDouble(vc(v), vt, eps)
 
 object types:
