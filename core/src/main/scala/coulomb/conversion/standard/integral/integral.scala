@@ -34,12 +34,17 @@ given ctx_VC_Float_Int: ValueConversion[Float, Int] with
 
 transparent inline given ctx_UC_Long[UF, UT](using coef: Coefficient[UF, UT]):
         UnitConversion[Long, UF, UT] =
-    val c = coef.value
+    val nc = coef.value.n.toDouble
+    val dc = coef.value.d.toDouble
+    // using nc and dc is more efficient than using Rational directly in the conversion function
+    // but still gives us 53 bits of integer precision for exact rational arithmetic, and also
+    // graceful loss of precision if nc*v exceeds 53 bits
     new UnitConversion[Long, UF, UT]:
-        def apply(v: Long): Long = (c * Rational(v)).toLong
+        def apply(v: Long): Long = ((nc * v) / dc).toLong
 
 transparent inline given ctx_UC_Int[UF, UT](using coef: Coefficient[UF, UT]):
         UnitConversion[Int, UF, UT] =
-    val c = coef.value
+    val nc = coef.value.n.toDouble
+    val dc = coef.value.d.toDouble
     new UnitConversion[Int, UF, UT]:
-        def apply(v: Int): Int = (c * Rational(v)).toInt 
+        def apply(v: Int): Int = ((nc * v) / dc).toInt
