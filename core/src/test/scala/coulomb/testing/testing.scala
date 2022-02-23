@@ -66,7 +66,7 @@ object types:
         TypeRepr.of[V] match
             case vt if vt =:= TypeRepr.of[Float] => Expr(1e-5)
             case vt if vt =:= TypeRepr.of[Double] => Expr(1e-10)
-            case _ => Expr(0)
+            case _ => Expr(1e-10)
 
     private def tsmeta[T](using Type[T], Quotes): Expr[String] =
         import quotes.reflect.*
