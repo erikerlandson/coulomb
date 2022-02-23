@@ -35,4 +35,5 @@ class QuantitySuite extends CoulombSuite:
        73f.withUnit[Second].value.checkVT[Float](73.0, eps=0)
        37L.withUnit[Kilogram].value.checkVT[Long](37.0, eps=0)
        13.withUnit[Liter].value.checkVT[Int](13.0, eps=0)
+       assertEquals("foo".withUnit[Minute].value, "foo")
     }
