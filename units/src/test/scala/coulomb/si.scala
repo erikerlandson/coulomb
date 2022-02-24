@@ -19,6 +19,8 @@ import coulomb.testing.CoulombSuite
 class SIUnitsSuite extends CoulombSuite:
     import coulomb.*
     import coulomb.units.si.{*, given}
+    import coulomb.units.si.prefixes.{*, given}
+    import coulomb.conversion.standard.given
 
     test("defines si units") {
         1.withUnit[Meter].assertQ[Int, Meter](1)
@@ -28,4 +30,25 @@ class SIUnitsSuite extends CoulombSuite:
         "goo".withUnit[Mole].assertQ[String, Mole]("goo")
         true.withUnit[Candela].assertQ[Boolean, Candela](true)
         List("moo").withUnit[Kelvin].assertQ[List[String], Kelvin](List("moo"))
+    }
+
+    test("defines si prefixes") {
+        assertEquals(1d.withUnit[Kilo].toUnit[1].value, 1e3)
+        assertEquals(1d.withUnit[Mega].toUnit[1].value, 1e6)
+        assertEquals(1d.withUnit[Giga].toUnit[1].value, 1e9)
+        assertEquals(1d.withUnit[Tera].toUnit[1].value, 1e12)
+        assertEquals(1d.withUnit[Peta].toUnit[1].value, 1e15)
+        assertEquals(1d.withUnit[Exa].toUnit[1].value, 1e18)
+        assertEquals(1d.withUnit[Zetta].toUnit[1].value, 1e21)
+        assertEquals(1d.withUnit[Yotta].toUnit[1].value, 1e24)
+
+        assertEquals(1d.withUnit[Milli].toUnit[1].value, 1e-3)
+        assertEquals(1d.withUnit[Micro].toUnit[1].value, 1e-6)
+        assertEquals(1d.withUnit[Nano].toUnit[1].value, 1e-9)
+        assertEquals(1d.withUnit[Pico].toUnit[1].value, 1e-12)
+        assertEquals(1d.withUnit[Femto].toUnit[1].value, 1e-15)
+        // picking up a bit of fp artifacts at least significant bits on very small vals
+        assertEqualsDouble(1d.withUnit[Atto].toUnit[1].value, 1e-18, 1e-18 * 1e-15)
+        assertEqualsDouble(1d.withUnit[Zepto].toUnit[1].value, 1e-21, 1e-21 * 1e-15)
+        assertEqualsDouble(1d.withUnit[Yocto].toUnit[1].value, 1e-24, 1e-24 * 1e-15)
     }
