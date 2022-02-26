@@ -78,6 +78,7 @@ object quantity:
 end quantity
 
 import coulomb.ops.*
+import coulomb.rational.Rational
 
 extension[VL, UL](ql: Quantity[VL, UL])
     inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
@@ -109,5 +110,8 @@ extension[VL, UL](ql: Quantity[VL, UL])
 inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
 inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
 
-/** obtain the coefficient */
-inline def coefficient[U1, U2] = ${ coulomb.infra.meta.coefficient[U1, U2] }
+/**
+ * Obtain the coefficient of conversion from U1 -> U2
+ * If U1 and U2 are not convertible, causes a compilation failure.
+ */
+inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
