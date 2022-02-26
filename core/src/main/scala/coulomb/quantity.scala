@@ -111,11 +111,5 @@ extension[VL, UL](ql: Quantity[VL, UL])
 def showUnit[U](using sh: Show[U]): String = sh.value
 def showUnitFull[U](using sh: ShowFull[U]): String = sh.value
 
-@implicitNotFound("No coefficient of conversion exists for unit types (${U1}) and (${U2})")
-abstract class Coefficient[U1, U2]:
-    val value: coulomb.rational.Rational
-    override def toString = s"Coefficient($value)"
-
-object Coefficient:
-    transparent inline given [U1, U2]: Coefficient[U1, U2] =
-        ${ coulomb.infra.meta.coefficient[U1, U2] }
+/** obtain the coefficient */
+inline def coefficient[U1, U2] = ${ coulomb.infra.meta.coefficient[U1, U2] }

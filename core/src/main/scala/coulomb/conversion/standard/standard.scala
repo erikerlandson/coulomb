@@ -17,7 +17,7 @@
 package coulomb.conversion.standard
 
 import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
-import coulomb.Coefficient
+import coulomb.coefficient
 
 // 16 of these - full crossproduct
 transparent inline given ctx_VR_Double_Double: ValueResolution[Double, Double] =
@@ -127,14 +127,14 @@ given ctx_VC_Int_Int: ValueConversion[Int, Int] with
 // 4 of these - one for each of the big 4
 // unit conversions that discard fractional values can be imported from 
 // the 'integral' subpackage
-transparent inline given ctx_UC_Double[UF, UT](using coef: Coefficient[UF, UT]):
+transparent inline given ctx_UC_Double[UF, UT]:
         UnitConversion[Double, UF, UT] =
-    val c = coef.value.toDouble
+    val c = coefficient[UF, UT].toDouble
     new UnitConversion[Double, UF, UT]:
         def apply(v: Double): Double = c * v
 
-transparent inline given ctx_UC_Float[UF, UT](using coef: Coefficient[UF, UT]):
+transparent inline given ctx_UC_Float[UF, UT]:
         UnitConversion[Float, UF, UT] =
-    val c = coef.value.toFloat
+    val c = coefficient[UF, UT].toFloat
     new UnitConversion[Float, UF, UT]:
         def apply(v: Float): Float = c * v

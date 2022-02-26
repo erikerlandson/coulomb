@@ -17,8 +17,7 @@
 package coulomb.conversion.standard.integral
 
 import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
-import coulomb.Coefficient
-import coulomb.rational.Rational
+import coulomb.coefficient
 
 given ctx_VC_Double_Long: ValueConversion[Double, Long] with
     def apply(v: Double): Long = v.toLong
@@ -32,19 +31,21 @@ given ctx_VC_Float_Long: ValueConversion[Float, Long] with
 given ctx_VC_Float_Int: ValueConversion[Float, Int] with
     def apply(v: Float): Int = v.toInt
 
-transparent inline given ctx_UC_Long[UF, UT](using coef: Coefficient[UF, UT]):
+transparent inline given ctx_UC_Long[UF, UT]:
         UnitConversion[Long, UF, UT] =
-    val nc = coef.value.n.toDouble
-    val dc = coef.value.d.toDouble
+    val coef = coefficient[UF, UT]
+    val nc = coef.n.toDouble
+    val dc = coef.d.toDouble
     // using nc and dc is more efficient than using Rational directly in the conversion function
     // but still gives us 53 bits of integer precision for exact rational arithmetic, and also
     // graceful loss of precision if nc*v exceeds 53 bits
     new UnitConversion[Long, UF, UT]:
         def apply(v: Long): Long = ((nc * v) / dc).toLong
 
-transparent inline given ctx_UC_Int[UF, UT](using coef: Coefficient[UF, UT]):
+transparent inline given ctx_UC_Int[UF, UT]:
         UnitConversion[Int, UF, UT] =
-    val nc = coef.value.n.toDouble
-    val dc = coef.value.d.toDouble
+    val coef = coefficient[UF, UT]
+    val nc = coef.n.toDouble
+    val dc = coef.d.toDouble
     new UnitConversion[Int, UF, UT]:
         def apply(v: Int): Int = ((nc * v) / dc).toInt

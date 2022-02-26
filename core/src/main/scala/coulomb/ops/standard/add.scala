@@ -20,7 +20,7 @@ import scala.util.NotGiven
 
 import coulomb.ops.{Add, Sub, Mul, Div, Neg, Pow}
 import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
-import coulomb.Coefficient
+import coulomb.coefficient
 
 // specialize these for efficiency, and as a
 // proof of concept that specializations can operate in this system
@@ -49,20 +49,18 @@ transparent inline given ctx_add_Int_1U[U]: Add[Int, U, Int, U] =
         def apply(vl: Int, vr: Int): Int = vl + vr
 
 transparent inline given ctx_add_Double_2U[UL, UR](using
-    neu: NotGiven[UL =:= UR],
-    coef: Coefficient[UR, UL]
+    neu: NotGiven[UL =:= UR]
         ): Add[Double, UL, Double, UR] =
-    val c = coef.value.toDouble
+    val c = coefficient[UR, UL].toDouble
     new Add[Double, UL, Double, UR]:
         type VO = Double
         type UO = UL
         def apply(vl: Double, vr: Double): Double = vl + (c * vr)
 
 transparent inline given ctx_add_Float_2U[UL, UR](using
-    neu: NotGiven[UL =:= UR],
-    coef: Coefficient[UR, UL]
+    neu: NotGiven[UL =:= UR]
         ): Add[Float, UL, Float, UR] =
-    val c = coef.value.toFloat
+    val c = coefficient[UR, UL].toFloat
     new Add[Float, UL, Float, UR]:
         type VO = Float
         type UO = UL
