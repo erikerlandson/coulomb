@@ -78,12 +78,10 @@ object quantity:
 end quantity
 
 import coulomb.ops.*
-import coulomb.ops.show.*
-import scala.annotation.implicitNotFound
 
 extension[VL, UL](ql: Quantity[VL, UL])
-    transparent inline def show(using sh: Show[UL]): String = s"${ql.value.toString} ${sh.value}"
-    transparent inline def showFull(using sh: ShowFull[UL]): String = s"${ql.value.toString} ${sh.value}"
+    inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
+    inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
 
     transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
         add(ql.value, qr.value).withUnit[add.UO]
@@ -108,8 +106,8 @@ extension[VL, UL](ql: Quantity[VL, UL])
     transparent inline def toUnit[U](using
         conv: coulomb.conversion.UnitConversion[VL, UL, U]): Quantity[VL, U] = conv(ql.value).withUnit[U]
 
-def showUnit[U](using sh: Show[U]): String = sh.value
-def showUnitFull[U](using sh: ShowFull[U]): String = sh.value
+inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
+inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
 
 /** obtain the coefficient */
 inline def coefficient[U1, U2] = ${ coulomb.infra.meta.coefficient[U1, U2] }

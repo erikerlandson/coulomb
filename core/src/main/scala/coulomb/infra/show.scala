@@ -14,51 +14,33 @@
  * limitations under the License.
  */
 
-package coulomb.ops.show
+package coulomb.infra
 
-import scala.annotation.implicitNotFound
-
-@implicitNotFound("Unit string not defined in scope for ${U}")
-abstract class Show[U]:
-    val value: String
-
-object Show:
-  transparent inline given showStandard[U]: Show[U] =
-      ${ meta.showStandard[U] }
-
-@implicitNotFound("Full Unit string not defined in scope for ${U}")
-abstract class ShowFull[U]:
-    val value: String
-
-object ShowFull:
-  transparent inline given showFullStandard[U]: ShowFull[U] =
-      ${ meta.showFullStandard[U] }
-
-object meta:
+object show:
     import scala.quoted.*
     import coulomb.*
     import coulomb.define.*
     import coulomb.infra.meta.*
 
-    def showStandard[U](using Quotes, Type[U]): Expr[Show[U]] =
+    def show[U](using Quotes, Type[U]): Expr[String] =
         import quotes.reflect.*
         val render = (tr: TypeRepr) => {
             val AppliedType(_, List(_, a)) = tr
             val strlt(abbv) = a
             abbv
         }
-        val usexpr = showrender(TypeRepr.of[U], render)
-        '{ new Show[U] { val value = ${Expr(usexpr)} } }
+        val str = showrender(TypeRepr.of[U], render)
+        Expr(str)
 
-    def showFullStandard[U](using Quotes, Type[U]): Expr[ShowFull[U]] =
+    def showFull[U](using Quotes, Type[U]): Expr[String] =
         import quotes.reflect.*
         val render = (tr: TypeRepr) => {
             val AppliedType(_, List(n, _)) = tr
             val strlt(name) = n
             name
         }
-        val usexpr = showrender(TypeRepr.of[U], render)
-        '{ new ShowFull[U] { val value = ${Expr(usexpr)} } }
+        val str = showrender(TypeRepr.of[U], render)
+        Expr(str)
 
     def showrender(using Quotes)(u: quotes.reflect.TypeRepr, render: quotes.reflect.TypeRepr => String): String =
         import quotes.reflect.*
