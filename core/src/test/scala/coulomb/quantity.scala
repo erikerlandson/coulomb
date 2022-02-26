@@ -92,3 +92,16 @@ class QuantitySuite extends CoulombSuite:
         1.withUnit[Minute].toUnit[Second].assertQ[Int, Second](60)
         1L.withUnit[Yard].toUnit[Meter].assertQ[Long, Meter](0)
     }
+
+    test("implicit conversions") {
+        // implicit conversions only happen if you import them
+        // https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
+        def f(q: Quantity[Double, Meter]): Double = q.value
+        assertCE("f(1d.withUnit[Yard])")
+        f(1d.withUnit[Yard].toUnit[Meter]).assertVTD[Double](0.9144)
+        object t {
+            import scala.language.implicitConversions
+            import coulomb.conversion.standard.implicitConversion.given
+            f(1d.withUnit[Yard]).assertVTD[Double](0.9144)
+        }
+    }
