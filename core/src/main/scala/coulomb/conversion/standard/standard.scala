@@ -127,13 +127,13 @@ given ctx_VC_Int_Int: ValueConversion[Int, Int] with
 // 4 of these - one for each of the big 4
 // unit conversions that discard fractional values can be imported from 
 // the 'integral' subpackage
-transparent inline given ctx_UC_Double[UF, UT]:
+inline given ctx_UC_Double[UF, UT]:
         UnitConversion[Double, UF, UT] =
     val c = coefficient[UF, UT].toDouble
     new UnitConversion[Double, UF, UT]:
         def apply(v: Double): Double = c * v
 
-transparent inline given ctx_UC_Float[UF, UT]:
+inline given ctx_UC_Float[UF, UT]:
         UnitConversion[Float, UF, UT] =
     val c = coefficient[UF, UT].toFloat
     new UnitConversion[Float, UF, UT]:

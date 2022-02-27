@@ -31,7 +31,7 @@ given ctx_VC_Float_Long: ValueConversion[Float, Long] with
 given ctx_VC_Float_Int: ValueConversion[Float, Int] with
     def apply(v: Float): Int = v.toInt
 
-transparent inline given ctx_UC_Long[UF, UT]:
+inline given ctx_UC_Long[UF, UT]:
         UnitConversion[Long, UF, UT] =
     val coef = coefficient[UF, UT]
     val nc = coef.n.toDouble
@@ -42,7 +42,7 @@ transparent inline given ctx_UC_Long[UF, UT]:
     new UnitConversion[Long, UF, UT]:
         def apply(v: Long): Long = ((nc * v) / dc).toLong
 
-transparent inline given ctx_UC_Int[UF, UT]:
+inline given ctx_UC_Int[UF, UT]:
         UnitConversion[Int, UF, UT] =
     val coef = coefficient[UF, UT]
     val nc = coef.n.toDouble

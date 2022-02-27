@@ -23,7 +23,7 @@ import coulomb.conversion.{ValueConversion, UnitConversion}
 // Quantity[V1, U1] -> Quantity[V2, U2], whenever a valid conversion exists
 // reference:
 // https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
-transparent inline given ctx_implicit_quantity_conversion[VF, UF, VT, UT](using
+inline given ctx_implicit_quantity_conversion[VF, UF, VT, UT](using
     vc: ValueConversion[VF, VT],
     uc: UnitConversion[VT, UF, UT]
         ): scala.Conversion[Quantity[VF, UF], Quantity[VT, UT]] =

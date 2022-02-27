@@ -79,10 +79,25 @@ end quantity
 
 import coulomb.ops.*
 import coulomb.rational.Rational
+import coulomb.conversion.{ValueConversion, UnitConversion}
+
+inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
+inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
+
+/**
+ * Obtain the coefficient of conversion from U1 -> U2
+ * If U1 and U2 are not convertible, causes a compilation failure.
+ */
+inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
 
 extension[VL, UL](ql: Quantity[VL, UL])
     inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
     inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
+
+    inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
+        conv(ql.value).withUnit[UL]
+    inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
+        conv(ql.value).withUnit[U]
 
     transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
         add(ql.value, qr.value).withUnit[add.UO]
@@ -101,17 +116,3 @@ extension[VL, UL](ql: Quantity[VL, UL])
 
     transparent inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
         neg(ql.value).withUnit[UL]
-
-    transparent inline def toValue[V](using
-        conv: coulomb.conversion.ValueConversion[VL, V]): Quantity[V, UL] = conv(ql.value).withUnit[UL]
-    transparent inline def toUnit[U](using
-        conv: coulomb.conversion.UnitConversion[VL, UL, U]): Quantity[VL, U] = conv(ql.value).withUnit[U]
-
-inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
-inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
-
-/**
- * Obtain the coefficient of conversion from U1 -> U2
- * If U1 and U2 are not convertible, causes a compilation failure.
- */
-inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
