@@ -22,8 +22,6 @@ import coulomb.*
 import coulomb.define.*
 import coulomb.ops.*
 
-import coulomb.Coefficient
-
 final type SNil
 final type %:[Head, Tail]
 
@@ -84,13 +82,12 @@ object meta:
                 case _ if v.isValidLong => ConstantType(LongConstant(v.toLong))
                 case _ => ConstantType(StringConstant(v.toString()))
 
-    // Coefficient[U1, U2]
-    def coefficient[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Coefficient[U1, U2]] =
+    def coefficient[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Rational] =
         import quotes.reflect.*
         // this call will fail if no coefficient exists, which means that
         // U1 and U2 are not convertable
         val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
-        '{ new Coefficient[U1, U2] { val value = ${Expr(c)} } }
+        Expr(c)
 
     def coef(using Quotes)(u1: quotes.reflect.TypeRepr, u2: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
@@ -103,7 +100,7 @@ object meta:
         // http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/
         val (rcoef, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
         if (rsig =:= TypeRepr.of[SNil]) then rcoef else
-            report.error(s"units are not convertable: ($u1) ($u2)")
+            report.error(s"unit type ${typestr(u1)} not convertable to ${typestr(u2)}")
             Rational.const0
 
     // returns tuple: (expr-for-coef, type-of-Res)
@@ -368,6 +365,12 @@ object meta:
     def typestr(using Quotes)(t: quotes.reflect.TypeRepr): String =
         import quotes.reflect.*
         def work(tr: TypeRepr): String = tr match
+            case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[*] =>
+                s"(${work(lhs)} * ${work(rhs)})"
+            case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[/] =>
+                s"(${work(lhs)} / ${work(rhs)})"
+            case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[^] =>
+                s"(${work(lhs)} ^ ${work(rhs)})"
             case AppliedType(tc, ta) =>
                 val tcn = tc.typeSymbol.name
                 val as = ta.map(work)

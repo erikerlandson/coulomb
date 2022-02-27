@@ -78,12 +78,26 @@ object quantity:
 end quantity
 
 import coulomb.ops.*
-import coulomb.ops.show.*
-import scala.annotation.implicitNotFound
+import coulomb.rational.Rational
+import coulomb.conversion.{ValueConversion, UnitConversion}
+
+inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
+inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
+
+/**
+ * Obtain the coefficient of conversion from U1 -> U2
+ * If U1 and U2 are not convertible, causes a compilation failure.
+ */
+inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
 
 extension[VL, UL](ql: Quantity[VL, UL])
-    transparent inline def show(using sh: Show[UL]): String = s"${ql.value.toString} ${sh.value}"
-    transparent inline def showFull(using sh: ShowFull[UL]): String = s"${ql.value.toString} ${sh.value}"
+    inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
+    inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
+
+    inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
+        conv(ql.value).withUnit[UL]
+    inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
+        conv(ql.value).withUnit[U]
 
     transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
         add(ql.value, qr.value).withUnit[add.UO]
@@ -102,20 +116,3 @@ extension[VL, UL](ql: Quantity[VL, UL])
 
     transparent inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
         neg(ql.value).withUnit[UL]
-
-    transparent inline def toValue[V](using
-        conv: coulomb.conversion.ValueConversion[VL, V]): Quantity[V, UL] = conv(ql.value).withUnit[UL]
-    transparent inline def toUnit[U](using
-        conv: coulomb.conversion.UnitConversion[VL, UL, U]): Quantity[VL, U] = conv(ql.value).withUnit[U]
-
-def showUnit[U](using sh: Show[U]): String = sh.value
-def showUnitFull[U](using sh: ShowFull[U]): String = sh.value
-
-@implicitNotFound("No coefficient of conversion exists for unit types (${U1}) and (${U2})")
-abstract class Coefficient[U1, U2]:
-    val value: coulomb.rational.Rational
-    override def toString = s"Coefficient($value)"
-
-object Coefficient:
-    transparent inline given [U1, U2]: Coefficient[U1, U2] =
-        ${ coulomb.infra.meta.coefficient[U1, U2] }
