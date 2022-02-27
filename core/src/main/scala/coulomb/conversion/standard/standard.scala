@@ -129,12 +129,12 @@ given ctx_VC_Int_Int: ValueConversion[Int, Int] with
 // the 'integral' subpackage
 inline given ctx_UC_Double[UF, UT]:
         UnitConversion[Double, UF, UT] =
-    val c = coefficient[UF, UT].toDouble
+    val c = coulomb.conversion.infra.coefficientDouble[UF, UT]
     new UnitConversion[Double, UF, UT]:
         def apply(v: Double): Double = c * v
 
 inline given ctx_UC_Float[UF, UT]:
         UnitConversion[Float, UF, UT] =
-    val c = coefficient[UF, UT].toFloat
+    val c = coulomb.conversion.infra.coefficientFloat[UF, UT]
     new UnitConversion[Float, UF, UT]:
         def apply(v: Float): Float = c * v

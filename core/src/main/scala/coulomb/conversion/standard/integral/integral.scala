@@ -17,7 +17,6 @@
 package coulomb.conversion.standard.integral
 
 import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
-import coulomb.coefficient
 
 given ctx_VC_Double_Long: ValueConversion[Double, Long] with
     def apply(v: Double): Long = v.toLong
@@ -33,9 +32,8 @@ given ctx_VC_Float_Int: ValueConversion[Float, Int] with
 
 inline given ctx_UC_Long[UF, UT]:
         UnitConversion[Long, UF, UT] =
-    val coef = coefficient[UF, UT]
-    val nc = coef.n.toDouble
-    val dc = coef.d.toDouble
+    val nc = coulomb.conversion.infra.coefficientNumDouble[UF, UT]
+    val dc = coulomb.conversion.infra.coefficientDenDouble[UF, UT]
     // using nc and dc is more efficient than using Rational directly in the conversion function
     // but still gives us 53 bits of integer precision for exact rational arithmetic, and also
     // graceful loss of precision if nc*v exceeds 53 bits
@@ -44,8 +42,7 @@ inline given ctx_UC_Long[UF, UT]:
 
 inline given ctx_UC_Int[UF, UT]:
         UnitConversion[Int, UF, UT] =
-    val coef = coefficient[UF, UT]
-    val nc = coef.n.toDouble
-    val dc = coef.d.toDouble
+    val nc = coulomb.conversion.infra.coefficientNumDouble[UF, UT]
+    val dc = coulomb.conversion.infra.coefficientDenDouble[UF, UT]
     new UnitConversion[Int, UF, UT]:
         def apply(v: Int): Int = ((nc * v) / dc).toInt

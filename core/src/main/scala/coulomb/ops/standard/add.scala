@@ -51,7 +51,7 @@ transparent inline given ctx_add_Double_2U[UL, UR](using
     ImplicitConversionsEnabled,
     NotGiven[UL =:= UR]
         ): Add[Double, UL, Double, UR] =
-    val c = coefficient[UR, UL].toDouble
+    val c = coulomb.conversion.infra.coefficientDouble[UR, UL]
     new Add[Double, UL, Double, UR]:
         type VO = Double
         type UO = UL
@@ -61,7 +61,7 @@ transparent inline given ctx_add_Float_2U[UL, UR](using
     ImplicitConversionsEnabled,
     NotGiven[UL =:= UR]
         ): Add[Float, UL, Float, UR] =
-    val c = coefficient[UR, UL].toFloat
+    val c = coulomb.conversion.infra.coefficientFloat[UR, UL]
     new Add[Float, UL, Float, UR]:
         type VO = Float
         type UO = UL
