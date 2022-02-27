@@ -201,8 +201,13 @@ class QuantitySuite extends CoulombSuite:
         (1.withUnit[Second] + 1L.withUnit[Minute]).assertQ[Long, Second](61)
         (1.withUnit[Second] + 1.withUnit[Minute]).assertQ[Int, Second](61)
 
+        // integer truncation can cause loss of precision
         (1L.withUnit[Meter] + 1L.withUnit[Yard]).assertQ[Long, Meter](1)
         (1L.withUnit[Meter] + 1.withUnit[Yard]).assertQ[Long, Meter](1)
         (1.withUnit[Meter] + 1L.withUnit[Yard]).assertQ[Long, Meter](1)
         (1.withUnit[Meter] + 1.withUnit[Yard]).assertQ[Int, Meter](1)
+
+        // fp effects (e.g. (3 * 0.3333).toInt -> 0) are avoided when possible
+        (1.withUnit[Yard] + 3.withUnit[Foot]).assertQ[Int, Yard](2)
+        (1L.withUnit[Yard] + 3L.withUnit[Foot]).assertQ[Long, Yard](2)
     }
