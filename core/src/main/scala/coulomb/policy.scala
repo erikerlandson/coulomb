@@ -20,4 +20,7 @@ object policy:
     // import coulomb.policy.strictUnitExpressions.given
     trait StrictUnitExpressions
     object strictUnitExpressions:
-        given StrictUnitExpressions with {}
+        given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
+
+    // intended to be defined via other policies
+    trait ImplicitConversionsEnabled

@@ -18,6 +18,7 @@ package coulomb.conversion.standard.implicitConversion
 
 import coulomb.*
 import coulomb.conversion.{ValueConversion, UnitConversion}
+import coulomb.policy.ImplicitConversionsEnabled
 
 // import this if you want to enable the compiler to implicitly convert
 // Quantity[V1, U1] -> Quantity[V2, U2], whenever a valid conversion exists
@@ -30,3 +31,9 @@ inline given ctx_implicit_quantity_conversion[VF, UF, VT, UT](using
     new scala.Conversion[Quantity[VF, UF], Quantity[VT, UT]]:
         def apply(q: Quantity[VF, UF]): Quantity[VT, UT] = 
             uc(vc(q.value)).withUnit[UT]
+
+// many operations on Quantity allow transformations that are
+// logically equivalent to implicitly converting Quantity value and unit types
+// So for coulomb's out-of-box operation policies, I will gate any such
+// transformations using this typeclass
+given ctx_ImplicitConversionsEnabled: ImplicitConversionsEnabled with {}

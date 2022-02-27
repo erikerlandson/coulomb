@@ -21,9 +21,8 @@ import scala.util.NotGiven
 import coulomb.ops.{Add, Sub, Mul, Div, Neg, Pow}
 import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
 import coulomb.coefficient
+import coulomb.policy.ImplicitConversionsEnabled
 
-// specialize these for efficiency, and as a
-// proof of concept that specializations can operate in this system
 transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
     new Add[Double, U, Double, U]:
         type VO = Double
@@ -49,7 +48,8 @@ transparent inline given ctx_add_Int_1U[U]: Add[Int, U, Int, U] =
         def apply(vl: Int, vr: Int): Int = vl + vr
 
 transparent inline given ctx_add_Double_2U[UL, UR](using
-    neu: NotGiven[UL =:= UR]
+    ImplicitConversionsEnabled,
+    NotGiven[UL =:= UR]
         ): Add[Double, UL, Double, UR] =
     val c = coefficient[UR, UL].toDouble
     new Add[Double, UL, Double, UR]:
@@ -58,7 +58,8 @@ transparent inline given ctx_add_Double_2U[UL, UR](using
         def apply(vl: Double, vr: Double): Double = vl + (c * vr)
 
 transparent inline given ctx_add_Float_2U[UL, UR](using
-    neu: NotGiven[UL =:= UR]
+    ImplicitConversionsEnabled,
+    NotGiven[UL =:= UR]
         ): Add[Float, UL, Float, UR] =
     val c = coefficient[UR, UL].toFloat
     new Add[Float, UL, Float, UR]:
@@ -68,6 +69,7 @@ transparent inline given ctx_add_Float_2U[UL, UR](using
 
 // anything not specialized is handled by this context function
 transparent inline given ctx_add_1V2U[V, UL, UR](using
+    ice: ImplicitConversionsEnabled,
     neu: NotGiven[UL =:= UR],
     ucv: UnitConversion[V, UR, UL],
     alg: Algebra[V]
@@ -75,9 +77,10 @@ transparent inline given ctx_add_1V2U[V, UL, UR](using
     new Add[V, UL, V, UR]:
         type VO = V
         type UO = UL
-        def apply(vl: V, vr: V): VO = alg.add(vl, ucv(vr))
+        def apply(vl: V, vr: V): V = alg.add(vl, ucv(vr))
 
 transparent inline given ctx_add_2V1U[VL, VR, U](using
+    ice: ImplicitConversionsEnabled,
     nev: NotGiven[VL =:= VR],
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
@@ -90,6 +93,7 @@ transparent inline given ctx_add_2V1U[VL, VR, U](using
         def apply(vl: VL, vr: VR): VO = alg.add(vlvo(vl), vrvo(vr))
 
 transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
+    ice: ImplicitConversionsEnabled,
     nev: NotGiven[VL =:= VR],
     neu: NotGiven[UL =:= UR],
     vres: ValueResolution[VL, VR],
