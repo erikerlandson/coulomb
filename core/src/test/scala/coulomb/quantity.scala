@@ -211,3 +211,97 @@ class QuantitySuite extends CoulombSuite:
         (1.withUnit[Yard] + 3.withUnit[Foot]).assertQ[Int, Yard](2)
         (1L.withUnit[Yard] + 3L.withUnit[Foot]).assertQ[Long, Yard](2)
     }
+
+    test("subtraction standard strict") {
+        import coulomb.ops.standard.given
+        // importing conversions makes them available explicitly but they will
+        // not be available implicitly unless that is enabled separately
+        import coulomb.conversion.standard.given
+
+        // same value and unit requires no implicit conversion
+        (3d.withUnit[Second] - 1d.withUnit[Second]).assertQ[Double, Second](2)
+        (3f.withUnit[Meter] - 1f.withUnit[Meter]).assertQ[Float, Meter](2)
+        (3L.withUnit[Kilogram] - 1L.withUnit[Kilogram]).assertQ[Long, Kilogram](2)
+        (3.withUnit[Meter / Second] - 1.withUnit[Meter / Second]).assertQ[Int, Meter / Second](2)
+
+        // changing either unit or value involves implicit conversion, should error out
+        assertCE("1d.withUnit[Meter] - 1d.withUnit[Yard]")
+        assertCE("1d.withUnit[Meter] - 1f.withUnit[Meter]")
+
+        // explicit conversion will still work
+        (1d.withUnit[Meter] - 1d.withUnit[Yard].toUnit[Meter]).assertQD[Double, Meter](0.0856)
+        (3d.withUnit[Meter] - 1f.withUnit[Meter].toValue[Double]).assertQD[Double, Meter](2)
+    }
+
+    test("subtraction standard") {
+        import coulomb.ops.standard.given
+        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.implicitConversion.given
+
+        // same value type, different units
+        (1d.withUnit[Kilo * Second] - 1d.withUnit[Second]).assertQD[Double, Kilo * Second](0.999)
+        (1f.withUnit[Meter] - 1f.withUnit[Yard]).assertQD[Float, Meter](0.0856)
+
+        // same unit, differing value types
+        (3d.withUnit[Meter] - 1f.withUnit[Meter]).assertQ[Double, Meter](2)
+        (3d.withUnit[Meter] - 1L.withUnit[Meter]).assertQ[Double, Meter](2)
+        (3d.withUnit[Meter] - 1.withUnit[Meter]).assertQ[Double, Meter](2)
+
+        (3f.withUnit[Meter] - 1d.withUnit[Meter]).assertQ[Double, Meter](2)
+        (3L.withUnit[Meter] - 1d.withUnit[Meter]).assertQ[Double, Meter](2)
+        (3.withUnit[Meter] - 1d.withUnit[Meter]).assertQ[Double, Meter](2)
+
+        (3f.withUnit[Meter] - 1d.withUnit[Meter]).assertQ[Double, Meter](2)
+        (3f.withUnit[Meter] - 1L.withUnit[Meter]).assertQ[Float, Meter](2)
+        (3f.withUnit[Meter] - 1.withUnit[Meter]).assertQ[Float, Meter](2)
+
+        (3d.withUnit[Meter] - 1f.withUnit[Meter]).assertQ[Double, Meter](2)
+        (3L.withUnit[Meter] - 1f.withUnit[Meter]).assertQ[Float, Meter](2)
+        (3.withUnit[Meter] - 1f.withUnit[Meter]).assertQ[Float, Meter](2)
+
+        // differing value and unit
+        (1d.withUnit[Kilogram] - 1f.withUnit[Pound]).assertQD[Double, Kilogram](0.54640763)
+        (1d.withUnit[Kilogram] - 1L.withUnit[Pound]).assertQD[Double, Kilogram](0.54640763)
+        (1d.withUnit[Kilogram] - 1.withUnit[Pound]).assertQD[Double, Kilogram](0.54640763)
+
+        (1f.withUnit[Kilogram] - 1d.withUnit[Pound]).assertQD[Double, Kilogram](0.54640763)
+        (1L.withUnit[Kilogram] - 1d.withUnit[Pound]).assertQD[Double, Kilogram](0.54640763)
+        (1.withUnit[Kilogram] - 1d.withUnit[Pound]).assertQD[Double, Kilogram](0.54640763)
+
+        (1f.withUnit[Kilogram] - 1f.withUnit[Pound]).assertQD[Float, Kilogram](0.54640763)
+        (1f.withUnit[Kilogram] - 1L.withUnit[Pound]).assertQD[Float, Kilogram](0.54640763)
+        (1f.withUnit[Kilogram] - 1.withUnit[Pound]).assertQD[Float, Kilogram](0.54640763)
+
+        (1f.withUnit[Kilogram] - 1f.withUnit[Pound]).assertQD[Float, Kilogram](0.54640763)
+        (1L.withUnit[Kilogram] - 1f.withUnit[Pound]).assertQD[Float, Kilogram](0.54640763)
+        (1.withUnit[Kilogram] - 1f.withUnit[Pound]).assertQD[Float, Kilogram](0.54640763)
+
+        // non convertible units should fail
+        assertCE("1d.withUnit[Meter] - 1d.withUnit[Second]")
+
+        // unsafe integral conversions should fail
+        assertCE("1.withUnit[Meter] - 1.withUnit[Yard]")
+        assertCE("1L.withUnit[Meter] - 1L.withUnit[Yard]")
+    }
+
+    test("subtraction standard integral") {
+        import coulomb.ops.standard.given
+        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.integral.given
+        import coulomb.conversion.standard.implicitConversion.given
+
+        (61L.withUnit[Second] - 1L.withUnit[Minute]).assertQ[Long, Second](1)
+        (61L.withUnit[Second] - 1.withUnit[Minute]).assertQ[Long, Second](1)
+        (61.withUnit[Second] - 1L.withUnit[Minute]).assertQ[Long, Second](1)
+        (61.withUnit[Second] - 1.withUnit[Minute]).assertQ[Int, Second](1)
+
+        // integer truncation can cause loss of precision
+        (2L.withUnit[Meter] - 1L.withUnit[Yard]).assertQ[Long, Meter](2)
+        (2L.withUnit[Meter] - 1.withUnit[Yard]).assertQ[Long, Meter](2)
+        (2.withUnit[Meter] - 1L.withUnit[Yard]).assertQ[Long, Meter](2)
+        (2.withUnit[Meter] - 1.withUnit[Yard]).assertQ[Int, Meter](2)
+
+        // fp effects (e.g. (3 * 0.3333).toInt -> 0) are avoided when possible
+        (2.withUnit[Yard] - 3.withUnit[Foot]).assertQ[Int, Yard](1)
+        (2L.withUnit[Yard] - 3L.withUnit[Foot]).assertQ[Long, Yard](1)
+    }
