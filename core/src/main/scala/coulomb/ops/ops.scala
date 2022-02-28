@@ -53,3 +53,11 @@ abstract class Pow[V, U, P]:
     type VO
     type UO
     def apply(v: V): VO
+
+@implicitNotFound("Unable to simplify unit type ${U}")
+abstract class SimplifiedUnit[U]:
+    type UO
+
+object SimplifiedUnit:
+    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
+        ${ coulomb.infra.meta.simplifiedUnit[U] }

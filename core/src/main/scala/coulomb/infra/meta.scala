@@ -29,7 +29,7 @@ object meta:
     import scala.quoted.*
     import scala.language.implicitConversions
 
-    given RationalToExpr: ToExpr[Rational] with
+    given ctx_RationalToExpr: ToExpr[Rational] with
         def apply(r: Rational)(using Quotes): Expr[Rational] = r match
             // Rational(1) is a useful special case to have predefined
             // could we get clever with some kind of expression caching/sharing here?
@@ -184,26 +184,12 @@ object meta:
                 if (p > 0) (sigcons(u, p, nsig), dsig) else (nsig, sigcons(u, -p, dsig))
             case _ => { report.error(s"unknown unit expression in stdsig: $sig"); (signil(), signil()) }
 
-    def mulRU[UL, UR](using Quotes, Type[UL], Type[UR]): Expr[MulRU[UL, UR]] =
+    def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
         import quotes.reflect.*
-        val t = unifyOp(stdsig(TypeRepr.of[UL]), stdsig(TypeRepr.of[UR]), _ + _)
-        val (un, ud) = sortsig(t)
+        val usig = stdsig(TypeRepr.of[U])
+        val (un, ud) = sortsig(usig)
         finRU(un, ud).asType match
-            case '[ru] => '{ new MulRU[UL, UR] { type RU = ru } }
-
-    def divRU[UL, UR](using Quotes, Type[UL], Type[UR]): Expr[DivRU[UL, UR]] =
-        import quotes.reflect.*
-        val t = unifyOp(stdsig(TypeRepr.of[UL]), stdsig(TypeRepr.of[UR]), _ - _)
-        val (un, ud) = sortsig(t)
-        finRU(un, ud).asType match
-            case '[ru] => '{ new DivRU[UL, UR] { type RU = ru } }
-
-    def powRU[U, P](using Quotes, Type[U], Type[P]): Expr[PowRU[U, P]] =
-        import quotes.reflect.*
-        val t = unifyPow(TypeRepr.of[P], stdsig(TypeRepr.of[U]))
-        val (un, ud) = sortsig(t)
-        finRU(un, ud).asType match
-            case '[ru] => '{ new PowRU[U, P] { type RU = ru } }
+            case '[uo] => '{ new SimplifiedUnit[U] { type UO = uo } }
 
     def finRU(using Quotes)(un: quotes.reflect.TypeRepr, ud: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
