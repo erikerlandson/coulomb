@@ -37,21 +37,34 @@ transparent inline given ctx_mul_Float_2U[UL, UR](using su: SimplifiedUnit[UL * 
         type UO = su.UO
         def apply(vl: Float, vr: Float): Float = vl * vr
 
-// this rule causes weird mis-firing
-// see: https://github.com/lampepfl/dotty/issues/14585
-/*
-transparent inline given ctx_mul_1V2U[V, UL, UR](using
-    su: SimplifiedUnit[UL * UR],
-    alg: Algebra[V]
-        ): Mul[V, UL, V, UR] =
-    new Mul[V, UL, V, UR]:
-        type VO = V
+transparent inline given ctx_mul_Long_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
+        Mul[Long, UL, Long, UR] =
+    new Mul[Long, UL, Long, UR]:
+        type VO = Long
         type UO = su.UO
-        def apply(vl: V, vr: V): V = alg.mul(vl, vr)
-*/
+        def apply(vl: Long, vr: Long): Long = vl * vr
+
+transparent inline given ctx_mul_Int_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
+        Mul[Int, UL, Int, UR] =
+    new Mul[Int, UL, Int, UR]:
+        type VO = Int
+        type UO = su.UO
+        def apply(vl: Int, vr: Int): Int = vl * vr
+
+transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
+    // this is a workaround
+    // https://github.com/lampepfl/dotty/issues/14585
+    eqv: VR =:= VL,
+    alg: Algebra[VL],
+    su: SimplifiedUnit[UL * UR]
+        ): Mul[VL, UL, VR, UR] =
+    new Mul[VL, UL, VR, UR]:
+        type VO = VL
+        type UO = su.UO
+        def apply(vl: VL, vr: VR): VL = alg.mul(vl, eqv(vr))
 
 transparent inline given ctx_mul_2V2U[VL, UL, VR, UR](using
-    //nev: NotGiven[VL =:= VR],
+    nev: NotGiven[VL =:= VR],
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
