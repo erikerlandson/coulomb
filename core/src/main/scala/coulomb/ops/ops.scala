@@ -54,6 +54,11 @@ abstract class Pow[V, U, P]:
     type UO
     def apply(v: V): VO
 
+/** Resolve the operator output type for left and right argument types */
+@implicitNotFound("No output type resolution in scope for argument value types {VL} and {VR}")
+abstract class ValueResolution[VL, VR]:
+    type VO
+
 @implicitNotFound("Unable to simplify unit type ${U}")
 abstract class SimplifiedUnit[U]:
     type UO

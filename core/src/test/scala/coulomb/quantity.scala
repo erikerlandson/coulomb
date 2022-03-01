@@ -120,6 +120,7 @@ class QuantitySuite extends CoulombSuite:
 
     test("addition standard strict") {
         import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
         // importing conversions makes them available explicitly but they will
         // not be available implicitly unless that is enabled separately
         import coulomb.conversion.standard.given
@@ -141,6 +142,7 @@ class QuantitySuite extends CoulombSuite:
 
     test("addition standard") {
         import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
         import coulomb.conversion.standard.implicitConversion.given
 
@@ -192,6 +194,7 @@ class QuantitySuite extends CoulombSuite:
 
     test("addition standard integral") {
         import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
         import coulomb.conversion.standard.integral.given
         import coulomb.conversion.standard.implicitConversion.given
@@ -214,6 +217,7 @@ class QuantitySuite extends CoulombSuite:
 
     test("subtraction standard strict") {
         import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
         // importing conversions makes them available explicitly but they will
         // not be available implicitly unless that is enabled separately
         import coulomb.conversion.standard.given
@@ -235,6 +239,7 @@ class QuantitySuite extends CoulombSuite:
 
     test("subtraction standard") {
         import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
         import coulomb.conversion.standard.implicitConversion.given
 
@@ -286,6 +291,7 @@ class QuantitySuite extends CoulombSuite:
 
     test("subtraction standard integral") {
         import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
         import coulomb.conversion.standard.integral.given
         import coulomb.conversion.standard.implicitConversion.given

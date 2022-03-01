@@ -19,8 +19,8 @@ package coulomb.ops.standard
 import scala.util.NotGiven
 
 import coulomb.{`*`, `/`, `^`}
-import coulomb.ops.{Mul, SimplifiedUnit}
-import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
+import coulomb.ops.{Mul, SimplifiedUnit, ValueResolution}
+import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.ImplicitConversionsEnabled
 
 transparent inline given ctx_mul_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
@@ -65,6 +65,7 @@ transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
 
 transparent inline given ctx_mul_2V2U[VL, UL, VR, UR](using
     nev: NotGiven[VL =:= VR],
+    ice: ImplicitConversionsEnabled,
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],

@@ -18,8 +18,8 @@ package coulomb.ops.standard
 
 import scala.util.NotGiven
 
-import coulomb.ops.Add
-import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
+import coulomb.ops.{Add, ValueResolution}
+import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.ImplicitConversionsEnabled
 
 transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =

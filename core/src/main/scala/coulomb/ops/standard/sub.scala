@@ -18,8 +18,8 @@ package coulomb.ops.standard
 
 import scala.util.NotGiven
 
-import coulomb.ops.Sub
-import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
+import coulomb.ops.{Sub, ValueResolution}
+import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.ImplicitConversionsEnabled
 
 transparent inline given ctx_sub_Double_1U[U]: Sub[Double, U, Double, U] =
