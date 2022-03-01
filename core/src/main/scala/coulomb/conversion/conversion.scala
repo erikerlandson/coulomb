@@ -18,11 +18,6 @@ package coulomb.conversion
 
 import scala.annotation.implicitNotFound
 
-/** Resolve the operator output type for left and right output types */
-@implicitNotFound("No output type resolution in scope for operand value types {VL} and {VR}")
-abstract class ValueResolution[VL, VR]:
-    type VO
-
 /** conversion of value types, assuming some constant unit type */
 @implicitNotFound("No value conversion in scope for value types {VF} => {VT}")
 abstract class ValueConversion[VF, VT] extends (VF => VT)

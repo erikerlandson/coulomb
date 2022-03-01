@@ -16,7 +16,7 @@
 
 package coulomb.conversion.standard
 
-import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
+import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.coefficient
 
 

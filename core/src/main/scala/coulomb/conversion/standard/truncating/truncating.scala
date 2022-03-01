@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package coulomb.conversion.standard.integral
+package coulomb.conversion.standard.truncating
 
-import coulomb.conversion.{ValueConversion, UnitConversion, ValueResolution}
+import coulomb.conversion.{ValueConversion, UnitConversion}
 
 given ctx_VC_Double_Long: ValueConversion[Double, Long] with
     def apply(v: Double): Long = v.toLong

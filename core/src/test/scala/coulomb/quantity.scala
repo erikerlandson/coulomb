@@ -57,7 +57,7 @@ class QuantitySuite extends CoulombSuite:
         1L.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
         1L.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
 
-        // fp to integral types is an error without importing integral rules
+        // fp to truncating types is an error without importing truncating rules
         assertCE("1f.withUnit[Meter].toValue[Int]")
         assertCE("1f.withUnit[Meter].toValue[Long]")
         1f.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
@@ -69,9 +69,9 @@ class QuantitySuite extends CoulombSuite:
         1d.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
     }
 
-    test("toValue standard integral") {
+    test("toValue standard truncating") {
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.integral.given
+        import coulomb.conversion.standard.truncating.given
 
         1.5f.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
         0.999f.withUnit[Meter].toValue[Long].assertQ[Long, Meter](0)
@@ -85,14 +85,14 @@ class QuantitySuite extends CoulombSuite:
 
         1.5f.withUnit[Minute].toUnit[Second].assertQ[Float, Second](90)
         1d.withUnit[Meter].toUnit[Yard].assertQD[Double, Yard](1.0936132983377078)
-        // conversions on integral types require importing integral conversion rules
+        // conversions on truncating types require importing truncating conversion rules
         assertCE("1.withUnit[Minute].toUnit[Second]")
         assertCE("1L.withUnit[Yard].toUnit[Meter]")
     }
 
-    test("toUnit standard integral") {
+    test("toUnit standard truncating") {
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.integral.given
+        import coulomb.conversion.standard.truncating.given
 
         1.withUnit[Minute].toUnit[Second].assertQ[Int, Second](60)
         1L.withUnit[Yard].toUnit[Meter].assertQ[Long, Meter](0)
@@ -187,16 +187,16 @@ class QuantitySuite extends CoulombSuite:
         // non convertible units should fail
         assertCE("1d.withUnit[Meter] + 1d.withUnit[Second]")
 
-        // unsafe integral conversions should fail
+        // unsafe truncating conversions should fail
         assertCE("1.withUnit[Meter] + 1.withUnit[Yard]")
         assertCE("1L.withUnit[Meter] + 1L.withUnit[Yard]")
     }
 
-    test("addition standard integral") {
+    test("addition standard truncating") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.integral.given
+        import coulomb.conversion.standard.truncating.given
         import coulomb.conversion.standard.implicitConversion.given
 
         (1L.withUnit[Second] + 1L.withUnit[Minute]).assertQ[Long, Second](61)
@@ -284,16 +284,16 @@ class QuantitySuite extends CoulombSuite:
         // non convertible units should fail
         assertCE("1d.withUnit[Meter] - 1d.withUnit[Second]")
 
-        // unsafe integral conversions should fail
+        // unsafe truncating conversions should fail
         assertCE("1.withUnit[Meter] - 1.withUnit[Yard]")
         assertCE("1L.withUnit[Meter] - 1L.withUnit[Yard]")
     }
 
-    test("subtraction standard integral") {
+    test("subtraction standard truncating") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.integral.given
+        import coulomb.conversion.standard.truncating.given
         import coulomb.conversion.standard.implicitConversion.given
 
         (61L.withUnit[Second] - 1L.withUnit[Minute]).assertQ[Long, Second](1)
