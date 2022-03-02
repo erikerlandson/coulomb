@@ -70,8 +70,8 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("toValue standard truncating") {
+        import coulomb.policy.allowTruncation.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.truncating.given
 
         1.5f.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
         0.999f.withUnit[Meter].toValue[Long].assertQ[Long, Meter](0)
@@ -91,8 +91,8 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("toUnit standard truncating") {
+        import coulomb.policy.allowTruncation.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.truncating.given
 
         1.withUnit[Minute].toUnit[Second].assertQ[Int, Second](60)
         1L.withUnit[Yard].toUnit[Meter].assertQ[Long, Meter](0)
@@ -193,10 +193,10 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("addition standard truncating") {
+        import coulomb.policy.allowTruncation.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.truncating.given
         import coulomb.conversion.standard.implicitConversion.given
 
         (1L.withUnit[Second] + 1L.withUnit[Minute]).assertQ[Long, Second](61)
@@ -290,10 +290,10 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("subtraction standard truncating") {
+        import coulomb.policy.allowTruncation.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.truncating.given
         import coulomb.conversion.standard.implicitConversion.given
 
         (61L.withUnit[Second] - 1L.withUnit[Minute]).assertQ[Long, Second](1)

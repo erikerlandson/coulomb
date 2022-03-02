@@ -18,44 +18,44 @@ package coulomb.conversion.standard
 
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.coefficient
+import coulomb.policy.AllowTruncation
 
-// conversions that discard fractional values can be imported from 
-// the 'truncating' subpackage
-given ctx_VC_Double_Double: ValueConversion[Double, Double] with
-    def apply(v: Double): Double = v
+import scala.util.NotGiven
+import scala.math.{Fractional, Numeric}
 
-given ctx_VC_Double_Float: ValueConversion[Double, Float] with
-    def apply(v: Double): Float = v.toFloat
+inline given ctx_VC_Double[VF](using num: Numeric[VF]): ValueConversion[VF, Double] =
+    new ValueConversion[VF, Double]:
+        def apply(v: VF): Double = num.toDouble(v)
 
-given ctx_VC_Float_Double: ValueConversion[Float, Double] with
-    def apply(v: Float): Double = v.toDouble
+inline given ctx_VC_Float[VF](using num: Numeric[VF]): ValueConversion[VF, Float] =
+    new ValueConversion[VF, Float]:
+        def apply(v: VF): Float = num.toFloat(v)
 
-given ctx_VC_Float_Float: ValueConversion[Float, Float] with
-    def apply(v: Float): Float = v
+inline given ctx_VC_Long[VF](using num: Numeric[VF],
+    ivf: NotGiven[Fractional[VF]]
+        ): ValueConversion[VF, Long] =
+    new ValueConversion[VF, Long]:
+        def apply(v: VF): Long = num.toLong(v)
 
-given ctx_VC_Long_Double: ValueConversion[Long, Double] with
-    def apply(v: Long): Double = v.toDouble
+inline given ctx_VC_Long_trunc[VF](using num: Numeric[VF],
+    fvf: Fractional[VF],
+    tre: AllowTruncation
+        ): ValueConversion[VF, Long] =
+    new ValueConversion[VF, Long]:
+        def apply(v: VF): Long = num.toLong(v)
 
-given ctx_VC_Long_Float: ValueConversion[Long, Float] with
-    def apply(v: Long): Float = v.toFloat
+inline given ctx_VC_Int[VF](using num: Numeric[VF],
+    ivf: NotGiven[Fractional[VF]]
+        ): ValueConversion[VF, Int] =
+    new ValueConversion[VF, Int]:
+        def apply(v: VF): Int = num.toInt(v)
 
-given ctx_VC_Long_Long: ValueConversion[Long, Long] with
-    def apply(v: Long): Long = v
-
-given ctx_VC_Long_Int: ValueConversion[Long, Int] with
-    def apply(v: Long): Int = v.toInt
-
-given ctx_VC_Int_Double: ValueConversion[Int, Double] with
-    def apply(v: Int): Double = v.toDouble
-
-given ctx_VC_Int_Float: ValueConversion[Int, Float] with
-    def apply(v: Int): Float = v.toFloat
-
-given ctx_VC_Int_Long: ValueConversion[Int, Long] with
-    def apply(v: Int): Long = v.toLong
-
-given ctx_VC_Int_Int: ValueConversion[Int, Int] with
-    def apply(v: Int): Int = v
+inline given ctx_VC_Int_trunc[VF](using num: Numeric[VF],
+    fvf: Fractional[VF],
+    tre: AllowTruncation
+        ): ValueConversion[VF, Int] =
+    new ValueConversion[VF, Int]:
+        def apply(v: VF): Int = num.toInt(v)
 
 // unit conversions that discard fractional values can be imported from 
 // the 'truncating' subpackage
@@ -70,3 +70,20 @@ inline given ctx_UC_Float[UF, UT]:
     val c = coulomb.conversion.infra.coefficientFloat[UF, UT]
     new UnitConversion[Float, UF, UT]:
         def apply(v: Float): Float = c * v
+
+inline given ctx_UC_Long[UF, UT](using AllowTruncation):
+        UnitConversion[Long, UF, UT] =
+    val nc = coulomb.conversion.infra.coefficientNumDouble[UF, UT]
+    val dc = coulomb.conversion.infra.coefficientDenDouble[UF, UT]
+    // using nc and dc is more efficient than using Rational directly in the conversion function
+    // but still gives us 53 bits of integer precision for exact rational arithmetic, and also
+    // graceful loss of precision if nc*v exceeds 53 bits
+    new UnitConversion[Long, UF, UT]:
+        def apply(v: Long): Long = ((nc * v) / dc).toLong
+
+inline given ctx_UC_Int[UF, UT](using AllowTruncation):
+        UnitConversion[Int, UF, UT] =
+    val nc = coulomb.conversion.infra.coefficientNumDouble[UF, UT]
+    val dc = coulomb.conversion.infra.coefficientDenDouble[UF, UT]
+    new UnitConversion[Int, UF, UT]:
+        def apply(v: Int): Int = ((nc * v) / dc).toInt

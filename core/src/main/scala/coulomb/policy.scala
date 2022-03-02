@@ -22,5 +22,9 @@ object policy:
     object strictUnitExpressions:
         given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
 
+    trait AllowTruncation
+    object allowTruncation:
+        given ctx_AllowTruncation: AllowTruncation with {}
+
     // intended to be defined via other policies
-    trait ImplicitConversionsEnabled
+    trait AllowImplicitConversions

@@ -21,7 +21,7 @@ import scala.util.NotGiven
 import coulomb.{`*`, `/`, `^`}
 import coulomb.ops.{Mul, SimplifiedUnit, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.policy.ImplicitConversionsEnabled
+import coulomb.policy.AllowImplicitConversions
 
 transparent inline given ctx_mul_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
         Mul[Double, UL, Double, UR] =
@@ -37,22 +37,7 @@ transparent inline given ctx_mul_Float_2U[UL, UR](using su: SimplifiedUnit[UL * 
         type UO = su.UO
         def apply(vl: Float, vr: Float): Float = vl * vr
 
-transparent inline given ctx_mul_Long_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-        Mul[Long, UL, Long, UR] =
-    new Mul[Long, UL, Long, UR]:
-        type VO = Long
-        type UO = su.UO
-        def apply(vl: Long, vr: Long): Long = vl * vr
-
-transparent inline given ctx_mul_Int_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-        Mul[Int, UL, Int, UR] =
-    new Mul[Int, UL, Int, UR]:
-        type VO = Int
-        type UO = su.UO
-        def apply(vl: Int, vr: Int): Int = vl * vr
-
 transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
-    // this is a workaround
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
     alg: Algebra[VL],
@@ -65,7 +50,7 @@ transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
 
 transparent inline given ctx_mul_2V2U[VL, UL, VR, UR](using
     nev: NotGiven[VL =:= VR],
-    ice: ImplicitConversionsEnabled,
+    ice: AllowImplicitConversions,
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],

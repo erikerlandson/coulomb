@@ -17,7 +17,7 @@
 package coulomb.conversion.standard.truncating
 
 import coulomb.conversion.{ValueConversion, UnitConversion}
-
+/*
 given ctx_VC_Double_Long: ValueConversion[Double, Long] with
     def apply(v: Double): Long = v.toLong
 
@@ -46,3 +46,4 @@ inline given ctx_UC_Int[UF, UT]:
     val dc = coulomb.conversion.infra.coefficientDenDouble[UF, UT]
     new UnitConversion[Int, UF, UT]:
         def apply(v: Int): Int = ((nc * v) / dc).toInt
+*/

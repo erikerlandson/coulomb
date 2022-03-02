@@ -20,7 +20,7 @@ import scala.util.NotGiven
 
 import coulomb.ops.{Add, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.policy.ImplicitConversionsEnabled
+import coulomb.policy.AllowImplicitConversions
 
 transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
     new Add[Double, U, Double, U]:
@@ -34,20 +34,8 @@ transparent inline given ctx_add_Float_1U[U]: Add[Float, U, Float, U] =
         type UO = U
         def apply(vl: Float, vr: Float): Float = vl + vr
 
-transparent inline given ctx_add_Long_1U[U]: Add[Long, U, Long, U] =
-    new Add[Long, U, Long, U]:
-        type VO = Long
-        type UO = U
-        def apply(vl: Long, vr: Long): Long = vl + vr
-
-transparent inline given ctx_add_Int_1U[U]: Add[Int, U, Int, U] =
-    new Add[Int, U, Int, U]:
-        type VO = Int
-        type UO = U
-        def apply(vl: Int, vr: Int): Int = vl + vr
-
 transparent inline given ctx_add_Double_2U[UL, UR](using
-    ImplicitConversionsEnabled,
+    AllowImplicitConversions,
     NotGiven[UL =:= UR]
         ): Add[Double, UL, Double, UR] =
     val c = coulomb.conversion.infra.coefficientDouble[UR, UL]
@@ -57,7 +45,7 @@ transparent inline given ctx_add_Double_2U[UL, UR](using
         def apply(vl: Double, vr: Double): Double = vl + (c * vr)
 
 transparent inline given ctx_add_Float_2U[UL, UR](using
-    ImplicitConversionsEnabled,
+    AllowImplicitConversions,
     NotGiven[UL =:= UR]
         ): Add[Float, UL, Float, UR] =
     val c = coulomb.conversion.infra.coefficientFloat[UR, UL]
@@ -66,34 +54,47 @@ transparent inline given ctx_add_Float_2U[UL, UR](using
         type UO = UL
         def apply(vl: Float, vr: Float): Float = vl + (c * vr)
 
-transparent inline given ctx_add_1V2U[V, UL, UR](using
-    ice: ImplicitConversionsEnabled,
-    neu: NotGiven[UL =:= UR],
-    ucv: UnitConversion[V, UR, UL],
-    alg: Algebra[V]
-        ): Add[V, UL, V, UR] =
-    new Add[V, UL, V, UR]:
-        type VO = V
+transparent inline given ctx_add_1V1U[VL, UL, VR, UR](using
+    // https://github.com/lampepfl/dotty/issues/14585
+    eqv: VR =:= VL,
+    equ: UR =:= UL,
+    alg: Algebra[VL]
+        ): Add[VL, UL, VR, UR] =
+    new Add[VL, UL, VR, UR]:
+        type VO = VL
         type UO = UL
-        def apply(vl: V, vr: V): V = alg.add(vl, ucv(vr))
+        def apply(vl: VL, vr: VR): VL = alg.add(vl, eqv(vr))
 
-transparent inline given ctx_add_2V1U[VL, VR, U](using
-    ice: ImplicitConversionsEnabled,
-    nev: NotGiven[VL =:= VR],
+transparent inline given ctx_add_1V2U[VL, UL, VR, UR](using
+    ice: AllowImplicitConversions,
+    eqv: VR =:= VL,
+    neu: NotGiven[UR =:= UL],
+    ucv: UnitConversion[VL, UR, UL],
+    alg: Algebra[VL]
+        ): Add[VL, UL, VR, UR] =
+    new Add[VL, UL, VR, UR]:
+        type VO = VL
+        type UO = UL
+        def apply(vl: VL, vr: VR): VL = alg.add(vl, ucv(eqv(vr)))
+
+transparent inline given ctx_add_2V1U[VL, UL, VR, UR](using
+    ice: AllowImplicitConversions,
+    nev: NotGiven[VR =:= VL],
+    equ: UR =:= UL,
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
     alg: Algebra[vres.VO]
-        ): Add[VL, U, VR, U] =
-    new Add[VL, U, VR, U]:
+        ): Add[VL, UL, VR, UR] =
+    new Add[VL, UL, VR, UR]:
         type VO = vres.VO
-        type UO = U
+        type UO = UL
         def apply(vl: VL, vr: VR): VO = alg.add(vlvo(vl), vrvo(vr))
 
 transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
-    ice: ImplicitConversionsEnabled,
-    nev: NotGiven[VL =:= VR],
-    neu: NotGiven[UL =:= UR],
+    ice: AllowImplicitConversions,
+    nev: NotGiven[VR =:= VL],
+    neu: NotGiven[UR =:= UL],
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
