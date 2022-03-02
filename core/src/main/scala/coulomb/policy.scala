@@ -26,5 +26,6 @@ object policy:
     object allowTruncation:
         given ctx_AllowTruncation: AllowTruncation with {}
 
-    // intended to be defined via other policies
     trait AllowImplicitConversions
+    object allowImplicitConversions:
+        given ctx_AllowImplicitConversions: AllowImplicitConversions with {}

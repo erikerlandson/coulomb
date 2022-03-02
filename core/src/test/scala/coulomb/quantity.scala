@@ -101,7 +101,8 @@ class QuantitySuite extends CoulombSuite:
     test("implicit conversions") {
         import coulomb.conversion.standard.given
 
-        // implicit conversions only happen if you import them
+        // implicit conversions only happen if you import them,
+        // and set coulomb policy to allow them
         // https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
         def f(q: Quantity[Double, Meter]): Double = q.value
         assertCE("f(1d.withUnit[Yard])")
@@ -113,7 +114,7 @@ class QuantitySuite extends CoulombSuite:
         object t {
             // enabling implicit conversions should allow them
             import scala.language.implicitConversions
-            import coulomb.conversion.standard.implicitConversion.given
+            import coulomb.policy.allowImplicitConversions.given
             f(1d.withUnit[Yard]).assertVTD[Double](0.9144)
         }
     }
@@ -141,10 +142,10 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("addition standard") {
+        import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.implicitConversion.given
 
         // same value type, different units
         (1d.withUnit[Kilo * Second] + 1d.withUnit[Second]).assertQD[Double, Kilo * Second](1.001)
@@ -194,10 +195,10 @@ class QuantitySuite extends CoulombSuite:
 
     test("addition standard truncating") {
         import coulomb.policy.allowTruncation.given
+        import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.implicitConversion.given
 
         (1L.withUnit[Second] + 1L.withUnit[Minute]).assertQ[Long, Second](61)
         (1L.withUnit[Second] + 1.withUnit[Minute]).assertQ[Long, Second](61)
@@ -238,10 +239,10 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("subtraction standard") {
+        import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.implicitConversion.given
 
         // same value type, different units
         (1d.withUnit[Kilo * Second] - 1d.withUnit[Second]).assertQD[Double, Kilo * Second](0.999)
@@ -291,10 +292,10 @@ class QuantitySuite extends CoulombSuite:
 
     test("subtraction standard truncating") {
         import coulomb.policy.allowTruncation.given
+        import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
-        import coulomb.conversion.standard.implicitConversion.given
 
         (61L.withUnit[Second] - 1L.withUnit[Minute]).assertQ[Long, Second](1)
         (61L.withUnit[Second] - 1.withUnit[Minute]).assertQ[Long, Second](1)

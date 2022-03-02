@@ -17,11 +17,26 @@
 package coulomb.conversion.standard
 
 import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.coefficient
-import coulomb.policy.AllowTruncation
+import coulomb.{coefficient, withUnit, Quantity}
+import coulomb.policy.{AllowTruncation, AllowImplicitConversions}
 
 import scala.util.NotGiven
 import scala.math.{Fractional, Numeric}
+
+// Enable the compiler to implicitly convert Quantity[V1, U1] -> Quantity[V2, U2], 
+// whenever a valid conversion exists: reference:
+// https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
+// I gate this with AllowImplicitConversions because many operations on coulomb
+// Quantity are logically equivalent to converting unit or value types, and
+// I can't use scala.language.implicitConversions as a gate 
+inline given ctx_implicit_quantity_conversion[VF, UF, VT, UT](using
+    aic: AllowImplicitConversions,
+    vc: ValueConversion[VF, VT],
+    uc: UnitConversion[VT, UF, UT]
+        ): scala.Conversion[Quantity[VF, UF], Quantity[VT, UT]] =
+    new scala.Conversion[Quantity[VF, UF], Quantity[VT, UT]]:
+        def apply(q: Quantity[VF, UF]): Quantity[VT, UT] = 
+            uc(vc(q.value)).withUnit[UT]
 
 inline given ctx_VC_Double[VF](using num: Numeric[VF]): ValueConversion[VF, Double] =
     new ValueConversion[VF, Double]:
