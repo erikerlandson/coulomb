@@ -19,10 +19,8 @@ package coulomb.conversion.standard
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.coefficient
 
-
-// 16 of these
 // conversions that discard fractional values can be imported from 
-// the 'integral' subpackage
+// the 'truncating' subpackage
 given ctx_VC_Double_Double: ValueConversion[Double, Double] with
     def apply(v: Double): Double = v
 
@@ -59,9 +57,8 @@ given ctx_VC_Int_Long: ValueConversion[Int, Long] with
 given ctx_VC_Int_Int: ValueConversion[Int, Int] with
     def apply(v: Int): Int = v
 
-// 4 of these - one for each of the big 4
 // unit conversions that discard fractional values can be imported from 
-// the 'integral' subpackage
+// the 'truncating' subpackage
 inline given ctx_UC_Double[UF, UT]:
         UnitConversion[Double, UF, UT] =
     val c = coulomb.conversion.infra.coefficientDouble[UF, UT]
