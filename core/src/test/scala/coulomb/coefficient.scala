@@ -50,3 +50,14 @@ class CoefficientSuite extends CoulombSuite:
         assertEquals(coefficient[Meter,  1.25f * Meter], Rational(4, 5))
         assertEquals(coefficient[((1 / 3L) * (10L ^ 100)) * Meter, Meter], Rational(1, 3) * Rational(10).pow(100))
     }
+
+    test("strict unit expressions") {
+        // by default, coulomb allows any type to behave like a base-unit
+        assertEquals(coefficient[Kilo * String, String], Rational(1000))
+        object t:
+            // strict unit expresion policy forbids types not explicitly defined as units
+            import coulomb.policy.strictUnitExpressions.given
+            assertCE("coefficient[Kilo * String, String]")
+            // explicitly defined units are OK
+            assertEquals(coefficient[Meter, Kilo * Yard], Rational(10, 9144))
+    }
