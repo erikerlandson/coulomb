@@ -18,14 +18,14 @@ package coulomb
 
 object policy:
     // import coulomb.policy.strictUnitExpressions.given
-    trait StrictUnitExpressions
+    sealed trait StrictUnitExpressions
     object strictUnitExpressions:
         given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
 
-    trait AllowTruncation
+    sealed trait AllowTruncation
     object allowTruncation:
         given ctx_AllowTruncation: AllowTruncation with {}
 
-    trait AllowImplicitConversions
+    sealed trait AllowImplicitConversions
     object allowImplicitConversions:
         given ctx_AllowImplicitConversions: AllowImplicitConversions with {}
