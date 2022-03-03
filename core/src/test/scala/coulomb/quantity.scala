@@ -331,3 +331,31 @@ class QuantitySuite extends CoulombSuite:
         // explicit conversion will still work
         (2d.withUnit[Meter] * 3.withUnit[Meter].toValue[Double]).assertQ[Double, Meter ^ 2](6)
     }
+
+    test("multiplication standard") {
+        import coulomb.policy.allowImplicitConversions.given
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.given
+
+        // differing value types
+        (3d.withUnit[Meter] * 5d.withUnit[Meter]).assertQ[Double, Meter ^ 2](15)
+        (3d.withUnit[Meter] * 5f.withUnit[Meter]).assertQ[Double, Meter ^ 2](15)
+        (3d.withUnit[Meter] * 5L.withUnit[Meter]).assertQ[Double, Meter ^ 2](15)
+        (3d.withUnit[Meter] * 5.withUnit[Meter]).assertQ[Double, Meter ^ 2](15)
+
+        (3f.withUnit[Meter / Second] * 5d.withUnit[Second / Meter]).assertQ[Double, 1](15)
+        (3f.withUnit[Meter / Second] * 5f.withUnit[Second / Meter]).assertQ[Float, 1](15)
+        (3f.withUnit[Meter / Second] * 5L.withUnit[Second / Meter]).assertQ[Float, 1](15)
+        (3f.withUnit[Meter / Second] * 5.withUnit[Second / Meter]).assertQ[Float, 1](15)
+
+        (3L.withUnit[1 / Second] * 5d.withUnit[Meter / 1]).assertQ[Double, Meter / Second](15)
+        (3L.withUnit[1 / Second] * 5f.withUnit[Meter / 1]).assertQ[Float, Meter / Second](15)
+        (3L.withUnit[1 / Second] * 5L.withUnit[Meter / 1]).assertQ[Long, Meter / Second](15)
+        (3L.withUnit[1 / Second] * 5.withUnit[Meter / 1]).assertQ[Long, Meter / Second](15)
+
+        (3.withUnit[Second] * 5d.withUnit[Kilogram]).assertQ[Double, Second * Kilogram](15)
+        (3.withUnit[Second] * 5f.withUnit[Kilogram]).assertQ[Float, Second * Kilogram](15)
+        (3.withUnit[Second] * 5L.withUnit[Kilogram]).assertQ[Long, Second * Kilogram](15)
+        (3.withUnit[Second] * 5.withUnit[Kilogram]).assertQ[Int, Second * Kilogram](15)
+    }
