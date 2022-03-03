@@ -312,3 +312,22 @@ class QuantitySuite extends CoulombSuite:
         (2.withUnit[Yard] - 3.withUnit[Foot]).assertQ[Int, Yard](1)
         (2L.withUnit[Yard] - 3L.withUnit[Foot]).assertQ[Long, Yard](1)
     }
+
+    test("multiplication standard strict") {
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.given
+
+        // same value types require no implicit conversion
+        (2d.withUnit[Meter] * 3d.withUnit[Meter]).assertQ[Double, Meter ^ 2](6)
+        (2f.withUnit[Meter / Kilogram] * 3f.withUnit[Kilogram / Second]).assertQ[Float, Meter / Second](6)
+        (2L.withUnit[Meter / Second] * 3L.withUnit[1 / Second]).assertQ[Long, Meter / (Second ^ 2)](6)
+        (2.withUnit[Kilogram * Meter / (Second ^ 2)] * 3.withUnit[Meter])
+            .assertQ[Int, Kilogram * (Meter ^ 2) / (Second ^ 2)](6)
+
+        // changing value involves implicit conversion, should error out
+        assertCE("2d.withUnit[Meter] * 3.withUnit[Meter]")
+
+        // explicit conversion will still work
+        (2d.withUnit[Meter] * 3.withUnit[Meter].toValue[Double]).assertQ[Double, Meter ^ 2](6)
+    }
