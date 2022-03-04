@@ -21,7 +21,7 @@ import coulomb.{coefficient, withUnit, Quantity}
 import coulomb.policy.{AllowTruncation, AllowImplicitConversions}
 
 import scala.util.NotGiven
-import scala.math.{Fractional, Numeric}
+import scala.math.{Fractional, Integral, Numeric}
 
 // Enable the compiler to implicitly convert Quantity[V1, U1] -> Quantity[V2, U2], 
 // whenever a valid conversion exists: reference:
@@ -46,29 +46,19 @@ inline given ctx_VC_Float[VF](using num: Numeric[VF]): ValueConversion[VF, Float
     new ValueConversion[VF, Float]:
         def apply(v: VF): Float = num.toFloat(v)
 
-inline given ctx_VC_Long[VF](using num: Numeric[VF],
-    ivf: NotGiven[Fractional[VF]]
-        ): ValueConversion[VF, Long] =
+inline given ctx_VC_Long[VF](using num: Integral[VF]): ValueConversion[VF, Long] =
     new ValueConversion[VF, Long]:
         def apply(v: VF): Long = num.toLong(v)
 
-inline given ctx_VC_Long_trunc[VF](using num: Numeric[VF],
-    fvf: Fractional[VF],
-    tre: AllowTruncation
-        ): ValueConversion[VF, Long] =
+inline given ctx_VC_Long_tr[VF](using num: Fractional[VF], at: AllowTruncation): ValueConversion[VF, Long] =
     new ValueConversion[VF, Long]:
         def apply(v: VF): Long = num.toLong(v)
 
-inline given ctx_VC_Int[VF](using num: Numeric[VF],
-    ivf: NotGiven[Fractional[VF]]
-        ): ValueConversion[VF, Int] =
+inline given ctx_VC_Int[VF](using num: Integral[VF]): ValueConversion[VF, Int] =
     new ValueConversion[VF, Int]:
         def apply(v: VF): Int = num.toInt(v)
 
-inline given ctx_VC_Int_trunc[VF](using num: Numeric[VF],
-    fvf: Fractional[VF],
-    tre: AllowTruncation
-        ): ValueConversion[VF, Int] =
+inline given ctx_VC_Int_tr[VF](using num: Fractional[VF], at: AllowTruncation): ValueConversion[VF, Int] =
     new ValueConversion[VF, Int]:
         def apply(v: VF): Int = num.toInt(v)
 

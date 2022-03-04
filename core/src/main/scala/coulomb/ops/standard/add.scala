@@ -58,7 +58,7 @@ transparent inline given ctx_add_1V1U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
     equ: UR =:= UL,
-    alg: Algebra[VL]
+    alg: CanAdd[VL]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = VL
@@ -70,7 +70,7 @@ transparent inline given ctx_add_1V2U[VL, UL, VR, UR](using
     eqv: VR =:= VL,
     neu: NotGiven[UR =:= UL],
     ucv: UnitConversion[VL, UR, UL],
-    alg: Algebra[VL]
+    alg: CanAdd[VL]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = VL
@@ -84,7 +84,7 @@ transparent inline given ctx_add_2V1U[VL, UL, VR, UR](using
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
-    alg: Algebra[vres.VO]
+    alg: CanAdd[vres.VO]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = vres.VO
@@ -99,7 +99,7 @@ transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
     ucvo: UnitConversion[vres.VO, UR, UL],
-    alg: Algebra[vres.VO]
+    alg: CanAdd[vres.VO]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = vres.VO

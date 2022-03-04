@@ -19,46 +19,46 @@ package coulomb.ops.standard
 import scala.util.NotGiven
 
 import coulomb.{`*`, `/`, `^`}
-import coulomb.ops.{Mul, SimplifiedUnit, ValueResolution}
+import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
 
-transparent inline given ctx_mul_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-        Mul[Double, UL, Double, UR] =
-    new Mul[Double, UL, Double, UR]:
+transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
+        Div[Double, UL, Double, UR] =
+    new Div[Double, UL, Double, UR]:
         type VO = Double
         type UO = su.UO
-        def apply(vl: Double, vr: Double): Double = vl * vr
+        def apply(vl: Double, vr: Double): Double = vl / vr
 
-transparent inline given ctx_mul_Float_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-        Mul[Float, UL, Float, UR] =
-    new Mul[Float, UL, Float, UR]:
+transparent inline given ctx_div_Float_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
+        Div[Float, UL, Float, UR] =
+    new Div[Float, UL, Float, UR]:
         type VO = Float
         type UO = su.UO
-        def apply(vl: Float, vr: Float): Float = vl * vr
+        def apply(vl: Float, vr: Float): Float = vl / vr
 
-transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
+transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
-    alg: CanMul[VL],
+    alg: CanDiv[VL],
     su: SimplifiedUnit[UL * UR]
-        ): Mul[VL, UL, VR, UR] =
-    new Mul[VL, UL, VR, UR]:
+        ): Div[VL, UL, VR, UR] =
+    new Div[VL, UL, VR, UR]:
         type VO = VL
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VL = alg.mul(vl, eqv(vr))
+        def apply(vl: VL, vr: VR): VL = alg.div(vl, eqv(vr))
 
-transparent inline given ctx_mul_2V2U[VL, UL, VR, UR](using
+transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
     nev: NotGiven[VL =:= VR],
     ice: AllowImplicitConversions,
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
-    alg: CanMul[vres.VO],
+    alg: CanDiv[vres.VO],
     su: SimplifiedUnit[UL * UR]
-        ): Mul[VL, UL, VR, UR] =
-    new Mul[VL, UL, VR, UR]:
+        ): Div[VL, UL, VR, UR] =
+    new Div[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VO = alg.mul(vlvo(vl), vrvo(vr))
+        def apply(vl: VL, vr: VR): VO = alg.div(vlvo(vl), vrvo(vr))
 

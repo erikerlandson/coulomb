@@ -16,48 +16,44 @@
 
 package coulomb.ops.standard
 
+import scala.math.{Fractional, Integral, Numeric}
+
 import coulomb.rational.Rational
+import coulomb.policy.AllowTruncation
 
-// could do most of this with scala.math.Numeric, but not powers
-abstract class Algebra[V]:
-    def add(vl: V, vr: V): V
-    def sub(vl: V, vr: V): V
+abstract class CanAdd[V]:
+   def add(vl: V, vr: V): V
+
+object CanAdd:
+    inline given ctx_CanAdd_Numeric[V](using num: Numeric[V]): CanAdd[V] =
+        new CanAdd[V]:
+            def add(vl: V, vr: V): V = num.plus(vl, vr)
+
+abstract class CanSub[V]:
+   def sub(vl: V, vr: V): V
+
+object CanSub:
+    inline given ctx_CanSub_Numeric[V](using num: Numeric[V]): CanSub[V] =
+        new CanSub[V]:
+            def sub(vl: V, vr: V): V = num.minus(vl, vr)
+
+abstract class CanMul[V]:
     def mul(vl: V, vr: V): V
+
+object CanMul:
+    inline given ctx_CanMul_Numeric[V](using num: Numeric[V]): CanMul[V] =
+        new CanMul[V]:
+            def mul(vl: V, vr: V): V = num.times(vl, vr)
+
+abstract class CanDiv[V]:
     def div(vl: V, vr: V): V
-    def neg(v: V): V
-    def pow(v: V, p: Rational): V
 
-object Algebra:
-    given ctx_alg_Double: Algebra[Double] with
-        def add(vl: Double, vr: Double): Double = vl + vr
-        def sub(vl: Double, vr: Double): Double = vl - vr
-        def mul(vl: Double, vr: Double): Double = vl * vr
-        def div(vl: Double, vr: Double): Double = vl / vr
-        def neg(v: Double): Double = -v
-        def pow(v: Double, p: Rational): Double = scala.math.pow(v, p.toDouble)
-
-    given ctx_alg_Float: Algebra[Float] with
-        def add(vl: Float, vr: Float): Float = vl + vr
-        def sub(vl: Float, vr: Float): Float = vl - vr
-        def mul(vl: Float, vr: Float): Float = vl * vr
-        def div(vl: Float, vr: Float): Float = vl / vr
-        def neg(v: Float): Float = -v
-        def pow(v: Float, p: Rational): Float = scala.math.pow(v, p.toDouble).toFloat
-
-    given ctx_alg_Long: Algebra[Long] with
-        def add(vl: Long, vr: Long): Long = vl + vr
-        def sub(vl: Long, vr: Long): Long = vl - vr
-        def mul(vl: Long, vr: Long): Long = vl * vr
-        def div(vl: Long, vr: Long): Long = vl / vr
-        def neg(v: Long): Long = -v
-        // compiler warns about loss of integer precision Long => Double here
-        def pow(v: Long, p: Rational): Long = scala.math.pow(v.toDouble, p.toDouble).toLong
-
-    given ctx_alg_Int: Algebra[Int] with
-        def add(vl: Int, vr: Int): Int = vl + vr
-        def sub(vl: Int, vr: Int): Int = vl - vr
-        def mul(vl: Int, vr: Int): Int = vl * vr
-        def div(vl: Int, vr: Int): Int = vl / vr
-        def neg(v: Int): Int = -v
-        def pow(v: Int, p: Rational): Int = scala.math.pow(v, p.toDouble).toInt
+object CanDiv:
+    inline given ctx_CanDiv_Fractional[V](using num: Fractional[V]): CanDiv[V] =
+        new CanDiv[V]:
+            def div(vl: V, vr: V): V = num.div(vl, vr)
+    
+    inline given ctx_CanDiv_Integral[V](using num: Integral[V], at: AllowTruncation): CanDiv[V] =
+        new CanDiv[V]:
+            def div(vl: V, vr: V): V = num.quot(vl, vr)
 
