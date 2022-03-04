@@ -420,8 +420,25 @@ class QuantitySuite extends CoulombSuite:
         (5L.withUnit[Meter] / 2.withUnit[Second]).assertQ[Long, Meter / Second](2)
 
         (5.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
-        (5.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
+        (5.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float,  Meter / Second](2.5)
         (5.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
         (5.withUnit[Meter] / 2.withUnit[Second]).assertQ[Int, Meter / Second](2)
+    }
+
+    test("constants in simplified unit types") {
+        import coulomb.policy.allowImplicitConversions.given
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.given
+
+        // changes/improvements to simplification algorithm may change these -
+        // it is more important that they be correct than have some particular form, but
+        // better forms may be more pleasing to humans
+
+        (2.withUnit[1000 * Meter] * 3.withUnit[Meter]).assertQ[Int, 1000 * (Meter ^ 2)](6)
+        (2.withUnit[Meter] * 3.withUnit[Meter * 1000]).assertQ[Int, (Meter ^ 2) * 1000](6)
+
+        (5d.withUnit[((10 ^ 100)/3) * Meter] / 2d.withUnit[Second])
+            .assertQ[Double, ((10 ^ 100) * Meter) / (3 * Second)](2.5)
     }
 
