@@ -49,7 +49,9 @@ lazy val algebra = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .settings(
     name := "coulomb-algebra",
     libraryDependencies ++= Seq(
-      "org.typelevel" %%% "algebra" % "2.7.0"
+      "org.typelevel" %%% "algebra" % "2.7.0",
+      "org.typelevel" %%% "algebra-laws" % "2.7.0" % Test,
+      "org.typelevel" %%% "discipline-munit" % "1.0.9" % Test,
     )
   )
   .dependsOn(core % "compile->compile;test->test")
