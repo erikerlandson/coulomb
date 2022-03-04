@@ -43,6 +43,19 @@ lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .dependsOn(core % "compile->compile;test->test")
   .settings(commonSettings :_*)
 
+lazy val testkit = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
+  .crossType(CrossType.Pure)
+  .in(file("testkit"))
+  .settings(
+    name := "coulomb-testkit",
+    libraryDependencies ++= Seq(
+      "org.scalacheck" %%% "scalacheck" % "1.15.4",
+      "org.scalameta" %%% "munit-scalacheck" % "0.7.29" % Test,
+    )
+  )
+  .dependsOn(core % "compile->compile;test->test")
+  .settings(commonSettings :_*)
+
 lazy val algebra = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
   .in(file("algebra"))
