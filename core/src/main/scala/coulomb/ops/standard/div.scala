@@ -23,14 +23,14 @@ import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
 
-transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
+transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
         Div[Double, UL, Double, UR] =
     new Div[Double, UL, Double, UR]:
         type VO = Double
         type UO = su.UO
         def apply(vl: Double, vr: Double): Double = vl / vr
 
-transparent inline given ctx_div_Float_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
+transparent inline given ctx_div_Float_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
         Div[Float, UL, Float, UR] =
     new Div[Float, UL, Float, UR]:
         type VO = Float
@@ -41,7 +41,7 @@ transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
     alg: CanDiv[VL],
-    su: SimplifiedUnit[UL * UR]
+    su: SimplifiedUnit[UL / UR]
         ): Div[VL, UL, VR, UR] =
     new Div[VL, UL, VR, UR]:
         type VO = VL
@@ -55,7 +55,7 @@ transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
     alg: CanDiv[vres.VO],
-    su: SimplifiedUnit[UL * UR]
+    su: SimplifiedUnit[UL / UR]
         ): Div[VL, UL, VR, UR] =
     new Div[VL, UL, VR, UR]:
         type VO = vres.VO

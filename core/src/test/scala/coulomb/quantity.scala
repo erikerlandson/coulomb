@@ -359,3 +359,24 @@ class QuantitySuite extends CoulombSuite:
         (3.withUnit[Second] * 5L.withUnit[Kilogram]).assertQ[Long, Second * Kilogram](15)
         (3.withUnit[Second] * 5.withUnit[Kilogram]).assertQ[Int, Second * Kilogram](15)
     }
+
+    test("division standard strict") {
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.given
+
+        // same value types require no implicit conversion
+        (12d.withUnit[Meter] / 3d.withUnit[Second]).assertQ[Double, Meter / Second](4)
+        (12f.withUnit[Meter / Kilogram] / 3f.withUnit[Second / Kilogram]).assertQ[Float, Meter / Second](4)
+
+        // changing value involves implicit conversion, should error out
+        assertCE("12d.withUnit[Meter] / 3.withUnit[Second]")
+
+        // integer division requires truncation 
+        assertCE("12L.withUnit[Meter] / 3L.withUnit[Second]")
+        assertCE("12.withUnit[Meter] / 3.withUnit[Second]")
+
+        // explicit conversion will still work
+        (12d.withUnit[Meter] / 3.withUnit[Second].toValue[Double]).assertQ[Double, Meter / Second](4)
+    }
+
