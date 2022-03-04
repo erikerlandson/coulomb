@@ -78,6 +78,8 @@ final class Rational private (val n: BigInt, val d: BigInt) extends Serializable
         case v: Long => (n == v) && (d == 1)
         case _ => false
 
+    override def hashCode: Int = 29 * (37 * n.## + d.##)
+
     inline def < (rhs: Rational): Boolean = (n * rhs.d) < (rhs.n * d)
     inline def > (rhs: Rational): Boolean = rhs < this
     inline def <= (rhs: Rational): Boolean = !(this > rhs)
