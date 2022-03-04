@@ -380,3 +380,48 @@ class QuantitySuite extends CoulombSuite:
         (12d.withUnit[Meter] / 3.withUnit[Second].toValue[Double]).assertQ[Double, Meter / Second](4)
     }
 
+    test("division standard") {
+        import coulomb.policy.allowImplicitConversions.given
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.given
+
+        (5d.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+        (5d.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+        (5d.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+        (5d.withUnit[Meter] / 2.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+
+        (5f.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+        (5f.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
+        (5f.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
+        (5f.withUnit[Meter] / 2.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
+
+        (5L.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+        (5L.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
+        assertCE("5L.withUnit[Meter] / 2L.withUnit[Second]")
+        assertCE("5L.withUnit[Meter] / 2.withUnit[Second]")
+
+        (5.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+        (5.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
+        assertCE("5.withUnit[Meter] / 2L.withUnit[Second]")
+        assertCE("5.withUnit[Meter] / 2.withUnit[Second]")
+    }
+
+    test("division standard truncating") {
+        import coulomb.policy.allowTruncation.given
+        import coulomb.policy.allowImplicitConversions.given
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.given
+
+        (5L.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+        (5L.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
+        (5L.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
+        (5L.withUnit[Meter] / 2.withUnit[Second]).assertQ[Long, Meter / Second](2)
+
+        (5.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
+        (5.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
+        (5.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
+        (5.withUnit[Meter] / 2.withUnit[Second]).assertQ[Int, Meter / Second](2)
+    }
+
