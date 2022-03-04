@@ -24,19 +24,19 @@ ThisBuild / crossScalaVersions := Seq("3.1.1")
 Test / parallelExecution := false
 
 def commonSettings = Seq(
-    libraryDependencies += "org.scalameta" %% "munit" % "0.7.29" % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % "0.7.29" % Test
 )
 
 lazy val root = tlCrossRootProject
   .aggregate(core, units, unidocs)
 
-lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+lazy val core = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
   .in(file("core"))
   .settings(name := "coulomb-core")
   .settings(commonSettings :_*)
 
-lazy val units = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
   .in(file("units"))
   .settings(name := "coulomb-units")
