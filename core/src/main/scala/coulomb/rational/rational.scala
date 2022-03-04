@@ -41,7 +41,6 @@ final class Rational private (val n: BigInt, val d: BigInt) extends Serializable
         if (e < 0) then
             canonical(d.pow(-e), n.pow(-e))
         else if (e == 0) then
-            require(n != 0)
             canonical(1, 1)
         else if (e == 1) then
             this
