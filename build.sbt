@@ -28,7 +28,7 @@ def commonSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject
-  .aggregate(core, units, unidocs)
+  .aggregate(core, units, algebra, unidocs)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
@@ -43,12 +43,24 @@ lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .dependsOn(core % "compile->compile;test->test")
   .settings(commonSettings :_*)
 
+lazy val algebra = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
+  .crossType(CrossType.Pure)
+  .in(file("algebra"))
+  .settings(
+    name := "coulomb-algebra",
+    libraryDependencies ++= Seq(
+      "org.typelevel" %%% "algebra" % "2.7.0"
+    )
+  )
+  .dependsOn(core % "compile->compile;test->test")
+  .settings(commonSettings :_*)
+
 // a target for rolling up all subproject deps: a convenient
 // way to get a repl that has access to all subprojects
 // sbt all/console
 lazy val all = project
   .in(file("all")) // sbt will create this - it is unused
-  .dependsOn(core.jvm, units.jvm) // scala repl only needs JVMPlatform subproj builds
+  .dependsOn(core.jvm, units.jvm, algebra.jvm) // scala repl only needs JVMPlatform subproj builds
   .settings(name := "coulomb-all")
   .enablePlugins(NoPublishPlugin) // don't publish
 
