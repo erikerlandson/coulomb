@@ -16,8 +16,8 @@
 
 package coulomb.testkit
 
-import coulomb.rational._
-import org.scalacheck.Arbitrary
+import coulomb.rational.*
+import org.scalacheck.*
 
 given Arbitrary[Rational] = Arbitrary(
   for
@@ -25,3 +25,5 @@ given Arbitrary[Rational] = Arbitrary(
     d <- Arbitrary.arbitrary[BigInt].suchThat(_ != 0)
   yield Rational(n, d)
 )
+
+given Cogen[Rational] = summon[Cogen[(BigInt, BigInt)]].contramap(r => (r.n, r.d))

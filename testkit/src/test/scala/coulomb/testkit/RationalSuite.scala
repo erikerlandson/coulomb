@@ -20,9 +20,15 @@ import coulomb.rational.*
 import munit.ScalaCheckSuite
 import org.scalacheck.Prop.*
 
-class ArbitrarySuite extends ScalaCheckSuite:
+class RationalSuite extends ScalaCheckSuite:
   property("rational identity") {
     forAll { (r: Rational) =>
       r == Rational.const0 || (Rational.const1 / r) * r == Rational.const1
+    }
+  }
+
+  property("functions of rationals are pure") {
+    forAll { (x: Rational, y: Rational, f: Rational => Rational) =>
+      x != y || f(x) == f(y)
     }
   }
