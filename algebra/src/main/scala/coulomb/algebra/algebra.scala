@@ -38,6 +38,9 @@ given Field[Rational] with
 
 given CommutativeGroup[Rational] = summon[Field[Rational]].additive
 
-given Hash[Rational] with
-  def eqv(x: Rational, y: Rational) = x == y
+given Order[Rational] with Hash[Rational] with
   def hash(x: Rational) = x.hashCode
+  def compare(x: Rational, y: Rational) =
+    if x == y then 0
+    else if x > y then 1
+    else -1
