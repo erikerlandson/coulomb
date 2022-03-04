@@ -36,6 +36,8 @@ given Field[Rational] with
   def negate(x: Rational) = -x
   override def pow(x: Rational, n: Int) = x.pow(n)
 
+given CommutativeGroup[Rational] = summon[Field[Rational]].additive
+
 given Hash[Rational] with
   def eqv(x: Rational, y: Rational) = x == y
   def hash(x: Rational) = x.hashCode
