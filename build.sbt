@@ -28,7 +28,7 @@ def commonSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject
-  .aggregate(core, units)
+  .aggregate(core, units, unidocs)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -51,6 +51,12 @@ lazy val all = project
   .dependsOn(core.jvm, units.jvm) // scala repl only needs JVMPlatform subproj builds
   .settings(name := "coulomb-all")
   .enablePlugins(NoPublishPlugin) // don't publish
+
+// a published artifact aggregating API docs for viewing at javadoc.io
+lazy val unidocs = project
+  .in(file("unidocs")) // sbt will create this - it is unused
+  .settings(name := "coulomb-docs") // the name of the artifact
+  .enablePlugins(TypelevelUnidocPlugin) // enable Unidoc + publishing
 
 lazy val docs = project.in(file("site"))
   .enablePlugins(TypelevelSitePlugin)
