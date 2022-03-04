@@ -67,7 +67,7 @@ lazy val algebra = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
       "org.typelevel" %%% "discipline-munit" % "1.0.9" % Test,
     )
   )
-  .dependsOn(core % "compile->compile;test->test")
+  .dependsOn(core % "compile->compile;test->test", testkit % Test)
   .settings(commonSettings :_*)
 
 // a target for rolling up all subproject deps: a convenient
