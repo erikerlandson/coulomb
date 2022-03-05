@@ -141,22 +141,19 @@ object Rational:
 end Rational
 
 
-/** type classes that are useful for testing rational type-expressions */
+/** Obtaining values from Rational type expressions */
 object typeexpr:
     import scala.annotation.implicitNotFound
+    import coulomb.infra.meta
 
-    @implicitNotFound("Cannot parse type ${E} into a Rational value")
-    abstract class RationalTE[E]:
-        val value: Rational
+    inline def rational[E]: Rational = ${ meta.teToRational[E] }
+    inline def bigInt[E]: BigInt = ${ meta.teToBigInt[E] }
+    inline def double[E]: Double = ${ meta.teToDouble[E] }
 
-    object RationalTE:
-        transparent inline given ctx_RationalTE[E]: RationalTE[E] =
-            ${ coulomb.infra.meta.parseRationalTE[E] }
+    @implicitNotFound("type expr ${E} is not a non-negative Int")
+    abstract class NonNegInt[E]:
+        val value: Int
 
-    @implicitNotFound("Cannot parse type ${E} into a BigInt value")
-    abstract class BigIntTE[E]:
-        val value: BigInt
-
-    object BigIntTE:
-        transparent inline given ctx_BigIntTE[E]: BigIntTE[E] =
-            ${ coulomb.infra.meta.parseBigIntTE[E] }
+    object NonNegInt:
+        // interesting, this has to be 'transparent' to work with NotGiven
+        transparent inline given ctx_NonNegInt[E]: NonNegInt[E] = ${ meta.teToNonNegInt[E] }

@@ -17,7 +17,6 @@
 package coulomb.infra
 
 import coulomb.rational.Rational
-import coulomb.rational.typeexpr.{RationalTE, BigIntTE}
 import coulomb.*
 import coulomb.define.*
 import coulomb.ops.*
@@ -36,15 +35,29 @@ object meta:
             case v if (v == 1) => '{ Rational.const1 }
             case _ => '{ Rational(${Expr(r.n)}, ${Expr(r.d)}) }
 
-    def parseRationalTE[E](using Quotes, Type[E]): Expr[RationalTE[E]] =
+    def teToRational[E](using Quotes, Type[E]): Expr[Rational] =
         import quotes.reflect.*
         val rationalTE(v) = TypeRepr.of[E]
-        '{ new RationalTE[E] { val value = ${Expr(v)} } }
+        Expr(v)
 
-    def parseBigIntTE[E](using Quotes, Type[E]): Expr[BigIntTE[E]] =
+    def teToBigInt[E](using Quotes, Type[E]): Expr[BigInt] =
         import quotes.reflect.*
         val bigintTE(v) = TypeRepr.of[E]
-        '{ new BigIntTE[E] { val value = ${Expr(v)} } }
+        Expr(v)
+
+    def teToDouble[E](using Quotes, Type[E]): Expr[Double] =
+        import quotes.reflect.*
+        val rationalTE(v) = TypeRepr.of[E]
+        Expr(v.toDouble)
+
+    def teToNonNegInt[E](using Quotes, Type[E]): Expr[coulomb.rational.typeexpr.NonNegInt[E]] =
+        import quotes.reflect.*
+        val rationalTE(v) = TypeRepr.of[E]
+        if ((v.d == 1) && (v.n >= 0) && (v.n.isValidInt)) then
+            '{ new coulomb.rational.typeexpr.NonNegInt[E] { val value = ${Expr(v.n.toInt)} } }
+        else
+            report.error(s"type expr ${typestr(TypeRepr.of[E])} is not a non-negative Int")
+            '{ new coulomb.rational.typeexpr.NonNegInt[E] { val value = 0 } }
 
     object rationalTE:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Rational] =
@@ -253,11 +266,13 @@ object meta:
         (Rational.const0, quotes.reflect.TypeRepr.of[Nothing])
 
     // keep this for reference
+    /*
     def summonString[T](using Quotes, Type[T]): String =
         import quotes.reflect.*
         Expr.summon[T] match
             case None => "None"
             case Some(e) => s"${e.show}   ${e.asTerm.show(using Printer.TreeStructure)}"
+i   */
 
     def unifyOp(using Quotes)(
             sig1: quotes.reflect.TypeRepr, sig2: quotes.reflect.TypeRepr,
