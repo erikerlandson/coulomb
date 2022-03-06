@@ -99,6 +99,9 @@ extension[VL, UL](ql: Quantity[VL, UL])
     inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
         conv(ql.value).withUnit[U]
 
+    inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
+        neg(ql.value).withUnit[UL]
+
     transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
         add(ql.value, qr.value).withUnit[add.UO]
 
@@ -114,5 +117,21 @@ extension[VL, UL](ql: Quantity[VL, UL])
     transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
         pow(ql.value).withUnit[pow.UO]
 
-    transparent inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
-        neg(ql.value).withUnit[UL]
+    inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+        ord(ql.value, qr.value) == 0
+
+    inline def =!=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+        ord(ql.value, qr.value) != 0
+
+    inline def <[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+        ord(ql.value, qr.value) < 0
+
+    inline def <=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+        ord(ql.value, qr.value) <= 0
+
+    inline def >[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+        ord(ql.value, qr.value) > 0
+
+    inline def >=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+        ord(ql.value, qr.value) >= 0
+

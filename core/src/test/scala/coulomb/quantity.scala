@@ -512,3 +512,66 @@ class QuantitySuite extends CoulombSuite:
         (-(7L.withUnit[Liter])).assertQ[Long, Liter](-7)
         (-(7.withUnit[Liter])).assertQ[Int, Liter](-7)
     }
+
+    test("equality standard strict") {
+        import coulomb.ops.standard.given
+        import coulomb.conversion.standard.given
+
+        assertEquals(1d.withUnit[Meter] === 1d.withUnit[Meter], true)
+        assertEquals(1f.withUnit[Meter] === 1f.withUnit[Meter], true)
+        assertEquals(1L.withUnit[Meter] === 1L.withUnit[Meter], true)
+        assertEquals(1.withUnit[Meter] === 1.withUnit[Meter], true)
+
+        assertEquals(1d.withUnit[Meter] === 2d.withUnit[Meter], false)
+        assertEquals(1f.withUnit[Meter] === 2f.withUnit[Meter], false)
+        assertEquals(1L.withUnit[Meter] === 2L.withUnit[Meter], false)
+        assertEquals(1.withUnit[Meter] === 2.withUnit[Meter], false)
+
+        assertCE("1d.withUnit[Meter] === 1.withUnit[Meter]")
+        assertCE("1d.withUnit[Meter] === 1d.withUnit[Yard]")
+    }
+
+    test("equality standard") {
+        import coulomb.policy.allowImplicitConversions.given
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.given
+
+        assertEquals(2d.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], true)
+        assertEquals(2d.withUnit[(1 / 2) * Meter] === 2f.withUnit[Meter], false)
+        assertEquals(2d.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter], true)
+        assertEquals(1d.withUnit[(1 / 2) * Meter] === 1.withUnit[Meter], false)
+
+        assertEquals(2f.withUnit[(1 / 2) * Meter] === 2d.withUnit[Meter], false)
+        assertEquals(2f.withUnit[(1 / 2) * Meter] === 1f.withUnit[Meter], true)
+        assertEquals(1f.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter], false)
+        assertEquals(2f.withUnit[(1 / 2) * Meter] === 1.withUnit[Meter], true)
+
+        assertEquals(2L.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], true)
+        assertEquals(2L.withUnit[(1 / 2) * Meter] === 2f.withUnit[Meter], false)
+        assertCE("2L.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter]")
+        assertCE("2L.withUnit[(1 / 2) * Meter] === 1.withUnit[Meter]")
+
+        assertEquals(1.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], false)
+        assertEquals(2.withUnit[(1 / 2) * Meter] === 1f.withUnit[Meter], true)
+        assertCE("2.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter]")
+        assertCE("2.withUnit[(1 / 2) * Meter] === 1.withUnit[Meter]")
+    }
+
+    test("equality standard truncating") {
+        import coulomb.policy.allowTruncation.given
+        import coulomb.policy.allowImplicitConversions.given
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.given
+
+        assertEquals(2L.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], true)
+        assertEquals(2L.withUnit[(1 / 2) * Meter] === 2f.withUnit[Meter], false)
+        assertEquals(2L.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter], true)
+        assertEquals(2L.withUnit[(1 / 2) * Meter] === 2.withUnit[Meter], false)
+
+        assertEquals(1.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], false)
+        assertEquals(2.withUnit[(1 / 2) * Meter] === 1f.withUnit[Meter], true)
+        assertEquals(1.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter], false)
+        assertEquals(2.withUnit[(1 / 2) * Meter] === 1.withUnit[Meter], true)
+    }

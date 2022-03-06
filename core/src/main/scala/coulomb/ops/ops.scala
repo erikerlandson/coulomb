@@ -54,6 +54,10 @@ abstract class Pow[V, U, P]:
     type UO
     def apply(v: V): VO
 
+@implicitNotFound("Ordering not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
+abstract class Ord[VL, UL, VR, UR]:
+    def apply(vl: VL, vr: VR): Int
+
 /** Resolve the operator output type for left and right argument types */
 @implicitNotFound("No output type resolution in scope for argument value types {VL} and {VR}")
 abstract class ValueResolution[VL, VR]:
