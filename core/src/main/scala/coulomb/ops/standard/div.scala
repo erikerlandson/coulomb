@@ -18,10 +18,14 @@ package coulomb.ops.standard
 
 import scala.util.NotGiven
 
-import coulomb.{`*`, `/`, `^`}
+import algebra.ring.MultiplicativeGroup
+import algebra.ring.TruncatedDivision
+
+import coulomb.`/`
 import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
+import coulomb.policy.AllowTruncation
 
 transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
         Div[Double, UL, Double, UR] =
@@ -62,3 +66,17 @@ transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
         type UO = su.UO
         def apply(vl: VL, vr: VR): VO = alg.div(vlvo(vl), vrvo(vr))
 
+abstract class CanDiv[V]:
+    def div(vl: V, vr: V): V
+
+object CanDiv:
+    inline given ctx_CanDiv_MultiplicativeGroup[V](using alg: MultiplicativeGroup[V]): CanDiv[V] =
+        new CanDiv[V]:
+            def div(vl: V, vr: V): V = alg.div(vl, vr)
+    
+    inline given ctx_CanDiv_TruncatedDivision[V](using
+        nmg: NotGiven[MultiplicativeGroup[V]],
+        at: AllowTruncation,
+        alg: TruncatedDivision[V]): CanDiv[V] =
+        new CanDiv[V]:
+            def div(vl: V, vr: V): V = alg.tquot(vl, vr)

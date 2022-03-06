@@ -22,6 +22,7 @@ import scala.math.{Fractional, Integral, Numeric}
 import coulomb.rational.Rational
 import coulomb.policy.AllowTruncation
 
+/*
 abstract class CanAdd[V]:
    def add(vl: V, vr: V): V
 
@@ -45,18 +46,8 @@ object CanMul:
     inline given ctx_CanMul_Numeric[V](using num: Numeric[V]): CanMul[V] =
         new CanMul[V]:
             def mul(vl: V, vr: V): V = num.times(vl, vr)
+*/
 
-abstract class CanDiv[V]:
-    def div(vl: V, vr: V): V
-
-object CanDiv:
-    inline given ctx_CanDiv_Fractional[V](using num: Fractional[V]): CanDiv[V] =
-        new CanDiv[V]:
-            def div(vl: V, vr: V): V = num.div(vl, vr)
-    
-    inline given ctx_CanDiv_Integral[V](using num: Integral[V], at: AllowTruncation): CanDiv[V] =
-        new CanDiv[V]:
-            def div(vl: V, vr: V): V = num.quot(vl, vr)
 
 abstract class CanPow[V, E]:
     def pow(v: V): V
