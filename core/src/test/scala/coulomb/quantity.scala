@@ -503,3 +503,12 @@ class QuantitySuite extends CoulombSuite:
             .assertQ[Double, ((10 ^ 100) * Meter) / (3 * Second)](2.5)
     }
 
+    test("negation standard") {
+        import coulomb.ops.standard.given
+        import coulomb.conversion.standard.given
+
+        (-(7d.withUnit[Liter])).assertQ[Double, Liter](-7)
+        (-(7f.withUnit[Liter])).assertQ[Float, Liter](-7)
+        (-(7L.withUnit[Liter])).assertQ[Long, Liter](-7)
+        (-(7.withUnit[Liter])).assertQ[Int, Liter](-7)
+    }

@@ -95,3 +95,10 @@ object CanPow:
         new CanPow[Int, E]:
             def pow(v: Int): Int = math.pow(v.toDouble, e).toInt
 
+abstract class CanNeg[V]:
+    def neg(v: V): V
+
+object CanNeg:
+    inline given ctx_CanNeg_Numeric[V](using num: Numeric[V]): CanNeg[V] =
+        new CanNeg[V]:
+            def neg(v: V): V = num.negate(v)

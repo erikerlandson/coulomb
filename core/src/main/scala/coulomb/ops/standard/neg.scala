@@ -18,15 +18,17 @@ package coulomb.ops.standard
 
 import scala.util.NotGiven
 
-import coulomb.`^`
-import coulomb.ops.{Pow, SimplifiedUnit}
+import coulomb.ops.Neg
 
-transparent inline given ctx_quantity_pow[V, U, E](using
-    alg: CanPow[V, E],
-    su: SimplifiedUnit[U ^ E]
-        ): Pow[V, U, E] =
-    new Pow[V, U, E]:
-        type VO = V
-        type UO = su.UO
-        def apply(v: V): VO = alg.pow(v)
+inline given ctx_quantity_neg_Double[U]: Neg[Double, U] =
+    new Neg[Double, U]:
+        def apply(v: Double): Double = -v
+
+inline given ctx_quantity_neg_Float[U]: Neg[Float, U] =
+    new Neg[Float, U]:
+        def apply(v: Float): Float = -v
+
+inline given ctx_quantity_neg[V, U](using alg: CanNeg[V]): Neg[V, U] =
+    new Neg[V, U]:
+        def apply(v: V): V = alg.neg(v)
 
