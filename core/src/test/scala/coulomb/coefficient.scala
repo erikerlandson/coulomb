@@ -36,6 +36,7 @@ class CoefficientSuite extends CoulombSuite:
         assertEquals(coefficient[Meter ^ 3, 1000 * Liter], Rational(1))
         assertEquals(coefficient[Meter, Kilo * Yard], Rational(10, 9144))
     }
+
     test("non-convertible units") {
         assertCE("coefficient[Meter, Second]")
         assertCE("coefficient[Meter ^ 2, Liter]")
