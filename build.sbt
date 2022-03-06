@@ -35,6 +35,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .in(file("core"))
   .settings(name := "coulomb-core")
   .settings(commonSettings :_*)
+  .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.7.0")
 
 lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
