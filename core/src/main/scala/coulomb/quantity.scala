@@ -120,6 +120,8 @@ extension[VL, UL](ql: Quantity[VL, UL])
     transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
         pow(ql.value).withUnit[pow.UO]
 
+    transparent inline def tpow[P](using tp: TPow[VL, UL, P]): Quantity[tp.VO, tp.UO] =
+        tp(ql.value).withUnit[tp.UO]
 
     inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
         ord(ql.value, qr.value) == 0

@@ -46,45 +46,6 @@ object CanMul:
     inline given ctx_CanMul_Numeric[V](using num: Numeric[V]): CanMul[V] =
         new CanMul[V]:
             def mul(vl: V, vr: V): V = num.times(vl, vr)
-*/
-
-
-abstract class CanPow[V, E]:
-    def pow(v: V): V
-
-object CanPow:
-    import coulomb.rational.typeexpr
-    import scala.math
-
-    inline given ctx_CanPow_Double[E]: CanPow[Double, E] =
-        val e: Double = typeexpr.double[E]
-        new CanPow[Double, E]:
-            def pow(v: Double): Double = math.pow(v, e)
-
-    inline given ctx_CanPow_Float[E]: CanPow[Float, E] =
-        val e: Double = typeexpr.double[E]
-        new CanPow[Float, E]:
-            def pow(v: Float): Float = math.pow(v.toDouble, e).toFloat
-
-    inline given ctx_CanPow_Long[E](using gez: typeexpr.NonNegInt[E]): CanPow[Long, E] =
-        new CanPow[Long, E]:
-            def pow(v: Long): Long = math.pow(v.toDouble, gez.value.toDouble).toLong
-
-    inline given ctx_CanPow_Long_trunc[E](using NotGiven[typeexpr.NonNegInt[E]], AllowTruncation):
-            CanPow[Long, E] =
-        val e = typeexpr.double[E]
-        new CanPow[Long, E]:
-            def pow(v: Long): Long = math.pow(v.toDouble, e).toLong
-
-    inline given ctx_CanPow_Int[E](using gez: typeexpr.NonNegInt[E]): CanPow[Int, E] =
-        new CanPow[Int, E]:
-            def pow(v: Int): Int = math.pow(v.toDouble, gez.value.toDouble).toInt
-
-    inline given ctx_CanPow_Int_trunc[E](using NotGiven[typeexpr.NonNegInt[E]], AllowTruncation):
-            CanPow[Int, E] =
-        val e = typeexpr.double[E]
-        new CanPow[Int, E]:
-            def pow(v: Int): Int = math.pow(v.toDouble, e).toInt
 
 abstract class CanNeg[V]:
     def neg(v: V): V
@@ -93,3 +54,4 @@ object CanNeg:
     inline given ctx_CanNeg_Numeric[V](using num: Numeric[V]): CanNeg[V] =
         new CanNeg[V]:
             def neg(v: V): V = num.negate(v)
+*/

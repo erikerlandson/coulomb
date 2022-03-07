@@ -30,3 +30,47 @@ transparent inline given ctx_quantity_pow[V, U, E](using
         type UO = su.UO
         def apply(v: V): VO = alg.pow(v)
 
+abstract class CanPow[V, E]:
+    def pow(v: V): V
+
+object CanPow:
+    import coulomb.rational.typeexpr
+    import algebra.ring.MultiplicativeSemigroup
+    import algebra.ring.MultiplicativeGroup
+
+    inline given ctx_FracPow_CanPow[V, E](using fp: FracPow[V]): CanPow[V, E] =
+        val e: Double = typeexpr.double[E]
+        new CanPow[V, E]:
+            def pow(v: V): V = fp.pow(v, e)
+
+    inline given ctx_MultiplicativeGroup_CanPow[V, E](using
+        nfp: NotGiven[FracPow[V]],
+        mgp: MultiplicativeGroup[V],
+        aie: typeexpr.AllInt[E]): CanPow[V, E] =
+        val e: Int = aie.value
+        new CanPow[V, E]:
+            def pow(v: V): V = mgp.pow(v, e)
+
+    inline given ctx_MultiplicativeSemigroup_CanPow[V, E](using
+        nfp: NotGiven[FracPow[V]],
+        nmg: NotGiven[MultiplicativeGroup[V]],
+        msg: MultiplicativeSemigroup[V],
+        pie: typeexpr.PosInt[E]): CanPow[V, E] =
+        val e: Int = pie.value
+        new CanPow[V, E]:
+            def pow(v: V): V = msg.pow(v, e)
+
+    // there is no typelevel community typeclass that expresses the concept
+    // "supports raising to fractional powers without truncation"
+    // The closest thing is spire NRoot, but it is also defined on truncating integer types,
+    // so it is not helpful for distinguishing "pow" from "tpow", and in any case requires spire
+    // https://github.com/typelevel/spire/issues/741
+    abstract class FracPow[V]:
+        def pow(v: V, e: Double): V
+
+    object FracPow:
+        given ctx_Double_is_FracPow: FracPow[Double] with
+            def pow(v: Double, e: Double): Double = math.pow(v, e) 
+
+        given ctx_Float_is_FracPow: FracPow[Float] with
+            def pow(v: Float, e: Double): Float = math.pow(v, e).toFloat 

@@ -65,3 +65,9 @@ object CanTQuot:
         num: scala.math.Integral[V]): CanTQuot[V] =
         new CanTQuot[V]:
             def tquot(vl: V, vr: V): V = num.quot(vl, vr)
+
+    inline given ctx_Fractional_CanTQuot[V](using
+        ntd: NotGiven[TruncatedDivision[V]],
+        num: scala.math.Fractional[V]): CanTQuot[V] =
+        new CanTQuot[V]:
+            def tquot(vl: V, vr: V): V = num.fromInt(num.toInt(num.div(vl, vr)))

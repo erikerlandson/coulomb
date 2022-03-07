@@ -157,3 +157,17 @@ object typeexpr:
     object NonNegInt:
         // interesting, this has to be 'transparent' to work with NotGiven
         transparent inline given ctx_NonNegInt[E]: NonNegInt[E] = ${ meta.teToNonNegInt[E] }
+
+    @implicitNotFound("type expr ${E} is not a positive Int")
+    abstract class PosInt[E]:
+        val value: Int
+
+    object PosInt:
+        transparent inline given ctx_PosInt[E]: PosInt[E] = ${ meta.teToPosInt[E] }
+
+    @implicitNotFound("type expr ${E} is not an Int")
+    abstract class AllInt[E]:
+        val value: Int
+
+    object AllInt:
+        transparent inline given ctx_AllInt[E]: AllInt[E] = ${ meta.teToInt[E] }

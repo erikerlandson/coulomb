@@ -417,6 +417,9 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
 
+        (5d.withUnit[Meter] `tquot` 2d.withUnit[Second]).assertQ[Double, Meter / Second](2)
+        (5f.withUnit[Meter] `tquot` 2f.withUnit[Second]).assertQ[Float, Meter / Second](2)
+
         (5L.withUnit[Meter] `tquot` 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
         (5L.withUnit[Meter] `tquot` 2.withUnit[Second]).assertQ[Long, Meter / Second](2)
 
@@ -441,48 +444,48 @@ class QuantitySuite extends CoulombSuite:
         2f.withUnit[Meter].pow[1 / 2].assertQD[Float, Meter ^ (1 / 2)](1.4142135623730951)
         2f.withUnit[Meter].pow[-1 / 2].assertQD[Float, 1 / (Meter ^ (1 / 2))](0.7071067811865476)
 
-        2L.withUnit[Meter].pow[0].assertQ[Long, 1](1)
+        // integer types are supported via multiplicative semigroup
+        assertCE("2L.withUnit[Meter].pow[0]")
         2L.withUnit[Meter].pow[2].assertQ[Long, Meter ^ 2](4)
         assertCE("2L.withUnit[Meter].pow[-1]")
         assertCE("2L.withUnit[Meter].pow[1 / 2]")
         assertCE("2L.withUnit[Meter].pow[-1 / 2]")
 
-        2.withUnit[Meter].pow[0].assertQ[Int, 1](1)
+        assertCE("2.withUnit[Meter].pow[0]")
         2.withUnit[Meter].pow[2].assertQ[Int, Meter ^ 2](4)
         assertCE("2.withUnit[Meter].pow[-1]")
         assertCE("2.withUnit[Meter].pow[1 / 2]")
         assertCE("2.withUnit[Meter].pow[-1 / 2]")
     }
 
-    test("power standard truncating") {
-        import coulomb.policy.allowTruncation.given
+    test("truncating power standard") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
 
-        10d.withUnit[Meter].pow[0].assertQ[Double, 1](1)
-        10d.withUnit[Meter].pow[2].assertQ[Double, Meter ^ 2](100)
-        10d.withUnit[Meter].pow[-1].assertQD[Double, 1 / Meter](0.1)
-        10d.withUnit[Meter].pow[1 / 2].assertQD[Double, Meter ^ (1 / 2)](3.1622776601683795)
-        10d.withUnit[Meter].pow[-1 / 2].assertQD[Double, 1 / (Meter ^ (1 / 2))](0.31622776601683794)
+        10d.withUnit[Meter].tpow[0].assertQ[Double, 1](1)
+        10d.withUnit[Meter].tpow[2].assertQ[Double, Meter ^ 2](100)
+        10d.withUnit[Meter].tpow[-1].assertQ[Double, 1 / Meter](0)
+        10d.withUnit[Meter].tpow[1 / 2].assertQ[Double, Meter ^ (1 / 2)](3)
+        10d.withUnit[Meter].tpow[-1 / 2].assertQ[Double, 1 / (Meter ^ (1 / 2))](0)
 
-        10f.withUnit[Meter].pow[0].assertQ[Float, 1](1)
-        10f.withUnit[Meter].pow[2].assertQ[Float, Meter ^ 2](100)
-        10f.withUnit[Meter].pow[-1].assertQD[Float, 1 / Meter](0.1)
-        10f.withUnit[Meter].pow[1 / 2].assertQD[Float, Meter ^ (1 / 2)](3.1622776601683795)
-        10f.withUnit[Meter].pow[-1 / 2].assertQD[Float, 1 / (Meter ^ (1 / 2))](0.31622776601683794)
+        10f.withUnit[Meter].tpow[0].assertQ[Float, 1](1)
+        10f.withUnit[Meter].tpow[2].assertQ[Float, Meter ^ 2](100)
+        10f.withUnit[Meter].tpow[-1].assertQ[Float, 1 / Meter](0)
+        10f.withUnit[Meter].tpow[1 / 2].assertQ[Float, Meter ^ (1 / 2)](3)
+        10f.withUnit[Meter].tpow[-1 / 2].assertQ[Float, 1 / (Meter ^ (1 / 2))](0)
 
-        10L.withUnit[Meter].pow[0].assertQ[Long, 1](1)
-        10L.withUnit[Meter].pow[2].assertQ[Long, Meter ^ 2](100)
-        10L.withUnit[Meter].pow[-1].assertQ[Long, 1 / Meter](0)
-        10L.withUnit[Meter].pow[1 / 2].assertQ[Long, Meter ^ (1 / 2)](3)
-        10L.withUnit[Meter].pow[-1 / 2].assertQ[Long, 1 / (Meter ^ (1 / 2))](0)
+        10L.withUnit[Meter].tpow[0].assertQ[Long, 1](1)
+        10L.withUnit[Meter].tpow[2].assertQ[Long, Meter ^ 2](100)
+        10L.withUnit[Meter].tpow[-1].assertQ[Long, 1 / Meter](0)
+        10L.withUnit[Meter].tpow[1 / 2].assertQ[Long, Meter ^ (1 / 2)](3)
+        10L.withUnit[Meter].tpow[-1 / 2].assertQ[Long, 1 / (Meter ^ (1 / 2))](0)
 
-        10.withUnit[Meter].pow[0].assertQ[Int, 1](1)
-        10.withUnit[Meter].pow[2].assertQ[Int, Meter ^ 2](100)
-        10.withUnit[Meter].pow[-1].assertQ[Int, 1 / Meter](0)
-        10.withUnit[Meter].pow[1 / 2].assertQ[Int, Meter ^ (1 / 2)](3)
-        10.withUnit[Meter].pow[-1 / 2].assertQ[Int, 1 / (Meter ^ (1 / 2))](0)
+        10.withUnit[Meter].tpow[0].assertQ[Int, 1](1)
+        10.withUnit[Meter].tpow[2].assertQ[Int, Meter ^ 2](100)
+        10.withUnit[Meter].tpow[-1].assertQ[Int, 1 / Meter](0)
+        10.withUnit[Meter].tpow[1 / 2].assertQ[Int, Meter ^ (1 / 2)](3)
+        10.withUnit[Meter].tpow[-1 / 2].assertQ[Int, 1 / (Meter ^ (1 / 2))](0)
     }
 
     test("constants in simplified unit types") {
