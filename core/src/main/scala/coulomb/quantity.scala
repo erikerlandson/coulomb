@@ -80,6 +80,7 @@ end quantity
 import coulomb.ops.*
 import coulomb.rational.Rational
 import coulomb.conversion.{ValueConversion, UnitConversion}
+import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
 
 inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
 inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
@@ -97,6 +98,11 @@ extension[VL, UL](ql: Quantity[VL, UL])
     inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
         conv(ql.value).withUnit[UL]
     inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
+        conv(ql.value).withUnit[U]
+
+    inline def tToValue[V](using conv: TruncatingValueConversion[VL, V]): Quantity[V, UL] =
+        conv(ql.value).withUnit[UL]
+    inline def tToUnit[U](using conv: TruncatingUnitConversion[VL, UL, U]): Quantity[VL, U] =
         conv(ql.value).withUnit[U]
 
     inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
