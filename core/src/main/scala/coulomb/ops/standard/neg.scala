@@ -19,6 +19,7 @@ package coulomb.ops.standard
 import scala.util.NotGiven
 
 import coulomb.ops.Neg
+import algebra.ring.AdditiveGroup
 
 inline given ctx_quantity_neg_Double[U]: Neg[Double, U] =
     new Neg[Double, U]:
@@ -28,7 +29,7 @@ inline given ctx_quantity_neg_Float[U]: Neg[Float, U] =
     new Neg[Float, U]:
         def apply(v: Float): Float = -v
 
-inline given ctx_quantity_neg[V, U](using alg: CanNeg[V]): Neg[V, U] =
+inline given ctx_quantity_neg[V, U](using alg: AdditiveGroup[V]): Neg[V, U] =
     new Neg[V, U]:
-        def apply(v: V): V = alg.neg(v)
+        def apply(v: V): V = alg.negate(v)
 
