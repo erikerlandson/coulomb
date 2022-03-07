@@ -18,49 +18,50 @@ package coulomb.ops.standard
 
 import scala.util.NotGiven
 
-import algebra.ring.MultiplicativeGroup
+import algebra.ring.TruncatedDivision
 
 import coulomb.`/`
-import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
-import coulomb.conversion.{ValueConversion, UnitConversion}
+import coulomb.ops.{TQuot, SimplifiedUnit, ValueResolution}
+import coulomb.conversion.{ValueConversion}
 import coulomb.policy.AllowImplicitConversions
 import coulomb.policy.AllowTruncation
 
-transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
-        Div[Double, UL, Double, UR] =
-    new Div[Double, UL, Double, UR]:
-        type VO = Double
-        type UO = su.UO
-        def apply(vl: Double, vr: Double): Double = vl / vr
-
-transparent inline given ctx_div_Float_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
-        Div[Float, UL, Float, UR] =
-    new Div[Float, UL, Float, UR]:
-        type VO = Float
-        type UO = su.UO
-        def apply(vl: Float, vr: Float): Float = vl / vr
-
-transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
+transparent inline given ctx_tquot_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
-    alg: MultiplicativeGroup[VL],
+    alg: CanTQuot[VL],
     su: SimplifiedUnit[UL / UR]
-        ): Div[VL, UL, VR, UR] =
-    new Div[VL, UL, VR, UR]:
+        ): TQuot[VL, UL, VR, UR] =
+    new TQuot[VL, UL, VR, UR]:
         type VO = VL
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VL = alg.div(vl, eqv(vr))
+        def apply(vl: VL, vr: VR): VL = alg.tquot(vl, eqv(vr))
 
-transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
+transparent inline given ctx_tquot_2V2U[VL, UL, VR, UR](using
     nev: NotGiven[VL =:= VR],
     ice: AllowImplicitConversions,
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
-    alg: MultiplicativeGroup[vres.VO],
+    alg: CanTQuot[vres.VO],
     su: SimplifiedUnit[UL / UR]
-        ): Div[VL, UL, VR, UR] =
-    new Div[VL, UL, VR, UR]:
+        ): TQuot[VL, UL, VR, UR] =
+    new TQuot[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VO = alg.div(vlvo(vl), vrvo(vr))
+        def apply(vl: VL, vr: VR): VO = alg.tquot(vlvo(vl), vrvo(vr))
+
+// if algebra ever implements TruncatedDivision for Int and Long I can get rid of this
+abstract class CanTQuot[V]:
+    def tquot(vl: V, vr: V): V
+
+object CanTQuot:
+    inline given ctx_TruncatedDivision_CanTQuot[V](using td: TruncatedDivision[V]): CanTQuot[V] =
+        new CanTQuot[V]:
+            def tquot(vl: V, vr: V): V = td.tquot(vl, vr)
+
+    inline given ctx_Integral_CanTQuot[V](using
+        ntd: NotGiven[TruncatedDivision[V]],
+        num: scala.math.Integral[V]): CanTQuot[V] =
+        new CanTQuot[V]:
+            def tquot(vl: V, vr: V): V = num.quot(vl, vr)

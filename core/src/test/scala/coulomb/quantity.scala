@@ -20,6 +20,8 @@ class QuantitySuite extends CoulombSuite:
     import coulomb.*
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
+    import algebra.ring.TruncatedDivision
+    import algebra.ring.TruncatedDivision.given
 
     test("lift via Quantity") {
         Quantity[Meter](3.14).assertQ[Double, Meter](3.14)
@@ -408,22 +410,18 @@ class QuantitySuite extends CoulombSuite:
         assertCE("5.withUnit[Meter] / 2.withUnit[Second]")
     }
 
-    test("division standard truncating") {
-        import coulomb.policy.allowTruncation.given
+    test("truncating division standard") {
+        //import coulomb.policy.allowTruncation.given
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
 
-        (5L.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
-        (5L.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
-        (5L.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
-        (5L.withUnit[Meter] / 2.withUnit[Second]).assertQ[Long, Meter / Second](2)
+        (5L.withUnit[Meter] `tquot` 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
+        (5L.withUnit[Meter] `tquot` 2.withUnit[Second]).assertQ[Long, Meter / Second](2)
 
-        (5.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
-        (5.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float,  Meter / Second](2.5)
-        (5.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
-        (5.withUnit[Meter] / 2.withUnit[Second]).assertQ[Int, Meter / Second](2)
+        (5.withUnit[Meter] `tquot` 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
+        (5.withUnit[Meter] `tquot` 2.withUnit[Second]).assertQ[Int, Meter / Second](2)
     }
 
     test("power standard") {
