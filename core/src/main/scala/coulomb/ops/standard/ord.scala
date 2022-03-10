@@ -17,7 +17,8 @@
 package coulomb.ops.standard
 
 import scala.util.NotGiven
-import scala.math.Ordering
+
+import cats.kernel.Order
 
 import coulomb.ops.{Ord, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
@@ -27,7 +28,7 @@ transparent inline given ctx_ord_1V1U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
     equ: UR =:= UL,
-    ord: Ordering[VL]
+    ord: Order[VL]
         ): Ord[VL, UL, VR, UR] =
     new Ord[VL, UL, VR, UR]:
         def apply(vl: VL, vr: VR): Int = ord.compare(vl, eqv(vr))
@@ -37,7 +38,7 @@ transparent inline given ctx_ord_1V2U[VL, UL, VR, UR](using
     eqv: VR =:= VL,
     neu: NotGiven[UR =:= UL],
     ucv: UnitConversion[VL, UR, UL],
-    ord: Ordering[VL]
+    ord: Order[VL]
         ): Ord[VL, UL, VR, UR] =
     new Ord[VL, UL, VR, UR]:
         def apply(vl: VL, vr: VR): Int = ord.compare(vl, ucv(eqv(vr)))
@@ -49,7 +50,7 @@ transparent inline given ctx_ord_2V1U[VL, UL, VR, UR](using
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
-    ord: Ordering[vres.VO]
+    ord: Order[vres.VO]
         ): Ord[VL, UL, VR, UR] =
     new Ord[VL, UL, VR, UR]:
         def apply(vl: VL, vr: VR): Int = ord.compare(vlvo(vl), vrvo(vr))
@@ -62,7 +63,7 @@ transparent inline given ctx_ord_2V2U[VL, UL, VR, UR](using
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
     ucvo: UnitConversion[vres.VO, UR, UL],
-    ord: Ordering[vres.VO]
+    ord: Order[vres.VO]
         ): Ord[VL, UL, VR, UR] =
     new Ord[VL, UL, VR, UR]:
         def apply(vl: VL, vr: VR): Int = ord.compare(vlvo(vl), ucvo(vrvo(vr)))
