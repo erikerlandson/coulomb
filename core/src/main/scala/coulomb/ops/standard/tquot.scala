@@ -29,7 +29,7 @@ import coulomb.policy.AllowTruncation
 transparent inline given ctx_tquot_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
-    alg: CanTQuot[VL],
+    alg: TruncatedDivision[VL],
     su: SimplifiedUnit[UL / UR]
         ): TQuot[VL, UL, VR, UR] =
     new TQuot[VL, UL, VR, UR]:
@@ -43,31 +43,10 @@ transparent inline given ctx_tquot_2V2U[VL, UL, VR, UR](using
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
-    alg: CanTQuot[vres.VO],
+    alg: TruncatedDivision[vres.VO],
     su: SimplifiedUnit[UL / UR]
         ): TQuot[VL, UL, VR, UR] =
     new TQuot[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = su.UO
         def apply(vl: VL, vr: VR): VO = alg.tquot(vlvo(vl), vrvo(vr))
-
-// if algebra ever implements TruncatedDivision for Int and Long I can get rid of this
-abstract class CanTQuot[V]:
-    def tquot(vl: V, vr: V): V
-
-object CanTQuot:
-    inline given ctx_TruncatedDivision_CanTQuot[V](using td: TruncatedDivision[V]): CanTQuot[V] =
-        new CanTQuot[V]:
-            def tquot(vl: V, vr: V): V = td.tquot(vl, vr)
-
-    inline given ctx_Integral_CanTQuot[V](using
-        ntd: NotGiven[TruncatedDivision[V]],
-        num: scala.math.Integral[V]): CanTQuot[V] =
-        new CanTQuot[V]:
-            def tquot(vl: V, vr: V): V = num.quot(vl, vr)
-
-    inline given ctx_Fractional_CanTQuot[V](using
-        ntd: NotGiven[TruncatedDivision[V]],
-        num: scala.math.Fractional[V]): CanTQuot[V] =
-        new CanTQuot[V]:
-            def tquot(vl: V, vr: V): V = num.fromInt(num.toInt(num.div(vl, vr)))

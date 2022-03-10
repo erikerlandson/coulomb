@@ -20,8 +20,7 @@ class QuantitySuite extends CoulombSuite:
     import coulomb.*
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
-    import algebra.ring.TruncatedDivision
-    import algebra.ring.TruncatedDivision.given
+    import coulomb.ops.algebra.all.given
 
     test("lift via Quantity") {
         Quantity[Meter](3.14).assertQ[Double, Meter](3.14)
