@@ -14,27 +14,37 @@
  * limitations under the License.
  */
 
-package coulomb.units.mks
+package coulomb.units
 
-import coulomb.define.*
-import coulomb.{`*`, `/`, `^`}
+object mks:
+    import coulomb.define.*
+    import coulomb.{`*`, `/`, `^`}
+    import coulomb.units.si.*
 
-import coulomb.units.si.*
+    // exports are safe to "union" from multiple imports
+    export coulomb.units.si.{
+        Meter, ctx_unit_Meter,
+        Kilogram, ctx_unit_Kilogram,
+        Second, ctx_unit_Second
+    }
 
-final type Radian
-given ctx_unit_Radian: DerivedUnit[Radian, 1, 1, "radian", "rad"] with {}
+    final type Radian
+    given ctx_unit_Radian: DerivedUnit[Radian, 1, 1, "radian", "rad"] with {}
 
-final type Steradian
-given ctx_unit_Steradian: DerivedUnit[Steradian, 1, 1, "steradian", "sr"] with {}
+    final type Steradian
+    given ctx_unit_Steradian: DerivedUnit[Steradian, 1, 1, "steradian", "sr"] with {}
 
-final type Hertz
-given ctx_unit_Hertz: DerivedUnit[Hertz, 1 / Second, 1, "hertz", "Hz"] with {}
+    final type Hertz
+    given ctx_unit_Hertz: DerivedUnit[Hertz, 1 / Second, 1, "hertz", "Hz"] with {}
 
-final type Newton
-given ctx_unit_Newton: DerivedUnit[Newton, Kilogram * Meter / (Second ^ 2), 1, "newton", "N"] with {}
+    final type Newton
+    given ctx_unit_Newton: DerivedUnit[Newton, Kilogram * Meter / (Second ^ 2), 1, "newton", "N"] with {}
 
-final type Joule
-given ctx_unit_Joule: DerivedUnit[Joule, Newton * Meter, 1, "joule", "J"] with {}
+    final type Joule
+    given ctx_unit_Joule: DerivedUnit[Joule, Newton * Meter, 1, "joule", "J"] with {}
 
-final type Watt
-given ctx_unit_Watt: DerivedUnit[Watt, Joule / Second, 1, "watt", "W"] with {}
+    final type Watt
+    given ctx_unit_Watt: DerivedUnit[Watt, Joule / Second, 1, "watt", "W"] with {}
+
+    final type Pascal
+    given ctx_unit_Pascal: DerivedUnit[Pascal, Newton / (Meter ^ 2), 1, "pascal", "Pa"] with {}
