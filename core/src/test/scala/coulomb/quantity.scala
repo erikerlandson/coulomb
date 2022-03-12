@@ -47,7 +47,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("toValue standard") {
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.value.given
 
         1.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
         1.withUnit[Meter].toValue[Long].assertQ[Long, Meter](1)
@@ -71,7 +71,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("toValue standard truncating") {
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.value.given
 
         1.5f.withUnit[Meter].tToValue[Int].assertQ[Int, Meter](1)
         0.999f.withUnit[Meter].tToValue[Long].assertQ[Long, Meter](0)
@@ -81,7 +81,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("toUnit standard") {
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         1.5f.withUnit[Minute].toUnit[Second].assertQ[Float, Second](90)
         1d.withUnit[Meter].toUnit[Yard].assertQD[Double, Yard](1.0936132983377078)
@@ -91,14 +91,14 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("toUnit standard truncating") {
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.unit.given
 
         1.withUnit[Minute].tToUnit[Second].assertQ[Int, Second](60)
         1L.withUnit[Yard].tToUnit[Meter].assertQ[Long, Meter](0)
     }
 
     test("implicit conversions") {
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // implicit conversions only happen if you import them,
         // and set coulomb policy to allow them
@@ -123,7 +123,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.ops.resolution.standard.given
         // importing conversions makes them available explicitly but they will
         // not be available implicitly unless that is enabled separately
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // adding w/ same value and unit requires no implicit conversion
         (1d.withUnit[Second] + 1d.withUnit[Second]).assertQ[Double, Second](2)
@@ -144,7 +144,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // same value type, different units
         (1d.withUnit[Kilo * Second] + 1d.withUnit[Second]).assertQD[Double, Kilo * Second](1.001)
@@ -196,7 +196,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         (1L.withUnit[Second] + 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](61)
         (1L.withUnit[Second] + 1.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](61)
@@ -219,7 +219,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.ops.resolution.standard.given
         // importing conversions makes them available explicitly but they will
         // not be available implicitly unless that is enabled separately
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // same value and unit requires no implicit conversion
         (3d.withUnit[Second] - 1d.withUnit[Second]).assertQ[Double, Second](2)
@@ -240,7 +240,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // same value type, different units
         (1d.withUnit[Kilo * Second] - 1d.withUnit[Second]).assertQD[Double, Kilo * Second](0.999)
@@ -292,7 +292,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         (61L.withUnit[Second] - 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](1)
         (61L.withUnit[Second] - 1.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](1)
@@ -313,7 +313,7 @@ class QuantitySuite extends CoulombSuite:
     test("multiplication standard strict") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // same value types require no implicit conversion
         (2d.withUnit[Meter] * 3d.withUnit[Meter]).assertQ[Double, Meter ^ 2](6)
@@ -333,7 +333,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // differing value types
         (3d.withUnit[Meter] * 5d.withUnit[Meter]).assertQ[Double, Meter ^ 2](15)
@@ -360,7 +360,7 @@ class QuantitySuite extends CoulombSuite:
     test("division standard strict") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // same value types require no implicit conversion
         (12d.withUnit[Meter] / 3d.withUnit[Second]).assertQ[Double, Meter / Second](4)
@@ -381,7 +381,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         (5d.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
         (5d.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
@@ -408,7 +408,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         (5d.withUnit[Meter] `tquot` 2d.withUnit[Second]).assertQ[Double, Meter / Second](2)
         (5f.withUnit[Meter] `tquot` 2f.withUnit[Second]).assertQ[Float, Meter / Second](2)
@@ -423,7 +423,7 @@ class QuantitySuite extends CoulombSuite:
     test("power standard") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         2d.withUnit[Meter].pow[0].assertQ[Double, 1](1)
         2d.withUnit[Meter].pow[2].assertQ[Double, Meter ^ 2](4)
@@ -454,7 +454,7 @@ class QuantitySuite extends CoulombSuite:
     test("truncating power standard") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         10d.withUnit[Meter].tpow[0].assertQ[Double, 1](1)
         10d.withUnit[Meter].tpow[2].assertQ[Double, Meter ^ 2](100)
@@ -485,7 +485,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         // changes/improvements to simplification algorithm may change these -
         // it is more important that they be correct than have some particular form, but
@@ -500,7 +500,6 @@ class QuantitySuite extends CoulombSuite:
 
     test("negation standard") {
         import coulomb.ops.standard.given
-        import coulomb.conversion.standard.given
 
         (-(7d.withUnit[Liter])).assertQ[Double, Liter](-7)
         (-(7f.withUnit[Liter])).assertQ[Float, Liter](-7)
@@ -510,7 +509,7 @@ class QuantitySuite extends CoulombSuite:
 
     test("equality standard strict") {
         import coulomb.ops.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         assertEquals(1d.withUnit[Meter] === 1d.withUnit[Meter], true)
         assertEquals(1f.withUnit[Meter] === 1f.withUnit[Meter], true)
@@ -530,7 +529,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         assertEquals(2d.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], true)
         assertEquals(2d.withUnit[(1 / 2) * Meter] === 2f.withUnit[Meter], false)
@@ -557,7 +556,7 @@ class QuantitySuite extends CoulombSuite:
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.given
+        import coulomb.conversion.standard.all.given
 
         assertEquals(2L.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], true)
         assertEquals(2L.withUnit[(1 / 2) * Meter] === 2f.withUnit[Meter], false)
@@ -577,7 +576,7 @@ class OptimizedQuantitySuite extends CoulombSuite:
     import coulomb.ops.algebra.all.given
 
     import coulomb.policy.allowImplicitConversions.given
-    import coulomb.conversion.standard.given
+    import coulomb.conversion.standard.all.given
 
     // I need to test with optimizations in scope
     // it would be ideal to somehow compile the main QuantitySuite with

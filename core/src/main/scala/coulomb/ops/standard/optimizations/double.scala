@@ -22,6 +22,8 @@ import coulomb.{`*`, `/`, `^`}
 import coulomb.ops.*
 import coulomb.policy.AllowImplicitConversions
 
+import coulomb.conversion.coefficients.*
+
 object double:
     inline given ctx_quantity_neg_Double[U]: Neg[Double, U] =
         new Neg[Double, U]:
@@ -37,7 +39,7 @@ object double:
         AllowImplicitConversions,
         NotGiven[UL =:= UR]
             ): Add[Double, UL, Double, UR] =
-        val c = coulomb.conversion.infra.coefficientDouble[UR, UL]
+        val c = coefficientDouble[UR, UL]
         new Add[Double, UL, Double, UR]:
             type VO = Double
             type UO = UL
@@ -53,7 +55,7 @@ object double:
         AllowImplicitConversions,
         NotGiven[UL =:= UR]
             ): Sub[Double, UL, Double, UR] =
-        val c = coulomb.conversion.infra.coefficientDouble[UR, UL]
+        val c = coefficientDouble[UR, UL]
         new Sub[Double, UL, Double, UR]:
             type VO = Double
             type UO = UL

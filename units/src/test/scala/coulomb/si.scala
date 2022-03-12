@@ -20,7 +20,7 @@ class SIUnitsSuite extends CoulombSuite:
     import coulomb.*
     import coulomb.units.si.{*, given}
     import coulomb.units.si.prefixes.{*, given}
-    import coulomb.conversion.standard.given
+    import coulomb.conversion.standard.all.given
 
     test("defines si units") {
         1.withUnit[Meter].assertQ[Int, Meter](1)
