@@ -16,8 +16,8 @@
 
 package coulomb.ops.algebra
 
-object all
-    extends IntInstances
-    with LongInstances
-    with FloatInstances
-    with DoubleInstances
+object all:
+    export coulomb.ops.algebra.int.{*,given}
+    export coulomb.ops.algebra.long.{*,given}
+    export coulomb.ops.algebra.float.{*,given}
+    export coulomb.ops.algebra.double.{*,given}

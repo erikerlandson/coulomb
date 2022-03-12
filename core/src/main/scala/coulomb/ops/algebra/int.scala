@@ -18,9 +18,7 @@ package coulomb.ops.algebra
 
 import algebra.ring.TruncatedDivision
 
-object int extends IntInstances
-
-trait IntInstances:
+object int:
     given ctx_Int_is_TruncatingPower: TruncatingPower[Int] with
         def tpow(v: Int, e: Double): Int = math.pow(v.toDouble, e).toInt
 

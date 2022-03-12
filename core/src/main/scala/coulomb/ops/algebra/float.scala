@@ -18,9 +18,7 @@ package coulomb.ops.algebra
 
 import algebra.ring.TruncatedDivision
 
-object float extends FloatInstances
-
-trait FloatInstances:
+object float:
     given ctx_Float_is_FractionalPower: FractionalPower[Float] with
         def pow(v: Float, e: Double): Float = math.pow(v.toDouble, e).toFloat
 

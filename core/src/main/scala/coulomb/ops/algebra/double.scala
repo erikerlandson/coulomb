@@ -18,9 +18,7 @@ package coulomb.ops.algebra
 
 import algebra.ring.TruncatedDivision
 
-object double extends DoubleInstances
-
-trait DoubleInstances:
+object double:
     given ctx_Double_is_FractionalPower: FractionalPower[Double] with
         def pow(v: Double, e: Double): Double = math.pow(v, e)
 
