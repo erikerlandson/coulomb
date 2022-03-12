@@ -569,3 +569,52 @@ class QuantitySuite extends CoulombSuite:
         assertEquals(1.withUnit[(1 / 2) * Meter].tToUnit[Meter] === 1L.withUnit[Meter], false)
         assertEquals(2.withUnit[(1 / 2) * Meter].tToUnit[Meter] === 1.withUnit[Meter], true)
     }
+
+class OptimizedQuantitySuite extends CoulombSuite:
+    import coulomb.*
+    import coulomb.testing.units.{*, given}
+    import algebra.instances.all.given
+    import coulomb.ops.algebra.all.given
+
+    import coulomb.policy.allowImplicitConversions.given
+    import coulomb.conversion.standard.given
+
+    // I need to test with optimizations in scope
+    // it would be ideal to somehow compile the main QuantitySuite with
+    // and without these optimizations
+    import coulomb.ops.standard.optimizations.all.given
+    import coulomb.ops.standard.given
+    // it is important that non-optimized be imported at the same scope level (or higher)
+    // otherwise it will override the optimizations if it is at narrower scope
+
+    // I could also use a way to specifically verify that the optimizations are being
+    // applied.  Currently I am just modifying the optimizations to be wrong and see if the tests fail
+
+    test("negation standard") {
+        (-(7d.withUnit[Liter])).assertQ[Double, Liter](-7)
+        (-(7f.withUnit[Liter])).assertQ[Float, Liter](-7)
+    }
+
+    test("addition") {
+        (1d.withUnit[Second] + 1d.withUnit[Second]).assertQ[Double, Second](2)
+        (1f.withUnit[Meter] + 1f.withUnit[Meter]).assertQ[Float, Meter](2)
+        (1d.withUnit[Kilo * Second] + 1d.withUnit[Second]).assertQD[Double, Kilo * Second](1.001)
+        (1f.withUnit[Meter] + 1f.withUnit[Yard]).assertQD[Float, Meter](1.9144)
+    }
+
+    test("subtraction") {
+        (3d.withUnit[Second] - 1d.withUnit[Second]).assertQ[Double, Second](2)
+        (3f.withUnit[Meter] - 1f.withUnit[Meter]).assertQ[Float, Meter](2)
+        (1d.withUnit[Kilo * Second] - 1d.withUnit[Second]).assertQD[Double, Kilo * Second](0.999)
+        (1f.withUnit[Meter] - 1f.withUnit[Yard]).assertQD[Float, Meter](0.0856)
+    }
+
+    test("multiplication") {
+        (2d.withUnit[Meter] * 3d.withUnit[Meter]).assertQ[Double, Meter ^ 2](6)
+        (2f.withUnit[Meter / Kilogram] * 3f.withUnit[Kilogram / Second]).assertQ[Float, Meter / Second](6)
+    }
+
+    test("division") {
+        (12d.withUnit[Meter] / 3d.withUnit[Second]).assertQ[Double, Meter / Second](4)
+        (12f.withUnit[Meter / Kilogram] / 3f.withUnit[Second / Kilogram]).assertQ[Float, Meter / Second](4)
+    }
