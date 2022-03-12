@@ -25,20 +25,6 @@ import coulomb.ops.{Mul, SimplifiedUnit, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
 
-transparent inline given ctx_mul_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-        Mul[Double, UL, Double, UR] =
-    new Mul[Double, UL, Double, UR]:
-        type VO = Double
-        type UO = su.UO
-        def apply(vl: Double, vr: Double): Double = vl * vr
-
-transparent inline given ctx_mul_Float_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-        Mul[Float, UL, Float, UR] =
-    new Mul[Float, UL, Float, UR]:
-        type VO = Float
-        type UO = su.UO
-        def apply(vl: Float, vr: Float): Float = vl * vr
-
 transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,

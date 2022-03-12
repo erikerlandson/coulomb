@@ -26,20 +26,6 @@ import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
 import coulomb.policy.AllowTruncation
 
-transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
-        Div[Double, UL, Double, UR] =
-    new Div[Double, UL, Double, UR]:
-        type VO = Double
-        type UO = su.UO
-        def apply(vl: Double, vr: Double): Double = vl / vr
-
-transparent inline given ctx_div_Float_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
-        Div[Float, UL, Float, UR] =
-    new Div[Float, UL, Float, UR]:
-        type VO = Float
-        type UO = su.UO
-        def apply(vl: Float, vr: Float): Float = vl / vr
-
 transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,

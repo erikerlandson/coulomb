@@ -24,38 +24,6 @@ import coulomb.ops.{Add, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
 
-transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
-    new Add[Double, U, Double, U]:
-        type VO = Double
-        type UO = U
-        def apply(vl: Double, vr: Double): Double = vl + vr
-
-transparent inline given ctx_add_Float_1U[U]: Add[Float, U, Float, U] =
-    new Add[Float, U, Float, U]:
-        type VO = Float
-        type UO = U
-        def apply(vl: Float, vr: Float): Float = vl + vr
-
-transparent inline given ctx_add_Double_2U[UL, UR](using
-    AllowImplicitConversions,
-    NotGiven[UL =:= UR]
-        ): Add[Double, UL, Double, UR] =
-    val c = coulomb.conversion.infra.coefficientDouble[UR, UL]
-    new Add[Double, UL, Double, UR]:
-        type VO = Double
-        type UO = UL
-        def apply(vl: Double, vr: Double): Double = vl + (c * vr)
-
-transparent inline given ctx_add_Float_2U[UL, UR](using
-    AllowImplicitConversions,
-    NotGiven[UL =:= UR]
-        ): Add[Float, UL, Float, UR] =
-    val c = coulomb.conversion.infra.coefficientFloat[UR, UL]
-    new Add[Float, UL, Float, UR]:
-        type VO = Float
-        type UO = UL
-        def apply(vl: Float, vr: Float): Float = vl + (c * vr)
-
 transparent inline given ctx_add_1V1U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
