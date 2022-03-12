@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-package coulomb.ops.standard
+package coulomb.ops.standard.optimizations
 
-import coulomb.ops.Neg
-import algebra.ring.AdditiveGroup
-
-inline given ctx_quantity_neg[V, U](using alg: AdditiveGroup[V]): Neg[V, U] =
-    new Neg[V, U]:
-        def apply(v: V): V = alg.negate(v)
-
+object all:
+    export double.given
+    export float.given

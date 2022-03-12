@@ -80,6 +80,7 @@ end quantity
 import coulomb.ops.*
 import coulomb.rational.Rational
 import coulomb.conversion.{ValueConversion, UnitConversion}
+import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
 
 inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
 inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
@@ -99,6 +100,11 @@ extension[VL, UL](ql: Quantity[VL, UL])
     inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
         conv(ql.value).withUnit[U]
 
+    inline def tToValue[V](using conv: TruncatingValueConversion[VL, V]): Quantity[V, UL] =
+        conv(ql.value).withUnit[UL]
+    inline def tToUnit[U](using conv: TruncatingUnitConversion[VL, UL, U]): Quantity[VL, U] =
+        conv(ql.value).withUnit[U]
+
     inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
         neg(ql.value).withUnit[UL]
 
@@ -114,8 +120,14 @@ extension[VL, UL](ql: Quantity[VL, UL])
     transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[VL, UL, VR, UR]): Quantity[div.VO, div.UO] =
         div(ql.value, qr.value).withUnit[div.UO]
 
+    transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using tq: TQuot[VL, UL, VR, UR]): Quantity[tq.VO, tq.UO] =
+        tq(ql.value, qr.value).withUnit[tq.UO]
+
     transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
         pow(ql.value).withUnit[pow.UO]
+
+    transparent inline def tpow[P](using tp: TPow[VL, UL, P]): Quantity[tp.VO, tp.UO] =
+        tp(ql.value).withUnit[tp.UO]
 
     inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
         ord(ql.value, qr.value) == 0

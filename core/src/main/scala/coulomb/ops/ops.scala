@@ -20,6 +20,10 @@ import scala.annotation.implicitNotFound
 
 import coulomb.*
 
+@implicitNotFound("Negation not defined in scope for Quantity[${V}, ${U}]")
+abstract class Neg[V, U]:
+    def apply(v: V): V
+
 @implicitNotFound("Addition not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Add[VL, UL, VR, UR]:
     type VO
@@ -44,12 +48,20 @@ abstract class Div[VL, UL, VR, UR]:
     type UO
     def apply(vl: VL, vr: VR): VO
 
-@implicitNotFound("Negation not defined in scope for Quantity[${V}, ${U}]")
-abstract class Neg[V, U]:
-    def apply(v: V): V
+@implicitNotFound("Truncating Division not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
+abstract class TQuot[VL, UL, VR, UR]:
+    type VO
+    type UO
+    def apply(vl: VL, vr: VR): VO
 
 @implicitNotFound("Power not defined in scope for Quantity[${V}, ${U}] ^ ${P}")
 abstract class Pow[V, U, P]:
+    type VO
+    type UO
+    def apply(v: V): VO
+
+@implicitNotFound("Truncating Power not defined in scope for Quantity[${V}, ${U}] ^ ${P}")
+abstract class TPow[V, U, P]:
     type VO
     type UO
     def apply(v: V): VO

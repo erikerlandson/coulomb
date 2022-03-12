@@ -19,6 +19,8 @@ import coulomb.testing.CoulombSuite
 class QuantitySuite extends CoulombSuite:
     import coulomb.*
     import coulomb.testing.units.{*, given}
+    import algebra.instances.all.given
+    import coulomb.ops.algebra.all.given
 
     test("lift via Quantity") {
         Quantity[Meter](3.14).assertQ[Double, Meter](3.14)
@@ -57,7 +59,6 @@ class QuantitySuite extends CoulombSuite:
         1L.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
         1L.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
 
-        // fp to truncating types is an error without importing truncating rules
         assertCE("1f.withUnit[Meter].toValue[Int]")
         assertCE("1f.withUnit[Meter].toValue[Long]")
         1f.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
@@ -70,14 +71,13 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("toValue standard truncating") {
-        import coulomb.policy.allowTruncation.given
         import coulomb.conversion.standard.given
 
-        1.5f.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
-        0.999f.withUnit[Meter].toValue[Long].assertQ[Long, Meter](0)
+        1.5f.withUnit[Meter].tToValue[Int].assertQ[Int, Meter](1)
+        0.999f.withUnit[Meter].tToValue[Long].assertQ[Long, Meter](0)
 
-        1.5d.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
-        0.999d.withUnit[Meter].toValue[Long].assertQ[Long, Meter](0)
+        1.5d.withUnit[Meter].tToValue[Int].assertQ[Int, Meter](1)
+        0.999d.withUnit[Meter].tToValue[Long].assertQ[Long, Meter](0)
     }
 
     test("toUnit standard") {
@@ -85,17 +85,16 @@ class QuantitySuite extends CoulombSuite:
 
         1.5f.withUnit[Minute].toUnit[Second].assertQ[Float, Second](90)
         1d.withUnit[Meter].toUnit[Yard].assertQD[Double, Yard](1.0936132983377078)
-        // conversions on truncating types require importing truncating conversion rules
+
         assertCE("1.withUnit[Minute].toUnit[Second]")
         assertCE("1L.withUnit[Yard].toUnit[Meter]")
     }
 
     test("toUnit standard truncating") {
-        import coulomb.policy.allowTruncation.given
         import coulomb.conversion.standard.given
 
-        1.withUnit[Minute].toUnit[Second].assertQ[Int, Second](60)
-        1L.withUnit[Yard].toUnit[Meter].assertQ[Long, Meter](0)
+        1.withUnit[Minute].tToUnit[Second].assertQ[Int, Second](60)
+        1L.withUnit[Yard].tToUnit[Meter].assertQ[Long, Meter](0)
     }
 
     test("implicit conversions") {
@@ -194,26 +193,25 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("addition standard truncating") {
-        import coulomb.policy.allowTruncation.given
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
 
-        (1L.withUnit[Second] + 1L.withUnit[Minute]).assertQ[Long, Second](61)
-        (1L.withUnit[Second] + 1.withUnit[Minute]).assertQ[Long, Second](61)
-        (1.withUnit[Second] + 1L.withUnit[Minute]).assertQ[Long, Second](61)
-        (1.withUnit[Second] + 1.withUnit[Minute]).assertQ[Int, Second](61)
+        (1L.withUnit[Second] + 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](61)
+        (1L.withUnit[Second] + 1.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](61)
+        (1.withUnit[Second] + 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](61)
+        (1.withUnit[Second] + 1.withUnit[Minute].tToUnit[Second]).assertQ[Int, Second](61)
 
         // integer truncation can cause loss of precision
-        (1L.withUnit[Meter] + 1L.withUnit[Yard]).assertQ[Long, Meter](1)
-        (1L.withUnit[Meter] + 1.withUnit[Yard]).assertQ[Long, Meter](1)
-        (1.withUnit[Meter] + 1L.withUnit[Yard]).assertQ[Long, Meter](1)
-        (1.withUnit[Meter] + 1.withUnit[Yard]).assertQ[Int, Meter](1)
+        (1L.withUnit[Meter] + 1L.withUnit[Yard].tToUnit[Meter]).assertQ[Long, Meter](1)
+        (1L.withUnit[Meter] + 1.withUnit[Yard].tToUnit[Meter]).assertQ[Long, Meter](1)
+        (1.withUnit[Meter] + 1L.withUnit[Yard].tToUnit[Meter]).assertQ[Long, Meter](1)
+        (1.withUnit[Meter] + 1.withUnit[Yard].tToUnit[Meter]).assertQ[Int, Meter](1)
 
         // fp effects (e.g. (3 * 0.3333).toInt -> 0) are avoided when possible
-        (1.withUnit[Yard] + 3.withUnit[Foot]).assertQ[Int, Yard](2)
-        (1L.withUnit[Yard] + 3L.withUnit[Foot]).assertQ[Long, Yard](2)
+        (1.withUnit[Yard] + 3.withUnit[Foot].tToUnit[Yard]).assertQ[Int, Yard](2)
+        (1L.withUnit[Yard] + 3L.withUnit[Foot].tToUnit[Yard]).assertQ[Long, Yard](2)
     }
 
     test("subtraction standard strict") {
@@ -291,26 +289,25 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("subtraction standard truncating") {
-        import coulomb.policy.allowTruncation.given
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
 
-        (61L.withUnit[Second] - 1L.withUnit[Minute]).assertQ[Long, Second](1)
-        (61L.withUnit[Second] - 1.withUnit[Minute]).assertQ[Long, Second](1)
-        (61.withUnit[Second] - 1L.withUnit[Minute]).assertQ[Long, Second](1)
-        (61.withUnit[Second] - 1.withUnit[Minute]).assertQ[Int, Second](1)
+        (61L.withUnit[Second] - 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](1)
+        (61L.withUnit[Second] - 1.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](1)
+        (61.withUnit[Second] - 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](1)
+        (61.withUnit[Second] - 1.withUnit[Minute].tToUnit[Second]).assertQ[Int, Second](1)
 
         // integer truncation can cause loss of precision
-        (2L.withUnit[Meter] - 1L.withUnit[Yard]).assertQ[Long, Meter](2)
-        (2L.withUnit[Meter] - 1.withUnit[Yard]).assertQ[Long, Meter](2)
-        (2.withUnit[Meter] - 1L.withUnit[Yard]).assertQ[Long, Meter](2)
-        (2.withUnit[Meter] - 1.withUnit[Yard]).assertQ[Int, Meter](2)
+        (2L.withUnit[Meter] - 1L.withUnit[Yard].tToUnit[Meter]).assertQ[Long, Meter](2)
+        (2L.withUnit[Meter] - 1.withUnit[Yard].tToUnit[Meter]).assertQ[Long, Meter](2)
+        (2.withUnit[Meter] - 1L.withUnit[Yard].tToUnit[Meter]).assertQ[Long, Meter](2)
+        (2.withUnit[Meter] - 1.withUnit[Yard].tToUnit[Meter]).assertQ[Int, Meter](2)
 
         // fp effects (e.g. (3 * 0.3333).toInt -> 0) are avoided when possible
-        (2.withUnit[Yard] - 3.withUnit[Foot]).assertQ[Int, Yard](1)
-        (2L.withUnit[Yard] - 3L.withUnit[Foot]).assertQ[Long, Yard](1)
+        (2.withUnit[Yard] - 3.withUnit[Foot].tToUnit[Yard]).assertQ[Int, Yard](1)
+        (2L.withUnit[Yard] - 3L.withUnit[Foot].tToUnit[Yard]).assertQ[Long, Yard](1)
     }
 
     test("multiplication standard strict") {
@@ -407,22 +404,20 @@ class QuantitySuite extends CoulombSuite:
         assertCE("5.withUnit[Meter] / 2.withUnit[Second]")
     }
 
-    test("division standard truncating") {
-        import coulomb.policy.allowTruncation.given
+    test("truncating division standard") {
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
 
-        (5L.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
-        (5L.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float, Meter / Second](2.5)
-        (5L.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
-        (5L.withUnit[Meter] / 2.withUnit[Second]).assertQ[Long, Meter / Second](2)
+        (5d.withUnit[Meter] `tquot` 2d.withUnit[Second]).assertQ[Double, Meter / Second](2)
+        (5f.withUnit[Meter] `tquot` 2f.withUnit[Second]).assertQ[Float, Meter / Second](2)
 
-        (5.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
-        (5.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Float,  Meter / Second](2.5)
-        (5.withUnit[Meter] / 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
-        (5.withUnit[Meter] / 2.withUnit[Second]).assertQ[Int, Meter / Second](2)
+        (5L.withUnit[Meter] `tquot` 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
+        (5L.withUnit[Meter] `tquot` 2.withUnit[Second]).assertQ[Long, Meter / Second](2)
+
+        (5.withUnit[Meter] `tquot` 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
+        (5.withUnit[Meter] `tquot` 2.withUnit[Second]).assertQ[Int, Meter / Second](2)
     }
 
     test("power standard") {
@@ -442,48 +437,48 @@ class QuantitySuite extends CoulombSuite:
         2f.withUnit[Meter].pow[1 / 2].assertQD[Float, Meter ^ (1 / 2)](1.4142135623730951)
         2f.withUnit[Meter].pow[-1 / 2].assertQD[Float, 1 / (Meter ^ (1 / 2))](0.7071067811865476)
 
-        2L.withUnit[Meter].pow[0].assertQ[Long, 1](1)
+        // positive integer exponents are supported via multiplicative semigroup
+        assertCE("2L.withUnit[Meter].pow[0]")
         2L.withUnit[Meter].pow[2].assertQ[Long, Meter ^ 2](4)
         assertCE("2L.withUnit[Meter].pow[-1]")
         assertCE("2L.withUnit[Meter].pow[1 / 2]")
         assertCE("2L.withUnit[Meter].pow[-1 / 2]")
 
-        2.withUnit[Meter].pow[0].assertQ[Int, 1](1)
+        assertCE("2.withUnit[Meter].pow[0]")
         2.withUnit[Meter].pow[2].assertQ[Int, Meter ^ 2](4)
         assertCE("2.withUnit[Meter].pow[-1]")
         assertCE("2.withUnit[Meter].pow[1 / 2]")
         assertCE("2.withUnit[Meter].pow[-1 / 2]")
     }
 
-    test("power standard truncating") {
-        import coulomb.policy.allowTruncation.given
+    test("truncating power standard") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.given
 
-        10d.withUnit[Meter].pow[0].assertQ[Double, 1](1)
-        10d.withUnit[Meter].pow[2].assertQ[Double, Meter ^ 2](100)
-        10d.withUnit[Meter].pow[-1].assertQD[Double, 1 / Meter](0.1)
-        10d.withUnit[Meter].pow[1 / 2].assertQD[Double, Meter ^ (1 / 2)](3.1622776601683795)
-        10d.withUnit[Meter].pow[-1 / 2].assertQD[Double, 1 / (Meter ^ (1 / 2))](0.31622776601683794)
+        10d.withUnit[Meter].tpow[0].assertQ[Double, 1](1)
+        10d.withUnit[Meter].tpow[2].assertQ[Double, Meter ^ 2](100)
+        10d.withUnit[Meter].tpow[-1].assertQ[Double, 1 / Meter](0)
+        10d.withUnit[Meter].tpow[1 / 2].assertQ[Double, Meter ^ (1 / 2)](3)
+        10d.withUnit[Meter].tpow[-1 / 2].assertQ[Double, 1 / (Meter ^ (1 / 2))](0)
 
-        10f.withUnit[Meter].pow[0].assertQ[Float, 1](1)
-        10f.withUnit[Meter].pow[2].assertQ[Float, Meter ^ 2](100)
-        10f.withUnit[Meter].pow[-1].assertQD[Float, 1 / Meter](0.1)
-        10f.withUnit[Meter].pow[1 / 2].assertQD[Float, Meter ^ (1 / 2)](3.1622776601683795)
-        10f.withUnit[Meter].pow[-1 / 2].assertQD[Float, 1 / (Meter ^ (1 / 2))](0.31622776601683794)
+        10f.withUnit[Meter].tpow[0].assertQ[Float, 1](1)
+        10f.withUnit[Meter].tpow[2].assertQ[Float, Meter ^ 2](100)
+        10f.withUnit[Meter].tpow[-1].assertQ[Float, 1 / Meter](0)
+        10f.withUnit[Meter].tpow[1 / 2].assertQ[Float, Meter ^ (1 / 2)](3)
+        10f.withUnit[Meter].tpow[-1 / 2].assertQ[Float, 1 / (Meter ^ (1 / 2))](0)
 
-        10L.withUnit[Meter].pow[0].assertQ[Long, 1](1)
-        10L.withUnit[Meter].pow[2].assertQ[Long, Meter ^ 2](100)
-        10L.withUnit[Meter].pow[-1].assertQ[Long, 1 / Meter](0)
-        10L.withUnit[Meter].pow[1 / 2].assertQ[Long, Meter ^ (1 / 2)](3)
-        10L.withUnit[Meter].pow[-1 / 2].assertQ[Long, 1 / (Meter ^ (1 / 2))](0)
+        10L.withUnit[Meter].tpow[0].assertQ[Long, 1](1)
+        10L.withUnit[Meter].tpow[2].assertQ[Long, Meter ^ 2](100)
+        10L.withUnit[Meter].tpow[-1].assertQ[Long, 1 / Meter](0)
+        10L.withUnit[Meter].tpow[1 / 2].assertQ[Long, Meter ^ (1 / 2)](3)
+        10L.withUnit[Meter].tpow[-1 / 2].assertQ[Long, 1 / (Meter ^ (1 / 2))](0)
 
-        10.withUnit[Meter].pow[0].assertQ[Int, 1](1)
-        10.withUnit[Meter].pow[2].assertQ[Int, Meter ^ 2](100)
-        10.withUnit[Meter].pow[-1].assertQ[Int, 1 / Meter](0)
-        10.withUnit[Meter].pow[1 / 2].assertQ[Int, Meter ^ (1 / 2)](3)
-        10.withUnit[Meter].pow[-1 / 2].assertQ[Int, 1 / (Meter ^ (1 / 2))](0)
+        10.withUnit[Meter].tpow[0].assertQ[Int, 1](1)
+        10.withUnit[Meter].tpow[2].assertQ[Int, Meter ^ 2](100)
+        10.withUnit[Meter].tpow[-1].assertQ[Int, 1 / Meter](0)
+        10.withUnit[Meter].tpow[1 / 2].assertQ[Int, Meter ^ (1 / 2)](3)
+        10.withUnit[Meter].tpow[-1 / 2].assertQ[Int, 1 / (Meter ^ (1 / 2))](0)
     }
 
     test("constants in simplified unit types") {
@@ -559,7 +554,6 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("equality standard truncating") {
-        import coulomb.policy.allowTruncation.given
         import coulomb.policy.allowImplicitConversions.given
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
@@ -567,11 +561,60 @@ class QuantitySuite extends CoulombSuite:
 
         assertEquals(2L.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], true)
         assertEquals(2L.withUnit[(1 / 2) * Meter] === 2f.withUnit[Meter], false)
-        assertEquals(2L.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter], true)
-        assertEquals(2L.withUnit[(1 / 2) * Meter] === 2.withUnit[Meter], false)
+        assertEquals(2L.withUnit[(1 / 2) * Meter].tToUnit[Meter] === 1L.withUnit[Meter], true)
+        assertEquals(2L.withUnit[(1 / 2) * Meter].tToUnit[Meter] === 2.withUnit[Meter], false)
 
         assertEquals(1.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], false)
         assertEquals(2.withUnit[(1 / 2) * Meter] === 1f.withUnit[Meter], true)
-        assertEquals(1.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter], false)
-        assertEquals(2.withUnit[(1 / 2) * Meter] === 1.withUnit[Meter], true)
+        assertEquals(1.withUnit[(1 / 2) * Meter].tToUnit[Meter] === 1L.withUnit[Meter], false)
+        assertEquals(2.withUnit[(1 / 2) * Meter].tToUnit[Meter] === 1.withUnit[Meter], true)
+    }
+
+class OptimizedQuantitySuite extends CoulombSuite:
+    import coulomb.*
+    import coulomb.testing.units.{*, given}
+    import algebra.instances.all.given
+    import coulomb.ops.algebra.all.given
+
+    import coulomb.policy.allowImplicitConversions.given
+    import coulomb.conversion.standard.given
+
+    // I need to test with optimizations in scope
+    // it would be ideal to somehow compile the main QuantitySuite with
+    // and without these optimizations
+    import coulomb.ops.standard.optimizations.all.given
+    import coulomb.ops.standard.given
+    // it is important that non-optimized be imported at the same scope level (or higher)
+    // otherwise it will override the optimizations if it is at narrower scope
+
+    // I could also use a way to specifically verify that the optimizations are being
+    // applied.  Currently I am just modifying the optimizations to be wrong and see if the tests fail
+
+    test("negation standard") {
+        (-(7d.withUnit[Liter])).assertQ[Double, Liter](-7)
+        (-(7f.withUnit[Liter])).assertQ[Float, Liter](-7)
+    }
+
+    test("addition") {
+        (1d.withUnit[Second] + 1d.withUnit[Second]).assertQ[Double, Second](2)
+        (1f.withUnit[Meter] + 1f.withUnit[Meter]).assertQ[Float, Meter](2)
+        (1d.withUnit[Kilo * Second] + 1d.withUnit[Second]).assertQD[Double, Kilo * Second](1.001)
+        (1f.withUnit[Meter] + 1f.withUnit[Yard]).assertQD[Float, Meter](1.9144)
+    }
+
+    test("subtraction") {
+        (3d.withUnit[Second] - 1d.withUnit[Second]).assertQ[Double, Second](2)
+        (3f.withUnit[Meter] - 1f.withUnit[Meter]).assertQ[Float, Meter](2)
+        (1d.withUnit[Kilo * Second] - 1d.withUnit[Second]).assertQD[Double, Kilo * Second](0.999)
+        (1f.withUnit[Meter] - 1f.withUnit[Yard]).assertQD[Float, Meter](0.0856)
+    }
+
+    test("multiplication") {
+        (2d.withUnit[Meter] * 3d.withUnit[Meter]).assertQ[Double, Meter ^ 2](6)
+        (2f.withUnit[Meter / Kilogram] * 3f.withUnit[Kilogram / Second]).assertQ[Float, Meter / Second](6)
+    }
+
+    test("division") {
+        (12d.withUnit[Meter] / 3d.withUnit[Second]).assertQ[Double, Meter / Second](4)
+        (12f.withUnit[Meter / Kilogram] / 3f.withUnit[Second / Kilogram]).assertQ[Float, Meter / Second](4)
     }

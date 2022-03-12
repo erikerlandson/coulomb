@@ -18,64 +18,34 @@ package coulomb.ops.standard
 
 import scala.util.NotGiven
 
+import algebra.ring.AdditiveSemigroup
+
 import coulomb.ops.{Add, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
-
-transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
-    new Add[Double, U, Double, U]:
-        type VO = Double
-        type UO = U
-        def apply(vl: Double, vr: Double): Double = vl + vr
-
-transparent inline given ctx_add_Float_1U[U]: Add[Float, U, Float, U] =
-    new Add[Float, U, Float, U]:
-        type VO = Float
-        type UO = U
-        def apply(vl: Float, vr: Float): Float = vl + vr
-
-transparent inline given ctx_add_Double_2U[UL, UR](using
-    AllowImplicitConversions,
-    NotGiven[UL =:= UR]
-        ): Add[Double, UL, Double, UR] =
-    val c = coulomb.conversion.infra.coefficientDouble[UR, UL]
-    new Add[Double, UL, Double, UR]:
-        type VO = Double
-        type UO = UL
-        def apply(vl: Double, vr: Double): Double = vl + (c * vr)
-
-transparent inline given ctx_add_Float_2U[UL, UR](using
-    AllowImplicitConversions,
-    NotGiven[UL =:= UR]
-        ): Add[Float, UL, Float, UR] =
-    val c = coulomb.conversion.infra.coefficientFloat[UR, UL]
-    new Add[Float, UL, Float, UR]:
-        type VO = Float
-        type UO = UL
-        def apply(vl: Float, vr: Float): Float = vl + (c * vr)
 
 transparent inline given ctx_add_1V1U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,
     equ: UR =:= UL,
-    alg: CanAdd[VL]
+    alg: AdditiveSemigroup[VL]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = VL
         type UO = UL
-        def apply(vl: VL, vr: VR): VL = alg.add(vl, eqv(vr))
+        def apply(vl: VL, vr: VR): VL = alg.plus(vl, eqv(vr))
 
 transparent inline given ctx_add_1V2U[VL, UL, VR, UR](using
     ice: AllowImplicitConversions,
     eqv: VR =:= VL,
     neu: NotGiven[UR =:= UL],
     ucv: UnitConversion[VL, UR, UL],
-    alg: CanAdd[VL]
+    alg: AdditiveSemigroup[VL]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = VL
         type UO = UL
-        def apply(vl: VL, vr: VR): VL = alg.add(vl, ucv(eqv(vr)))
+        def apply(vl: VL, vr: VR): VL = alg.plus(vl, ucv(eqv(vr)))
 
 transparent inline given ctx_add_2V1U[VL, UL, VR, UR](using
     ice: AllowImplicitConversions,
@@ -84,12 +54,12 @@ transparent inline given ctx_add_2V1U[VL, UL, VR, UR](using
     vres: ValueResolution[VL, VR],
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
-    alg: CanAdd[vres.VO]
+    alg: AdditiveSemigroup[vres.VO]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = UL
-        def apply(vl: VL, vr: VR): VO = alg.add(vlvo(vl), vrvo(vr))
+        def apply(vl: VL, vr: VR): VO = alg.plus(vlvo(vl), vrvo(vr))
 
 transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
     ice: AllowImplicitConversions,
@@ -99,10 +69,10 @@ transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
     vlvo: ValueConversion[VL, vres.VO],
     vrvo: ValueConversion[VR, vres.VO],
     ucvo: UnitConversion[vres.VO, UR, UL],
-    alg: CanAdd[vres.VO]
+    alg: AdditiveSemigroup[vres.VO]
         ): Add[VL, UL, VR, UR] =
     new Add[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = UL
-        def apply(vl: VL, vr: VR): VO = alg.add(vlvo(vl), ucvo(vrvo(vr)))
+        def apply(vl: VL, vr: VR): VO = alg.plus(vlvo(vl), ucvo(vrvo(vr)))
 

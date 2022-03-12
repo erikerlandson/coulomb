@@ -59,6 +59,24 @@ object meta:
             report.error(s"type expr ${typestr(TypeRepr.of[E])} is not a non-negative Int")
             '{ new coulomb.rational.typeexpr.NonNegInt[E] { val value = 0 } }
 
+    def teToPosInt[E](using Quotes, Type[E]): Expr[coulomb.rational.typeexpr.PosInt[E]] =
+        import quotes.reflect.*
+        val rationalTE(v) = TypeRepr.of[E]
+        if ((v.d == 1) && (v.n > 0) && (v.n.isValidInt)) then
+            '{ new coulomb.rational.typeexpr.PosInt[E] { val value = ${Expr(v.n.toInt)} } }
+        else
+            report.error(s"type expr ${typestr(TypeRepr.of[E])} is not a positive Int")
+            '{ new coulomb.rational.typeexpr.PosInt[E] { val value = 0 } }
+
+    def teToInt[E](using Quotes, Type[E]): Expr[coulomb.rational.typeexpr.AllInt[E]] =
+        import quotes.reflect.*
+        val rationalTE(v) = TypeRepr.of[E]
+        if ((v.d == 1) && (v.n.isValidInt)) then
+            '{ new coulomb.rational.typeexpr.AllInt[E] { val value = ${Expr(v.n.toInt)} } }
+        else
+            report.error(s"type expr ${typestr(TypeRepr.of[E])} is not an Int")
+            '{ new coulomb.rational.typeexpr.AllInt[E] { val value = 0 } }
+
     object rationalTE:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Rational] =
             import quotes.reflect.*

@@ -16,7 +16,7 @@
 
 package coulomb.conversion.standard
 
-import coulomb.conversion.{ValueConversion, UnitConversion}
+import coulomb.conversion.*
 import coulomb.{coefficient, withUnit, Quantity}
 import coulomb.policy.{AllowTruncation, AllowImplicitConversions}
 
@@ -50,16 +50,16 @@ inline given ctx_VC_Long[VF](using num: Integral[VF]): ValueConversion[VF, Long]
     new ValueConversion[VF, Long]:
         def apply(v: VF): Long = num.toLong(v)
 
-inline given ctx_VC_Long_tr[VF](using num: Fractional[VF], at: AllowTruncation): ValueConversion[VF, Long] =
-    new ValueConversion[VF, Long]:
+inline given ctx_TVC_Long[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Long] =
+    new TruncatingValueConversion[VF, Long]:
         def apply(v: VF): Long = num.toLong(v)
 
 inline given ctx_VC_Int[VF](using num: Integral[VF]): ValueConversion[VF, Int] =
     new ValueConversion[VF, Int]:
         def apply(v: VF): Int = num.toInt(v)
 
-inline given ctx_VC_Int_tr[VF](using num: Fractional[VF], at: AllowTruncation): ValueConversion[VF, Int] =
-    new ValueConversion[VF, Int]:
+inline given ctx_TVC_Int_tr[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Int] =
+    new TruncatingValueConversion[VF, Int]:
         def apply(v: VF): Int = num.toInt(v)
 
 // unit conversions that discard fractional values can be imported from 
@@ -76,19 +76,17 @@ inline given ctx_UC_Float[UF, UT]:
     new UnitConversion[Float, UF, UT]:
         def apply(v: Float): Float = c * v
 
-inline given ctx_UC_Long[UF, UT](using AllowTruncation):
-        UnitConversion[Long, UF, UT] =
+inline given ctx_TUC_Long[UF, UT]: TruncatingUnitConversion[Long, UF, UT] =
     val nc = coulomb.conversion.infra.coefficientNumDouble[UF, UT]
     val dc = coulomb.conversion.infra.coefficientDenDouble[UF, UT]
     // using nc and dc is more efficient than using Rational directly in the conversion function
     // but still gives us 53 bits of integer precision for exact rational arithmetic, and also
     // graceful loss of precision if nc*v exceeds 53 bits
-    new UnitConversion[Long, UF, UT]:
+    new TruncatingUnitConversion[Long, UF, UT]:
         def apply(v: Long): Long = ((nc * v) / dc).toLong
 
-inline given ctx_UC_Int[UF, UT](using AllowTruncation):
-        UnitConversion[Int, UF, UT] =
+inline given ctx_TUC_Int[UF, UT]: TruncatingUnitConversion[Int, UF, UT] =
     val nc = coulomb.conversion.infra.coefficientNumDouble[UF, UT]
     val dc = coulomb.conversion.infra.coefficientDenDouble[UF, UT]
-    new UnitConversion[Int, UF, UT]:
+    new TruncatingUnitConversion[Int, UF, UT]:
         def apply(v: Int): Int = ((nc * v) / dc).toInt

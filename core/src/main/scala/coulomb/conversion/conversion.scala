@@ -22,6 +22,12 @@ import scala.annotation.implicitNotFound
 @implicitNotFound("No value conversion in scope for value types {VF} => {VT}")
 abstract class ValueConversion[VF, VT] extends (VF => VT)
 
+@implicitNotFound("No truncating value conversion in scope for value types {VF} => {VT}")
+abstract class TruncatingValueConversion[VF, VT] extends (VF => VT)
+
 /** Convert a value of type V from implied units UF to UT */
 @implicitNotFound("No unit conversion in scope for value type {V}, unit types {UF} => {UT}")
 abstract class UnitConversion[V, UF, UT] extends (V => V)
+
+@implicitNotFound("No truncating unit conversion in scope for value type {V}, unit types {UF} => {UT}")
+abstract class TruncatingUnitConversion[V, UF, UT] extends (V => V)

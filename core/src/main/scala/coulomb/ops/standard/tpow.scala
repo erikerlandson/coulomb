@@ -16,10 +16,19 @@
 
 package coulomb.ops.standard
 
-import coulomb.ops.Neg
-import algebra.ring.AdditiveGroup
+import scala.util.NotGiven
 
-inline given ctx_quantity_neg[V, U](using alg: AdditiveGroup[V]): Neg[V, U] =
-    new Neg[V, U]:
-        def apply(v: V): V = alg.negate(v)
+import coulomb.`^`
+import coulomb.ops.{TPow, SimplifiedUnit}
+import coulomb.ops.algebra.TruncatingPower
+import coulomb.rational.typeexpr
 
+transparent inline given ctx_quantity_tpow[V, U, E](using
+    alg: TruncatingPower[V],
+    su: SimplifiedUnit[U ^ E]
+        ): TPow[V, U, E] =
+    val e = typeexpr.double[E]
+    new TPow[V, U, E]:
+        type VO = V
+        type UO = su.UO
+        def apply(v: V): VO = alg.tpow(v, e)
