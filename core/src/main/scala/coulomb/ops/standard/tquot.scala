@@ -24,7 +24,6 @@ import coulomb.`/`
 import coulomb.ops.{TQuot, SimplifiedUnit, ValueResolution}
 import coulomb.conversion.{ValueConversion}
 import coulomb.policy.AllowImplicitConversions
-import coulomb.policy.AllowTruncation
 
 transparent inline given ctx_tquot_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585

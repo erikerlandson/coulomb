@@ -22,10 +22,6 @@ object policy:
     object strictUnitExpressions:
         given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
 
-    sealed trait AllowTruncation
-    object allowTruncation:
-        given ctx_AllowTruncation: AllowTruncation with {}
-
     sealed trait AllowImplicitConversions
     object allowImplicitConversions:
         given ctx_AllowImplicitConversions: AllowImplicitConversions with {}
