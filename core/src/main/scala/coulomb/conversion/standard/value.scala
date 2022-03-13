@@ -19,26 +19,26 @@ package coulomb.conversion.standard
 object value:
     import coulomb.conversion.*
  
-    inline given ctx_VC_Double[VF](using num: Numeric[VF]): ValueConversion[VF, Double] =
+    given ctx_VC_Double[VF](using num: Numeric[VF]): ValueConversion[VF, Double] =
         new ValueConversion[VF, Double]:
             def apply(v: VF): Double = num.toDouble(v)
 
-    inline given ctx_VC_Float[VF](using num: Numeric[VF]): ValueConversion[VF, Float] =
+    given ctx_VC_Float[VF](using num: Numeric[VF]): ValueConversion[VF, Float] =
         new ValueConversion[VF, Float]:
             def apply(v: VF): Float = num.toFloat(v)
 
-    inline given ctx_VC_Long[VF](using num: Integral[VF]): ValueConversion[VF, Long] =
+    given ctx_VC_Long[VF](using num: Integral[VF]): ValueConversion[VF, Long] =
         new ValueConversion[VF, Long]:
             def apply(v: VF): Long = num.toLong(v)
 
-    inline given ctx_TVC_Long[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Long] =
+    given ctx_TVC_Long[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Long] =
         new TruncatingValueConversion[VF, Long]:
             def apply(v: VF): Long = num.toLong(v)
 
-    inline given ctx_VC_Int[VF](using num: Integral[VF]): ValueConversion[VF, Int] =
+    given ctx_VC_Int[VF](using num: Integral[VF]): ValueConversion[VF, Int] =
         new ValueConversion[VF, Int]:
             def apply(v: VF): Int = num.toInt(v)
 
-    inline given ctx_TVC_Int[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Int] =
+    given ctx_TVC_Int[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Int] =
         new TruncatingValueConversion[VF, Int]:
             def apply(v: VF): Int = num.toInt(v)

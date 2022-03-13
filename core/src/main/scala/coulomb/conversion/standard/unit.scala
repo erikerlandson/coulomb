@@ -20,14 +20,12 @@ object unit:
     import coulomb.conversion.*
     import coulomb.conversion.coefficients.*
 
-    inline given ctx_UC_Double[UF, UT]:
-              UnitConversion[Double, UF, UT] =
+    inline given ctx_UC_Double[UF, UT]: UnitConversion[Double, UF, UT] =
         val c = coefficientDouble[UF, UT]
         new UnitConversion[Double, UF, UT]:
             def apply(v: Double): Double = c * v
 
-    inline given ctx_UC_Float[UF, UT]:
-            UnitConversion[Float, UF, UT] =
+    inline given ctx_UC_Float[UF, UT]: UnitConversion[Float, UF, UT] =
         val c = coefficientFloat[UF, UT]
         new UnitConversion[Float, UF, UT]:
             def apply(v: Float): Float = c * v
@@ -46,4 +44,3 @@ object unit:
         val dc = coefficientDenDouble[UF, UT]
         new TruncatingUnitConversion[Int, UF, UT]:
             def apply(v: Int): Int = ((nc * v) / dc).toInt
-
