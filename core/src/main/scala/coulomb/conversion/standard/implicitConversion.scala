@@ -27,7 +27,7 @@ object implicitConversion:
     // I gate this with AllowImplicitConversions because many operations on coulomb
     // Quantity are logically equivalent to converting unit or value types, and
     // I can't use scala.language.implicitConversions as a gate 
-    inline given ctx_implicit_quantity_conversion[VF, UF, VT, UT](using
+    given ctx_implicit_quantity_conversion[VF, UF, VT, UT](using
         aic: AllowImplicitConversions,
         vc: ValueConversion[VF, VT],
         uc: UnitConversion[VT, UF, UT]
