@@ -111,6 +111,9 @@ extension[VL, UL](ql: Quantity[VL, UL])
     transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
         add(ql.value, qr.value).withUnit[add.UO]
 
+    transparent inline def ++[VR, UR](qr: Quantity[VR, UR])(using add: Add2[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
+        add(ql, qr)
+
     transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: Sub[VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
         sub(ql.value, qr.value).withUnit[sub.UO]
 

@@ -20,9 +20,79 @@ import scala.util.NotGiven
 
 import algebra.ring.AdditiveSemigroup
 
-import coulomb.ops.{Add, ValueResolution}
+import coulomb.{Quantity,withUnit}
+import coulomb.ops.{Add, Add2, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
+
+transparent inline given ctx_add2_Double_1U[U]: Add2[Double, U, Double, U] =
+    new Add2[Double, U, Double, U]:
+        type VO = Double
+        type UO = U
+        def apply(ql: Quantity[Double, U], qr: Quantity[Double, U]): Quantity[Double, U] =
+            (ql.value + qr.value).withUnit[U]
+
+transparent inline given ctx_add2_Double_2U[UL, UR](using
+    scala.Conversion[Quantity[Double, UR], Quantity[Double, UL]] // redundant!
+        ): Add2[Double, UL, Double, UR] =
+    val c = coulomb.conversion.coefficients.coefficientDouble[UR, UL]
+    new Add2[Double, UL, Double, UR]:
+        type VO = Double
+        type UO = UL
+        def apply(ql: Quantity[Double, UL], qr: Quantity[Double, UR]): Quantity[Double, UL] =
+            (ql.value + (c * qr.value)).withUnit[UL]
+
+transparent inline given ctx_add2_1V1U[VL, UL, VR, UR](using
+    // https://github.com/lampepfl/dotty/issues/14585
+    eqv: VR =:= VL,
+    equ: UR =:= UL,
+    alg: AdditiveSemigroup[VL]
+        ): Add2[VL, UL, VR, UR] =
+    new Add2[VL, UL, VR, UR]:
+        type VO = VL
+        type UO = UL
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VL, UL] =
+            alg.plus(ql.value, eqv(qr.value)).withUnit[UL]
+
+transparent inline given ctx_add2_1V2U[VL, UL, VR, UR](using
+    eqv: VR =:= VL,
+    neu: NotGiven[UR =:= UL],
+    icr: scala.Conversion[Quantity[VR, UR], Quantity[VL, UL]],
+    alg: AdditiveSemigroup[VL]
+        ): Add2[VL, UL, VR, UR] =
+    new Add2[VL, UL, VR, UR]:
+        type VO = VL
+        type UO = UL
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VL, UL] =
+            alg.plus(ql.value, icr(qr).value).withUnit[UL]
+
+transparent inline given ctx_add2_2V1U[VL, UL, VR, UR](using
+    nev: NotGiven[VR =:= VL],
+    equ: UR =:= UL,
+    vres: ValueResolution[VL, VR],
+    icl: scala.Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: scala.Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
+    alg: AdditiveSemigroup[vres.VO]
+        ): Add2[VL, UL, VR, UR] =
+    new Add2[VL, UL, VR, UR]:
+        type VO = vres.VO 
+        type UO = UL
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UL] =
+            alg.plus(icl(ql).value, icr(qr).value).withUnit[UL]
+
+transparent inline given ctx_add2_2V2U[VL, UL, VR, UR](using
+    nev: NotGiven[VR =:= VL],
+    neu: NotGiven[UR =:= UL],
+    vres: ValueResolution[VL, VR],
+    icl: scala.Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: scala.Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
+    alg: AdditiveSemigroup[vres.VO]
+        ): Add2[VL, UL, VR, UR] =
+    new Add2[VL, UL, VR, UR]:
+        type VO = vres.VO
+        type UO = UL
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UL] =
+            alg.plus(icl(ql).value, icr(qr).value).withUnit[UL]
 
 transparent inline given ctx_add_1V1U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585

@@ -30,6 +30,12 @@ abstract class Add[VL, UL, VR, UR]:
     type UO
     def apply(vl: VL, vr: VR): VO
 
+@implicitNotFound("Addition not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
+abstract class Add2[VL, UL, VR, UR]:
+    type VO
+    type UO
+    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+
 @implicitNotFound("Subtraction not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Sub[VL, UL, VR, UR]:
     type VO
