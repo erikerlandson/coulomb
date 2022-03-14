@@ -150,3 +150,14 @@ extension[VL, UL](ql: Quantity[VL, UL])
     inline def >=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
         ord(ql.value, qr.value) >= 0
 
+object benchmark:
+    def time[T](expr: => T): (Long, T) =
+        val t0 = System.nanoTime()
+        val r = expr
+        val t = (System.nanoTime() - t0) / 1000000L
+        (t, r)
+
+    def medianTime[T](expr: => T, n: Int = 5): (Long, T) =
+        require(n % 2 == 1)
+        val data = (Vector.fill(n) { time(expr) }).sortBy(_._1)
+        data(n / 2)

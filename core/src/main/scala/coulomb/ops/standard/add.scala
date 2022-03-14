@@ -25,23 +25,6 @@ import coulomb.ops.{Add, Add2, ValueResolution}
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.policy.AllowImplicitConversions
 
-transparent inline given ctx_add2_Double_1U[U]: Add2[Double, U, Double, U] =
-    new Add2[Double, U, Double, U]:
-        type VO = Double
-        type UO = U
-        def apply(ql: Quantity[Double, U], qr: Quantity[Double, U]): Quantity[Double, U] =
-            (ql.value + qr.value).withUnit[U]
-
-transparent inline given ctx_add2_Double_2U[UL, UR](using
-    scala.Conversion[Quantity[Double, UR], Quantity[Double, UL]] // redundant!
-        ): Add2[Double, UL, Double, UR] =
-    val c = coulomb.conversion.coefficients.coefficientDouble[UR, UL]
-    new Add2[Double, UL, Double, UR]:
-        type VO = Double
-        type UO = UL
-        def apply(ql: Quantity[Double, UL], qr: Quantity[Double, UR]): Quantity[Double, UL] =
-            (ql.value + (c * qr.value)).withUnit[UL]
-
 transparent inline given ctx_add2_1V1U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
     eqv: VR =:= VL,

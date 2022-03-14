@@ -19,6 +19,7 @@ package coulomb.ops.standard.optimizations
 import scala.util.NotGiven
 
 import coulomb.{`*`, `/`, `^`}
+import coulomb.{Quantity,withUnit}
 import coulomb.ops.*
 import coulomb.policy.AllowImplicitConversions
 
@@ -28,6 +29,23 @@ object double:
     inline given ctx_quantity_neg_Double[U]: Neg[Double, U] =
         new Neg[Double, U]:
             def apply(v: Double): Double = -v
+
+    transparent inline given ctx_add2_Double_1U[U]: Add2[Double, U, Double, U] =
+        new Add2[Double, U, Double, U]:
+            type VO = Double
+            type UO = U
+            def apply(ql: Quantity[Double, U], qr: Quantity[Double, U]): Quantity[Double, U] =
+                (ql.value + qr.value).withUnit[U]
+
+    transparent inline given ctx_add2_Double_2U[UL, UR](using
+        scala.Conversion[Quantity[Double, UR], Quantity[Double, UL]] // redundant!
+            ): Add2[Double, UL, Double, UR] =
+        val c = coulomb.conversion.coefficients.coefficientDouble[UR, UL]
+        new Add2[Double, UL, Double, UR]:
+            type VO = Double
+            type UO = UL
+            def apply(ql: Quantity[Double, UL], qr: Quantity[Double, UR]): Quantity[Double, UL] =
+                (ql.value + (c * qr.value)).withUnit[UL]
 
     transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
         new Add[Double, U, Double, U]:
