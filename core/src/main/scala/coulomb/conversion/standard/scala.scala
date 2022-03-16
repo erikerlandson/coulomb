@@ -22,11 +22,9 @@ object scala:
     import coulomb.{withUnit, Quantity}
 
     // Enable the compiler to implicitly convert Quantity[V1, U1] -> Quantity[V2, U2], 
-    // whenever a valid conversion exists: reference:
+    // whenever a valid conversion exists:
     // https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
-    // I gate this with AllowImplicitConversions because many operations on coulomb
-    // Quantity are logically equivalent to converting unit or value types, and
-    // I can't use scala.language.implicitConversions as a gate 
+
     given ctx_implicit_quantity_conversion_1V1U[V, U]: Conversion[Quantity[V, U], Quantity[V, U]] =
         new Conversion[Quantity[V, U], Quantity[V, U]]:
             def apply(q: Quantity[V, U]): Quantity[V, U] = q 
