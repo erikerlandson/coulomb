@@ -17,12 +17,12 @@
 package coulomb.ops.standard
 
 import scala.util.NotGiven
+import scala.Conversion
 
 import cats.kernel.Order
 
+import coulomb.Quantity
 import coulomb.ops.{Ord, ValueResolution}
-import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.policy.AllowImplicitConversions
 
 transparent inline given ctx_ord_1V1U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
@@ -31,40 +31,39 @@ transparent inline given ctx_ord_1V1U[VL, UL, VR, UR](using
     ord: Order[VL]
         ): Ord[VL, UL, VR, UR] =
     new Ord[VL, UL, VR, UR]:
-        def apply(vl: VL, vr: VR): Int = ord.compare(vl, eqv(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
+            ord.compare(ql.value, eqv(qr.value))
 
 transparent inline given ctx_ord_1V2U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
     eqv: VR =:= VL,
     neu: NotGiven[UR =:= UL],
-    ucv: UnitConversion[VL, UR, UL],
+    icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
     ord: Order[VL]
         ): Ord[VL, UL, VR, UR] =
     new Ord[VL, UL, VR, UR]:
-        def apply(vl: VL, vr: VR): Int = ord.compare(vl, ucv(eqv(vr)))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
+            ord.compare(ql.value, icr(qr).value)
 
 transparent inline given ctx_ord_2V1U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
     nev: NotGiven[VR =:= VL],
     equ: UR =:= UL,
     vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
+    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
     ord: Order[vres.VO]
         ): Ord[VL, UL, VR, UR] =
     new Ord[VL, UL, VR, UR]:
-        def apply(vl: VL, vr: VR): Int = ord.compare(vlvo(vl), vrvo(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
+            ord.compare(icl(ql).value, icr(qr).value)
 
 transparent inline given ctx_ord_2V2U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
     nev: NotGiven[VR =:= VL],
     neu: NotGiven[UR =:= UL],
     vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
-    ucvo: UnitConversion[vres.VO, UR, UL],
+    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
     ord: Order[vres.VO]
         ): Ord[VL, UL, VR, UR] =
     new Ord[VL, UL, VR, UR]:
-        def apply(vl: VL, vr: VR): Int = ord.compare(vlvo(vl), ucvo(vrvo(vr)))
-
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
+            ord.compare(icl(ql).value, icr(qr).value)

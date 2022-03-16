@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package coulomb
+package coulomb.conversion.standard
 
-object policy:
-    // import coulomb.policy.strictUnitExpressions.given
-    sealed trait StrictUnitExpressions
-    object strictUnitExpressions:
-        given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
+object explicit:
+    export coulomb.conversion.standard.value.given
+    export coulomb.conversion.standard.unit.given

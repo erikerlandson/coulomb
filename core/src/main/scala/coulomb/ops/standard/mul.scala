@@ -17,13 +17,12 @@
 package coulomb.ops.standard
 
 import scala.util.NotGiven
+import scala.Conversion
 
 import algebra.ring.MultiplicativeSemigroup
 
-import coulomb.`*`
+import coulomb.{`*`, Quantity, withUnit}
 import coulomb.ops.{Mul, SimplifiedUnit, ValueResolution}
-import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.policy.AllowImplicitConversions
 
 transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
@@ -34,19 +33,19 @@ transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
     new Mul[VL, UL, VR, UR]:
         type VO = VL
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VL = alg.times(vl, eqv(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.times(ql.value, eqv(qr.value)).withUnit[UO]
 
 transparent inline given ctx_mul_2V2U[VL, UL, VR, UR](using
-    nev: NotGiven[VL =:= VR],
-    ice: AllowImplicitConversions,
+    nev: NotGiven[VR =:= VL],
     vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
+    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
     alg: MultiplicativeSemigroup[vres.VO],
     su: SimplifiedUnit[UL * UR]
         ): Mul[VL, UL, VR, UR] =
     new Mul[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VO = alg.times(vlvo(vl), vrvo(vr))
-
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.times(icl(ql).value, icr(qr).value).withUnit[UO]
