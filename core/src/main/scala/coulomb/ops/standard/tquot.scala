@@ -17,13 +17,12 @@
 package coulomb.ops.standard
 
 import scala.util.NotGiven
+import scala.Conversion
 
 import algebra.ring.TruncatedDivision
 
-import coulomb.`/`
+import coulomb.{`/`, Quantity, withUnit}
 import coulomb.ops.{TQuot, SimplifiedUnit, ValueResolution}
-import coulomb.conversion.{ValueConversion}
-import coulomb.policy.AllowImplicitConversions
 
 transparent inline given ctx_tquot_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
@@ -34,18 +33,19 @@ transparent inline given ctx_tquot_1V2U[VL, UL, VR, UR](using
     new TQuot[VL, UL, VR, UR]:
         type VO = VL
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VL = alg.tquot(vl, eqv(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.tquot(ql.value, eqv(qr.value)).withUnit[UO]
 
 transparent inline given ctx_tquot_2V2U[VL, UL, VR, UR](using
-    nev: NotGiven[VL =:= VR],
-    ice: AllowImplicitConversions,
+    nev: NotGiven[VR =:= VL],
     vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
+    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
     alg: TruncatedDivision[vres.VO],
     su: SimplifiedUnit[UL / UR]
         ): TQuot[VL, UL, VR, UR] =
     new TQuot[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VO = alg.tquot(vlvo(vl), vrvo(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.tquot(icl(ql).value, icr(qr).value).withUnit[UO]

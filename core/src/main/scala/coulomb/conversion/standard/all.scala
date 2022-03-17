@@ -17,6 +17,6 @@
 package coulomb.conversion.standard
 
 object all:
-    export value.given
-    export unit.given
-    export implicitConversion.given
+    export coulomb.conversion.standard.value.given
+    export coulomb.conversion.standard.unit.given
+    export coulomb.conversion.standard.scala.given

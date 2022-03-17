@@ -17,13 +17,12 @@
 package coulomb.ops.standard
 
 import scala.util.NotGiven
+import scala.Conversion
 
 import algebra.ring.MultiplicativeGroup
 
-import coulomb.`/`
+import coulomb.{`/`, Quantity, withUnit}
 import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
-import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.policy.AllowImplicitConversions
 
 transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
@@ -34,18 +33,19 @@ transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
     new Div[VL, UL, VR, UR]:
         type VO = VL
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VL = alg.div(vl, eqv(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.div(ql.value, eqv(qr.value)).withUnit[UO]
 
 transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
-    nev: NotGiven[VL =:= VR],
-    ice: AllowImplicitConversions,
+    nev: NotGiven[VR =:= VL],
     vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
+    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
     alg: MultiplicativeGroup[vres.VO],
     su: SimplifiedUnit[UL / UR]
         ): Div[VL, UL, VR, UR] =
     new Div[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = su.UO
-        def apply(vl: VL, vr: VR): VO = alg.div(vlvo(vl), vrvo(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.div(icl(ql).value, icr(qr).value).withUnit[UO]

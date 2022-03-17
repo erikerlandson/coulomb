@@ -17,12 +17,12 @@
 package coulomb.ops.standard
 
 import scala.util.NotGiven
+import scala.Conversion
 
 import algebra.ring.AdditiveGroup
 
+import coulomb.{Quantity, withUnit}
 import coulomb.ops.{Sub, ValueResolution}
-import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.policy.AllowImplicitConversions
 
 transparent inline given ctx_sub_1V1U[VL, UL, VR, UR](using
     // https://github.com/lampepfl/dotty/issues/14585
@@ -33,45 +33,45 @@ transparent inline given ctx_sub_1V1U[VL, UL, VR, UR](using
     new Sub[VL, UL, VR, UR]:
         type VO = VL
         type UO = UL
-        def apply(vl: VL, vr: VR): VL = alg.minus(vl, eqv(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.minus(ql.value, eqv(qr.value)).withUnit[UO]
 
 transparent inline given ctx_sub_1V2U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
     eqv: VR =:= VL,
     neu: NotGiven[UR =:= UL],
-    ucv: UnitConversion[VL, UR, UL],
+    icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
     alg: AdditiveGroup[VL]
         ): Sub[VL, UL, VR, UR] =
     new Sub[VL, UL, VR, UR]:
         type VO = VL
         type UO = UL
-        def apply(vl: VL, vr: VR): VL = alg.minus(vl, ucv(eqv(vr)))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.minus(ql.value, icr(qr).value).withUnit[UO]
 
 transparent inline given ctx_sub_2V1U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
     nev: NotGiven[VR =:= VL],
     equ: UR =:= UL,
     vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
+    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
     alg: AdditiveGroup[vres.VO]
         ): Sub[VL, UL, VR, UR] =
     new Sub[VL, UL, VR, UR]:
-        type VO = vres.VO
+        type VO = vres.VO 
         type UO = UL
-        def apply(vl: VL, vr: VR): VO = alg.minus(vlvo(vl), vrvo(vr))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.minus(icl(ql).value, icr(qr).value).withUnit[UO]
 
 transparent inline given ctx_sub_2V2U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
-    nev: NotGiven[VL =:= VR],
-    neu: NotGiven[UL =:= UR],
+    nev: NotGiven[VR =:= VL],
+    neu: NotGiven[UR =:= UL],
     vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
-    ucvo: UnitConversion[vres.VO, UR, UL],
+    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
     alg: AdditiveGroup[vres.VO]
         ): Sub[VL, UL, VR, UR] =
     new Sub[VL, UL, VR, UR]:
         type VO = vres.VO
         type UO = UL
-        def apply(vl: VL, vr: VR): VO = alg.minus(vlvo(vl), ucvo(vrvo(vr)))
+        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+            alg.minus(icl(ql).value, icr(qr).value).withUnit[UO]

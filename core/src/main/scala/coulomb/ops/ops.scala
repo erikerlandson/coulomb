@@ -22,53 +22,53 @@ import coulomb.*
 
 @implicitNotFound("Negation not defined in scope for Quantity[${V}, ${U}]")
 abstract class Neg[V, U]:
-    def apply(v: V): V
+    def apply(q: Quantity[V, U]): Quantity[V, U]
 
 @implicitNotFound("Addition not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Add[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(vl: VL, vr: VR): VO
+    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
 
 @implicitNotFound("Subtraction not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Sub[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(vl: VL, vr: VR): VO
+    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
 
 @implicitNotFound("Multiplication not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Mul[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(vl: VL, vr: VR): VO
+    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
 
 @implicitNotFound("Division not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Div[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(vl: VL, vr: VR): VO
+    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
 
 @implicitNotFound("Truncating Division not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class TQuot[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(vl: VL, vr: VR): VO
+    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
 
 @implicitNotFound("Power not defined in scope for Quantity[${V}, ${U}] ^ ${P}")
 abstract class Pow[V, U, P]:
     type VO
     type UO
-    def apply(v: V): VO
+    def apply(q: Quantity[V, U]): Quantity[VO, UO]
 
 @implicitNotFound("Truncating Power not defined in scope for Quantity[${V}, ${U}] ^ ${P}")
 abstract class TPow[V, U, P]:
     type VO
     type UO
-    def apply(v: V): VO
+    def apply(q: Quantity[V, U]): Quantity[VO, UO]
 
 @implicitNotFound("Ordering not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Ord[VL, UL, VR, UR]:
-    def apply(vl: VL, vr: VR): Int
+    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int
 
 /** Resolve the operator output type for left and right argument types */
 @implicitNotFound("No output type resolution in scope for argument value types {VL} and {VR}")

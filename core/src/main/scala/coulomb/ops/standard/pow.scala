@@ -21,7 +21,7 @@ import scala.util.NotGiven
 import algebra.ring.MultiplicativeSemigroup
 import algebra.ring.MultiplicativeGroup
 
-import coulomb.`^`
+import coulomb.{`^`, Quantity, withUnit}
 import coulomb.ops.{Pow, SimplifiedUnit}
 import coulomb.rational.typeexpr
 import coulomb.ops.algebra.FractionalPower
@@ -34,7 +34,8 @@ transparent inline given ctx_pow_FractionalPower[V, U, E](using
     new Pow[V, U, E]:
         type VO = V
         type UO = su.UO
-        def apply(v: V): VO = alg.pow(v, e)
+        def apply(q: Quantity[V, U]): Quantity[VO, UO] =
+            alg.pow(q.value, e).withUnit[UO]
 
 transparent inline given ctx_pow_MultiplicativeGroup[V, U, E](using
     nfp: NotGiven[FractionalPower[V]],
@@ -46,7 +47,8 @@ transparent inline given ctx_pow_MultiplicativeGroup[V, U, E](using
     new Pow[V, U, E]:
         type VO = V
         type UO = su.UO
-        def apply(v: V): VO = alg.pow(v, e)
+        def apply(q: Quantity[V, U]): Quantity[VO, UO] =
+            alg.pow(q.value, e).withUnit[UO]
 
 transparent inline given ctx_pow_MultiplicativeSemigroup[V, U, E](using
     nfp: NotGiven[FractionalPower[V]],
@@ -59,4 +61,5 @@ transparent inline given ctx_pow_MultiplicativeSemigroup[V, U, E](using
     new Pow[V, U, E]:
         type VO = V
         type UO = su.UO
-        def apply(v: V): VO = alg.pow(v, e)
+        def apply(q: Quantity[V, U]): Quantity[VO, UO] =
+            alg.pow(q.value, e).withUnit[UO]

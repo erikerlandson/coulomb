@@ -16,10 +16,13 @@
 
 package coulomb.ops.standard
 
-import coulomb.ops.Neg
 import algebra.ring.AdditiveGroup
+
+import coulomb.{Quantity, withUnit}
+import coulomb.ops.Neg
 
 inline given ctx_quantity_neg[V, U](using alg: AdditiveGroup[V]): Neg[V, U] =
     new Neg[V, U]:
-        def apply(v: V): V = alg.negate(v)
+        def apply(q: Quantity[V, U]): Quantity[V, U] =
+            alg.negate(q.value).withUnit[U]
 

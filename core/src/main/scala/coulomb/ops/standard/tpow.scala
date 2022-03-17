@@ -18,7 +18,7 @@ package coulomb.ops.standard
 
 import scala.util.NotGiven
 
-import coulomb.`^`
+import coulomb.{`^`, Quantity, withUnit}
 import coulomb.ops.{TPow, SimplifiedUnit}
 import coulomb.ops.algebra.TruncatingPower
 import coulomb.rational.typeexpr
@@ -31,4 +31,5 @@ transparent inline given ctx_quantity_tpow[V, U, E](using
     new TPow[V, U, E]:
         type VO = V
         type UO = su.UO
-        def apply(v: V): VO = alg.tpow(v, e)
+        def apply(q: Quantity[V, U]): Quantity[VO, UO] =
+            alg.tpow(q.value, e).withUnit[UO]
