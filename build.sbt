@@ -61,3 +61,8 @@ lazy val unidocs = project
 
 lazy val docs = project.in(file("site"))
   .enablePlugins(TypelevelSitePlugin)
+
+lazy val benchmarks = project.in(file("benchmarks"))
+  .dependsOn(core.jvm % "compile->compile;compile->test")
+  .settings(name := "coulomb-benchmarks")
+  .enablePlugins(NoPublishPlugin, JmhPlugin)
