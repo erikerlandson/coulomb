@@ -80,9 +80,6 @@ jobs:
       - name: Test
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
 
-      - name: Benchmarks
-        run sbt 'benchmarks/Jmh/run .*Benchmark'
-
       - name: Check binary compatibility
         if: matrix.java == 'temurin@8'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' mimaReportBinaryIssues
