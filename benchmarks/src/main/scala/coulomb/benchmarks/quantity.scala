@@ -22,7 +22,7 @@ import org.openjdk.jmh.annotations.*
 
 @State(Scope.Thread)
 @Fork(1)
-@BenchmarkMode(Array(Mode.Throughput, Mode.AverageTime))
+@BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 3, time = 1)
 @Measurement(iterations = 10, time = 1)
