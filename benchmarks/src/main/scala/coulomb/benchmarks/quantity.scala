@@ -21,8 +21,11 @@ import java.util.concurrent.TimeUnit
 import org.openjdk.jmh.annotations.*
 
 @State(Scope.Thread)
+@Fork(1)
 @BenchmarkMode(Array(Mode.Throughput, Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
+@Warmup(iterations = 3, time = 5)
+@Measurement(iterations = 5, time = 5)
 class QuantityBenchmark:
     import coulomb.*
     import coulomb.testing.units.{*, given}
@@ -36,11 +39,9 @@ class QuantityBenchmark:
 
     @Setup(Level.Trial)
     def prepare: Unit =
-        data = Vector.fill(1000) { math.random().withUnit[Meter] }
+        data = Vector.fill(100000) { math.random().withUnit[Meter] }
 
     @Benchmark
-    @Warmup(iterations = 5, time = 5)
-    @Measurement(iterations = 5, time = 10)
-    def add(): Double =
-        0.0
+    def add(): Quantity[Double, Meter] =
+        data.foldLeft(0d.withUnit[Meter]) { (s, x) => s + x }
         
