@@ -24,9 +24,10 @@ import org.openjdk.jmh.annotations.*
 @Fork(1)
 @BenchmarkMode(Array(Mode.Throughput, Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 3, time = 5)
-@Measurement(iterations = 5, time = 5)
+@Warmup(iterations = 3, time = 1)
+@Measurement(iterations = 10, time = 1)
 class QuantityBenchmark:
+    import scala.language.implicitConversions
     import coulomb.*
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
@@ -42,6 +43,37 @@ class QuantityBenchmark:
         data = Vector.fill(100000) { math.random().withUnit[Meter] }
 
     @Benchmark
-    def add(): Quantity[Double, Meter] =
+    def add1V1U(): Quantity[Double, Meter] =
         data.foldLeft(0d.withUnit[Meter]) { (s, x) => s + x }
-        
+
+    @Benchmark
+    def add1V1U_opt(): Quantity[Double, Meter] =
+        import coulomb.ops.standard.optimizations.all.given
+        data.foldLeft(0d.withUnit[Meter]) { (s, x) => s + x }
+
+    @Benchmark
+    def add1V2U(): Quantity[Double, Kilo * Meter] =
+        data.foldLeft(0d.withUnit[Kilo * Meter]) { (s, x) => s + x }
+
+    @Benchmark
+    def add1V2U_opt(): Quantity[Double, Kilo * Meter] =
+        import coulomb.ops.standard.optimizations.all.given
+        data.foldLeft(0d.withUnit[Kilo * Meter]) { (s, x) => s + x }
+
+    @Benchmark
+    def add2V1U(): Quantity[Float, Meter] =
+        data.foldLeft(0f.withUnit[Meter]) { (s, x) => s + x }
+
+    @Benchmark
+    def add2V1U_opt(): Quantity[Float, Meter] =
+        import coulomb.ops.standard.optimizations.all.given
+        data.foldLeft(0f.withUnit[Meter]) { (s, x) => s + x }
+
+    @Benchmark
+    def add2V2U(): Quantity[Float, Kilo * Meter] =
+        data.foldLeft(0f.withUnit[Kilo * Meter]) { (s, x) => s + x }
+
+    @Benchmark
+    def add2V2U_opt(): Quantity[Float, Kilo * Meter] =
+        import coulomb.ops.standard.optimizations.all.given
+        data.foldLeft(0f.withUnit[Kilo * Meter]) { (s, x) => s + x }
