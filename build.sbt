@@ -64,9 +64,10 @@ lazy val docs = project.in(file("site"))
 
 // https://github.com/sbt/sbt-jmh
 // sbt "benchmarks/Jmh/run .*Benchmark"
-ThisBuild / githubWorkflowBuild += WorkflowStep.Sbt(List("benchmarks/Jmh/run .*Benchmark"))
-
 lazy val benchmarks = project.in(file("benchmarks"))
   .dependsOn(core.jvm % "compile->compile;compile->test")
   .settings(name := "coulomb-benchmarks")
   .enablePlugins(NoPublishPlugin, JmhPlugin)
+
+// can enable this to add benchmarks to CI
+// ThisBuild / githubWorkflowBuild += WorkflowStep.Sbt(List("benchmarks/Jmh/run .*Benchmark"))

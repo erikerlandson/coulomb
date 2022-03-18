@@ -88,8 +88,6 @@ jobs:
         if: matrix.java == 'temurin@8'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
 
-      - run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' 'benchmarks/Jmh/run .*Benchmark'
-
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3')
         run: mkdir -p benchmarks/target target all/target units/.jvm/target unidocs/target .js/target site/target core/.js/target core/.jvm/target .jvm/target .native/target units/.js/target project/target
