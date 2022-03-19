@@ -194,7 +194,8 @@ object meta:
                 if (e == 0) signil()
                 else if (e == 1) stdsig(b)
                 else unifyPow(p, stdsig(b))
-            case unitconst(c) => sigcons(rationalTE(c), Rational.const1, signil())
+            case unitconst(c) =>
+                if (c == 1) signil() else sigcons(rationalTE(c), Rational.const1, signil())
             case baseunit() => sigcons(u, Rational.const1, signil())
             case derivedunit(_, _) => sigcons(u, Rational.const1, signil())
             case _ if (!strictunitexprs) =>
