@@ -29,31 +29,31 @@ final type Second
 given ctx_unit_Second: BaseUnit[Second, "second", "s"] with {}
 
 final type Kilo
-given ctx_unit_Kilo: PrefixUnit[Kilo, 10 ^ 3, "kilo", "k"] with {}
+given ctx_unit_Kilo: DerivedUnit[Kilo, 10 ^ 3, "kilo", "k"] with {}
 
 final type Mega
-given ctx_unit_Mega: PrefixUnit[Mega, 10 ^ 6, "mega", "M"] with {}
+given ctx_unit_Mega: DerivedUnit[Mega, 10 ^ 6, "mega", "M"] with {}
 
 final type Milli
-given ctx_unit_Milli: PrefixUnit[Milli, 10 ^ -3, "milli", "m"] with {}
+given ctx_unit_Milli: DerivedUnit[Milli, 10 ^ -3, "milli", "m"] with {}
 
 final type Micro
-given ctx_unit_Micro: PrefixUnit[Micro, 10 ^ -6, "micro", "μ"] with {}
+given ctx_unit_Micro: DerivedUnit[Micro, 10 ^ -6, "micro", "μ"] with {}
 
 final type Yard
-given ctx_unit_Yard: DerivedUnit[Yard, Meter, 9144 / 10000, "yard", "yd"] with {}
+given ctx_unit_Yard: DerivedUnit[Yard, Meter *  (9144 / 10000), "yard", "yd"] with {}
 
 final type Foot
-given ctx_unit_Foot: DerivedUnit[Foot, Yard, 1 / 3, "foot", "ft"] with {}
+given ctx_unit_Foot: DerivedUnit[Foot, Yard / 3, "foot", "ft"] with {}
 
 final type Liter
-given ctx_unit_Liter: DerivedUnit[Liter, Meter ^ 3, 1 / 1000, "liter", "l"] with {}
+given ctx_unit_Liter: DerivedUnit[Liter, (Meter ^ 3) / 1000, "liter", "l"] with {}
 
 final type Pound
-given ctx_unit_Pound: DerivedUnit[Pound, Kilogram, 45359237 / 100000000, "pound", "lb"] with {}
+given ctx_unit_Pound: DerivedUnit[Pound, Kilogram * (45359237 / 100000000), "pound", "lb"] with {}
 
 final type Minute
-given ctx_unit_Minute: DerivedUnit[Minute, Second, 60, "minute", "min"] with {}
+given ctx_unit_Minute: DerivedUnit[Minute, Second * 60, "minute", "min"] with {}
 
 final type Hour
-given ctx_unit_Hour: DerivedUnit[Hour, Minute, 60, "hour", "hr"] with {}
+given ctx_unit_Hour: DerivedUnit[Hour, Minute * 60, "hour", "hr"] with {}

@@ -32,18 +32,18 @@ abstract class BaseUnit[U, Name, Abbv] extends NamedUnit[Name, Abbv]
 /**
  * @tparam U unit type
  * @tparam D unit it is derived from
- * @tparam Coef unit coefficient, relative to `D`
  * @tparam Name unit name
  * @tparam Abbv unit abbreviation
  */
-abstract class DerivedUnit[U, D, Coef, Name, Abbv] extends NamedUnit[Name, Abbv]
+abstract class DerivedUnit[U, D, Name, Abbv] extends NamedUnit[Name, Abbv]
 
 /**
- * Prefixed units are derived from `1` (the identity unit)
- * 
+ * Offset Units represent units with an offset in their transforms, for example temperatures or times
+ *
  * @tparam U unit type
- * @tparam Coef unit coefficient
+ * @tparam D unit it is derived from
+ * @tparam O unit transform offset
  * @tparam Name unit name
  * @tparam Abbv unit abbreviation
  */
-abstract class PrefixUnit[U, Coef, Name, Abbv] extends DerivedUnit[U, 1, Coef, Name, Abbv]
+abstract class OffsetUnit[U, D, O, Name, Abbv] extends DerivedUnit[U, D, Name, Abbv]

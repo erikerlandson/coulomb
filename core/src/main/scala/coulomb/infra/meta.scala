@@ -141,6 +141,8 @@ object meta:
         // if this encounters a unit type pattern it cannot expand to a canonical signature,
         // at any level, it raises a compile-time error such that the context parameter search fails.
         u match
+            // identify embedded coefficients (includes '1' aka unitless)
+            case unitconst(c) => (c, signil())
             // traverse down the operator types first, since that can be done without
             // any attempts to look up context variables for BaseUnit and DerivedUnit,
             // which only happen at the leaves of expressions
@@ -166,8 +168,6 @@ object meta:
                     (ucoef, usig)
                 else
                     { report.error(s"bad exponent in cansig: $u"); csErr }
-            case unitless() => (Rational.const1, signil())
-            case unitconst(c) => (c, signil())
             case baseunit() => (Rational.const1, sigcons(u, Rational.const1, signil()))
             case derivedunit(ucoef, usig) => (ucoef, usig)
             case _ if (!strictunitexprs) =>
@@ -194,7 +194,6 @@ object meta:
                 if (e == 0) signil()
                 else if (e == 1) stdsig(b)
                 else unifyPow(p, stdsig(b))
-            case unitless() => signil()
             case unitconst(c) => sigcons(rationalTE(c), Rational.const1, signil())
             case baseunit() => sigcons(u, Rational.const1, signil())
             case derivedunit(_, _) => sigcons(u, Rational.const1, signil())
@@ -225,9 +224,9 @@ object meta:
     def finRU(using Quotes)(un: quotes.reflect.TypeRepr, ud: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
         (uProd(un), uProd(ud)) match
-            case (unitless(), unitless()) => TypeRepr.of[1]
-            case (n, unitless()) => n
-            case (unitless(), d) => TypeRepr.of[/].appliedTo(List(TypeRepr.of[1], d))
+            case (unitconst1(), unitconst1()) => TypeRepr.of[1]
+            case (n, unitconst1()) => n
+            case (unitconst1(), d) => TypeRepr.of[/].appliedTo(List(TypeRepr.of[1], d))
             case (n, d) => TypeRepr.of[/].appliedTo(List(n, d))
 
     def uProd(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
@@ -251,13 +250,14 @@ object meta:
                 case _: ImplicitSearchSuccess => true
                 case _ => false
 
-    object unitless:
+    object unitconst1:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
-            u =:= quotes.reflect.TypeRepr.of[1]
+            u match
+                case rationalTE(v) if (v == 1) => true
+                case _ => false
 
     object unitconst:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[Rational] =
-            import quotes.reflect.*
             u match
                 case rationalTE(v) => Some(v)
                 case _ => None
@@ -272,12 +272,11 @@ object meta:
     object derivedunit:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[(Rational, quotes.reflect.TypeRepr)] =
             import quotes.reflect.*
-            Implicits.search(TypeRepr.of[DerivedUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
+            Implicits.search(TypeRepr.of[DerivedUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
                 case iss: ImplicitSearchSuccess =>
-                    val AppliedType(_, List(_, d, c, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
-                    val rationalTE(coef) = c
+                    val AppliedType(_, List(_, d, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
                     val (dcoef, dsig) = cansig(d)
-                    Some((coef * dcoef, dsig))
+                    Some((dcoef, dsig))
                 case _ => None
 
     def csErr(using Quotes): (Rational, quotes.reflect.TypeRepr) =

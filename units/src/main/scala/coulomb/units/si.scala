@@ -45,61 +45,61 @@ object si:
         import coulomb.{`/`, `^`}
 
         final type Deka
-        given ctx_unit_Deka: PrefixUnit[Deka, 10, "deka", "da"] with {}
+        given ctx_unit_Deka: DerivedUnit[Deka, 10, "deka", "da"] with {}
 
         final type Hecto
-        given ctx_unit_Hecto: PrefixUnit[Hecto, 100, "hecto", "h"] with {}
+        given ctx_unit_Hecto: DerivedUnit[Hecto, 100, "hecto", "h"] with {}
 
         final type Kilo
-        given ctx_unit_Kilo: PrefixUnit[Kilo, 10 ^ 3, "kilo", "k"] with {}
+        given ctx_unit_Kilo: DerivedUnit[Kilo, 10 ^ 3, "kilo", "k"] with {}
 
         final type Mega
-        given ctx_unit_Mega: PrefixUnit[Mega, 10 ^ 6, "mega", "M"] with {}
+        given ctx_unit_Mega: DerivedUnit[Mega, 10 ^ 6, "mega", "M"] with {}
 
         final type Giga
-        given ctx_unit_Giga: PrefixUnit[Giga, 10 ^ 9, "giga", "G"] with {}
+        given ctx_unit_Giga: DerivedUnit[Giga, 10 ^ 9, "giga", "G"] with {}
 
         final type Tera
-        given ctx_unit_Tera: PrefixUnit[Tera, 10 ^ 12, "tera", "T"] with {}
+        given ctx_unit_Tera: DerivedUnit[Tera, 10 ^ 12, "tera", "T"] with {}
 
         final type Peta
-        given ctx_unit_Peta: PrefixUnit[Peta, 10 ^ 15, "peta", "P"] with {}
+        given ctx_unit_Peta: DerivedUnit[Peta, 10 ^ 15, "peta", "P"] with {}
 
         final type Exa
-        given ctx_unit_Exa: PrefixUnit[Exa, 10 ^ 18, "exa", "E"] with {}
+        given ctx_unit_Exa: DerivedUnit[Exa, 10 ^ 18, "exa", "E"] with {}
 
         final type Zetta
-        given ctx_unit_Zetta: PrefixUnit[Zetta, 10 ^ 21, "zetta", "Z"] with {}
+        given ctx_unit_Zetta: DerivedUnit[Zetta, 10 ^ 21, "zetta", "Z"] with {}
 
         final type Yotta
-        given ctx_unit_Yotta: PrefixUnit[Yotta, 10 ^ 24, "yotta", "Y"] with {}
+        given ctx_unit_Yotta: DerivedUnit[Yotta, 10 ^ 24, "yotta", "Y"] with {}
 
         final type Deci
-        given ctx_unit_Deci: PrefixUnit[Deci, 1 / 10, "deci", "d"] with {}
+        given ctx_unit_Deci: DerivedUnit[Deci, 1 / 10, "deci", "d"] with {}
 
         final type Centi
-        given ctx_unit_Centi: PrefixUnit[Centi, 1 / 100, "centi", "c"] with {}
+        given ctx_unit_Centi: DerivedUnit[Centi, 1 / 100, "centi", "c"] with {}
 
         final type Milli
-        given ctx_unit_Milli: PrefixUnit[Milli, 10 ^ -3, "milli", "m"] with {}
+        given ctx_unit_Milli: DerivedUnit[Milli, 10 ^ -3, "milli", "m"] with {}
 
         final type Micro
-        given ctx_unit_Micro: PrefixUnit[Micro, 10 ^ -6, "micro", "μ"] with {}
+        given ctx_unit_Micro: DerivedUnit[Micro, 10 ^ -6, "micro", "μ"] with {}
 
         final type Nano
-        given ctx_unit_Nano: PrefixUnit[Nano, 10 ^ -9, "nano", "n"] with {}
+        given ctx_unit_Nano: DerivedUnit[Nano, 10 ^ -9, "nano", "n"] with {}
 
         final type Pico
-        given ctx_unit_Pico: PrefixUnit[Pico, 10 ^ -12, "pico", "p"] with {}
+        given ctx_unit_Pico: DerivedUnit[Pico, 10 ^ -12, "pico", "p"] with {}
 
         final type Femto
-        given ctx_unit_Femto: PrefixUnit[Femto, 10 ^ -15, "femto", "f"] with {}
+        given ctx_unit_Femto: DerivedUnit[Femto, 10 ^ -15, "femto", "f"] with {}
 
         final type Atto
-        given ctx_unit_Atto: PrefixUnit[Atto, 10 ^ -18, "atto", "a"] with {}
+        given ctx_unit_Atto: DerivedUnit[Atto, 10 ^ -18, "atto", "a"] with {}
 
         final type Zepto
-        given ctx_unit_Zepto: PrefixUnit[Zepto, 10 ^ -21, "zepto", "z"] with {}
+        given ctx_unit_Zepto: DerivedUnit[Zepto, 10 ^ -21, "zepto", "z"] with {}
 
         final type Yocto
-        given ctx_unit_Yocto: PrefixUnit[Yocto, 10 ^ -24, "yocto", "y"] with {}
+        given ctx_unit_Yocto: DerivedUnit[Yocto, 10 ^ -24, "yocto", "y"] with {}
