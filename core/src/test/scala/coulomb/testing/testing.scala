@@ -16,7 +16,7 @@
 
 package coulomb.testing
 
-import coulomb.{OffsetQuantity, Quantity}
+import coulomb.{DeltaQuantity, Quantity}
 import coulomb.conversion.ValueConversion
 
 abstract class CoulombSuite extends munit.FunSuite:
@@ -39,8 +39,8 @@ abstract class CoulombSuite extends munit.FunSuite:
             val e = math.abs(vt) * eps.getOrElse(typeEps[V])
             assertEqualsDouble(vc(q.value), vt, e)
 
-    extension[V, U](q: OffsetQuantity[V, U])
-        transparent inline def assertOQ[VT, UT](vt: VT): Unit =
+    extension[V, U](q: DeltaQuantity[V, U])
+        transparent inline def assertDQ[VT, UT](vt: VT): Unit =
             // checking types first
             // checking in string form gives better idiomatic test failure outputs
             assertEquals(typeStr[V], typeStr[VT])
