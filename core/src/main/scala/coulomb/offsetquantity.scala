@@ -17,6 +17,7 @@
 package coulomb
 
 export offsetquantity.OffsetQuantity as OffsetQuantity
+export offsetquantity.withOffsetUnit as withOffsetUnit
 
 object offsetquantity:
     opaque type OffsetQuantity[V, U] = V
@@ -38,6 +39,18 @@ object offsetquantity:
         def apply[U](v: Float): OffsetQuantity[Float, U] = v
         def apply[U](v: Double): OffsetQuantity[Double, U] = v
     end OffsetQuantity
+
+    // lift using withOffsetUnit method
+    extension[V](v: V)
+        def withOffsetUnit[U]: OffsetQuantity[V, U] = v
+    extension(v: Int)
+        def withOffsetUnit[U]: OffsetQuantity[Int, U] = v
+    extension(v: Long)
+        def withOffsetUnit[U]: OffsetQuantity[Long, U] = v
+    extension(v: Float)
+        def withOffsetUnit[U]: OffsetQuantity[Float, U] = v
+    extension(v: Double)
+        def withOffsetUnit[U]: OffsetQuantity[Double, U] = v
 
     // extract
     extension[V, U](ql: OffsetQuantity[V, U])
