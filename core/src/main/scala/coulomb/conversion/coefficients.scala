@@ -25,15 +25,15 @@ object coefficients:
     inline def coefficientNumDouble[U1, U2]: Double = ${ meta.coefficientNumDouble[U1, U2] }
     inline def coefficientDenDouble[U1, U2]: Double = ${ meta.coefficientDenDouble[U1, U2] }
 
-    inline def deltaOffsetRational[U]: Rational = ${ meta.deltaOffsetRational[U] }
+    inline def deltaOffsetRational[U, B]: Rational = ${ meta.deltaOffsetRational[U, B] }
 
     object meta:
         import scala.quoted.*
         import coulomb.infra.meta.{*, given}
 
-        def deltaOffsetRational[U](using Quotes, Type[U]): Expr[Rational] =
+        def deltaOffsetRational[U, B](using Quotes, Type[U], Type[B]): Expr[Rational] =
             import quotes.reflect.*
-            val doff = offset(TypeRepr.of[U])
+            val doff = offset(TypeRepr.of[U], TypeRepr.of[B])
             Expr(doff)
 
         def coefficientRational[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Rational] =

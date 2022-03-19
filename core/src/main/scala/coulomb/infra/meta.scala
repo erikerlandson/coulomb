@@ -122,11 +122,6 @@ object meta:
 
     def coef(using Quotes)(u1: quotes.reflect.TypeRepr, u2: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
-        if (u1 =:= u2) then
-            // confirm that the type has a defined canonical signature, or fail
-            val _ = cansig(u1)
-            // the coefficient between two identical unit expression types is always exactly 1
-            Rational.const1
         // the fundamental algorithmic unit analysis criterion:
         // http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/
         val (rcoef, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
@@ -134,14 +129,28 @@ object meta:
             report.error(s"unit type ${typestr(u1)} not convertable to ${typestr(u2)}")
             Rational.const0
 
-    def offset(using Quotes)(u: quotes.reflect.TypeRepr): Rational =
+    def offset(using Quotes)(u: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
         u match
-            case deltaunit(offset) => offset
-            case baseunit() => Rational.const0
-            case derivedunit(_, _) => Rational.const0
-            case _ if (!strictunitexprs) => Rational.const0
+            case deltaunit(offset, db) =>
+                if (matchingdelta(db, b)) offset else
+                    report.error(s"bad DeltaUnit in offset: $u")
+                    Rational.const0
+            case baseunit() if convertible(u, b) => Rational.const0
+            case derivedunit(_, _) if convertible(u, b) => Rational.const0
             case _ => { report.error(s"unknown unit expression in offset: $u"); Rational.const0 }
+
+    def matchingdelta(using Quotes)(db: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Boolean =
+        import quotes.reflect.*
+        // units of db and b should cancel, and leave only a constant behind
+        simplify(TypeRepr.of[/].appliedTo(List(db, b))) match
+            case rationalTE(_) => true
+            case _ => false
+
+    def convertible(using Quotes)(u1: quotes.reflect.TypeRepr, u2: quotes.reflect.TypeRepr): Boolean =
+        import quotes.reflect.*
+        val (_, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
+        rsig =:= TypeRepr.of[SNil]
 
     // returns tuple: (expr-for-coef, type-of-Res)
     def cansig(using Quotes)(u: quotes.reflect.TypeRepr):
@@ -226,13 +235,12 @@ object meta:
 
     def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
         import quotes.reflect.*
-        val usig = stdsig(TypeRepr.of[U])
-        val (un, ud) = sortsig(usig)
-        finRU(un, ud).asType match
+        simplify(TypeRepr.of[U]).asType match
             case '[uo] => '{ new SimplifiedUnit[U] { type UO = uo } }
 
-    def finRU(using Quotes)(un: quotes.reflect.TypeRepr, ud: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
+    def simplify(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
+        val (un, ud) = sortsig(stdsig(u))
         (uProd(un), uProd(ud)) match
             case (unitconst1(), unitconst1()) => TypeRepr.of[1]
             case (n, unitconst1()) => n
@@ -290,13 +298,13 @@ object meta:
                 case _ => None
 
     object deltaunit:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[Rational] =
+        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[(Rational, quotes.reflect.TypeRepr)] =
             import quotes.reflect.*
             Implicits.search(TypeRepr.of[DeltaUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
                 case iss: ImplicitSearchSuccess =>
-                    val AppliedType(_, List(_, _, o, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DeltaUnit].typeSymbol)
+                    val AppliedType(_, List(_, b, o, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DeltaUnit].typeSymbol)
                     val rationalTE(offset) = o
-                    Some(offset)
+                    Some((offset, b))
                 case _ => None
 
     def csErr(using Quotes): (Rational, quotes.reflect.TypeRepr) =
