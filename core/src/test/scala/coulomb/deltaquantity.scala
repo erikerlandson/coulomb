@@ -23,25 +23,25 @@ class DeltaQuantitySuite extends CoulombSuite:
     import coulomb.ops.algebra.all.given
 
     test("lift via DeltaQuantity") {
-        DeltaQuantity[Meter](3.14).assertDQ[Double, Meter](3.14)
-        DeltaQuantity[Second](7.7f).assertDQ[Float, Second](7.7f)
-        DeltaQuantity[Kilogram](42L).assertDQ[Long, Kilogram](42)
-        DeltaQuantity[Liter](99).assertDQ[Int, Liter](99)
-        DeltaQuantity[Minute]("foo").assertDQ[String, Minute]("foo")
+        DeltaQuantity[Meter, Meter](3.14).assertDQ[Double, Meter](3.14)
+        DeltaQuantity[Second, Second](7.7f).assertDQ[Float, Second](7.7f)
+        DeltaQuantity[Kilogram, Kilogram](42L).assertDQ[Long, Kilogram](42)
+        DeltaQuantity[Liter, Liter](99).assertDQ[Int, Liter](99)
+        DeltaQuantity[Minute, Minute]("foo").assertDQ[String, Minute]("foo")
     }
 
     test("lift via withDeltaUnit") {
-        1d.withDeltaUnit[Meter].assertDQ[Double, Meter](1)
-        1f.withDeltaUnit[Second].assertDQ[Float, Second](1)
-        1L.withDeltaUnit[Kilogram].assertDQ[Long, Kilogram](1)
-        1.withDeltaUnit[Liter].assertDQ[Int, Liter](1)
-        "foo".withDeltaUnit[Minute].assertDQ[String, Minute]("foo")
+        1d.withDeltaUnit[Meter, Meter].assertDQ[Double, Meter](1)
+        1f.withDeltaUnit[Second, Meter].assertDQ[Float, Second](1)
+        1L.withDeltaUnit[Kilogram, Kilogram].assertDQ[Long, Kilogram](1)
+        1.withDeltaUnit[Liter, Liter].assertDQ[Int, Liter](1)
+        "foo".withDeltaUnit[Minute, Minute].assertDQ[String, Minute]("foo")
     }
 
     test("value") {
-       7d.withDeltaUnit[Meter].value.assertVT[Double](7)
-       73f.withDeltaUnit[Second].value.assertVT[Float](73)
-       37L.withDeltaUnit[Kilogram].value.assertVT[Long](37)
-       13.withDeltaUnit[Liter].value.assertVT[Int](13)
-       "foo".withDeltaUnit[Minute].value.assertVT[String]("foo")
+       7d.withDeltaUnit[Meter, Meter].value.assertVT[Double](7)
+       73f.withDeltaUnit[Second, Meter].value.assertVT[Float](73)
+       37L.withDeltaUnit[Kilogram, Kilogram].value.assertVT[Long](37)
+       13.withDeltaUnit[Liter, Liter].value.assertVT[Int](13)
+       "foo".withDeltaUnit[Minute, Minute].value.assertVT[String]("foo")
     }

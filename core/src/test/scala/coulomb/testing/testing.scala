@@ -39,7 +39,7 @@ abstract class CoulombSuite extends munit.FunSuite:
             val e = math.abs(vt) * eps.getOrElse(typeEps[V])
             assertEqualsDouble(vc(q.value), vt, e)
 
-    extension[V, U](q: DeltaQuantity[V, U])
+    extension[V, U, B](q: DeltaQuantity[V, U, B])
         transparent inline def assertDQ[VT, UT](vt: VT): Unit =
             // checking types first
             // checking in string form gives better idiomatic test failure outputs

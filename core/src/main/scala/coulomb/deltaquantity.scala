@@ -20,47 +20,47 @@ export deltaquantity.DeltaQuantity as DeltaQuantity
 export deltaquantity.withDeltaUnit as withDeltaUnit
 
 object deltaquantity:
-    opaque type DeltaQuantity[V, U] = V
+    opaque type DeltaQuantity[V, U, B] = V
 
-    abstract class Applier[U]:
-        def apply[V](v: V): DeltaQuantity[V, U]
+    abstract class Applier[U, B]:
+        def apply[V](v: V): DeltaQuantity[V, U, B]
     object Applier:
-        given [U]: Applier[U] = new Applier[U] { def apply[V](v: V): DeltaQuantity[V, U] = v } 
+        given [U, B]: Applier[U, B] = new Applier[U, B] { def apply[V](v: V): DeltaQuantity[V, U, B] = v } 
 
     // lift
     object DeltaQuantity:
-        def apply[U](using a: Applier[U]) = a
-        def apply[U](v: Int): DeltaQuantity[Int, U] = v
-        def apply[U](v: Long): DeltaQuantity[Long, U] = v
-        def apply[U](v: Float): DeltaQuantity[Float, U] = v
-        def apply[U](v: Double): DeltaQuantity[Double, U] = v
+        def apply[U, B](using a: Applier[U, B]) = a
+        def apply[U, B](v: Int): DeltaQuantity[Int, U, B] = v
+        def apply[U, B](v: Long): DeltaQuantity[Long, U, B] = v
+        def apply[U, B](v: Float): DeltaQuantity[Float, U, B] = v
+        def apply[U, B](v: Double): DeltaQuantity[Double, U, B] = v
     end DeltaQuantity
 
     // lift using withDeltaUnit method
     extension[V](v: V)
-        def withDeltaUnit[U]: DeltaQuantity[V, U] = v
+        def withDeltaUnit[U, B]: DeltaQuantity[V, U, B] = v
     extension(v: Int)
-        def withDeltaUnit[U]: DeltaQuantity[Int, U] = v
+        def withDeltaUnit[U, B]: DeltaQuantity[Int, U, B] = v
     extension(v: Long)
-        def withDeltaUnit[U]: DeltaQuantity[Long, U] = v
+        def withDeltaUnit[U, B]: DeltaQuantity[Long, U, B] = v
     extension(v: Float)
-        def withDeltaUnit[U]: DeltaQuantity[Float, U] = v
+        def withDeltaUnit[U, B]: DeltaQuantity[Float, U, B] = v
     extension(v: Double)
-        def withDeltaUnit[U]: DeltaQuantity[Double, U] = v
+        def withDeltaUnit[U, B]: DeltaQuantity[Double, U, B] = v
 
     // extract
-    extension[V, U](ql: DeltaQuantity[V, U])
+    extension[V, U, B](ql: DeltaQuantity[V, U, B])
         def value: V = ql
-    extension[U](ql: DeltaQuantity[Int, U])
+    extension[U, B](ql: DeltaQuantity[Int, U, B])
         def value: Int = ql
-    extension[U](ql: DeltaQuantity[Long, U])
+    extension[U, B](ql: DeltaQuantity[Long, U, B])
         def value: Long = ql
-    extension[U](ql: DeltaQuantity[Float, U])
+    extension[U, B](ql: DeltaQuantity[Float, U, B])
         def value: Float = ql
-    extension[U](ql: DeltaQuantity[Double, U])
+    extension[U, B](ql: DeltaQuantity[Double, U, B])
         def value: Double = ql
 
-    extension[VL, UL](ql: DeltaQuantity[VL, UL])
+    extension[VL, UL, BL](ql: DeltaQuantity[VL, UL, BL])
         inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
         inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
     end extension
