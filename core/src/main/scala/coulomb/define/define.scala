@@ -38,11 +38,11 @@ abstract class BaseUnit[U, Name, Abbv] extends NamedUnit[Name, Abbv]
 abstract class DerivedUnit[U, D, Name, Abbv] extends NamedUnit[Name, Abbv]
 
 /**
- * Delta Units represent units with an delta in their transforms, for example temperatures or times
+ * Delta Units represent units with an offset in their transforms, for example temperatures or times
  *
  * @tparam U unit type
  * @tparam D unit it is derived from
- * @tparam O unit transform delta
+ * @tparam O unit transform offset
  * @tparam Name unit name
  * @tparam Abbv unit abbreviation
  */
