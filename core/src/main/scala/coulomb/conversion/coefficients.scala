@@ -16,15 +16,30 @@
 
 package coulomb.conversion
 
+import coulomb.rational.Rational
+
 object coefficients:
+    inline def coefficientRational[U1, U2]: Rational = ${ meta.coefficientRational[U1, U2] }
     inline def coefficientDouble[U1, U2]: Double = ${ meta.coefficientDouble[U1, U2] }
     inline def coefficientFloat[U1, U2]: Float = ${ meta.coefficientFloat[U1, U2] }
     inline def coefficientNumDouble[U1, U2]: Double = ${ meta.coefficientNumDouble[U1, U2] }
     inline def coefficientDenDouble[U1, U2]: Double = ${ meta.coefficientDenDouble[U1, U2] }
 
+    inline def deltaOffsetRational[U]: Rational = ${ meta.deltaOffsetRational[U] }
+
     object meta:
         import scala.quoted.*
-        import coulomb.infra.meta.coef
+        import coulomb.infra.meta.{*, given}
+
+        def deltaOffsetRational[U](using Quotes, Type[U]): Expr[Rational] =
+            import quotes.reflect.*
+            val doff = offset(TypeRepr.of[U])
+            Expr(doff)
+
+        def coefficientRational[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Rational] =
+            import quotes.reflect.*
+            val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
+            Expr(c)
 
         def coefficientDouble[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Double] =
             import quotes.reflect.*

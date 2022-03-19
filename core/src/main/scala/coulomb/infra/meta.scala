@@ -134,6 +134,15 @@ object meta:
             report.error(s"unit type ${typestr(u1)} not convertable to ${typestr(u2)}")
             Rational.const0
 
+    def offset(using Quotes)(u: quotes.reflect.TypeRepr): Rational =
+        import quotes.reflect.*
+        u match
+            case deltaunit(offset) => offset
+            case baseunit() => Rational.const0
+            case derivedunit(_, _) => Rational.const0
+            case _ if (!strictunitexprs) => Rational.const0
+            case _ => { report.error(s"unknown unit expression in offset: $u"); Rational.const0 }
+
     // returns tuple: (expr-for-coef, type-of-Res)
     def cansig(using Quotes)(u: quotes.reflect.TypeRepr):
             (Rational, quotes.reflect.TypeRepr) =
@@ -278,6 +287,16 @@ object meta:
                     val AppliedType(_, List(_, d, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
                     val (dcoef, dsig) = cansig(d)
                     Some((dcoef, dsig))
+                case _ => None
+
+    object deltaunit:
+        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[Rational] =
+            import quotes.reflect.*
+            Implicits.search(TypeRepr.of[DeltaUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
+                case iss: ImplicitSearchSuccess =>
+                    val AppliedType(_, List(_, _, o, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DeltaUnit].typeSymbol)
+                    val rationalTE(offset) = o
+                    Some(offset)
                 case _ => None
 
     def csErr(using Quotes): (Rational, quotes.reflect.TypeRepr) =
