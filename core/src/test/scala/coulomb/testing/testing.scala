@@ -48,6 +48,14 @@ abstract class CoulombSuite extends munit.FunSuite:
             // if types check, then asInstanceOf should succeed
             assertEquals(q.value.asInstanceOf[VT], vt)
 
+        transparent inline def assertDQD[VT, UT](vt: Double, eps: Option[Double] = None)(using
+                vc: ValueConversion[V, Double]): Unit =
+            assertEquals(typeStr[V], typeStr[VT])
+            assertEquals(typeStr[U], typeStr[UT])
+            // epsilon governed by V, but scale by |vt|
+            val e = math.abs(vt) * eps.getOrElse(typeEps[V])
+            assertEqualsDouble(vc(q.value), vt, e)
+
     extension[V](v: V)
         transparent inline def assertVT[VT](vt: VT): Unit =
             assertEquals(typeStr[V], typeStr[VT])

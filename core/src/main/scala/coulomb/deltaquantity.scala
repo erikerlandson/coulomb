@@ -20,6 +20,8 @@ export deltaquantity.DeltaQuantity as DeltaQuantity
 export deltaquantity.withDeltaUnit as withDeltaUnit
 
 object deltaquantity:
+    import coulomb.ops.*
+
     opaque type DeltaQuantity[V, U, B] = V
 
     abstract class Applier[U, B]:
@@ -63,5 +65,9 @@ object deltaquantity:
     extension[VL, UL, BL](ql: DeltaQuantity[VL, UL, BL])
         inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
         inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
+
+        transparent inline def -[B, VR, UR](qr: DeltaQuantity[VR, UR, B])(using sub: DeltaSub[B, VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
+            sub(ql, qr)
+
     end extension
 end deltaquantity

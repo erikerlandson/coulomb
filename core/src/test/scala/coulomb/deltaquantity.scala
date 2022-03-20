@@ -45,3 +45,11 @@ class DeltaQuantitySuite extends CoulombSuite:
        13.withDeltaUnit[Liter, Liter].value.assertVT[Int](13)
        "foo".withDeltaUnit[Minute, Minute].value.assertVT[String]("foo")
     }
+
+    test("DeltaQuantity subtraction standard") {
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.all.given
+
+        (100d.withDeltaUnit[Celsius, Kelvin] - 122d.withDeltaUnit[Fahrenheit, Kelvin]).assertQD[Double, Celsius](50)
+    } 

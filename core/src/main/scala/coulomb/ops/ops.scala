@@ -70,6 +70,12 @@ abstract class TPow[V, U, P]:
 abstract class Ord[VL, UL, VR, UR]:
     def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int
 
+@implicitNotFound("Subtraction not defined in scope for DeltaQuantity[${VL}, ${UL}] and DeltaQuantity[${VR}, ${UR}]")
+abstract class DeltaSub[B, VL, UL, VR, UR]:
+    type VO
+    type UO
+    def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Quantity[VO, UO]
+
 /** Resolve the operator output type for left and right argument types */
 @implicitNotFound("No output type resolution in scope for argument value types {VL} and {VR}")
 abstract class ValueResolution[VL, VR]:

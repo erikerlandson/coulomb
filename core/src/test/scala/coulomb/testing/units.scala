@@ -57,3 +57,12 @@ given ctx_unit_Minute: DerivedUnit[Minute, Second * 60, "minute", "min"] with {}
 
 final type Hour
 given ctx_unit_Hour: DerivedUnit[Hour, Minute * 60, "hour", "hr"] with {}
+
+final type Kelvin
+given ctx_unit_Kelvin: BaseUnit[Kelvin, "kelvin", "K"] with {}
+
+final type Celsius
+given ctx_unit_Celsius: DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] with {}
+
+final type Fahrenheit
+given ctx_unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] with {}
