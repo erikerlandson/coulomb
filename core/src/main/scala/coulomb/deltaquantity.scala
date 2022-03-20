@@ -82,5 +82,8 @@ object deltaquantity:
 
         transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: DeltaSubQ[B, VL, UL, VR, UR]): DeltaQuantity[sub.VO, sub.UO, B] =
             sub(ql, qr)
+
+        transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: DeltaAddQ[B, VL, UL, VR, UR]): DeltaQuantity[add.VO, add.UO, B] =
+            add(ql, qr)
     end extension
 end deltaquantity

@@ -142,3 +142,27 @@ class DeltaQuantitySuite extends CoulombSuite:
         // 2V2U
         (100f.withDeltaUnit[Celsius, Kelvin] - 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](50)
     } 
+
+    test("quantity addition strict") {
+        import coulomb.ops.standard.given
+        import coulomb.conversion.standard.explicit.given
+
+        // 1V1U
+        (100d.withDeltaUnit[Celsius, Kelvin] + 50d.withUnit[Celsius]).assertDQ[Double, Celsius](150)
+        (10f.withDeltaUnit[Minute, Second] + 5f.withUnit[Minute]).assertDQ[Float, Minute](15)
+        (100L.withDeltaUnit[Kelvin, Kelvin] + 50L.withUnit[Kelvin]).assertDQ[Long, Kelvin](150)
+        (10.withDeltaUnit[Second, Second] + 5.withUnit[Second]).assertDQ[Int, Second](15)
+    }
+
+    test("quantity addition standard") {
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.all.given
+
+        // 2V1U
+        (100d.withDeltaUnit[Celsius, Kelvin] + 50f.withUnit[Celsius]).assertDQ[Double, Celsius](150)
+        // 1V2U
+        (100d.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](150)
+        // 2V2U
+        (100f.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](150)
+    } 
