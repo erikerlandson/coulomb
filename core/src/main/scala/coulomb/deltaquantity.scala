@@ -21,6 +21,7 @@ export deltaquantity.withDeltaUnit as withDeltaUnit
 
 object deltaquantity:
     import coulomb.ops.*
+    import coulomb.conversion.*
 
     opaque type DeltaQuantity[V, U, B] = V
 
@@ -62,11 +63,21 @@ object deltaquantity:
     extension[U, B](ql: DeltaQuantity[Double, U, B])
         def value: Double = ql
 
-    extension[VL, UL, BL](ql: DeltaQuantity[VL, UL, BL])
+    extension[VL, UL, B](ql: DeltaQuantity[VL, UL, B])
         inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
         inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
 
-        transparent inline def -[B, VR, UR](qr: DeltaQuantity[VR, UR, B])(using sub: DeltaSub[B, VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
+        inline def toValue[V](using conv: ValueConversion[VL, V]): DeltaQuantity[V, UL, B] =
+            conv(ql.value).withDeltaUnit[UL, B]
+        inline def toUnit[U](using conv: DeltaUnitConversion[VL, B, UL, U]): DeltaQuantity[VL, U, B] =
+            conv(ql.value).withDeltaUnit[U, B]
+
+        inline def tToValue[V](using conv: TruncatingValueConversion[VL, V]): DeltaQuantity[V, UL, B] =
+            conv(ql.value).withDeltaUnit[UL, B]
+        inline def tToUnit[U](using conv: TruncatingDeltaUnitConversion[VL, B, UL, U]): DeltaQuantity[VL, U, B] =
+            conv(ql.value).withDeltaUnit[U, B]
+
+        transparent inline def -[VR, UR](qr: DeltaQuantity[VR, UR, B])(using sub: DeltaSub[B, VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
             sub(ql, qr)
 
     end extension

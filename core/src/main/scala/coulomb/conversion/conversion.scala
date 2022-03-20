@@ -35,3 +35,7 @@ abstract class TruncatingUnitConversion[V, UF, UT] extends (V => V)
 /** Convert a value of type V from implied delta units UF to UT */
 @implicitNotFound("No unit conversion in scope for value type {V}, unit types {UF} => {UT}")
 abstract class DeltaUnitConversion[V, B, UF, UT] extends (V => V)
+
+/** Convert a value of type V from implied delta units UF to UT */
+@implicitNotFound("No truncating unit conversion in scope for value type {V}, unit types {UF} => {UT}")
+abstract class TruncatingDeltaUnitConversion[V, B, UF, UT] extends (V => V)

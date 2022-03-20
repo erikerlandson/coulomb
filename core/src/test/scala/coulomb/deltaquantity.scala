@@ -46,7 +46,56 @@ class DeltaQuantitySuite extends CoulombSuite:
        "foo".withDeltaUnit[Minute, Minute].value.assertVT[String]("foo")
     }
 
-    test("DeltaQuantity subtraction strict") {
+    test("toValue standard") {
+        import coulomb.conversion.standard.value.given
+        100.withDeltaUnit[Celsius, Kelvin].toValue[Int].assertDQ[Int, Celsius](100)
+        100.withDeltaUnit[Celsius, Kelvin].toValue[Long].assertDQ[Long, Celsius](100)
+        100.withDeltaUnit[Celsius, Kelvin].toValue[Float].assertDQ[Float, Celsius](100)
+        100.withDeltaUnit[Celsius, Kelvin].toValue[Double].assertDQ[Double, Celsius](100)
+
+        100L.withDeltaUnit[Celsius, Kelvin].toValue[Int].assertDQ[Int, Celsius](100)
+        100L.withDeltaUnit[Celsius, Kelvin].toValue[Long].assertDQ[Long, Celsius](100)
+        100L.withDeltaUnit[Celsius, Kelvin].toValue[Float].assertDQ[Float, Celsius](100)
+        100L.withDeltaUnit[Celsius, Kelvin].toValue[Double].assertDQ[Double, Celsius](100)
+
+        assertCE("100f.withDeltaUnit[Celsius, Kelvin].toValue[Int]")
+        assertCE("100f.withDeltaUnit[Celsius, Kelvin].toValue[Long]")
+        100f.withDeltaUnit[Celsius, Kelvin].toValue[Float].assertDQ[Float, Celsius](100)
+        100f.withDeltaUnit[Celsius, Kelvin].toValue[Double].assertDQ[Double, Celsius](100)
+
+        assertCE("100d.withDeltaUnit[Celsius, Kelvin].toValue[Int]")
+        assertCE("100d.withDeltaUnit[Celsius, Kelvin].toValue[Long]")
+        100d.withDeltaUnit[Celsius, Kelvin].toValue[Float].assertDQ[Float, Celsius](100)
+        100d.withDeltaUnit[Celsius, Kelvin].toValue[Double].assertDQ[Double, Celsius](100)
+    }
+
+    test("toValue standard truncating") {
+        import coulomb.conversion.standard.value.given
+        1.999f.withDeltaUnit[Minute, Second].tToValue[Int].assertDQ[Int, Minute](1)
+        0.999f.withDeltaUnit[Minute, Second].tToValue[Long].assertDQ[Long, Minute](0)
+
+        1.999d.withDeltaUnit[Minute, Second].tToValue[Int].assertDQ[Int, Minute](1)
+        0.999d.withDeltaUnit[Minute, Second].tToValue[Long].assertDQ[Long, Minute](0)
+    }
+
+    test("toUnit standard") {
+        import coulomb.conversion.standard.explicit.given
+
+        37d.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit].assertDQD[Double, Fahrenheit](98.6)
+        37f.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit].assertDQD[Float, Fahrenheit](98.6)
+
+        assertCE("37L.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit]")
+        assertCE("37.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit]")
+    }
+
+    test("toUnit standard truncating") {
+        import coulomb.conversion.standard.explicit.given
+
+        37L.withDeltaUnit[Celsius, Kelvin].tToUnit[Fahrenheit].assertDQ[Long, Fahrenheit](98)
+        37.withDeltaUnit[Celsius, Kelvin].tToUnit[Fahrenheit].assertDQ[Int, Fahrenheit](98)
+    }
+
+    test("subtraction strict") {
         import coulomb.ops.standard.given
         import coulomb.conversion.standard.explicit.given
 
@@ -57,7 +106,7 @@ class DeltaQuantitySuite extends CoulombSuite:
         (10.withDeltaUnit[Second, Second] - 5.withDeltaUnit[Second, Second]).assertQ[Int, Second](5)
     } 
 
-    test("DeltaQuantity subtraction standard") {
+    test("subtraction standard") {
         import coulomb.ops.standard.given
         import coulomb.ops.resolution.standard.given
         import coulomb.conversion.standard.all.given

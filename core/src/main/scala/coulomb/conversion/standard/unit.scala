@@ -46,15 +46,31 @@ object unit:
             def apply(v: Int): Int = ((nc * v) / dc).toInt
 
     inline given ctx_DUC_Double[B, UF, UT]: DeltaUnitConversion[Double, B, UF, UT] =
-        val c = coefficientDouble[UF, B] / coefficientDouble[UT, B]
+        val c = coefficientDouble[UF, UT]
         val df = deltaOffsetDouble[UF, B]
         val dt = deltaOffsetDouble[UT, B]
         new DeltaUnitConversion[Double, B, UF, UT]:
             def apply(v: Double): Double = ((v + df) * c) - dt
 
     inline given ctx_DUC_Float[B, UF, UT]: DeltaUnitConversion[Float, B, UF, UT] =
-        val c = coefficientFloat[UF, B] / coefficientFloat[UT, B]
+        val c = coefficientFloat[UF, UT]
         val df = deltaOffsetFloat[UF, B]
         val dt = deltaOffsetFloat[UT, B]
         new DeltaUnitConversion[Float, B, UF, UT]:
             def apply(v: Float): Float = ((v + df) * c) - dt
+
+    inline given ctx_TDUC_Long[B, UF, UT]: TruncatingDeltaUnitConversion[Long, B, UF, UT] =
+        val nc = coefficientNumDouble[UF, UT]
+        val dc = coefficientDenDouble[UF, UT]
+        val df = deltaOffsetDouble[UF, B]
+        val dt = deltaOffsetDouble[UT, B]
+        new TruncatingDeltaUnitConversion[Long, B, UF, UT]:
+            def apply(v: Long): Long = (((nc * (v + df)) / dc) - dt).toLong
+
+    inline given ctx_TDUC_Int[B, UF, UT]: TruncatingDeltaUnitConversion[Int, B, UF, UT] =
+        val nc = coefficientNumDouble[UF, UT]
+        val dc = coefficientDenDouble[UF, UT]
+        val df = deltaOffsetDouble[UF, B]
+        val dt = deltaOffsetDouble[UT, B]
+        new TruncatingDeltaUnitConversion[Int, B, UF, UT]:
+            def apply(v: Int): Int = (((nc * (v + df)) / dc) - dt).toInt
