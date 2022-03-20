@@ -134,11 +134,11 @@ object meta:
         u match
             case deltaunit(offset, db) =>
                 if (matchingdelta(db, b)) offset else
-                    report.error(s"bad DeltaUnit in offset: $u")
+                    report.error(s"bad DeltaUnit in offset: ${typestr(u)}")
                     Rational.const0
             case baseunit() if convertible(u, b) => Rational.const0
             case derivedunit(_, _) if convertible(u, b) => Rational.const0
-            case _ => { report.error(s"unknown unit expression in offset: $u"); Rational.const0 }
+            case _ => { report.error(s"unknown unit expression in offset: ${typestr(u)}"); Rational.const0 }
 
     def matchingdelta(using Quotes)(db: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Boolean =
         import quotes.reflect.*
@@ -185,7 +185,7 @@ object meta:
                     val usig = unifyPow(p, bsig)
                     (ucoef, usig)
                 else
-                    { report.error(s"bad exponent in cansig: $u"); csErr }
+                    { report.error(s"bad exponent in cansig: ${typestr(u)}"); csErr }
             case baseunit() => (Rational.const1, sigcons(u, Rational.const1, signil()))
             case derivedunit(ucoef, usig) => (ucoef, usig)
             case _ if (!strictunitexprs) =>
@@ -193,7 +193,7 @@ object meta:
                 // it does not match the strict unit expression forms above, and
                 // if the strict unit expression policy has not been enabled
                 (Rational.const1, sigcons(u, Rational.const1, signil()))
-            case _ => { report.error(s"unknown unit expression in cansig: $u"); csErr }
+            case _ => { report.error(s"unknown unit expression in cansig: ${typestr(u)}"); csErr }
 
     def stdsig(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
@@ -221,7 +221,7 @@ object meta:
                 // it does not match the strict unit expression forms above, and
                 // if the strict unit expression policy has not been enabled
                 sigcons(u, Rational.const1, signil())
-            case _ => { report.error(s"unknown unit expression in stdsig: $u"); signil() }
+            case _ => { report.error(s"unknown unit expression in stdsig: ${typestr(u)}"); signil() }
 
     def sortsig(using Quotes)(sig: quotes.reflect.TypeRepr):
             (quotes.reflect.TypeRepr, quotes.reflect.TypeRepr) =
@@ -231,7 +231,7 @@ object meta:
             case sigcons(u, p, tail) =>
                 val (nsig, dsig) = sortsig(tail)
                 if (p > 0) (sigcons(u, p, nsig), dsig) else (nsig, sigcons(u, -p, dsig))
-            case _ => { report.error(s"unknown unit expression in stdsig: $sig"); (signil(), signil()) }
+            case _ => { report.error(s"unknown unit expression in stdsig: ${typestr(sig)}"); (signil(), signil()) }
 
     def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
         import quotes.reflect.*
@@ -256,7 +256,7 @@ object meta:
                 TypeRepr.of[*].appliedTo(List(uTerm(u1, p1), uTerm(u2, p2)))
             case sigcons(u, p, tail) =>
                 TypeRepr.of[*].appliedTo(List(uTerm(u, p), uProd(tail)))
-            case _ => { report.error(s"unknown unit expression in uProd: $u"); TypeRepr.of[Nothing] }
+            case _ => { report.error(s"unknown unit expression in uProd: ${typestr(u)}"); TypeRepr.of[Nothing] }
 
     def uTerm(using Quotes)(u: quotes.reflect.TypeRepr, p: Rational): quotes.reflect.TypeRepr =
         import quotes.reflect.*
