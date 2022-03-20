@@ -24,49 +24,46 @@ import algebra.ring.AdditiveGroup
 import coulomb.*
 import coulomb.ops.{DeltaSub, ValueResolution}
 
-/*
-transparent inline given ctx_sub_1V1U[VL, UL, VR, UR](using
-    // https://github.com/lampepfl/dotty/issues/14585
+transparent inline given ctx_deltasub_1V1U[B, VL, UL, VR, UR](using
     eqv: VR =:= VL,
     equ: UR =:= UL,
     alg: AdditiveGroup[VL]
-        ): Sub[VL, UL, VR, UR] =
-    new Sub[VL, UL, VR, UR]:
+        ): DeltaSub[B, VL, UL, VR, UR] =
+    new DeltaSub[B, VL, UL, VR, UR]:
         type VO = VL
         type UO = UL
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+        def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Quantity[VO, UO] =
             alg.minus(ql.value, eqv(qr.value)).withUnit[UO]
 
-transparent inline given ctx_sub_1V2U[VL, UL, VR, UR](using
+transparent inline given ctx_deltasub_1V2U[B, VL, UL, VR, UR](using
     eqv: VR =:= VL,
     neu: NotGiven[UR =:= UL],
-    icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
+    icr: Conversion[DeltaQuantity[VR, UR, B], DeltaQuantity[VL, UL, B]],
     alg: AdditiveGroup[VL]
-        ): Sub[VL, UL, VR, UR] =
-    new Sub[VL, UL, VR, UR]:
+        ): DeltaSub[B, VL, UL, VR, UR] =
+    new DeltaSub[B, VL, UL, VR, UR]:
         type VO = VL
         type UO = UL
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+        def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Quantity[VO, UO] =
             alg.minus(ql.value, icr(qr).value).withUnit[UO]
 
-transparent inline given ctx_sub_2V1U[VL, UL, VR, UR](using
+transparent inline given ctx_deltasub_2V1U[B, VL, UL, VR, UR](using
     nev: NotGiven[VR =:= VL],
     equ: UR =:= UL,
     vres: ValueResolution[VL, VR],
-    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
-    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
+    icl: Conversion[DeltaQuantity[VL, UL, B], DeltaQuantity[vres.VO, UL, B]],
+    icr: Conversion[DeltaQuantity[VR, UR, B], DeltaQuantity[vres.VO, UL, B]],
     alg: AdditiveGroup[vres.VO]
-        ): Sub[VL, UL, VR, UR] =
-    new Sub[VL, UL, VR, UR]:
-        type VO = vres.VO 
+        ): DeltaSub[B, VL, UL, VR, UR] =
+    new DeltaSub[B, VL, UL, VR, UR]:
+        type VO = vres.VO
         type UO = UL
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+        def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Quantity[VO, UO] =
             alg.minus(icl(ql).value, icr(qr).value).withUnit[UO]
 
-*/
 transparent inline given ctx_deltasub_2V2U[B, VL, UL, VR, UR](using
-    //nev: NotGiven[VR =:= VL],
-    //neu: NotGiven[UR =:= UL],
+    nev: NotGiven[VR =:= VL],
+    neu: NotGiven[UR =:= UL],
     vres: ValueResolution[VL, VR],
     icl: Conversion[DeltaQuantity[VL, UL, B], DeltaQuantity[vres.VO, UL, B]],
     icr: Conversion[DeltaQuantity[VR, UR, B], DeltaQuantity[vres.VO, UL, B]],
