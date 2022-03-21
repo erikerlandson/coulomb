@@ -16,7 +16,7 @@
 
 package coulomb.testing
 
-import coulomb.Quantity
+import coulomb.{DeltaQuantity, Quantity}
 import coulomb.conversion.ValueConversion
 
 abstract class CoulombSuite extends munit.FunSuite:
@@ -32,6 +32,23 @@ abstract class CoulombSuite extends munit.FunSuite:
             assertEquals(q.value.asInstanceOf[VT], vt)
 
         transparent inline def assertQD[VT, UT](vt: Double, eps: Option[Double] = None)(using
+                vc: ValueConversion[V, Double]): Unit =
+            assertEquals(typeStr[V], typeStr[VT])
+            assertEquals(typeStr[U], typeStr[UT])
+            // epsilon governed by V, but scale by |vt|
+            val e = math.abs(vt) * eps.getOrElse(typeEps[V])
+            assertEqualsDouble(vc(q.value), vt, e)
+
+    extension[V, U, B](q: DeltaQuantity[V, U, B])
+        transparent inline def assertDQ[VT, UT](vt: VT): Unit =
+            // checking types first
+            // checking in string form gives better idiomatic test failure outputs
+            assertEquals(typeStr[V], typeStr[VT])
+            assertEquals(typeStr[U], typeStr[UT])
+            // if types check, then asInstanceOf should succeed
+            assertEquals(q.value.asInstanceOf[VT], vt)
+
+        transparent inline def assertDQD[VT, UT](vt: Double, eps: Option[Double] = None)(using
                 vc: ValueConversion[V, Double]): Unit =
             assertEquals(typeStr[V], typeStr[VT])
             assertEquals(typeStr[U], typeStr[UT])

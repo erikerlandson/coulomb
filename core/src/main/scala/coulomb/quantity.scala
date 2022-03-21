@@ -16,6 +16,11 @@
 
 package coulomb
 
+import coulomb.ops.*
+import coulomb.rational.Rational
+import coulomb.conversion.{ValueConversion, UnitConversion}
+import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
+
 /** Represents the product of two unit expressions L and R */
 final type *[L, R]
 
@@ -27,6 +32,15 @@ final type ^[B, E]
 
 @deprecated("Unitless should be replaced by integer literal type '1'")
 final type Unitless = 1
+
+inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
+inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
+
+/**
+ * Obtain the coefficient of conversion from U1 -> U2
+ * If U1 and U2 are not convertible, causes a compilation failure.
+ */
+inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
 
 export quantity.Quantity as Quantity
 export quantity.withUnit as withUnit
@@ -52,6 +66,18 @@ object quantity:
         def apply[U](v: Double): Quantity[Double, U] = v
     end Quantity
 
+    // lift using withUnit method
+    extension[V](v: V)
+        def withUnit[U]: Quantity[V, U] = v
+    extension(v: Int)
+        def withUnit[U]: Quantity[Int, U] = v
+    extension(v: Long)
+        def withUnit[U]: Quantity[Long, U] = v
+    extension(v: Float)
+        def withUnit[U]: Quantity[Float, U] = v
+    extension(v: Double)
+        def withUnit[U]: Quantity[Double, U] = v
+
     // extract
     extension[V, U](ql: Quantity[V, U])
         def value: V = ql
@@ -64,97 +90,60 @@ object quantity:
     extension[U](ql: Quantity[Double, U])
         def value: Double = ql
 
-    extension[V](v: V)
-        def withUnit[U]: Quantity[V, U] = v
-    extension(v: Int)
-        def withUnit[U]: Quantity[Int, U] = v
-    extension(v: Long)
-        def withUnit[U]: Quantity[Long, U] = v
-    extension(v: Float)
-        def withUnit[U]: Quantity[Float, U] = v
-    extension(v: Double)
-        def withUnit[U]: Quantity[Double, U] = v
+    extension[VL, UL](ql: Quantity[VL, UL])
+        inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
+        inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
 
+        inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
+            conv(ql.value).withUnit[UL]
+        inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
+            conv(ql.value).withUnit[U]
+
+        inline def tToValue[V](using conv: TruncatingValueConversion[VL, V]): Quantity[V, UL] =
+            conv(ql.value).withUnit[UL]
+        inline def tToUnit[U](using conv: TruncatingUnitConversion[VL, UL, U]): Quantity[VL, U] =
+            conv(ql.value).withUnit[U]
+
+        inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
+            neg(ql)
+
+        transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
+            add(ql, qr)
+
+        transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: Sub[VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
+            sub(ql, qr)
+
+        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[VL, UL, VR, UR]): Quantity[mul.VO, mul.UO] =
+            mul(ql, qr)
+
+        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[VL, UL, VR, UR]): Quantity[div.VO, div.UO] =
+            div(ql, qr)
+
+        transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using tq: TQuot[VL, UL, VR, UR]): Quantity[tq.VO, tq.UO] =
+            tq(ql, qr)
+
+        transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
+            pow(ql)
+
+        transparent inline def tpow[P](using tp: TPow[VL, UL, P]): Quantity[tp.VO, tp.UO] =
+            tp(ql)
+
+        inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) == 0
+
+        inline def =!=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) != 0
+
+        inline def <[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) < 0
+
+        inline def <=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) <= 0
+
+        inline def >[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) > 0
+
+        inline def >=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) >= 0
+    end extension
 end quantity
-
-import coulomb.ops.*
-import coulomb.rational.Rational
-import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
-
-inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
-inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
-
-/**
- * Obtain the coefficient of conversion from U1 -> U2
- * If U1 and U2 are not convertible, causes a compilation failure.
- */
-inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
-
-extension[VL, UL](ql: Quantity[VL, UL])
-    inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
-    inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
-
-    inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
-        conv(ql.value).withUnit[UL]
-    inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
-        conv(ql.value).withUnit[U]
-
-    inline def tToValue[V](using conv: TruncatingValueConversion[VL, V]): Quantity[V, UL] =
-        conv(ql.value).withUnit[UL]
-    inline def tToUnit[U](using conv: TruncatingUnitConversion[VL, UL, U]): Quantity[VL, U] =
-        conv(ql.value).withUnit[U]
-
-    inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
-        neg(ql)
-
-    transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
-        add(ql, qr)
-
-    transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: Sub[VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
-        sub(ql, qr)
-
-    transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[VL, UL, VR, UR]): Quantity[mul.VO, mul.UO] =
-        mul(ql, qr)
-
-    transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[VL, UL, VR, UR]): Quantity[div.VO, div.UO] =
-        div(ql, qr)
-
-    transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using tq: TQuot[VL, UL, VR, UR]): Quantity[tq.VO, tq.UO] =
-        tq(ql, qr)
-
-    transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
-        pow(ql)
-
-    transparent inline def tpow[P](using tp: TPow[VL, UL, P]): Quantity[tp.VO, tp.UO] =
-        tp(ql)
-
-    inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
-        ord(ql, qr) == 0
-
-    inline def =!=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
-        ord(ql, qr) != 0
-
-    inline def <[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
-        ord(ql, qr) < 0
-
-    inline def <=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
-        ord(ql, qr) <= 0
-
-    inline def >[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
-        ord(ql, qr) > 0
-
-    inline def >=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
-        ord(ql, qr) >= 0
-
-object benchmark:
-    def time[T](expr: => T): (Long, T) =
-        val t0 = System.nanoTime()
-        val r = expr
-        val t = (System.nanoTime() - t0) / 1000000L
-        (t, r)
-
-    def medianTime[T](expr: => T, n: Int = 5): (Long, T) =
-        require(n % 2 == 1)
-        val data = (Vector.fill(n) { time(expr) }).sortBy(_._1)
-        data(n / 2)

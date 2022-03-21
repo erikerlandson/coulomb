@@ -46,7 +46,7 @@ object show:
         import quotes.reflect.*
         u match
             case flatmul(t) => termstr(t, render)
-            case AppliedType(op, List(lu, unitless())) if (op =:= TypeRepr.of[/]) =>
+            case AppliedType(op, List(lu, unitconst1())) if (op =:= TypeRepr.of[/]) =>
                 showrender(lu, render)
             case AppliedType(op, List(lu, ru)) if (op =:= TypeRepr.of[/]) =>
                 val (ls, rs) = (paren(lu, render), paren(ru, render))

@@ -122,17 +122,35 @@ object meta:
 
     def coef(using Quotes)(u1: quotes.reflect.TypeRepr, u2: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
-        if (u1 =:= u2) then
-            // confirm that the type has a defined canonical signature, or fail
-            val _ = cansig(u1)
-            // the coefficient between two identical unit expression types is always exactly 1
-            Rational.const1
         // the fundamental algorithmic unit analysis criterion:
         // http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/
         val (rcoef, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
         if (rsig =:= TypeRepr.of[SNil]) then rcoef else
             report.error(s"unit type ${typestr(u1)} not convertable to ${typestr(u2)}")
             Rational.const0
+
+    def offset(using Quotes)(u: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Rational =
+        import quotes.reflect.*
+        u match
+            case deltaunit(offset, db) =>
+                if (matchingdelta(db, b)) offset else
+                    report.error(s"bad DeltaUnit in offset: ${typestr(u)}")
+                    Rational.const0
+            case baseunit() if convertible(u, b) => Rational.const0
+            case derivedunit(_, _) if convertible(u, b) => Rational.const0
+            case _ => { report.error(s"unknown unit expression in offset: ${typestr(u)}"); Rational.const0 }
+
+    def matchingdelta(using Quotes)(db: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Boolean =
+        import quotes.reflect.*
+        // units of db and b should cancel, and leave only a constant behind
+        simplify(TypeRepr.of[/].appliedTo(List(db, b))) match
+            case rationalTE(_) => true
+            case _ => false
+
+    def convertible(using Quotes)(u1: quotes.reflect.TypeRepr, u2: quotes.reflect.TypeRepr): Boolean =
+        import quotes.reflect.*
+        val (_, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
+        rsig =:= TypeRepr.of[SNil]
 
     // returns tuple: (expr-for-coef, type-of-Res)
     def cansig(using Quotes)(u: quotes.reflect.TypeRepr):
@@ -141,6 +159,8 @@ object meta:
         // if this encounters a unit type pattern it cannot expand to a canonical signature,
         // at any level, it raises a compile-time error such that the context parameter search fails.
         u match
+            // identify embedded coefficients (includes '1' aka unitless)
+            case unitconst(c) => (c, signil())
             // traverse down the operator types first, since that can be done without
             // any attempts to look up context variables for BaseUnit and DerivedUnit,
             // which only happen at the leaves of expressions
@@ -165,9 +185,7 @@ object meta:
                     val usig = unifyPow(p, bsig)
                     (ucoef, usig)
                 else
-                    { report.error(s"bad exponent in cansig: $u"); csErr }
-            case unitless() => (Rational.const1, signil())
-            case unitconst(c) => (c, signil())
+                    { report.error(s"bad exponent in cansig: ${typestr(u)}"); csErr }
             case baseunit() => (Rational.const1, sigcons(u, Rational.const1, signil()))
             case derivedunit(ucoef, usig) => (ucoef, usig)
             case _ if (!strictunitexprs) =>
@@ -175,7 +193,7 @@ object meta:
                 // it does not match the strict unit expression forms above, and
                 // if the strict unit expression policy has not been enabled
                 (Rational.const1, sigcons(u, Rational.const1, signil()))
-            case _ => { report.error(s"unknown unit expression in cansig: $u"); csErr }
+            case _ => { report.error(s"unknown unit expression in cansig: ${typestr(u)}"); csErr }
 
     def stdsig(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
@@ -194,8 +212,8 @@ object meta:
                 if (e == 0) signil()
                 else if (e == 1) stdsig(b)
                 else unifyPow(p, stdsig(b))
-            case unitless() => signil()
-            case unitconst(c) => sigcons(rationalTE(c), Rational.const1, signil())
+            case unitconst(c) =>
+                if (c == 1) signil() else sigcons(rationalTE(c), Rational.const1, signil())
             case baseunit() => sigcons(u, Rational.const1, signil())
             case derivedunit(_, _) => sigcons(u, Rational.const1, signil())
             case _ if (!strictunitexprs) =>
@@ -203,7 +221,7 @@ object meta:
                 // it does not match the strict unit expression forms above, and
                 // if the strict unit expression policy has not been enabled
                 sigcons(u, Rational.const1, signil())
-            case _ => { report.error(s"unknown unit expression in stdsig: $u"); signil() }
+            case _ => { report.error(s"unknown unit expression in stdsig: ${typestr(u)}"); signil() }
 
     def sortsig(using Quotes)(sig: quotes.reflect.TypeRepr):
             (quotes.reflect.TypeRepr, quotes.reflect.TypeRepr) =
@@ -213,21 +231,20 @@ object meta:
             case sigcons(u, p, tail) =>
                 val (nsig, dsig) = sortsig(tail)
                 if (p > 0) (sigcons(u, p, nsig), dsig) else (nsig, sigcons(u, -p, dsig))
-            case _ => { report.error(s"unknown unit expression in stdsig: $sig"); (signil(), signil()) }
+            case _ => { report.error(s"unknown unit expression in stdsig: ${typestr(sig)}"); (signil(), signil()) }
 
     def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
         import quotes.reflect.*
-        val usig = stdsig(TypeRepr.of[U])
-        val (un, ud) = sortsig(usig)
-        finRU(un, ud).asType match
+        simplify(TypeRepr.of[U]).asType match
             case '[uo] => '{ new SimplifiedUnit[U] { type UO = uo } }
 
-    def finRU(using Quotes)(un: quotes.reflect.TypeRepr, ud: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
+    def simplify(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
+        val (un, ud) = sortsig(stdsig(u))
         (uProd(un), uProd(ud)) match
-            case (unitless(), unitless()) => TypeRepr.of[1]
-            case (n, unitless()) => n
-            case (unitless(), d) => TypeRepr.of[/].appliedTo(List(TypeRepr.of[1], d))
+            case (unitconst1(), unitconst1()) => TypeRepr.of[1]
+            case (n, unitconst1()) => n
+            case (unitconst1(), d) => TypeRepr.of[/].appliedTo(List(TypeRepr.of[1], d))
             case (n, d) => TypeRepr.of[/].appliedTo(List(n, d))
 
     def uProd(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
@@ -239,7 +256,7 @@ object meta:
                 TypeRepr.of[*].appliedTo(List(uTerm(u1, p1), uTerm(u2, p2)))
             case sigcons(u, p, tail) =>
                 TypeRepr.of[*].appliedTo(List(uTerm(u, p), uProd(tail)))
-            case _ => { report.error(s"unknown unit expression in uProd: $u"); TypeRepr.of[Nothing] }
+            case _ => { report.error(s"unknown unit expression in uProd: ${typestr(u)}"); TypeRepr.of[Nothing] }
 
     def uTerm(using Quotes)(u: quotes.reflect.TypeRepr, p: Rational): quotes.reflect.TypeRepr =
         import quotes.reflect.*
@@ -251,13 +268,14 @@ object meta:
                 case _: ImplicitSearchSuccess => true
                 case _ => false
 
-    object unitless:
+    object unitconst1:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
-            u =:= quotes.reflect.TypeRepr.of[1]
+            u match
+                case rationalTE(v) if (v == 1) => true
+                case _ => false
 
     object unitconst:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[Rational] =
-            import quotes.reflect.*
             u match
                 case rationalTE(v) => Some(v)
                 case _ => None
@@ -272,12 +290,21 @@ object meta:
     object derivedunit:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[(Rational, quotes.reflect.TypeRepr)] =
             import quotes.reflect.*
-            Implicits.search(TypeRepr.of[DerivedUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
+            Implicits.search(TypeRepr.of[DerivedUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
                 case iss: ImplicitSearchSuccess =>
-                    val AppliedType(_, List(_, d, c, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
-                    val rationalTE(coef) = c
+                    val AppliedType(_, List(_, d, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
                     val (dcoef, dsig) = cansig(d)
-                    Some((coef * dcoef, dsig))
+                    Some((dcoef, dsig))
+                case _ => None
+
+    object deltaunit:
+        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[(Rational, quotes.reflect.TypeRepr)] =
+            import quotes.reflect.*
+            Implicits.search(TypeRepr.of[DeltaUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
+                case iss: ImplicitSearchSuccess =>
+                    val AppliedType(_, List(_, b, o, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DeltaUnit].typeSymbol)
+                    val rationalTE(offset) = o
+                    Some((offset, b))
                 case _ => None
 
     def csErr(using Quotes): (Rational, quotes.reflect.TypeRepr) =
