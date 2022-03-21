@@ -74,9 +74,18 @@ object types:
     import scala.quoted.*
 
     /** typeStr(type.path.Foo[type.path.Bar]) => Foo[Bar] */
-    transparent inline def typeStr[T]: String = ${ tsmeta[T] }
-    transparent inline def typesEq[T1, T2]: Boolean = ${ temeta[T1, T2] }
-    transparent inline def typeEps[V]: Double = ${ tepsmeta[V] }
+    inline def typeStr[T]: String = ${ tsmeta[T] }
+    inline def typesEq[T1, T2]: Boolean = ${ temeta[T1, T2] }
+    inline def typeEps[V]: Double = ${ tepsmeta[V] }
+
+    private def tsmeta[T](using Type[T], Quotes): Expr[String] =
+        import quotes.reflect.*
+        Expr(coulomb.infra.meta.typestr(TypeRepr.of[T]))
+
+    private def temeta[T1, T2](using Type[T1], Type[T2], Quotes): Expr[Boolean] =
+        import quotes.reflect.*
+        val eql = TypeRepr.of[T1] =:= TypeRepr.of[T2]
+        Expr(eql)
 
     private def tepsmeta[V](using Type[V], Quotes): Expr[Double] =
         import quotes.reflect.*
@@ -84,24 +93,6 @@ object types:
             case vt if vt =:= TypeRepr.of[Float] => Expr(1e-5)
             case vt if vt =:= TypeRepr.of[Double] => Expr(1e-10)
             case _ => Expr(1e-10)
-
-    private def tsmeta[T](using Type[T], Quotes): Expr[String] =
-        import quotes.reflect.*
-        def work(tr: TypeRepr): String = tr match
-            case AppliedType(tc, ta) =>
-                val tcn = tc.typeSymbol.name
-                val as = ta.map(work)
-                if (as.length == 0) tcn else
-                    tcn + "[" + as.mkString(",") + "]"
-            case t => t.typeSymbol.name
-        val t = TypeRepr.of[T].dealias
-        val ts = work(t)
-        Expr(ts)
-
-    private def temeta[T1, T2](using Type[T1], Type[T2], Quotes): Expr[Boolean] =
-        import quotes.reflect.*
-        val eql = TypeRepr.of[T1] =:= TypeRepr.of[T2]
-        Expr(eql)
 
 object serde:
     import java.io.*
