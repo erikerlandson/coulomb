@@ -46,6 +46,14 @@ class QuantitySuite extends CoulombSuite:
        "foo".withUnit[Minute].value.assertVT[String]("foo")
     }
 
+    test("serde") {
+        import coulomb.testing.serde.roundTripSerDe
+
+        val qo = 1d.withUnit[Meter]
+        val qi = roundTripSerDe(qo)
+        qi.assertQ[Double, Meter](1)
+    }
+
     test("toValue standard") {
         import coulomb.conversion.standard.value.given
 

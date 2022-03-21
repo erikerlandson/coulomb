@@ -103,4 +103,23 @@ object types:
         val eql = TypeRepr.of[T1] =:= TypeRepr.of[T2]
         Expr(eql)
 
+object serde:
+    import java.io.*
 
+    class SerDeInputStream(inputStream: InputStream) extends ObjectInputStream(inputStream):
+        override def resolveClass(desc: ObjectStreamClass): Class[?] =
+            try
+                Class.forName(desc.getName, false, getClass.getClassLoader)
+            catch
+                case ex: ClassNotFoundException => super.resolveClass(desc)
+
+    def roundTripSerDe[T](v: T): T =
+        val bufout = new ByteArrayOutputStream()
+        val obout = new ObjectOutputStream(bufout)
+
+        obout.writeObject(v)
+
+        val bufin = new ByteArrayInputStream(bufout.toByteArray)
+        val obin = new SerDeInputStream(bufin)
+
+        obin.readObject().asInstanceOf[T]
