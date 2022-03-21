@@ -106,7 +106,7 @@ object types:
 object serde:
     import java.io.*
 
-    class SerDeInputStream(inputStream: InputStream) extends ObjectInputStream(inputStream):
+    private class SerDeInputStream(inputStream: InputStream) extends ObjectInputStream(inputStream):
         override def resolveClass(desc: ObjectStreamClass): Class[?] =
             try
                 Class.forName(desc.getName, false, getClass.getClassLoader)
