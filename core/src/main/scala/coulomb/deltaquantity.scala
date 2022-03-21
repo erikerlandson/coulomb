@@ -85,5 +85,23 @@ object deltaquantity:
 
         transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: DeltaAddQ[B, VL, UL, VR, UR]): DeltaQuantity[add.VO, add.UO, B] =
             add(ql, qr)
+
+        inline def ===[VR, UR](qr: DeltaQuantity[VR, UR, B])(using ord: DeltaOrd[B, VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) == 0
+
+        inline def =!=[VR, UR](qr: DeltaQuantity[VR, UR, B])(using ord: DeltaOrd[B, VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) != 0
+
+        inline def <[VR, UR](qr: DeltaQuantity[VR, UR, B])(using ord: DeltaOrd[B, VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) < 0
+
+        inline def <=[VR, UR](qr: DeltaQuantity[VR, UR, B])(using ord: DeltaOrd[B, VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) <= 0
+
+        inline def >[VR, UR](qr: DeltaQuantity[VR, UR, B])(using ord: DeltaOrd[B, VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) > 0
+
+        inline def >=[VR, UR](qr: DeltaQuantity[VR, UR, B])(using ord: DeltaOrd[B, VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) >= 0
     end extension
 end deltaquantity

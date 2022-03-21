@@ -166,3 +166,26 @@ class DeltaQuantitySuite extends CoulombSuite:
         // 2V2U
         (100f.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](150)
     } 
+
+    test("less-than strict") {
+        import coulomb.ops.standard.given
+        import coulomb.conversion.standard.explicit.given
+
+        assertEquals(7d.withDeltaUnit[Minute, Second] < 8d.withDeltaUnit[Minute, Second], true)
+        assertEquals(7f.withDeltaUnit[Minute, Second] < 7f.withDeltaUnit[Minute, Second], false)
+        assertEquals(7L.withDeltaUnit[Minute, Second] < 8L.withDeltaUnit[Minute, Second], true)
+        assertEquals(7.withDeltaUnit[Minute, Second] < 7.withDeltaUnit[Minute, Second], false)
+    }
+
+    test("less-than standard") {
+        import coulomb.ops.standard.given
+        import coulomb.ops.resolution.standard.given
+        import coulomb.conversion.standard.all.given
+
+        // 1V2U
+        assertEquals(36d.withDeltaUnit[Celsius, Kelvin] < 98.6d.withDeltaUnit[Fahrenheit, Kelvin], true)
+        // 2V1U
+        assertEquals(36f.withDeltaUnit[Celsius, Kelvin] < 36d.withDeltaUnit[Celsius, Kelvin], false)
+        // 2V2U
+        assertEquals(38d.withDeltaUnit[Celsius, Kelvin] < 98.6f.withDeltaUnit[Fahrenheit, Kelvin], false)
+    }
