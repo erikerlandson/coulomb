@@ -26,7 +26,7 @@ object show:
         import quotes.reflect.*
         val render = (tr: TypeRepr) => {
             val AppliedType(_, List(_, a)) = tr
-            val strlt(abbv) = a
+            val ConstantType(StringConstant(abbv)) = a
             abbv
         }
         val str = showrender(TypeRepr.of[U], render)
@@ -36,7 +36,7 @@ object show:
         import quotes.reflect.*
         val render = (tr: TypeRepr) => {
             val AppliedType(_, List(n, _)) = tr
-            val strlt(name) = n
+            val ConstantType(StringConstant(name)) = n
             name
         }
         val str = showrender(TypeRepr.of[U], render)
