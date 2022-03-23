@@ -25,8 +25,10 @@ object mks:
     export coulomb.units.si.{
         Meter, ctx_unit_Meter,
         Kilogram, ctx_unit_Kilogram,
-        Second, ctx_unit_Second
+        ctx_unit_Second
     }
+
+    type Second = coulomb.units.si.Second
 
     final type Radian
     given ctx_unit_Radian: DerivedUnit[Radian, 1, "radian", "rad"] with {}

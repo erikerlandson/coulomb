@@ -23,7 +23,8 @@ object time:
 
     import coulomb.*
 
-    export coulomb.units.si.{ Second, ctx_unit_Second }
+    type Second = coulomb.units.si.Second
+    export coulomb.units.si.ctx_unit_Second
 
     final type Minute
     given ctx_unit_Minute: DerivedUnit[Minute, 60 * Second, "minute", "min"] with {}

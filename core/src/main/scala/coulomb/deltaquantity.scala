@@ -16,7 +16,8 @@
 
 package coulomb
 
-export deltaquantity.DeltaQuantity as DeltaQuantity
+type DeltaQuantity[V, U, B] = deltaquantity.DeltaQuantity[V, U, B]
+val DeltaQuantity = deltaquantity.DeltaQuantity
 export deltaquantity.withDeltaUnit as withDeltaUnit
 
 object deltaquantity:
