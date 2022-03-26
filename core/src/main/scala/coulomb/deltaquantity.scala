@@ -25,11 +25,6 @@ object deltaquantity:
 
     opaque type DeltaQuantity[V, U, B] = V
 
-    abstract class Applier[U, B]:
-        def apply[V](v: V): DeltaQuantity[V, U, B]
-    object Applier:
-        given [U, B]: Applier[U, B] = new Applier[U, B] { def apply[V](v: V): DeltaQuantity[V, U, B] = v } 
-
     // lift
     object DeltaQuantity:
         def apply[U, B](using a: Applier[U, B]) = a
@@ -37,7 +32,11 @@ object deltaquantity:
         def apply[U, B](v: Long): DeltaQuantity[Long, U, B] = v
         def apply[U, B](v: Float): DeltaQuantity[Float, U, B] = v
         def apply[U, B](v: Double): DeltaQuantity[Double, U, B] = v
-    end DeltaQuantity
+
+        abstract class Applier[U, B]:
+            def apply[V](v: V): DeltaQuantity[V, U, B]
+        object Applier:
+            given [U, B]: Applier[U, B] = new Applier[U, B] { def apply[V](v: V): DeltaQuantity[V, U, B] = v } 
 
     // lift using withDeltaUnit method
     extension[V](v: V)

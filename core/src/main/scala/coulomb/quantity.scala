@@ -48,15 +48,6 @@ export quantity.withUnit
 object quantity:
     opaque type Quantity[V, U] = V
 
-    // The only two methods I need in scope of the opaque type
-    // are a way to lift raw values into a Quantity
-    // and a way to extract raw values from a quantity
-
-    abstract class Applier[U]:
-        def apply[V](v: V): Quantity[V, U]
-    object Applier:
-        given [U]: Applier[U] = new Applier[U] { def apply[V](v: V): Quantity[V, U] = v } 
-
     // lift
     object Quantity:
         def apply[U](using a: Applier[U]) = a
@@ -64,7 +55,11 @@ object quantity:
         def apply[U](v: Long): Quantity[Long, U] = v
         def apply[U](v: Float): Quantity[Float, U] = v
         def apply[U](v: Double): Quantity[Double, U] = v
-    end Quantity
+
+        abstract class Applier[U]:
+            def apply[V](v: V): Quantity[V, U]
+        object Applier:
+            given [U]: Applier[U] = new Applier[U] { def apply[V](v: V): Quantity[V, U] = v } 
 
     // lift using withUnit method
     extension[V](v: V)
