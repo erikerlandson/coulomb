@@ -93,7 +93,7 @@ abstract class DeltaOrd[B, VL, UL, VR, UR]:
     def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Int
 
 /** Resolve the operator output type for left and right argument types */
-@implicitNotFound("No output type resolution in scope for argument value types {VL} and {VR}")
+@implicitNotFound("No output type resolution in scope for argument value types ${VL} and ${VR}")
 abstract class ValueResolution[VL, VR]:
     type VO
 
