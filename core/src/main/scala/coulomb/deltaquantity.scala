@@ -16,8 +16,12 @@
 
 package coulomb
 
-export deltaquantity.DeltaQuantity as DeltaQuantity
-export deltaquantity.withDeltaUnit as withDeltaUnit
+export deltaquantity.DeltaQuantity
+export deltaquantity.withDeltaUnit
+
+inline def show[V, U, B](q: DeltaQuantity[V, U, B]): String = s"${q.value.toString} ${showUnit[U]}"
+inline def showFull[V, U, B](q: DeltaQuantity[V, U, B]): String = s"${q.value.toString} ${showUnitFull[U]}"
+
 
 object deltaquantity:
     import coulomb.ops.*
