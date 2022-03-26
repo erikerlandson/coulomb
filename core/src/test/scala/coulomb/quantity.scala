@@ -56,6 +56,14 @@ class QuantitySuite extends CoulombSuite:
     }
 */
 
+    test("show") {
+        assertEquals(1.withUnit[Second].show, "1 s")
+    }
+
+    test("showFull") {
+        assertEquals(1.withUnit[Second].showFull, "1 second")
+    }
+
     test("toValue standard") {
         import coulomb.conversion.standard.value.given
 

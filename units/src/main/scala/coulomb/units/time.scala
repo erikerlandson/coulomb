@@ -37,7 +37,7 @@ object time:
     final type Week
     given ctx_unit_Week: DerivedUnit[Week, 7 * Day, "week", "wk"] with {}
 
-    final type EpochTime[V, U] = coulomb.deltaquantity.DeltaQuantity[V, U, coulomb.units.si.Second]
+    final type EpochTime[V, U] = DeltaQuantity[V, U, Second]
 
     object EpochTime:
         def apply[U](using a: Applier[U]) = a

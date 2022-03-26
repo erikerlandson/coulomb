@@ -42,8 +42,8 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  */
 inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
 
-export quantity.Quantity as Quantity
-export quantity.withUnit as withUnit
+export quantity.Quantity
+export quantity.withUnit
 
 object quantity:
     opaque type Quantity[V, U] = V

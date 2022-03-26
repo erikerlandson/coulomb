@@ -46,6 +46,14 @@ class DeltaQuantitySuite extends CoulombSuite:
        "foo".withDeltaUnit[Minute, Minute].value.assertVT[String]("foo")
     }
 
+    test("show") {
+        assertEquals(1.withDeltaUnit[Second, Second].show, "1 s")
+    }
+
+    test("showFull") {
+        assertEquals(1.withDeltaUnit[Second, Second].showFull, "1 second")
+    }
+
     test("toValue standard") {
         import coulomb.conversion.standard.value.given
         100.withDeltaUnit[Celsius, Kelvin].toValue[Int].assertDQ[Int, Celsius](100)
