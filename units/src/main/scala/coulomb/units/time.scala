@@ -47,9 +47,7 @@ object time:
         object Applier:
             given [U]: Applier[U] =
                 new Applier[U]:
-                    def apply[V](v: V): EpochTime[V, U] =
-                        v.withDeltaUnit[U, coulomb.units.si.Second]
+                    def apply[V](v: V): EpochTime[V, U] = v.withDeltaUnit[U, Second]
 
     extension[V](v: V)
-        def withEpochTime[U]: EpochTime[V, U] =
-            v.withDeltaUnit[U, coulomb.units.si.Second]
+        def withEpochTime[U]: EpochTime[V, U] = v.withDeltaUnit[U, Second]
