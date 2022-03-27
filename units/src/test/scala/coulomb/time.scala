@@ -194,3 +194,33 @@ class TimeUnitsSuite extends CoulombSuite:
         assertCE("3L.withEpochTime[Day] < 3L.withEpochTime[Week]")
         assertEquals(3L.withEpochTime[Day] < 3L.withEpochTime[Week].tToUnit[Day], true)
     }
+
+class JavaTimeSuite extends CoulombSuite:
+    import java.time.{ Duration, Instant }
+    import coulomb.*
+    import coulomb.units.time.{*, given}
+    import coulomb.units.si.prefixes.{*, given}
+    import coulomb.units.javatime.*
+    import algebra.instances.all.given
+
+    test("toQuantity") {
+        import coulomb.conversion.standard.all.given
+        import coulomb.units.javatime.conversions.explicit.given
+
+        val dur = Duration.ofSeconds(70, 400000000)
+        dur.toQuantity[Float, Minute].assertQD[Float, Minute](1.173333)
+ 
+        // truncation
+        assertCE("dur.toQuantity[Int, Minute]")
+        dur.tToQuantity[Int, Minute].assertQ[Int, Minute](1)
+    }
+
+    test("toDuration") {
+        import coulomb.conversion.standard.all.given
+        import coulomb.ops.standard.given
+        import coulomb.units.javatime.conversions.explicit.given
+
+        val q = 1d.withUnit[Hour] + 777.1d.withUnit[Nano * Second]
+        val dur = q.toDuration
+        assertEquals(dur.getSeconds(), 3600L)
+    }

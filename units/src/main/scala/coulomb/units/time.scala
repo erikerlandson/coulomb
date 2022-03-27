@@ -136,7 +136,7 @@ object javatime:
                     ): QuantityDuration[V, U] =
                 new QuantityDuration[V, U]:
                     def apply(q: Quantity[V, U]): Duration =
-                        val qsec: Rational = vc(q.value)
+                        val qsec: Rational = uc(vc(q.value))
                         val secs: Long = qsec.toLong
                         val nano: Int = ((qsec - Rational(secs)) * Rational(1000000000)).toInt
                         Duration.ofSeconds(secs, nano)
