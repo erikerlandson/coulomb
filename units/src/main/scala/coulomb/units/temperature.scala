@@ -21,6 +21,8 @@ object temperature:
     import coulomb.{`*`, `/`, `^`}
     import coulomb.units.si.Kelvin
 
+    import coulomb.*
+
     export coulomb.units.si.{ Kelvin, ctx_unit_Kelvin }
 
     final type Celsius
@@ -28,3 +30,18 @@ object temperature:
 
     final type Fahrenheit
     given ctx_unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] with {}
+
+    final type Temperature[V, U] = DeltaQuantity[V, U, Kelvin]
+
+    object Temperature:
+        def apply[U](using a: Applier[U]) = a
+
+        abstract class Applier[U]:
+            def apply[V](v: V): Temperature[V, U]
+        object Applier:
+            given [U]: Applier[U] =
+                new Applier[U]:
+                    def apply[V](v: V): Temperature[V, U] = v.withDeltaUnit[U, Kelvin]
+
+    extension[V](v: V)
+        def withTemperature[U]: Temperature[V, U] = v.withDeltaUnit[U, Kelvin]
