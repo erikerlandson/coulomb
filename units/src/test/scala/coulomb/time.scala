@@ -223,4 +223,25 @@ class JavaTimeSuite extends CoulombSuite:
         val q = 1d.withUnit[Hour] + 777.1d.withUnit[Nano * Second]
         val dur = q.toDuration
         assertEquals(dur.getSeconds(), 3600L)
+        assertEquals(dur.getNano(), 777)
+    }
+
+    test("toEpochTime") {
+        import coulomb.conversion.standard.all.given
+        import coulomb.units.javatime.conversions.explicit.given
+
+        val ins = Instant.parse("1969-07-20T00:00:00Z")
+        ins.toEpochTime[Double, Day].assertDQD[Double, Day](-165)
+        
+        // truncation
+        assertCE("ins.toEpochTime[Long, Day]")
+        ins.tToEpochTime[Long, Day].assertDQ[Long, Day](-165)
+    }
+
+    test("toInstant") {
+        import coulomb.conversion.standard.all.given
+        import coulomb.units.javatime.conversions.explicit.given
+
+        val et = (-165L).withEpochTime[Day]       
+        assertEquals(et.toInstant.toString, "1969-07-20T00:00:00Z")
     }
