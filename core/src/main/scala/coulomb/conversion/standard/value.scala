@@ -50,10 +50,10 @@ object value:
     given ctx_VC_Rational_Float: ValueConversion[Rational, Float] with
         def apply(v: Rational): Float = v.toFloat
 
-    given ctx_VC_Rational_Long: ValueConversion[Rational, Long] with
+    given ctx_TVC_Rational_Long: TruncatingValueConversion[Rational, Long] with
         def apply(v: Rational): Long = v.toLong
 
-    given ctx_VC_Rational_Int: ValueConversion[Rational, Int] with
+    given ctx_TVC_Rational_Int: TruncatingValueConversion[Rational, Int] with
         def apply(v: Rational): Int = v.toInt
 
     given ctx_VC_Double_Rational: ValueConversion[Double, Rational] with
