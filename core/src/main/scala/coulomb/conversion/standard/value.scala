@@ -18,6 +18,7 @@ package coulomb.conversion.standard
 
 object value:
     import coulomb.conversion.*
+    import coulomb.rational.Rational
  
     given ctx_VC_Double[VF](using num: Numeric[VF]): ValueConversion[VF, Double] =
         new ValueConversion[VF, Double]:
@@ -42,3 +43,27 @@ object value:
     given ctx_TVC_Int[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Int] =
         new TruncatingValueConversion[VF, Int]:
             def apply(v: VF): Int = num.toInt(v)
+
+    given ctx_VC_Rational_Double: ValueConversion[Rational, Double] with
+        def apply(v: Rational): Double = v.toDouble
+
+    given ctx_VC_Rational_Float: ValueConversion[Rational, Float] with
+        def apply(v: Rational): Float = v.toFloat
+
+    given ctx_VC_Rational_Long: ValueConversion[Rational, Long] with
+        def apply(v: Rational): Long = v.toLong
+
+    given ctx_VC_Rational_Int: ValueConversion[Rational, Int] with
+        def apply(v: Rational): Int = v.toInt
+
+    given ctx_VC_Double_Rational: ValueConversion[Double, Rational] with
+        def apply(v: Double): Rational = Rational(v)
+
+    given ctx_VC_Float_Rational: ValueConversion[Float, Rational] with
+        def apply(v: Float): Rational = Rational(v)
+
+    given ctx_VC_Long_Rational: ValueConversion[Long, Rational] with
+        def apply(v: Long): Rational = Rational(v)
+
+    given ctx_VC_Int_Rational: ValueConversion[Int, Rational] with
+        def apply(v: Int): Rational = Rational(v)

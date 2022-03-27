@@ -19,6 +19,12 @@ package coulomb.conversion.standard
 object unit:
     import coulomb.conversion.*
     import coulomb.conversion.coefficients.*
+    import coulomb.rational.Rational
+
+    inline given ctx_UC_Rational[UF, UT]: UnitConversion[Rational, UF, UT] =
+        val c = coefficientRational[UF, UT]
+        new UnitConversion[Rational, UF, UT]:
+            def apply(v: Rational): Rational = c * v
 
     inline given ctx_UC_Double[UF, UT]: UnitConversion[Double, UF, UT] =
         val c = coefficientDouble[UF, UT]
