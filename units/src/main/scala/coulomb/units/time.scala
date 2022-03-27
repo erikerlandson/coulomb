@@ -107,6 +107,19 @@ object javatime:
                 new Conversion[Duration, Quantity[V, U]]:
                     def apply(d: Duration): Quantity[V, U] = d2q(d)
 
+            given ctx_Conversion_EI[V, U](using q2d: QuantityDuration[V, U]):
+                    Conversion[EpochTime[V, U], Instant] =
+                new Conversion[EpochTime[V, U], Instant]:
+                    def apply(e: EpochTime[V, U]): Instant =
+                        Instant.EPOCH.plus(q2d(e.value.withUnit[U]))
+
+            given ctx_Conversion_IE[V, U](using d2q: DurationQuantity[V, U]):
+                    Conversion[Instant, EpochTime[V, U]] =
+                new Conversion[Instant, EpochTime[V, U]]:
+                    def apply(i: Instant): EpochTime[V, U] =
+                        val d = Duration.ofSeconds(i.getEpochSecond(), i.getNano())
+                        d2q(d).value.withEpochTime[U]
+
         object explicit:
             given ctx_DurationQuantity[V, U](using
                 uc: UnitConversion[Rational, Second, U],

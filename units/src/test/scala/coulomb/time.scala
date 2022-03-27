@@ -208,7 +208,7 @@ class JavaTimeSuite extends CoulombSuite:
         import coulomb.units.javatime.conversions.explicit.given
 
         val dur = Duration.ofSeconds(70, 400000000)
-        dur.toQuantity[Float, Minute].assertQD[Float, Minute](1.173333)
+        dur.toQuantity[Float, Minute].assertQD[Float, Minute](1.17333)
  
         // truncation
         assertCE("dur.toQuantity[Int, Minute]")
@@ -244,4 +244,48 @@ class JavaTimeSuite extends CoulombSuite:
 
         val et = (-165L).withEpochTime[Day]       
         assertEquals(et.toInstant.toString, "1969-07-20T00:00:00Z")
+    }
+
+    test("implicit Q -> D") {
+        import scala.language.implicitConversions
+        import coulomb.conversion.standard.all.given
+        import coulomb.ops.standard.given
+        import coulomb.units.javatime.conversions.all.given
+        
+        def f(d: Duration): (Long, Int) = (d.getSeconds(), d.getNano())
+        val q = 1d.withUnit[Hour] + 777.1d.withUnit[Nano * Second]
+        assertEquals(f(q), (3600L, 777))
+    }
+
+    test("implicit D -> Q") {
+        import scala.language.implicitConversions
+        import coulomb.conversion.standard.all.given
+        import coulomb.ops.standard.given
+        import coulomb.units.javatime.conversions.all.given
+
+        def f(q: Quantity[Float, Minute]): Float = q.value
+        val dur = Duration.ofSeconds(70, 400000000)
+        f(dur).assertVTD[Float](1.17333)
+    }
+
+    test("implicit ET -> I") {
+        import scala.language.implicitConversions
+        import coulomb.conversion.standard.all.given
+        import coulomb.ops.standard.given
+        import coulomb.units.javatime.conversions.all.given
+
+        def f(i: Instant): String = i.toString()
+        val et = (-165L).withEpochTime[Day]
+        assertEquals(f(et), "1969-07-20T00:00:00Z")
+    }
+
+    test("implicit I -> ET") {
+        import scala.language.implicitConversions
+        import coulomb.conversion.standard.all.given
+        import coulomb.ops.standard.given
+        import coulomb.units.javatime.conversions.all.given
+
+        def f(et: EpochTime[Double, Day]): Double = et.value
+        val ins = Instant.parse("1969-07-20T00:00:00Z")
+        f(ins).assertVTD[Double](-165)
     }
