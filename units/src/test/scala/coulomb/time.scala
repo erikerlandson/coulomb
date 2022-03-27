@@ -195,6 +195,7 @@ class TimeUnitsSuite extends CoulombSuite:
         assertEquals(3L.withEpochTime[Day] < 3L.withEpochTime[Week].tToUnit[Day], true)
     }
 
+/* This breaks the JS linker
 class JavaTimeSuite extends CoulombSuite:
     import java.time.{ Duration, Instant }
     import coulomb.*
@@ -289,3 +290,4 @@ class JavaTimeSuite extends CoulombSuite:
         val ins = Instant.parse("1969-07-20T00:00:00Z")
         f(ins).assertVTD[Double](-165)
     }
+*/
