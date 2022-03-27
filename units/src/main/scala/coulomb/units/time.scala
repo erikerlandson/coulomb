@@ -51,3 +51,92 @@ object time:
 
     extension[V](v: V)
         def withEpochTime[U]: EpochTime[V, U] = v.withDeltaUnit[U, Second]
+
+object javatime:
+    import java.time.{ Duration, Instant }
+    import coulomb.*
+    import coulomb.units.time.*
+
+    import conversions.*
+    import _root_.scala.Conversion
+
+    extension(duration: Duration)
+        def toQuantity[V, U](using d2q: DurationQuantity[V, U]): Quantity[V, U] = d2q(duration)
+        def tToQuantity[V, U](using d2q: TruncatingDurationQuantity[V, U]): Quantity[V, U] = d2q(duration)
+
+    extension[V, U](quantity: Quantity[V, U])
+        def toDuration(using q2d: QuantityDuration[V, U]): Duration = q2d(quantity)
+
+    extension(instant: Instant)
+        def toEpochTime[V, U](using d2q: DurationQuantity[V, U]): EpochTime[V, U] =
+            // this is cheating a bit, but it works because both Instant and Epochtime
+            // are based on 1970 epoch
+            val d = Duration.ofSeconds(instant.getEpochSecond(), instant.getNano())
+            d2q(d).value.withEpochTime[U]
+
+        def tToEpochTime[V, U](using d2q: TruncatingDurationQuantity[V, U]): EpochTime[V, U] =
+            val d = Duration.ofSeconds(instant.getEpochSecond(), instant.getNano())
+            d2q(d).value.withEpochTime[U]
+
+    extension[V, U](epochTime: EpochTime[V, U])
+        def toInstant(using q2d: QuantityDuration[V, U]): Instant =
+            // taking advantage of Instant and EpochTime sharing same 1970 reference
+            Instant.EPOCH.plus(q2d(epochTime.value.withUnit[U]))
+
+    object conversions:
+        import coulomb.conversion.*
+        import coulomb.rational.Rational
+
+        abstract class DurationQuantity[V, U] extends (Duration => Quantity[V, U])
+        abstract class QuantityDuration[V, U] extends (Quantity[V, U] => Duration)
+        // Quantity -> Duration will never truncate
+        abstract class TruncatingDurationQuantity[V, U] extends (Duration => Quantity[V, U])
+
+        object all:
+            export coulomb.units.javatime.conversions.scala.given
+            export coulomb.units.javatime.conversions.explicit.given
+
+        object scala:
+            given ctx_Conversion_QD[V, U](using q2d: QuantityDuration[V, U]):
+                    Conversion[Quantity[V, U], Duration] =
+                new Conversion[Quantity[V, U], Duration]:
+                    def apply(q: Quantity[V, U]): Duration = q2d(q)
+
+            given ctx_Conversion_DQ[V, U](using d2q: DurationQuantity[V, U]):
+                    Conversion[Duration, Quantity[V, U]] =
+                new Conversion[Duration, Quantity[V, U]]:
+                    def apply(d: Duration): Quantity[V, U] = d2q(d)
+
+        object explicit:
+            given ctx_DurationQuantity[V, U](using
+                uc: UnitConversion[Rational, Second, U],
+                vc: ValueConversion[Rational, V]
+                    ): DurationQuantity[V, U] =
+                new DurationQuantity[V, U]:
+                    def apply(duration: Duration): Quantity[V, U] =
+                          val seconds: Long = duration.getSeconds()
+                          val nano: Int = duration.getNano()
+                          val qsec: Rational = Rational(seconds) + Rational(nano, 1000000000)
+                          vc(uc(qsec)).withUnit[U]
+
+            given ctx_TruncatingDurationQuantity[V, U](using
+                uc: UnitConversion[Rational, Second, U],
+                vc: TruncatingValueConversion[Rational, V]
+                    ): TruncatingDurationQuantity[V, U] =
+                new TruncatingDurationQuantity[V, U]:
+                    def apply(duration: Duration): Quantity[V, U] =
+                          val seconds: Long = duration.getSeconds()
+                          val nano: Int = duration.getNano()
+                          val qsec: Rational = Rational(seconds) + Rational(nano, 1000000000)
+                          vc(uc(qsec)).withUnit[U]
+
+            given ctx_QuantityDuration[V, U](using
+                vc: ValueConversion[V, Rational],
+                uc: UnitConversion[Rational, U, Second]
+                    ): QuantityDuration[V, U] =
+                new QuantityDuration[V, U]:
+                    def apply(q: Quantity[V, U]): Duration =
+                        val qsec: Rational = vc(q.value)
+                        val secs: Long = qsec.toLong
+                        val nano: Int = ((qsec - Rational(secs)) * Rational(1000000000)).toInt
+                        Duration.ofSeconds(secs, nano)
