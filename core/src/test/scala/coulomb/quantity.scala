@@ -46,16 +46,6 @@ class QuantitySuite extends CoulombSuite:
        "foo".withUnit[Minute].value.assertVT[String]("foo")
     }
 
-/*  This works in JVM but breaks JS
-    test("serde") {
-        import coulomb.testing.serde.roundTripSerDe
-
-        val qo = 1d.withUnit[Meter]
-        val qi = roundTripSerDe(qo)
-        qi.assertQ[Double, Meter](1)
-    }
-*/
-
     test("show") {
         assertEquals(1.withUnit[Second].show, "1 s")
     }
