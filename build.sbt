@@ -44,6 +44,8 @@ lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .dependsOn(core % "compile->compile;test->test")
   .settings(commonSettings :_*)
 
+(units.js / libraryDependencies) += "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M2"
+
 // a target for rolling up all subproject deps: a convenient
 // way to get a repl that has access to all subprojects
 // sbt all/console
