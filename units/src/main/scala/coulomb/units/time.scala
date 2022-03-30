@@ -29,13 +29,13 @@ object time:
     given ctx_unit_Minute: DerivedUnit[Minute, 60 * Second, "minute", "min"] with {}
 
     final type Hour
-    given ctx_unit_Hour: DerivedUnit[Hour, 60 * Minute, "hour", "h"] with {}
+    given ctx_unit_Hour: DerivedUnit[Hour, 3600 * Second, "hour", "h"] with {}
 
     final type Day
-    given ctx_unit_Day: DerivedUnit[Day, 24 * Hour, "day", "d"] with {}
+    given ctx_unit_Day: DerivedUnit[Day, 86400 * Second, "day", "d"] with {}
 
     final type Week
-    given ctx_unit_Week: DerivedUnit[Week, 7 * Day, "week", "wk"] with {}
+    given ctx_unit_Week: DerivedUnit[Week, 604800 * Second, "week", "wk"] with {}
 
     final type EpochTime[V, U] = DeltaQuantity[V, U, Second]
 
