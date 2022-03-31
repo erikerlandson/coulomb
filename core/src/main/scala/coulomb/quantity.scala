@@ -117,7 +117,7 @@ object quantity:
         transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using tq: TQuot[VL, UL, VR, UR]): Quantity[tq.VO, tq.UO] =
             tq(ql, qr)
 
-        transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
+        def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
             pow(ql)
 
         transparent inline def tpow[P](using tp: TPow[VL, UL, P]): Quantity[tp.VO, tp.UO] =

@@ -150,6 +150,16 @@ object typeexpr:
     inline def bigInt[E]: BigInt = ${ meta.teToBigInt[E] }
     inline def double[E]: Double = ${ meta.teToDouble[E] }
 
+
+    @implicitNotFound("type expr ${E} is not a Double")
+    abstract class DoubleValue[E]:
+        val value: Double
+
+    object DoubleValue:
+        transparent inline given ctx_DoubleValue[E]: DoubleValue[E] =
+            new DoubleValue[E]:
+                val value: Double = double[E]
+
     @implicitNotFound("type expr ${E} is not a non-negative Int")
     abstract class NonNegInt[E]:
         val value: Int
