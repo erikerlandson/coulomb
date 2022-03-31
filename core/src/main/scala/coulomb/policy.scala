@@ -17,7 +17,58 @@
 package coulomb
 
 object policy:
-    // import coulomb.policy.strictUnitExpressions.given
+    /**
+     * A "standard" policy that supports all operations, including those involving
+     * implicit conversions of units or value types.
+     *
+     * {{{
+     * import coulomb.*
+     * import coulomb.policy.standard.given
+     * }}}
+     */
+    object standard:
+        // export algebra.instances.all.given
+        // export coulomb.ops.standard.given
+        export coulomb.ops.algebra.all.given
+        export coulomb.conversion.standard.value.given
+        export coulomb.conversion.standard.unit.given
+        export coulomb.conversion.standard.scala.given
+        export coulomb.ops.standard.optimizations.all.given
+
+    /**
+     * A policy that supports all standard operations, but does not support operations that
+     * involve any implicit conversions of either units or value types.
+     * For example, one may add two quantities having the same unit and value type, but
+     * not quantities differing in either their value type or unit.
+     *
+     * Explicit conversions such as `q.toUnit` or `q.toValue` are allowed.
+     *
+     * {{{
+     * import coulomb.*
+     * import coulomb.policy.strict.given
+     * }}}
+     */
+    object strict:
+        // export algebra.instances.all.given
+        // export coulomb.ops.standard.given
+        export coulomb.ops.algebra.all.given
+        export coulomb.conversion.standard.value.given
+        export coulomb.conversion.standard.unit.given
+
+    /**
+     * When a context variable of this type is in scope, coulomb will raise a compile error
+     * if it encounters a type not declared as a unit.
+     */
     sealed trait StrictUnitExpressions
+
+    /**
+     * By default, coulomb will treat any unrecognized type as a base unit.
+     * To disable this behavior and raise a compile error on any type not declared as
+     * a BaseUnit, DerivedUnit, etc:
+     *
+     * {{{
+     * import coulomb.policy.strictUnitExpressions.given
+     * }}}
+     */
     object strictUnitExpressions:
         given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
