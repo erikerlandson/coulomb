@@ -26,6 +26,19 @@ import coulomb.ops.{Pow, SimplifiedUnit}
 import coulomb.rational.typeexpr
 import coulomb.ops.algebra.FractionalPower
 
+object study1:
+    import coulomb.*, algebra.instances.all.given, coulomb.ops.standard.given, coulomb.policy.standard.given
+    val x = 2d.withUnit[String] 
+    val y = 2f.withUnit[Int] 
+    val z = 2f.withUnit[Boolean] 
+
+object study2:
+    import coulomb.*, algebra.instances.all.given, coulomb.ops.standard.given, coulomb.policy.standard.given
+    import coulomb.ops.standard.study1.*
+    val a = x.pow[2] 
+    val b = y.pow[3] 
+    val c = z.pow[4] 
+
 class PowImplFP[V, U, E, UOp](alg: FractionalPower[V], e: Double) extends Pow[V, U, E]:
     type VO = V
     type UO = UOp
