@@ -100,7 +100,3 @@ abstract class ValueResolution[VL, VR]:
 @implicitNotFound("Unable to simplify unit type ${U}")
 abstract class SimplifiedUnit[U]:
     type UO
-
-object SimplifiedUnit:
-    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
-        ${ coulomb.infra.meta.simplifiedUnit[U] }

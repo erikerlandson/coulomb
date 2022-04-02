@@ -16,6 +16,19 @@
 
 package coulomb.ops.standard
 
-// eventually these go in `object all`
-export pow.given
-export simplify.given
+object simplify:
+    import coulomb.ops.SimplifiedUnit
+
+    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
+        ${ infra.simplifiedUnit[U] }
+
+    object infra:
+        import scala.quoted.*
+
+        class SU[U, UOp] extends SimplifiedUnit[U]:
+            type UO = UOp
+
+        def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
+            import quotes.reflect.*
+            coulomb.infra.meta.simplify(TypeRepr.of[U]).asType match
+                case '[uo] => '{ new SU[U, uo] }

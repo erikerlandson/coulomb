@@ -233,11 +233,6 @@ object meta:
                 val (nsig, dsig) = sortsig(tail)
                 if (e > 0) ((u, e) :: nsig, dsig) else (nsig, (u, -e) :: dsig)
 
-    def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
-        import quotes.reflect.*
-        simplify(TypeRepr.of[U]).asType match
-            case '[uo] => '{ new SimplifiedUnit[U] { type UO = uo } }
-
     def simplify(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
         val (un, ud) = sortsig(stdsig(u))
