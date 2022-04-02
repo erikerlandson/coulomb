@@ -27,6 +27,7 @@ export tpow.given
 export ord.given
 export deltasub.given
 export deltasubq.given
+export deltaaddq.given
 
 // will be exported via policies
 export coulomb.ops.simplification.standard.given
