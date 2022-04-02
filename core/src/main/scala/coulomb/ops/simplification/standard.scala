@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package coulomb.ops.standard
+package coulomb.ops.simplification
 
-object simplify:
+object standard:
     import coulomb.ops.SimplifiedUnit
 
     transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
@@ -32,3 +32,4 @@ object simplify:
             import quotes.reflect.*
             coulomb.infra.meta.simplify(TypeRepr.of[U]).asType match
                 case '[uo] => '{ new SU[U, uo] }
+
