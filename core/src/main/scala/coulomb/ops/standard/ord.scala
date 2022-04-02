@@ -16,54 +16,67 @@
 
 package coulomb.ops.standard
 
-import scala.util.NotGiven
-import scala.Conversion
+object ord:
+    import scala.util.NotGiven
+    import scala.Conversion
 
-import cats.kernel.Order
+    import cats.kernel.Order
 
-import coulomb.Quantity
-import coulomb.ops.{Ord, ValueResolution}
+    import coulomb.Quantity
+    import coulomb.ops.{Ord, ValueResolution}
 
-transparent inline given ctx_ord_1V1U[VL, UL, VR, UR](using
-    // https://github.com/lampepfl/dotty/issues/14585
-    eqv: VR =:= VL,
-    equ: UR =:= UL,
-    ord: Order[VL]
-        ): Ord[VL, UL, VR, UR] =
-    new Ord[VL, UL, VR, UR]:
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
-            ord.compare(ql.value, eqv(qr.value))
+    transparent inline given ctx_ord_1V1U[VL, UL, VR, UR](using
+        // https://github.com/lampepfl/dotty/issues/14585
+        eqv: VR =:= VL,
+        equ: UR =:= UL,
+        ord: Order[VL]
+            ): Ord[VL, UL, VR, UR] =
+        new infra.Ord1V1U[VL, UL, VR, UR](ord, eqv)
 
-transparent inline given ctx_ord_1V2U[VL, UL, VR, UR](using
-    eqv: VR =:= VL,
-    neu: NotGiven[UR =:= UL],
-    icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
-    ord: Order[VL]
-        ): Ord[VL, UL, VR, UR] =
-    new Ord[VL, UL, VR, UR]:
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
-            ord.compare(ql.value, icr(qr).value)
+    transparent inline given ctx_ord_1V2U[VL, UL, VR, UR](using
+        eqv: VR =:= VL,
+        neu: NotGiven[UR =:= UL],
+        icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
+        ord: Order[VL]
+            ): Ord[VL, UL, VR, UR] =
+        new infra.Ord1V2U[VL, UL, VR, UR](ord, icr)
 
-transparent inline given ctx_ord_2V1U[VL, UL, VR, UR](using
-    nev: NotGiven[VR =:= VL],
-    equ: UR =:= UL,
-    vres: ValueResolution[VL, VR],
-    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
-    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
-    ord: Order[vres.VO]
-        ): Ord[VL, UL, VR, UR] =
-    new Ord[VL, UL, VR, UR]:
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
-            ord.compare(icl(ql).value, icr(qr).value)
+    transparent inline given ctx_ord_2V1U[VL, UL, VR, UR](using
+        nev: NotGiven[VR =:= VL],
+        equ: UR =:= UL,
+        vres: ValueResolution[VL, VR],
+        icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+        icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
+        ord: Order[vres.VO]
+            ): Ord[VL, UL, VR, UR] =
+        new infra.Ord2V2U[VL, UL, VR, UR, vres.VO](ord, icl, icr)
 
-transparent inline given ctx_ord_2V2U[VL, UL, VR, UR](using
-    nev: NotGiven[VR =:= VL],
-    neu: NotGiven[UR =:= UL],
-    vres: ValueResolution[VL, VR],
-    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
-    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
-    ord: Order[vres.VO]
-        ): Ord[VL, UL, VR, UR] =
-    new Ord[VL, UL, VR, UR]:
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
-            ord.compare(icl(ql).value, icr(qr).value)
+    transparent inline given ctx_ord_2V2U[VL, UL, VR, UR](using
+        nev: NotGiven[VR =:= VL],
+        neu: NotGiven[UR =:= UL],
+        vres: ValueResolution[VL, VR],
+        icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+        icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
+        ord: Order[vres.VO]
+            ): Ord[VL, UL, VR, UR] =
+        new infra.Ord2V2U[VL, UL, VR, UR, vres.VO](ord, icl, icr)
+
+    object infra:
+        class Ord1V1U[VL, UL, VR, UR](
+            ord: Order[VL],
+            eqv: VR =:= VL) extends Ord[VL, UL, VR, UR]:
+            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
+                ord.compare(ql.value, eqv(qr.value))
+ 
+        class Ord1V2U[VL, UL, VR, UR](
+            ord: Order[VL],
+            icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]]) extends Ord[VL, UL, VR, UR]:
+            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
+                ord.compare(ql.value, icr(qr).value)
+
+        class Ord2V2U[VL, UL, VR, UR, VOp](
+            ord: Order[VOp],
+            icl: Conversion[Quantity[VL, UL], Quantity[VOp, UL]], 
+            icr: Conversion[Quantity[VR, UR], Quantity[VOp, UL]]) extends Ord[VL, UL, VR, UR]:
+            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int =
+                ord.compare(icl(ql).value, icr(qr).value)
