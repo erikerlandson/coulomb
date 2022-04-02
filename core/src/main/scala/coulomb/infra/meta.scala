@@ -19,7 +19,6 @@ package coulomb.infra
 import coulomb.rational.Rational
 import coulomb.*
 import coulomb.define.*
-import coulomb.ops.*
 
 object meta:
     import scala.quoted.*
