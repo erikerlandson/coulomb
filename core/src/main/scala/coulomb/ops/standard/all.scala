@@ -20,5 +20,6 @@ package coulomb.ops.standard
 export add.given
 export sub.given
 export mul.given
+export div.given
 export pow.given
 export simplify.given

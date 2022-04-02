@@ -16,36 +16,48 @@
 
 package coulomb.ops.standard
 
-import scala.util.NotGiven
-import scala.Conversion
+object div:
+    import scala.util.NotGiven
+    import scala.Conversion
 
-import algebra.ring.MultiplicativeGroup
+    import algebra.ring.MultiplicativeGroup
 
-import coulomb.{`/`, Quantity, withUnit}
-import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
+    import coulomb.{`/`, Quantity, withUnit}
+    import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
 
-transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
-    // https://github.com/lampepfl/dotty/issues/14585
-    eqv: VR =:= VL,
-    alg: MultiplicativeGroup[VL],
-    su: SimplifiedUnit[UL / UR]
-        ): Div[VL, UL, VR, UR] =
-    new Div[VL, UL, VR, UR]:
-        type VO = VL
-        type UO = su.UO
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-            alg.div(ql.value, eqv(qr.value)).withUnit[UO]
+    transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
+        // https://github.com/lampepfl/dotty/issues/14585
+        eqv: VR =:= VL,
+        alg: MultiplicativeGroup[VL],
+        su: SimplifiedUnit[UL / UR]
+            ): Div[VL, UL, VR, UR] =
+        new infra.Div1V2U[VL, UL, VR, UR, su.UO](alg, eqv)
 
-transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
-    nev: NotGiven[VR =:= VL],
-    vres: ValueResolution[VL, VR],
-    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
-    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
-    alg: MultiplicativeGroup[vres.VO],
-    su: SimplifiedUnit[UL / UR]
-        ): Div[VL, UL, VR, UR] =
-    new Div[VL, UL, VR, UR]:
-        type VO = vres.VO
-        type UO = su.UO
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-            alg.div(icl(ql).value, icr(qr).value).withUnit[UO]
+    transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
+        nev: NotGiven[VR =:= VL],
+        vres: ValueResolution[VL, VR],
+        icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+        icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
+        alg: MultiplicativeGroup[vres.VO],
+        su: SimplifiedUnit[UL / UR]
+            ): Div[VL, UL, VR, UR] =
+        new infra.Div2V2U[VL, UL, VR, UR, vres.VO, su.UO](alg, icl, icr)
+
+    object infra:
+        class Div1V2U[VL, UL, VR, UR, UOp](
+            alg: MultiplicativeGroup[VL],
+            eqv: VR =:= VL) extends Div[VL, UL, VR, UR]:
+            type VO = VL
+            type UO = UOp 
+            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+                alg.div(ql.value, eqv(qr.value)).withUnit[UO]
+
+        class Div2V2U[VL, UL, VR, UR, VOp, UOp](
+            alg: MultiplicativeGroup[VOp],
+            icl: Conversion[Quantity[VL, UL], Quantity[VOp, UL]], 
+            icr: Conversion[Quantity[VR, UR], Quantity[VOp, UR]]) extends Div[VL, UL, VR, UR]:
+            type VO = VOp
+            type UO = UOp 
+            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
+                alg.div(icl(ql).value, icr(qr).value).withUnit[UO]
+        
