@@ -19,5 +19,6 @@ package coulomb.ops.standard
 // eventually these go in `object all`
 export add.given
 export sub.given
+export mul.given
 export pow.given
 export simplify.given
