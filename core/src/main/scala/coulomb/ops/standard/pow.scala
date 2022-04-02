@@ -16,17 +16,17 @@
 
 package coulomb.ops.standard
 
-import scala.util.NotGiven
-
-import algebra.ring.MultiplicativeSemigroup
-import algebra.ring.MultiplicativeGroup
-
-import coulomb.{`^`, Quantity, withUnit}
-import coulomb.ops.{Pow, SimplifiedUnit}
-import coulomb.rational.typeexpr
-import coulomb.ops.algebra.FractionalPower
-
 object pow:
+    import scala.util.NotGiven
+
+    import algebra.ring.MultiplicativeSemigroup
+    import algebra.ring.MultiplicativeGroup
+
+    import coulomb.{`^`, Quantity, withUnit}
+    import coulomb.ops.{Pow, SimplifiedUnit}
+    import coulomb.rational.typeexpr
+    import coulomb.ops.algebra.FractionalPower
+
     transparent inline given ctx_pow_FractionalPower[V, U, E](using
         alg: FractionalPower[V],
         su: SimplifiedUnit[U ^ E]

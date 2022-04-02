@@ -21,5 +21,7 @@ export add.given
 export sub.given
 export mul.given
 export div.given
+export tquot.given
 export pow.given
+export tpow.given
 export simplify.given
