@@ -22,61 +22,67 @@ object unit:
     import coulomb.rational.Rational
 
     inline given ctx_UC_Rational[UF, UT]: UnitConversion[Rational, UF, UT] =
-        val c = coefficientRational[UF, UT]
-        new UnitConversion[Rational, UF, UT]:
-            def apply(v: Rational): Rational = c * v
+        new infra.RationalUC[UF, UT](coefficientRational[UF, UT])
 
     inline given ctx_UC_Double[UF, UT]: UnitConversion[Double, UF, UT] =
-        val c = coefficientDouble[UF, UT]
-        new UnitConversion[Double, UF, UT]:
-            def apply(v: Double): Double = c * v
+        new infra.DoubleUC[UF, UT](coefficientDouble[UF, UT])
 
     inline given ctx_UC_Float[UF, UT]: UnitConversion[Float, UF, UT] =
-        val c = coefficientFloat[UF, UT]
-        new UnitConversion[Float, UF, UT]:
-            def apply(v: Float): Float = c * v
+        new infra.FloatUC[UF, UT](coefficientFloat[UF, UT])
 
     inline given ctx_TUC_Long[UF, UT]: TruncatingUnitConversion[Long, UF, UT] =
-        val nc = coefficientNumDouble[UF, UT]
-        val dc = coefficientDenDouble[UF, UT]
-        // using nc and dc is more efficient than using Rational directly in the conversion function
-        // but still gives us 53 bits of integer precision for exact rational arithmetic, and also
-        // graceful loss of precision if nc*v exceeds 53 bits
-        new TruncatingUnitConversion[Long, UF, UT]:
-            def apply(v: Long): Long = ((nc * v) / dc).toLong
+        new infra.LongTUC[UF, UT](coefficientNumDouble[UF, UT], coefficientDenDouble[UF, UT])
 
     inline given ctx_TUC_Int[UF, UT]: TruncatingUnitConversion[Int, UF, UT] =
-        val nc = coefficientNumDouble[UF, UT]
-        val dc = coefficientDenDouble[UF, UT]
-        new TruncatingUnitConversion[Int, UF, UT]:
-            def apply(v: Int): Int = ((nc * v) / dc).toInt
+        new infra.IntTUC[UF, UT](coefficientNumDouble[UF, UT], coefficientDenDouble[UF, UT])
 
     inline given ctx_DUC_Double[B, UF, UT]: DeltaUnitConversion[Double, B, UF, UT] =
-        val c = coefficientDouble[UF, UT]
-        val df = deltaOffsetDouble[UF, B]
-        val dt = deltaOffsetDouble[UT, B]
-        new DeltaUnitConversion[Double, B, UF, UT]:
-            def apply(v: Double): Double = ((v + df) * c) - dt
+        new infra.DoubleDUC[B, UF, UT](
+            coefficientDouble[UF, UT], deltaOffsetDouble[UF, B], deltaOffsetDouble[UT, B])
 
     inline given ctx_DUC_Float[B, UF, UT]: DeltaUnitConversion[Float, B, UF, UT] =
-        val c = coefficientFloat[UF, UT]
-        val df = deltaOffsetFloat[UF, B]
-        val dt = deltaOffsetFloat[UT, B]
-        new DeltaUnitConversion[Float, B, UF, UT]:
-            def apply(v: Float): Float = ((v + df) * c) - dt
+        new infra.FloatDUC[B, UF, UT](
+            coefficientFloat[UF, UT], deltaOffsetFloat[UF, B], deltaOffsetFloat[UT, B])
 
     inline given ctx_TDUC_Long[B, UF, UT]: TruncatingDeltaUnitConversion[Long, B, UF, UT] =
-        val nc = coefficientNumDouble[UF, UT]
-        val dc = coefficientDenDouble[UF, UT]
-        val df = deltaOffsetDouble[UF, B]
-        val dt = deltaOffsetDouble[UT, B]
-        new TruncatingDeltaUnitConversion[Long, B, UF, UT]:
-            def apply(v: Long): Long = (((nc * (v + df)) / dc) - dt).toLong
+        new infra.LongTDUC[B, UF, UT](
+            coefficientNumDouble[UF, UT], coefficientDenDouble[UF, UT],
+            deltaOffsetDouble[UF, B], deltaOffsetDouble[UT, B])
 
     inline given ctx_TDUC_Int[B, UF, UT]: TruncatingDeltaUnitConversion[Int, B, UF, UT] =
-        val nc = coefficientNumDouble[UF, UT]
-        val dc = coefficientDenDouble[UF, UT]
-        val df = deltaOffsetDouble[UF, B]
-        val dt = deltaOffsetDouble[UT, B]
-        new TruncatingDeltaUnitConversion[Int, B, UF, UT]:
+        new infra.IntTDUC[B, UF, UT](
+            coefficientNumDouble[UF, UT], coefficientDenDouble[UF, UT],
+            deltaOffsetDouble[UF, B], deltaOffsetDouble[UT, B])
+
+    object infra:
+        class RationalUC[UF, UT](c: Rational) extends UnitConversion[Rational, UF, UT]:
+            def apply(v: Rational): Rational = c * v
+
+        class DoubleUC[UF, UT](c: Double) extends UnitConversion[Double, UF, UT]:
+            def apply(v: Double): Double = c * v
+
+        class FloatUC[UF, UT](c: Float) extends UnitConversion[Float, UF, UT]:
+            def apply(v: Float): Float = c * v
+
+        class LongTUC[UF, UT](nc: Double, dc: Double) extends TruncatingUnitConversion[Long, UF, UT]:
+            // using nc and dc is more efficient than using Rational directly in the conversion function
+            // but still gives us 53 bits of integer precision for exact rational arithmetic, and also
+            // graceful loss of precision if nc*v exceeds 53 bits
+            def apply(v: Long): Long = ((nc * v) / dc).toLong
+
+        class IntTUC[UF, UT](nc: Double, dc: Double) extends TruncatingUnitConversion[Int, UF, UT]:
+            def apply(v: Int): Int = ((nc * v) / dc).toInt
+
+        class DoubleDUC[B, UF, UT](c: Double, df: Double, dt: Double) extends DeltaUnitConversion[Double, B, UF, UT]:
+            def apply(v: Double): Double = ((v + df) * c) - dt
+
+        class FloatDUC[B, UF, UT](c: Float, df: Float, dt: Float) extends DeltaUnitConversion[Float, B, UF, UT]:
+            def apply(v: Float): Float = ((v + df) * c) - dt
+
+        class LongTDUC[B, UF, UT](nc: Double, dc: Double, df: Double, dt: Double) extends
+                TruncatingDeltaUnitConversion[Long, B, UF, UT]:
+            def apply(v: Long): Long = (((nc * (v + df)) / dc) - dt).toLong
+
+        class IntTDUC[B, UF, UT](nc: Double, dc: Double, df: Double, dt: Double) extends
+                TruncatingDeltaUnitConversion[Int, B, UF, UT]:
             def apply(v: Int): Int = (((nc * (v + df)) / dc) - dt).toInt
