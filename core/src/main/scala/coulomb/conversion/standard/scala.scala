@@ -26,35 +26,54 @@ object scala:
     // https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
 
     given ctx_Quantity_Conversion_1V1U[V, U]: Conversion[Quantity[V, U], Quantity[V, U]] =
-        new Conversion[Quantity[V, U], Quantity[V, U]]:
-            def apply(q: Quantity[V, U]): Quantity[V, U] = q 
+        new infra.QC1V1U[V, U]
 
     given ctx_Quantity_Conversion_1V2U[V, UF, UT](using
         uc: UnitConversion[V, UF, UT]
             ): Conversion[Quantity[V, UF], Quantity[V, UT]] =
-        new Conversion[Quantity[V, UF], Quantity[V, UT]]:
-            def apply(q: Quantity[V, UF]): Quantity[V, UT] = 
-                uc(q.value).withUnit[UT]
+        new infra.QC1V2U[V, UF, UT](uc)
 
     given ctx_Quantity_Conversion_2V1U[U, VF, VT](using
         vc: ValueConversion[VF, VT],
             ): Conversion[Quantity[VF, U], Quantity[VT, U]] =
-        new Conversion[Quantity[VF, U], Quantity[VT, U]]:
-            def apply(q: Quantity[VF, U]): Quantity[VT, U] = 
-                vc(q.value).withUnit[U]
+        new infra.QC2V1U[U, VF, VT](vc)
 
     given ctx_Quantity_Conversion_2V2U[VF, UF, VT, UT](using
         vc: ValueConversion[VF, VT],
         uc: UnitConversion[VT, UF, UT]
             ): Conversion[Quantity[VF, UF], Quantity[VT, UT]] =
-        new Conversion[Quantity[VF, UF], Quantity[VT, UT]]:
-            def apply(q: Quantity[VF, UF]): Quantity[VT, UT] = 
-                uc(vc(q.value)).withUnit[UT]
+        new infra.QC2V2U[VF, UF, VT, UT](vc, uc)
 
     given ctx_DeltaQuantity_conversion_2V2U[B, VF, UF, VT, UT](using
         vc: ValueConversion[VF, VT],
         uc: DeltaUnitConversion[VT, B, UF, UT]
             ): Conversion[DeltaQuantity[VF, UF, B], DeltaQuantity[VT, UT, B]] =
-        new Conversion[DeltaQuantity[VF, UF, B], DeltaQuantity[VT, UT, B]]:
+        new infra.DQC2V2U[B, VF, UF, VT, UT](vc, uc)
+
+    object infra:
+        class QC1V1U[V, U] extends Conversion[Quantity[V, U], Quantity[V, U]]:
+            def apply(q: Quantity[V, U]): Quantity[V, U] = q
+
+        class QC1V2U[V, UF, UT](uc: UnitConversion[V, UF, UT]) extends
+                Conversion[Quantity[V, UF], Quantity[V, UT]]:
+            def apply(q: Quantity[V, UF]): Quantity[V, UT] = 
+                uc(q.value).withUnit[UT]
+
+        class QC2V1U[U, VF, VT](vc: ValueConversion[VF, VT]) extends
+                Conversion[Quantity[VF, U], Quantity[VT, U]]:
+            def apply(q: Quantity[VF, U]): Quantity[VT, U] = 
+                vc(q.value).withUnit[U]
+
+        class QC2V2U[VF, UF, VT, UT](
+            vc: ValueConversion[VF, VT],
+            uc: UnitConversion[VT, UF, UT]) extends
+                Conversion[Quantity[VF, UF], Quantity[VT, UT]]:
+            def apply(q: Quantity[VF, UF]): Quantity[VT, UT] = 
+                uc(vc(q.value)).withUnit[UT]
+
+        class DQC2V2U[B, VF, UF, VT, UT](
+            vc: ValueConversion[VF, VT],
+            uc: DeltaUnitConversion[VT, B, UF, UT]) extends
+                Conversion[DeltaQuantity[VF, UF, B], DeltaQuantity[VT, UT, B]]:
             def apply(q: DeltaQuantity[VF, UF, B]): DeltaQuantity[VT, UT, B] = 
                 uc(vc(q.value)).withDeltaUnit[UT, B]
