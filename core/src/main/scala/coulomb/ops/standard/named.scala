@@ -21,4 +21,5 @@ object named:
     export sub.infra.SubNC
     export mul.infra.MulNC
     export div.infra.DivNC
+    export tquot.infra.TQuotNC
 

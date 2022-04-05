@@ -115,7 +115,7 @@ object quantity:
             div.eval(ql, qr)
 
         transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using tq: TQuot[VL, UL, VR, UR]): Quantity[tq.VO, tq.UO] =
-            tq(ql, qr)
+            tq.eval(ql, qr)
 
         transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
             pow(ql)

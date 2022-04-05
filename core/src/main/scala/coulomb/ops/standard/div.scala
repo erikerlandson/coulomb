@@ -25,15 +25,13 @@ object div:
     import coulomb.{`/`, Quantity, withUnit}
     import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
 
-    import infra.DivNC
-
     transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
         // https://github.com/lampepfl/dotty/issues/14585
         eqv: VR =:= VL,
         alg: MultiplicativeGroup[VL],
         su: SimplifiedUnit[UL / UR]
             ): Div[VL, UL, VR, UR] =
-        new DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.div(ql.value, eqv(qr.value)).withUnit[su.UO])
+        new infra.DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.div(ql.value, eqv(qr.value)).withUnit[su.UO])
 
     transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -43,7 +41,7 @@ object div:
         alg: MultiplicativeGroup[vres.VO],
         su: SimplifiedUnit[UL / UR]
             ): Div[VL, UL, VR, UR] =
-        new DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.div(icl(ql).value, icr(qr).value).withUnit[su.UO])
+        new infra.DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.div(icl(ql).value, icr(qr).value).withUnit[su.UO])
 
     object infra:
         class DivNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Div[VL, UL, VR, UR]:

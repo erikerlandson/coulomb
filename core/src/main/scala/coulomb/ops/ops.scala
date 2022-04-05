@@ -51,7 +51,7 @@ abstract class Div[VL, UL, VR, UR]:
 abstract class TQuot[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Power not defined in scope for Quantity[${V}, ${U}] ^ ${P}")
 abstract class Pow[V, U, P]:

@@ -25,15 +25,13 @@ object mul:
     import coulomb.{`*`, Quantity, withUnit}
     import coulomb.ops.{Mul, SimplifiedUnit, ValueResolution}
 
-    import infra.MulNC
-
     transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using
         // https://github.com/lampepfl/dotty/issues/14585
         eqv: VR =:= VL,
         alg: MultiplicativeSemigroup[VL],
         su: SimplifiedUnit[UL * UR]
             ): Mul[VL, UL, VR, UR] =
-        new MulNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.times(ql.value, eqv(qr.value)).withUnit[su.UO])
+        new infra.MulNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.times(ql.value, eqv(qr.value)).withUnit[su.UO])
 
     transparent inline given ctx_mul_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -43,7 +41,7 @@ object mul:
         alg: MultiplicativeSemigroup[vres.VO],
         su: SimplifiedUnit[UL * UR]
             ): Mul[VL, UL, VR, UR] =
-        new MulNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.times(icl(ql).value, icr(qr).value).withUnit[su.UO])
+        new infra.MulNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.times(icl(ql).value, icr(qr).value).withUnit[su.UO])
 
     object infra:
         class MulNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Mul[VL, UL, VR, UR]:

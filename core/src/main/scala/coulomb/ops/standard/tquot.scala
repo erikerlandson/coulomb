@@ -31,7 +31,7 @@ object tquot:
         alg: TruncatedDivision[VL],
         su: SimplifiedUnit[UL / UR]
             ): TQuot[VL, UL, VR, UR] =
-        new infra.TQuot1V2U[VL, UL, VR, UR, su.UO](alg, eqv)
+        new infra.TQuotNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.tquot(ql.value, eqv(qr.value)).withUnit[su.UO])
 
     transparent inline given ctx_tquot_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -41,22 +41,9 @@ object tquot:
         alg: TruncatedDivision[vres.VO],
         su: SimplifiedUnit[UL / UR]
             ): TQuot[VL, UL, VR, UR] =
-        new infra.TQuot2V2U[VL, UL, VR, UR, vres.VO, su.UO](alg, icl, icr)
+        new infra.TQuotNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.tquot(icl(ql).value, icr(qr).value).withUnit[su.UO])
 
     object infra:
-        class TQuot1V2U[VL, UL, VR, UR, UOp](
-            alg: TruncatedDivision[VL],
-            eqv: VR =:= VL) extends TQuot[VL, UL, VR, UR]:
-            type VO = VL
-            type UO = UOp 
-            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-                alg.tquot(ql.value, eqv(qr.value)).withUnit[UO]
-
-        class TQuot2V2U[VL, UL, VR, UR, VOp, UOp](
-            alg: TruncatedDivision[VOp],
-            icl: Conversion[Quantity[VL, UL], Quantity[VOp, UL]], 
-            icr: Conversion[Quantity[VR, UR], Quantity[VOp, UR]]) extends TQuot[VL, UL, VR, UR]:
+        class TQuotNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends TQuot[VL, UL, VR, UR]:
             type VO = VOp
-            type UO = UOp 
-            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-                alg.tquot(icl(ql).value, icr(qr).value).withUnit[UO]
+            type UO = UOp
