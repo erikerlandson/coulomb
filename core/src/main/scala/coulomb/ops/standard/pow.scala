@@ -31,7 +31,8 @@ object pow:
         alg: FractionalPower[V],
         su: SimplifiedUnit[U ^ E]
             ): Pow[V, U, E] =
-        new infra.PowFP[V, U, E, su.UO](alg, typeexpr.double[E])
+        val e = typeexpr.double[E]
+        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.pow(q.value, e).withUnit[su.UO])
 
     transparent inline given ctx_pow_MultiplicativeGroup[V, U, E](using
         nfp: NotGiven[FractionalPower[V]],
@@ -39,7 +40,8 @@ object pow:
         aie: typeexpr.AllInt[E],
         su: SimplifiedUnit[U ^ E]
             ): Pow[V, U, E] =
-        new infra.PowMG[V, U, E, su.UO](alg, aie.value)
+        val e = aie.value
+        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.pow(q.value, e).withUnit[su.UO])
 
     transparent inline given ctx_pow_MultiplicativeSemigroup[V, U, E](using
         nfp: NotGiven[FractionalPower[V]],
@@ -48,23 +50,10 @@ object pow:
         pie: typeexpr.PosInt[E],
         su: SimplifiedUnit[U ^ E]
             ): Pow[V, U, E] =
-        new infra.PowMSG[V, U, E, su.UO](alg, pie.value)
+        val e = pie.value
+        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.pow(q.value, e).withUnit[su.UO])
 
     object infra:
-        class PowFP[V, U, E, UOp](alg: FractionalPower[V], e: Double) extends Pow[V, U, E]:
-            type VO = V
+        class PowNC[V, U, E, VOp, UOp](val eval: Quantity[V, U] => Quantity[VOp, UOp]) extends Pow[V, U, E]:
+            type VO = VOp
             type UO = UOp
-            def apply(q: Quantity[V, U]): Quantity[VO, UO] =
-                alg.pow(q.value, e).withUnit[UO]
-
-        class PowMG[V, U, E, UOp](alg: MultiplicativeGroup[V], e: Int) extends Pow[V, U, E]:
-            type VO = V
-            type UO = UOp
-            def apply(q: Quantity[V, U]): Quantity[VO, UO] =
-                alg.pow(q.value, e).withUnit[UO]
-
-        class PowMSG[V, U, E, UOp](alg: MultiplicativeSemigroup[V], e: Int) extends Pow[V, U, E]:
-            type VO = V
-            type UO = UOp
-            def apply(q: Quantity[V, U]): Quantity[VO, UO] =
-                alg.pow(q.value, e).withUnit[UO]

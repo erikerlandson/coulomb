@@ -28,11 +28,10 @@ object tpow:
         alg: TruncatingPower[V],
         su: SimplifiedUnit[U ^ E]
             ): TPow[V, U, E] =
-        new infra.TPowNC[V, U, E, su.UO](alg, typeexpr.double[E])
+        val e = typeexpr.double[E]
+        new infra.TPowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.tpow(q.value, e).withUnit[su.UO])
 
     object infra:
-        class TPowNC[V, U, E, UOp](alg: TruncatingPower[V], e: Double) extends TPow[V, U, E]:
-            type VO = V
+        class TPowNC[V, U, E, VOp, UOp](val eval: Quantity[V, U] => Quantity[VOp, UOp]) extends TPow[V, U, E]:
+            type VO = VOp
             type UO = UOp
-            def apply(q: Quantity[V, U]): Quantity[VO, UO] =
-                alg.tpow(q.value, e).withUnit[UO]

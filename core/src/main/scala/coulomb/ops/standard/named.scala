@@ -22,4 +22,6 @@ object named:
     export mul.infra.MulNC
     export div.infra.DivNC
     export tquot.infra.TQuotNC
+    export pow.infra.PowNC
+    export tpow.infra.TPowNC
 

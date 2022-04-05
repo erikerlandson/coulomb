@@ -57,13 +57,13 @@ abstract class TQuot[VL, UL, VR, UR]:
 abstract class Pow[V, U, P]:
     type VO
     type UO
-    def apply(q: Quantity[V, U]): Quantity[VO, UO]
+    val eval: Quantity[V, U] => Quantity[VO, UO]
 
 @implicitNotFound("Truncating Power not defined in scope for Quantity[${V}, ${U}] ^ ${P}")
 abstract class TPow[V, U, P]:
     type VO
     type UO
-    def apply(q: Quantity[V, U]): Quantity[VO, UO]
+    val eval: Quantity[V, U] => Quantity[VO, UO]
 
 @implicitNotFound("Ordering not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Ord[VL, UL, VR, UR]:
