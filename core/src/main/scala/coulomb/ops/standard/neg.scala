@@ -22,10 +22,5 @@ object neg:
     import coulomb.{Quantity, withUnit}
     import coulomb.ops.Neg
 
-    inline given ctx_quantity_neg[V, U](using alg: AdditiveGroup[V]): Neg[V, U] =
-        new infra.NegNC[V, U](alg)
-
-    object infra:
-        class NegNC[V, U](alg: AdditiveGroup[V]) extends Neg[V, U]:
-            def apply(q: Quantity[V, U]): Quantity[V, U] =
-                alg.negate(q.value).withUnit[U]
+    given ctx_quantity_neg[V, U](using alg: AdditiveGroup[V]): Neg[V, U] =
+        (q: Quantity[V, U]) => alg.negate(q.value).withUnit[U]

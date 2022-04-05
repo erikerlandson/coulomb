@@ -26,9 +26,8 @@ import coulomb.ops.standard.named.*
 import coulomb.conversion.coefficients.*
 
 object float:
-    inline given ctx_quantity_neg_Float[U]: Neg[Float, U] =
-        new Neg[Float, U]:
-            def apply(q: Quantity[Float, U]): Quantity[Float, U] = (-(q.value)).withUnit[U]
+    given ctx_quantity_neg_Float[U]: Neg[Float, U] =
+        (q: Quantity[Float, U]) => (-(q.value)).withUnit[U]
 
     transparent inline given ctx_add_Float_1U[U]: Add[Float, U, Float, U] =
         new AddNC((ql: Quantity[Float, U], qr: Quantity[Float, U]) => (ql.value + qr.value).withUnit[U]) 

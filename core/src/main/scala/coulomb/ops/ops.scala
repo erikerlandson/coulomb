@@ -21,8 +21,7 @@ import scala.annotation.implicitNotFound
 import coulomb.*
 
 @implicitNotFound("Negation not defined in scope for Quantity[${V}, ${U}]")
-abstract class Neg[V, U]:
-    def apply(q: Quantity[V, U]): Quantity[V, U]
+abstract class Neg[V, U] extends (Quantity[V, U] => Quantity[V, U])
 
 @implicitNotFound("Addition not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Add[VL, UL, VR, UR]:
