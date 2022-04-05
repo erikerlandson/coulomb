@@ -72,7 +72,7 @@ abstract class Ord[VL, UL, VR, UR] extends ((Quantity[VL, UL], Quantity[VR, UR])
 abstract class DeltaSub[B, VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Quantity[VO, UO]
+    val eval: (DeltaQuantity[VL, UL, B], DeltaQuantity[VR, UR, B]) => Quantity[VO, UO]
 
 @implicitNotFound("Subtraction not defined in scope for DeltaQuantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class DeltaSubQ[B, VL, UL, VR, UR]:
