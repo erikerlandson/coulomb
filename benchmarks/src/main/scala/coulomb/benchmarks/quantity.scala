@@ -24,8 +24,8 @@ import org.openjdk.jmh.annotations.*
 @Fork(1)
 @BenchmarkMode(Array(Mode.Throughput))
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-@Warmup(iterations = 3, time = 1)
-@Measurement(iterations = 10, time = 1)
+@Warmup(iterations = 3, time = 2)
+@Measurement(iterations = 10, time = 2)
 class QuantityBenchmark:
     import scala.language.implicitConversions
     import coulomb.*
