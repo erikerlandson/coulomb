@@ -87,8 +87,7 @@ abstract class DeltaAddQ[B, VL, UL, VR, UR]:
     val eval: (DeltaQuantity[VL, UL, B], Quantity[VR, UR]) => DeltaQuantity[VO, UO, B]
 
 @implicitNotFound("Ordering not defined in scope for DeltaQuantity[${VL}, ${UL}] and DeltaQuantity[${VR}, ${UR}]")
-abstract class DeltaOrd[B, VL, UL, VR, UR]:
-    def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Int
+abstract class DeltaOrd[B, VL, UL, VR, UR] extends ((DeltaQuantity[VL, UL, B], DeltaQuantity[VR, UR, B]) => Int)
 
 /** Resolve the operator output type for left and right argument types */
 @implicitNotFound("No output type resolution in scope for argument value types ${VL} and ${VR}")
