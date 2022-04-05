@@ -66,8 +66,7 @@ abstract class TPow[V, U, P]:
     val eval: Quantity[V, U] => Quantity[VO, UO]
 
 @implicitNotFound("Ordering not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
-abstract class Ord[VL, UL, VR, UR]:
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int
+abstract class Ord[VL, UL, VR, UR] extends ((Quantity[VL, UL], Quantity[VR, UR]) => Int)
 
 @implicitNotFound("Subtraction not defined in scope for DeltaQuantity[${VL}, ${UL}] and DeltaQuantity[${VR}, ${UR}]")
 abstract class DeltaSub[B, VL, UL, VR, UR]:
