@@ -25,13 +25,15 @@ object sub:
     import coulomb.{Quantity, withUnit}
     import coulomb.ops.{Sub, ValueResolution}
 
+    import infra.SubNC
+
     transparent inline given ctx_sub_1V1U[VL, UL, VR, UR](using
         // https://github.com/lampepfl/dotty/issues/14585
         eqv: VR =:= VL,
         equ: UR =:= UL,
         alg: AdditiveGroup[VL]
             ): Sub[VL, UL, VR, UR] =
-        new infra.Sub1V1U[VL, UL, VR, UR](alg, eqv)
+        new SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(ql.value, eqv(qr.value)).withUnit[UL])
 
     transparent inline given ctx_sub_1V2U[VL, UL, VR, UR](using
         eqv: VR =:= VL,
@@ -39,7 +41,7 @@ object sub:
         icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
         alg: AdditiveGroup[VL]
             ): Sub[VL, UL, VR, UR] =
-        new infra.Sub1V2U[VL, UL, VR, UR](alg, icr)
+        new SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(ql.value, icr(qr).value).withUnit[UL])
 
     transparent inline given ctx_sub_2V1U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -49,7 +51,7 @@ object sub:
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveGroup[vres.VO]
             ): Sub[VL, UL, VR, UR] =
-        new infra.Sub2V2U[VL, UL, VR, UR, vres.VO](alg, icl, icr)
+        new SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(icl(ql).value, icr(qr).value).withUnit[UL])
 
     transparent inline given ctx_sub_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -59,31 +61,9 @@ object sub:
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveGroup[vres.VO]
             ): Sub[VL, UL, VR, UR] =
-        new infra.Sub2V2U[VL, UL, VR, UR, vres.VO](alg, icl, icr)
+        new SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(icl(ql).value, icr(qr).value).withUnit[UL])
 
     object infra:
-        class Sub1V1U[VL, UL, VR, UR](
-            alg: AdditiveGroup[VL],
-            eqv: VR =:= VL) extends Sub[VL, UL, VR, UR]:
-            type VO = VL
-            type UO = UL
-            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-                alg.minus(ql.value, eqv(qr.value)).withUnit[UO]
- 
-        class Sub1V2U[VL, UL, VR, UR](
-            alg: AdditiveGroup[VL],
-            icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]]) extends Sub[VL, UL, VR, UR]:
-            type VO = VL
-            type UO = UL
-            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-                alg.minus(ql.value, icr(qr).value).withUnit[UO]
-
-        class Sub2V2U[VL, UL, VR, UR, VOp](
-            alg: AdditiveGroup[VOp],
-            icl: Conversion[Quantity[VL, UL], Quantity[VOp, UL]], 
-            icr: Conversion[Quantity[VR, UR], Quantity[VOp, UL]]) extends Sub[VL, UL, VR, UR]:
+        class SubNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Sub[VL, UL, VR, UR]:
             type VO = VOp
-            type UO = UL
-            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-                alg.minus(icl(ql).value, icr(qr).value).withUnit[UO]
-
+            type UO = UOp

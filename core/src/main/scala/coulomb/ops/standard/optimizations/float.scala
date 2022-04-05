@@ -22,7 +22,7 @@ import scala.Conversion
 import coulomb.{`*`, `/`, `^`}
 import coulomb.{Quantity, withUnit}
 import coulomb.ops.*
-
+import coulomb.ops.standard.named.*
 import coulomb.conversion.coefficients.*
 
 object float:
@@ -31,51 +31,27 @@ object float:
             def apply(q: Quantity[Float, U]): Quantity[Float, U] = (-(q.value)).withUnit[U]
 
     transparent inline given ctx_add_Float_1U[U]: Add[Float, U, Float, U] =
-        new Add[Float, U, Float, U]:
-            type VO = Float
-            type UO = U
-            def apply(ql: Quantity[Float, U], qr: Quantity[Float, U]): Quantity[Float, U] =
-                (ql.value + qr.value).withUnit[U]
+        new AddNC((ql: Quantity[Float, U], qr: Quantity[Float, U]) => (ql.value + qr.value).withUnit[U]) 
 
     transparent inline given ctx_add_Float_2U[UL, UR](using
         Conversion[Quantity[Float, UR], Quantity[Float, UL]]
             ): Add[Float, UL, Float, UR] =
         val c = coefficientFloat[UR, UL]
-        new Add[Float, UL, Float, UR]:
-            type VO = Float
-            type UO = UL
-            def apply(ql: Quantity[Float, UL], qr: Quantity[Float, UR]): Quantity[Float, UL] =
-                (ql.value + (c * qr.value)).withUnit[UL]
+        new AddNC((ql: Quantity[Float, UL], qr: Quantity[Float, UR]) => (ql.value + (c*qr.value)).withUnit[UL]) 
 
     transparent inline given ctx_sub_Float_1U[U]: Sub[Float, U, Float, U] =
-        new Sub[Float, U, Float, U]:
-            type VO = Float
-            type UO = U
-            def apply(ql: Quantity[Float, U], qr: Quantity[Float, U]): Quantity[Float, U] =
-                (ql.value - qr.value).withUnit[U]
+        new SubNC((ql: Quantity[Float, U], qr: Quantity[Float, U]) => (ql.value - qr.value).withUnit[U]) 
 
     transparent inline given ctx_sub_Float_2U[UL, UR](using
         Conversion[Quantity[Float, UR], Quantity[Float, UL]]
             ): Sub[Float, UL, Float, UR] =
         val c = coefficientFloat[UR, UL]
-        new Sub[Float, UL, Float, UR]:
-            type VO = Float
-            type UO = UL
-            def apply(ql: Quantity[Float, UL], qr: Quantity[Float, UR]): Quantity[Float, UL] =
-                (ql.value - (c * qr.value)).withUnit[UL]
+        new SubNC((ql: Quantity[Float, UL], qr: Quantity[Float, UR]) => (ql.value - (c*qr.value)).withUnit[UL]) 
 
     transparent inline given ctx_mul_Float_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
             Mul[Float, UL, Float, UR] =
-        new Mul[Float, UL, Float, UR]:
-            type VO = Float
-            type UO = su.UO
-            def apply(ql: Quantity[Float, UL], qr: Quantity[Float, UR]): Quantity[Float, UO] =
-                (ql.value * qr.value).withUnit[UO]
+        new MulNC((ql: Quantity[Float, UL], qr: Quantity[Float, UR]) => (ql.value * qr.value).withUnit[su.UO]) 
 
     transparent inline given ctx_div_Float_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
             Div[Float, UL, Float, UR] =
-        new Div[Float, UL, Float, UR]:
-            type VO = Float
-            type UO = su.UO
-            def apply(ql: Quantity[Float, UL], qr: Quantity[Float, UR]): Quantity[Float, UO] =
-                (ql.value / qr.value).withUnit[UO]
+        new DivNC((ql: Quantity[Float, UL], qr: Quantity[Float, UR]) => (ql.value / qr.value).withUnit[su.UO]) 

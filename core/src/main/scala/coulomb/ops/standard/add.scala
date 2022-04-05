@@ -25,13 +25,15 @@ object add:
     import coulomb.{Quantity, withUnit}
     import coulomb.ops.{Add, ValueResolution}
 
+    import infra.AddNC
+
     transparent inline given ctx_add_1V1U[VL, UL, VR, UR](using
         // https://github.com/lampepfl/dotty/issues/14585
         eqv: VR =:= VL,
         equ: UR =:= UL,
         alg: AdditiveSemigroup[VL]
             ): Add[VL, UL, VR, UR] =
-        new infra.Add1V1U[VL, UL, VR, UR](alg, eqv)
+        new AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(ql.value, eqv(qr.value)).withUnit[UL])
 
     transparent inline given ctx_add_1V2U[VL, UL, VR, UR](using
         eqv: VR =:= VL,
@@ -39,7 +41,7 @@ object add:
         icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
         alg: AdditiveSemigroup[VL]
             ): Add[VL, UL, VR, UR] =
-        new infra.Add1V2U[VL, UL, VR, UR](alg, icr)
+        new AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(ql.value, icr(qr).value).withUnit[UL])
 
     transparent inline given ctx_add_2V1U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -49,7 +51,7 @@ object add:
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveSemigroup[vres.VO]
             ): Add[VL, UL, VR, UR] =
-        new infra.Add2V2U[VL, UL, VR, UR, vres.VO](alg, icl, icr)
+        new AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(icl(ql).value, icr(qr).value).withUnit[UL])
 
     transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -59,31 +61,9 @@ object add:
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveSemigroup[vres.VO]
             ): Add[VL, UL, VR, UR] =
-        new infra.Add2V2U[VL, UL, VR, UR, vres.VO](alg, icl, icr)
+        new AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(icl(ql).value, icr(qr).value).withUnit[UL])
 
     object infra:
-        class Add1V1U[VL, UL, VR, UR](
-            alg: AdditiveSemigroup[VL],
-            eqv: VR =:= VL) extends Add[VL, UL, VR, UR]:
-            type VO = VL
-            type UO = UL
-            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-                alg.plus(ql.value, eqv(qr.value)).withUnit[UO]
- 
-        class Add1V2U[VL, UL, VR, UR](
-            alg: AdditiveSemigroup[VL],
-            icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]]) extends Add[VL, UL, VR, UR]:
-            type VO = VL
-            type UO = UL
-            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-                alg.plus(ql.value, icr(qr).value).withUnit[UO]
-
-        class Add2V2U[VL, UL, VR, UR, VOp](
-            alg: AdditiveSemigroup[VOp],
-            icl: Conversion[Quantity[VL, UL], Quantity[VOp, UL]], 
-            icr: Conversion[Quantity[VR, UR], Quantity[VOp, UL]]) extends Add[VL, UL, VR, UR]:
+        class AddNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Add[VL, UL, VR, UR]:
             type VO = VOp
-            type UO = UL
-            def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-                alg.plus(icl(ql).value, icr(qr).value).withUnit[UO]
-
+            type UO = UOp

@@ -28,25 +28,25 @@ abstract class Neg[V, U]:
 abstract class Add[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Subtraction not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Sub[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Multiplication not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Mul[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Division not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Div[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Truncating Division not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class TQuot[VL, UL, VR, UR]:
