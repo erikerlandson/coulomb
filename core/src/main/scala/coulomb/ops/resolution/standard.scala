@@ -19,50 +19,54 @@ package coulomb.ops.resolution
 object standard:
     import coulomb.ops.ValueResolution
 
-    given ctx_VR_Double_Double: ValueResolution[Double, Double] with
-        type VO = Double
+    transparent inline given ctx_VR_Double_Double: ValueResolution[Double, Double] =
+        new infra.VRNC[Double, Double, Double]
 
-    given ctx_VR_Double_Float: ValueResolution[Double, Float] with
-        type VO = Double
+    transparent inline given ctx_VR_Double_Float: ValueResolution[Double, Float] =
+        new infra.VRNC[Double, Float, Double]
 
-    given ctx_VR_Double_Long: ValueResolution[Double, Long] with
-        type VO = Double
+    transparent inline given ctx_VR_Double_Long: ValueResolution[Double, Long] =
+        new infra.VRNC[Double, Long, Double]
 
-    given ctx_VR_Double_Int: ValueResolution[Double, Int] with
-        type VO = Double
+    transparent inline given ctx_VR_Double_Int: ValueResolution[Double, Int] =
+        new infra.VRNC[Double, Int, Double]
 
-    given ctx_VR_Float_Double: ValueResolution[Float, Double] with
-        type VO = Double
+    transparent inline given ctx_VR_Float_Double: ValueResolution[Float, Double] =
+        new infra.VRNC[Float, Double, Double]
 
-    given ctx_VR_Float_Float: ValueResolution[Float, Float] with
-        type VO = Float
+    transparent inline given ctx_VR_Float_Float: ValueResolution[Float, Float] =
+        new infra.VRNC[Float, Float, Float]
 
-    given ctx_VR_Float_Long: ValueResolution[Float, Long] with
-        type VO = Float
+    transparent inline given ctx_VR_Float_Long: ValueResolution[Float, Long] =
+        new infra.VRNC[Float, Long, Float]
 
-    given ctx_VR_Float_Int: ValueResolution[Float, Int] with
-        type VO = Float
+    transparent inline given ctx_VR_Float_Int: ValueResolution[Float, Int] =
+        new infra.VRNC[Float, Int, Float]
 
-    given ctx_VR_Long_Double: ValueResolution[Long, Double] with
-        type VO = Double
+    transparent inline given ctx_VR_Long_Double: ValueResolution[Long, Double] =
+        new infra.VRNC[Long, Double, Double]
 
-    given ctx_VR_Long_Float: ValueResolution[Long, Float] with
-        type VO = Float
+    transparent inline given ctx_VR_Long_Float: ValueResolution[Long, Float] =
+        new infra.VRNC[Long, Float, Float]
 
-    given ctx_VR_Long_Long: ValueResolution[Long, Long] with
-        type VO = Long
+    transparent inline given ctx_VR_Long_Long: ValueResolution[Long, Long] =
+        new infra.VRNC[Long, Long, Long]
 
-    given ctx_VR_Long_Int: ValueResolution[Long, Int] with
-        type VO = Long
+    transparent inline given ctx_VR_Long_Int: ValueResolution[Long, Int] =
+        new infra.VRNC[Long, Int, Long]
 
-    given ctx_VR_Int_Double: ValueResolution[Int, Double] with
-        type VO = Double
+    transparent inline given ctx_VR_Int_Double: ValueResolution[Int, Double] =
+        new infra.VRNC[Int, Double, Double]
 
-    given ctx_VR_Int_Float: ValueResolution[Int, Float] with
-        type VO = Float
+    transparent inline given ctx_VR_Int_Float: ValueResolution[Int, Float] =
+        new infra.VRNC[Int, Float, Float]
 
-    given ctx_VR_Int_Long: ValueResolution[Int, Long] with
-        type VO = Long
+    transparent inline given ctx_VR_Int_Long: ValueResolution[Int, Long] =
+        new infra.VRNC[Int, Long, Long]
 
-    given ctx_VR_Int_Int: ValueResolution[Int, Int] with
-        type VO = Int
+    transparent inline given ctx_VR_Int_Int: ValueResolution[Int, Int] =
+        new infra.VRNC[Int, Int, Int]
+
+    object infra:
+        class VRNC[VL, VR, VOp] extends ValueResolution[VL, VR]:
+            type VO = VOp
