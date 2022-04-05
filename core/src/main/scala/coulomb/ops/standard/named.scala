@@ -25,4 +25,5 @@ object named:
     export pow.infra.PowNC
     export tpow.infra.TPowNC
     export deltasub.infra.DeltaSubNC
+    export deltasubq.infra.DeltaSubQNC
 
