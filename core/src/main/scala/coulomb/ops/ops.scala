@@ -84,7 +84,7 @@ abstract class DeltaSubQ[B, VL, UL, VR, UR]:
 abstract class DeltaAddQ[B, VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]): DeltaQuantity[VO, UO, B]
+    val eval: (DeltaQuantity[VL, UL, B], Quantity[VR, UR]) => DeltaQuantity[VO, UO, B]
 
 @implicitNotFound("Ordering not defined in scope for DeltaQuantity[${VL}, ${UL}] and DeltaQuantity[${VR}, ${UR}]")
 abstract class DeltaOrd[B, VL, UL, VR, UR]:
