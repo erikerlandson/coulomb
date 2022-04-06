@@ -17,6 +17,7 @@
 package coulomb.units
 
 object constants:
+    import coulomb.*
     import coulomb.define.*
 
     import coulomb.units.si.{*, given}
@@ -26,5 +27,5 @@ object constants:
     given ctx_unit_SpeedOfLight: DerivedUnit[SpeedOfLight, 299792458 * Meter / Second, "speed-of-light", "c"] = DerivedUnit()
 
     final type PlanckConstant
-    given ctx_unit_PlanckConstant: DerivedUnit[PlanckConstant, (662607015 * (10 ^ -42)) * Joule * Second, "planck-constant", "ℎ"]
+    given ctx_unit_PlanckConstant: DerivedUnit[PlanckConstant, (662607015 * (10 ^ -42)) * Joule * Second, "planck-constant", "ℎ"] = DerivedUnit()
 
