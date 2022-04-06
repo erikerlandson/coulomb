@@ -179,7 +179,11 @@ object meta:
     def simplify(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
         given sigmode: SigMode = SigMode.Standard
-        val (un, ud) = sortsig(cansig(u)._2)
+        simplifysig(cansig(u)._2)
+
+    def simplifysig(using Quotes)(sig: List[(quotes.reflect.TypeRepr, Rational)]): quotes.reflect.TypeRepr =
+        import quotes.reflect.*
+        val (un, ud) = sortsig(sig)
         (uProd(un), uProd(ud)) match
             case (unitconst1(), unitconst1()) => TypeRepr.of[1]
             case (n, unitconst1()) => n

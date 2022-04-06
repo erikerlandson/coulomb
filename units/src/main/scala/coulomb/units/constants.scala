@@ -19,6 +19,7 @@ package coulomb.units
 object constants:
     import coulomb.*
     import coulomb.define.*
+    import coulomb.rational.Rational
 
     import coulomb.units.si.{*, given}
     import coulomb.units.mksa.{*, given}
@@ -29,3 +30,20 @@ object constants:
     final type PlanckConstant
     given ctx_unit_PlanckConstant: DerivedUnit[PlanckConstant, (662607015 * (10 ^ -42)) * Joule * Second, "planck-constant", "ℎ"] = DerivedUnit()
 
+    // would prefer to use something like `Quantity[Rational, ?]` instead of `Any` here
+    transparent inline def constq[CU]: Any = ${ meta.constq[CU] }
+
+    object meta:
+        import scala.quoted.*
+        import coulomb.infra.meta.{*, given}
+
+        def constq[CU](using Quotes, Type[CU]): Expr[Any] =
+            import quotes.reflect.*
+            given sigmode: SigMode = SigMode.Separate
+            TypeRepr.of[CU] match
+                case derivedunit(v, sig) =>
+                    simplifysig(sig).asType match
+                        case '[qu] => '{ ${Expr(v)}.withUnit[qu] }
+                case u =>
+                    report.error(s"unrecognized unit declaration: ${typestr(u)}")
+                    '{ Rational.const0.withUnit[Nothing] }
