@@ -22,60 +22,35 @@ import scala.Conversion
 import coulomb.{`*`, `/`, `^`}
 import coulomb.{Quantity, withUnit}
 import coulomb.ops.*
-
+import coulomb.ops.standard.named.*
 import coulomb.conversion.coefficients.*
 
 object double:
-    inline given ctx_quantity_neg_Double[U]: Neg[Double, U] =
-        new Neg[Double, U]:
-            def apply(q: Quantity[Double, U]): Quantity[Double, U] = (-(q.value)).withUnit[U]
+    given ctx_quantity_neg_Double[U]: Neg[Double, U] =
+        (q: Quantity[Double, U]) => (-(q.value)).withUnit[U]
 
     transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
-        new Add[Double, U, Double, U]:
-            type VO = Double
-            type UO = U
-            def apply(ql: Quantity[Double, U], qr: Quantity[Double, U]): Quantity[Double, U] =
-                (ql.value + qr.value).withUnit[U]
+        new AddNC((ql: Quantity[Double, U], qr: Quantity[Double, U]) => (ql.value + qr.value).withUnit[U]) 
 
     transparent inline given ctx_add_Double_2U[UL, UR](using
         Conversion[Quantity[Double, UR], Quantity[Double, UL]]
             ): Add[Double, UL, Double, UR] =
         val c = coefficientDouble[UR, UL]
-        new Add[Double, UL, Double, UR]:
-            type VO = Double
-            type UO = UL
-            def apply(ql: Quantity[Double, UL], qr: Quantity[Double, UR]): Quantity[Double, UL] =
-                (ql.value + (c * qr.value)).withUnit[UL]
-
+        new AddNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) => (ql.value + (c*qr.value)).withUnit[UL]) 
+        
     transparent inline given ctx_sub_Double_1U[U]: Sub[Double, U, Double, U] =
-        new Sub[Double, U, Double, U]:
-            type VO = Double
-            type UO = U
-            def apply(ql: Quantity[Double, U], qr: Quantity[Double, U]): Quantity[Double, U] =
-                (ql.value - qr.value).withUnit[U]
+        new SubNC((ql: Quantity[Double, U], qr: Quantity[Double, U]) => (ql.value - qr.value).withUnit[U])
 
     transparent inline given ctx_sub_Double_2U[UL, UR](using
         Conversion[Quantity[Double, UR], Quantity[Double, UL]]
             ): Sub[Double, UL, Double, UR] =
         val c = coefficientDouble[UR, UL]
-        new Sub[Double, UL, Double, UR]:
-            type VO = Double
-            type UO = UL
-            def apply(ql: Quantity[Double, UL], qr: Quantity[Double, UR]): Quantity[Double, UL] =
-                (ql.value - (c * qr.value)).withUnit[UL]
+        new SubNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) => (ql.value - (c*qr.value)).withUnit[UL]) 
 
     transparent inline given ctx_mul_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
             Mul[Double, UL, Double, UR] =
-        new Mul[Double, UL, Double, UR]:
-            type VO = Double
-            type UO = su.UO
-            def apply(ql: Quantity[Double, UL], qr: Quantity[Double, UR]): Quantity[Double, UO] =
-                (ql.value * qr.value).withUnit[UO]
+        new MulNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) => (ql.value * qr.value).withUnit[su.UO]) 
 
     transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
             Div[Double, UL, Double, UR] =
-        new Div[Double, UL, Double, UR]:
-            type VO = Double
-            type UO = su.UO
-            def apply(ql: Quantity[Double, UL], qr: Quantity[Double, UR]): Quantity[Double, UO] =
-                (ql.value / qr.value).withUnit[UO]
+        new DivNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) => (ql.value / qr.value).withUnit[su.UO]) 

@@ -52,45 +52,39 @@ class TemperatureUnitsSuite extends CoulombSuite:
     }
 
     test("toValue") {
-        import coulomb.conversion.standard.value.given
+        import coulomb.policy.strict.given
+
         1.withTemperature[Celsius].toValue[Float].assertDQ[Float, Celsius](1)
         1d.withTemperature[Celsius].tToValue[Int].assertDQ[Int, Celsius](1)
     }
 
     test("toUnit") {
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.strict.given
+
         37d.withTemperature[Celsius].toUnit[Fahrenheit].assertDQD[Double, Fahrenheit](98.6)
         37.withTemperature[Celsius].tToUnit[Fahrenheit].assertDQD[Int, Fahrenheit](98)
     }
 
     test("subtraction standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         (100.withTemperature[Celsius] - 122d.withTemperature[Fahrenheit]).assertQD[Double, Celsius](50)
     }
 
     test("quantity subtraction standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         (100.withTemperature[Celsius] - 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](50)
     }
 
     test("quantity addition standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         (100.withTemperature[Celsius] + 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](150)
     }
 
     test("less-than standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         assertEquals(100d.withTemperature[Celsius] < 100f.withTemperature[Fahrenheit], false)
         assertEquals(0f.withTemperature[Fahrenheit] < 0L.withTemperature[Celsius], true)

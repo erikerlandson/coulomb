@@ -103,25 +103,25 @@ object quantity:
             neg(ql)
 
         transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
-            add(ql, qr)
+            add.eval(ql, qr)
 
         transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: Sub[VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
-            sub(ql, qr)
+            sub.eval(ql, qr)
 
         transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[VL, UL, VR, UR]): Quantity[mul.VO, mul.UO] =
-            mul(ql, qr)
+            mul.eval(ql, qr)
 
         transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[VL, UL, VR, UR]): Quantity[div.VO, div.UO] =
-            div(ql, qr)
+            div.eval(ql, qr)
 
         transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using tq: TQuot[VL, UL, VR, UR]): Quantity[tq.VO, tq.UO] =
-            tq(ql, qr)
+            tq.eval(ql, qr)
 
         transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
-            pow(ql)
+            pow.eval(ql)
 
         transparent inline def tpow[P](using tp: TPow[VL, UL, P]): Quantity[tp.VO, tp.UO] =
-            tp(ql)
+            tp.eval(ql)
 
         inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) == 0

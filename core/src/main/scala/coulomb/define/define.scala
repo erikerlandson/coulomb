@@ -36,6 +36,11 @@ abstract class BaseUnit[U, Name, Abbv] extends NamedUnit[Name, Abbv]
  * @tparam Abbv unit abbreviation
  */
 abstract class DerivedUnit[U, D, Name, Abbv] extends NamedUnit[Name, Abbv]
+object DerivedUnit:
+    given ctx_unit_to_DU[U, D, Name, Abbv]: scala.Conversion[Unit, DerivedUnit[U, D, Name, Abbv]] =
+      (_: Unit) => new infra.DU[U, D, Name, Abbv]
+    object infra:
+        class DU[U, D, Name, Abbv] extends DerivedUnit[U, D, Name, Abbv]
 
 /**
  * Delta Units represent units with an offset in their transforms, for example temperatures or times
@@ -47,3 +52,4 @@ abstract class DerivedUnit[U, D, Name, Abbv] extends NamedUnit[Name, Abbv]
  * @tparam Abbv unit abbreviation
  */
 abstract class DeltaUnit[U, D, O, Name, Abbv] extends DerivedUnit[U, D, Name, Abbv]
+

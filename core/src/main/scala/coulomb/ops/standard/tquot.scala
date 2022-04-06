@@ -16,36 +16,34 @@
 
 package coulomb.ops.standard
 
-import scala.util.NotGiven
-import scala.Conversion
+object tquot:
+    import scala.util.NotGiven
+    import scala.Conversion
 
-import algebra.ring.TruncatedDivision
+    import algebra.ring.TruncatedDivision
 
-import coulomb.{`/`, Quantity, withUnit}
-import coulomb.ops.{TQuot, SimplifiedUnit, ValueResolution}
+    import coulomb.{`/`, Quantity, withUnit}
+    import coulomb.ops.{TQuot, SimplifiedUnit, ValueResolution}
 
-transparent inline given ctx_tquot_1V2U[VL, UL, VR, UR](using
-    // https://github.com/lampepfl/dotty/issues/14585
-    eqv: VR =:= VL,
-    alg: TruncatedDivision[VL],
-    su: SimplifiedUnit[UL / UR]
-        ): TQuot[VL, UL, VR, UR] =
-    new TQuot[VL, UL, VR, UR]:
-        type VO = VL
-        type UO = su.UO
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-            alg.tquot(ql.value, eqv(qr.value)).withUnit[UO]
+    transparent inline given ctx_tquot_1V2U[VL, UL, VR, UR](using
+        // https://github.com/lampepfl/dotty/issues/14585
+        eqv: VR =:= VL,
+        alg: TruncatedDivision[VL],
+        su: SimplifiedUnit[UL / UR]
+            ): TQuot[VL, UL, VR, UR] =
+        new infra.TQuotNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.tquot(ql.value, eqv(qr.value)).withUnit[su.UO])
 
-transparent inline given ctx_tquot_2V2U[VL, UL, VR, UR](using
-    nev: NotGiven[VR =:= VL],
-    vres: ValueResolution[VL, VR],
-    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
-    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
-    alg: TruncatedDivision[vres.VO],
-    su: SimplifiedUnit[UL / UR]
-        ): TQuot[VL, UL, VR, UR] =
-    new TQuot[VL, UL, VR, UR]:
-        type VO = vres.VO
-        type UO = su.UO
-        def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO] =
-            alg.tquot(icl(ql).value, icr(qr).value).withUnit[UO]
+    transparent inline given ctx_tquot_2V2U[VL, UL, VR, UR](using
+        nev: NotGiven[VR =:= VL],
+        vres: ValueResolution[VL, VR],
+        icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+        icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
+        alg: TruncatedDivision[vres.VO],
+        su: SimplifiedUnit[UL / UR]
+            ): TQuot[VL, UL, VR, UR] =
+        new infra.TQuotNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.tquot(icl(ql).value, icr(qr).value).withUnit[su.UO])
+
+    object infra:
+        class TQuotNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends TQuot[VL, UL, VR, UR]:
+            type VO = VOp
+            type UO = UOp

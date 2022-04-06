@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package coulomb.conversion.standard
+package coulomb.ops.standard
 
-object all:
-    export coulomb.conversion.standard.value.given
-    export coulomb.conversion.standard.unit.given
-    export coulomb.conversion.standard.scala.given
+object named:
+    export add.infra.AddNC
+    export sub.infra.SubNC
+    export mul.infra.MulNC
+    export div.infra.DivNC
+    export tquot.infra.TQuotNC
+    export pow.infra.PowNC
+    export tpow.infra.TPowNC
+    export deltasub.infra.DeltaSubNC
+    export deltasubq.infra.DeltaSubQNC
+    export deltaaddq.infra.DeltaAddQNC
+

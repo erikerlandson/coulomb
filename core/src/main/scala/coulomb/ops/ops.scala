@@ -21,76 +21,73 @@ import scala.annotation.implicitNotFound
 import coulomb.*
 
 @implicitNotFound("Negation not defined in scope for Quantity[${V}, ${U}]")
-abstract class Neg[V, U]:
-    def apply(q: Quantity[V, U]): Quantity[V, U]
+abstract class Neg[V, U] extends (Quantity[V, U] => Quantity[V, U])
 
 @implicitNotFound("Addition not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Add[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Subtraction not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Sub[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Multiplication not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Mul[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Division not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class Div[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Truncating Division not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class TQuot[VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Quantity[VO, UO]
+    val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VO, UO]
 
 @implicitNotFound("Power not defined in scope for Quantity[${V}, ${U}] ^ ${P}")
 abstract class Pow[V, U, P]:
     type VO
     type UO
-    def apply(q: Quantity[V, U]): Quantity[VO, UO]
+    val eval: Quantity[V, U] => Quantity[VO, UO]
 
 @implicitNotFound("Truncating Power not defined in scope for Quantity[${V}, ${U}] ^ ${P}")
 abstract class TPow[V, U, P]:
     type VO
     type UO
-    def apply(q: Quantity[V, U]): Quantity[VO, UO]
+    val eval: Quantity[V, U] => Quantity[VO, UO]
 
 @implicitNotFound("Ordering not defined in scope for Quantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
-abstract class Ord[VL, UL, VR, UR]:
-    def apply(ql: Quantity[VL, UL], qr: Quantity[VR, UR]): Int
+abstract class Ord[VL, UL, VR, UR] extends ((Quantity[VL, UL], Quantity[VR, UR]) => Int)
 
 @implicitNotFound("Subtraction not defined in scope for DeltaQuantity[${VL}, ${UL}] and DeltaQuantity[${VR}, ${UR}]")
 abstract class DeltaSub[B, VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Quantity[VO, UO]
+    val eval: (DeltaQuantity[VL, UL, B], DeltaQuantity[VR, UR, B]) => Quantity[VO, UO]
 
 @implicitNotFound("Subtraction not defined in scope for DeltaQuantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class DeltaSubQ[B, VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]): DeltaQuantity[VO, UO, B]
+    val eval: (DeltaQuantity[VL, UL, B], Quantity[VR, UR]) => DeltaQuantity[VO, UO, B]
 
 @implicitNotFound("Addition not defined in scope for DeltaQuantity[${VL}, ${UL}] and Quantity[${VR}, ${UR}]")
 abstract class DeltaAddQ[B, VL, UL, VR, UR]:
     type VO
     type UO
-    def apply(ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]): DeltaQuantity[VO, UO, B]
+    val eval: (DeltaQuantity[VL, UL, B], Quantity[VR, UR]) => DeltaQuantity[VO, UO, B]
 
 @implicitNotFound("Ordering not defined in scope for DeltaQuantity[${VL}, ${UL}] and DeltaQuantity[${VR}, ${UR}]")
-abstract class DeltaOrd[B, VL, UL, VR, UR]:
-    def apply(ql: DeltaQuantity[VL, UL, B], qr: DeltaQuantity[VR, UR, B]): Int
+abstract class DeltaOrd[B, VL, UL, VR, UR] extends ((DeltaQuantity[VL, UL, B], DeltaQuantity[VR, UR, B]) => Int)
 
 /** Resolve the operator output type for left and right argument types */
 @implicitNotFound("No output type resolution in scope for argument value types ${VL} and ${VR}")
@@ -100,7 +97,3 @@ abstract class ValueResolution[VL, VR]:
 @implicitNotFound("Unable to simplify unit type ${U}")
 abstract class SimplifiedUnit[U]:
     type UO
-
-object SimplifiedUnit:
-    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
-        ${ coulomb.infra.meta.simplifiedUnit[U] }

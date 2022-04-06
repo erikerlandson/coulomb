@@ -18,22 +18,24 @@ package coulomb
 
 object policy:
     /**
-     * A "standard" policy that supports all operations, including those involving
+     * A policy that supports all standard operation definitions, including those involving
      * implicit conversions of units or value types.
      *
      * {{{
      * import coulomb.*
      * import coulomb.policy.standard.given
+     *
+     * import algebra.instances.all.given
+     * import coulomb.ops.algebra.all.given
      * }}}
      */
     object standard:
-        // export algebra.instances.all.given
-        // export coulomb.ops.standard.given
-        export coulomb.ops.algebra.all.given
+        export coulomb.ops.standard.all.given
+        export coulomb.ops.simplification.standard.given
+        export coulomb.ops.resolution.standard.given
         export coulomb.conversion.standard.value.given
         export coulomb.conversion.standard.unit.given
         export coulomb.conversion.standard.scala.given
-        export coulomb.ops.standard.optimizations.all.given
 
     /**
      * A policy that supports all standard operations, but does not support operations that
@@ -46,12 +48,14 @@ object policy:
      * {{{
      * import coulomb.*
      * import coulomb.policy.strict.given
+     *
+     * import algebra.instances.all.given
+     * import coulomb.ops.algebra.all.given
      * }}}
      */
     object strict:
-        // export algebra.instances.all.given
-        // export coulomb.ops.standard.given
-        export coulomb.ops.algebra.all.given
+        export coulomb.ops.standard.all.given
+        export coulomb.ops.simplification.standard.given
         export coulomb.conversion.standard.value.given
         export coulomb.conversion.standard.unit.given
 

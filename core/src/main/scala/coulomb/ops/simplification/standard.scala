@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package coulomb.ops.standard
+package coulomb.ops.simplification
 
-object neg:
-    import algebra.ring.AdditiveGroup
+object standard:
+    import coulomb.ops.SimplifiedUnit
 
-    import coulomb.{Quantity, withUnit}
-    import coulomb.ops.Neg
+    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
+        ${ infra.simplifiedUnit[U] }
 
-    given ctx_quantity_neg[V, U](using alg: AdditiveGroup[V]): Neg[V, U] =
-        (q: Quantity[V, U]) => alg.negate(q.value).withUnit[U]
+    object infra:
+        import scala.quoted.*
+
+        class SU[U, UOp] extends SimplifiedUnit[U]:
+            type UO = UOp
+
+        def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
+            import quotes.reflect.*
+            coulomb.infra.meta.simplify(TypeRepr.of[U]).asType match
+                case '[uo] => '{ new SU[U, uo] }
+
