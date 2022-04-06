@@ -31,6 +31,12 @@ object meta:
             case v if (v == 1) => '{ Rational.const1 }
             case _ => '{ Rational(${Expr(r.n)}, ${Expr(r.d)}) }
 
+    sealed class SigMode
+    object SigMode:
+        case object Canonical extends SigMode
+        case object Standard extends SigMode
+        case object Separate extends SigMode
+
     object rationalTE:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Rational] =
             import quotes.reflect.*
@@ -78,6 +84,7 @@ object meta:
         import quotes.reflect.*
         // the fundamental algorithmic unit analysis criterion:
         // http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/
+        given sigmode: SigMode = SigMode.Canonical
         val (rcoef, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
         if (rsig == Nil) then rcoef else
             report.error(s"unit type ${typestr(u1)} not convertable to ${typestr(u2)}")
@@ -85,6 +92,7 @@ object meta:
 
     def offset(using Quotes)(u: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
+        given sigmode: SigMode = SigMode.Standard
         u match
             case deltaunit(offset, db) =>
                 if (matchingdelta(db, b)) offset else
@@ -103,18 +111,24 @@ object meta:
 
     def convertible(using Quotes)(u1: quotes.reflect.TypeRepr, u2: quotes.reflect.TypeRepr): Boolean =
         import quotes.reflect.*
+        given sigmode: SigMode = SigMode.Canonical
         val (_, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
         rsig == Nil
 
     // returns tuple: (expr-for-coef, type-of-Res)
-    def cansig(using Quotes)(u: quotes.reflect.TypeRepr):
+    def cansig(using qq: Quotes, mode: SigMode)(u: quotes.reflect.TypeRepr):
             (Rational, List[(quotes.reflect.TypeRepr, Rational)]) =
         import quotes.reflect.*
         // if this encounters a unit type pattern it cannot expand to a canonical signature,
         // at any level, it raises a compile-time error such that the context parameter search fails.
         u match
             // identify embedded coefficients (includes '1' aka unitless)
-            case unitconst(c) => (c, Nil)
+            case unitconst(c) => mode match
+                case SigMode.Standard =>
+                    // in standard mode we preserve constants in the signature
+                    if (c == 1) (Rational.const1, Nil)
+                    else (Rational.const1, (u, Rational.const1) :: Nil)
+                case _ => (c, Nil)
             // traverse down the operator types first, since that can be done without
             // any attempts to look up context variables for BaseUnit and DerivedUnit,
             // which only happen at the leaves of expressions
@@ -142,7 +156,9 @@ object meta:
                     report.error(s"bad exponent in cansig: ${typestr(u)}")
                     (Rational.const0, Nil)
             case baseunit() => (Rational.const1, (u, Rational.const1) :: Nil)
-            case derivedunit(ucoef, usig) => (ucoef, usig)
+            case derivedunit(ucoef, usig) => mode match
+                case SigMode.Canonical => (ucoef, usig)
+                case _ => (Rational.const1, (u, Rational.const1) :: Nil)
             case _ if (!strictunitexprs) =>
                 // we consider any other type for "promotion" to base-unit only if
                 // it does not match the strict unit expression forms above, and
@@ -151,36 +167,6 @@ object meta:
             case _ =>
                 report.error(s"unknown unit expression in cansig: ${typestr(u)}")
                 (Rational.const0, Nil)
-
-    def stdsig(using Quotes)(u: quotes.reflect.TypeRepr): List[(quotes.reflect.TypeRepr, Rational)] =
-        import quotes.reflect.*
-        // if this encounters a unit type pattern it cannot expand,
-        // at any level, it raises a compile-time error such that the context parameter search fails.
-        u match
-            // traverse down the operator types first, since that can be done without
-            // any attempts to look up context variables for BaseUnit and DerivedUnit,
-            // which only happen at the leaves of expressions
-            case AppliedType(op, List(lu, ru)) if (op =:= TypeRepr.of[*]) =>
-                unifyOp(stdsig(lu), stdsig(ru), _ + _)
-            case AppliedType(op, List(lu, ru)) if (op =:= TypeRepr.of[/]) =>
-                unifyOp(stdsig(lu), stdsig(ru), _ - _)
-            case AppliedType(op, List(b, p)) if (op =:= TypeRepr.of[^]) =>
-                val rationalTE(e) = p
-                if (e == 0) Nil
-                else if (e == 1) stdsig(b)
-                else unifyPow(e, stdsig(b))
-            case unitconst(c) =>
-                if (c == 1) Nil else (rationalTE(c), Rational.const1) :: Nil
-            case baseunit() => (u, Rational.const1) :: Nil
-            case derivedunit(_, _) => (u, Rational.const1) :: Nil
-            case _ if (!strictunitexprs) =>
-                // we consider any other type for "promotion" to base-unit only if
-                // it does not match the strict unit expression forms above, and
-                // if the strict unit expression policy has not been enabled
-                (u, Rational.const1) :: Nil
-            case _ =>
-                report.error(s"unknown unit expression in stdsig: ${typestr(u)}")
-                Nil
 
     def sortsig(using Quotes)(sig: List[(quotes.reflect.TypeRepr, Rational)]):
             (List[(quotes.reflect.TypeRepr, Rational)], List[(quotes.reflect.TypeRepr, Rational)]) =
@@ -192,7 +178,8 @@ object meta:
 
     def simplify(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
-        val (un, ud) = sortsig(stdsig(u))
+        given sigmode: SigMode = SigMode.Standard
+        val (un, ud) = sortsig(cansig(u)._2)
         (uProd(un), uProd(ud)) match
             case (unitconst1(), unitconst1()) => TypeRepr.of[1]
             case (n, unitconst1()) => n
@@ -239,13 +226,17 @@ object meta:
                 case _ => false
 
     object derivedunit:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr):
+        def unapply(using qq: Quotes, mode: SigMode)(u: quotes.reflect.TypeRepr):
                 Option[(Rational, List[(quotes.reflect.TypeRepr, Rational)])] =
             import quotes.reflect.*
             Implicits.search(TypeRepr.of[DerivedUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
-                case iss: ImplicitSearchSuccess =>
-                    val AppliedType(_, List(_, d, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
-                    Some(cansig(d))
+                case iss: ImplicitSearchSuccess => mode match
+                    case SigMode.Standard =>
+                        // don't unpack the signature definition in standard mode
+                        Some((Rational.const1, (u, Rational.const1) :: Nil))
+                    case _ =>
+                        val AppliedType(_, List(_, d, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
+                        Some(cansig(d))
                 case _ => None
 
     object deltaunit:
