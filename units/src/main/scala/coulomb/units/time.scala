@@ -26,16 +26,16 @@ object time:
     export coulomb.units.si.{ Second, ctx_unit_Second }
 
     final type Minute
-    given ctx_unit_Minute: DerivedUnit[Minute, 60 * Second, "minute", "min"] with {}
+    given ctx_unit_Minute: DerivedUnit[Minute, 60 * Second, "minute", "min"] = DerivedUnit()
 
     final type Hour
-    given ctx_unit_Hour: DerivedUnit[Hour, 3600 * Second, "hour", "h"] with {}
+    given ctx_unit_Hour: DerivedUnit[Hour, 3600 * Second, "hour", "h"] = DerivedUnit()
 
     final type Day
-    given ctx_unit_Day: DerivedUnit[Day, 86400 * Second, "day", "d"] with {}
+    given ctx_unit_Day: DerivedUnit[Day, 86400 * Second, "day", "d"] = DerivedUnit()
 
     final type Week
-    given ctx_unit_Week: DerivedUnit[Week, 604800 * Second, "week", "wk"] with {}
+    given ctx_unit_Week: DerivedUnit[Week, 604800 * Second, "week", "wk"] = DerivedUnit()
 
     final type EpochTime[V, U] = DeltaQuantity[V, U, Second]
 
