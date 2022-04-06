@@ -20,49 +20,49 @@ import coulomb.define.*
 import coulomb.{`*`, `/`, `^`}
 
 final type Meter
-given ctx_unit_Meter: BaseUnit[Meter, "meter", "m"] with {}
+given ctx_unit_Meter: BaseUnit[Meter, "meter", "m"] = BaseUnit()
 
 final type Kilogram
-given ctx_unit_Kilogram: BaseUnit[Kilogram, "kilogram", "kg"] with {}
+given ctx_unit_Kilogram: BaseUnit[Kilogram, "kilogram", "kg"] = BaseUnit()
 
 final type Second
-given ctx_unit_Second: BaseUnit[Second, "second", "s"] with {}
+given ctx_unit_Second: BaseUnit[Second, "second", "s"] = BaseUnit()
 
 final type Kilo
-given ctx_unit_Kilo: DerivedUnit[Kilo, 10 ^ 3, "kilo", "k"] with {}
+given ctx_unit_Kilo: DerivedUnit[Kilo, 10 ^ 3, "kilo", "k"] = DerivedUnit()
 
 final type Mega
-given ctx_unit_Mega: DerivedUnit[Mega, 10 ^ 6, "mega", "M"] with {}
+given ctx_unit_Mega: DerivedUnit[Mega, 10 ^ 6, "mega", "M"] = DerivedUnit()
 
 final type Milli
-given ctx_unit_Milli: DerivedUnit[Milli, 10 ^ -3, "milli", "m"] with {}
+given ctx_unit_Milli: DerivedUnit[Milli, 10 ^ -3, "milli", "m"] = DerivedUnit()
 
 final type Micro
-given ctx_unit_Micro: DerivedUnit[Micro, 10 ^ -6, "micro", "μ"] with {}
+given ctx_unit_Micro: DerivedUnit[Micro, 10 ^ -6, "micro", "μ"] = DerivedUnit()
 
 final type Yard
-given ctx_unit_Yard: DerivedUnit[Yard, Meter *  (9144 / 10000), "yard", "yd"] with {}
+given ctx_unit_Yard: DerivedUnit[Yard, Meter *  (9144 / 10000), "yard", "yd"] = DerivedUnit()
 
 final type Foot
-given ctx_unit_Foot: DerivedUnit[Foot, Yard / 3, "foot", "ft"] with {}
+given ctx_unit_Foot: DerivedUnit[Foot, Yard / 3, "foot", "ft"] = DerivedUnit()
 
 final type Liter
-given ctx_unit_Liter: DerivedUnit[Liter, (Meter ^ 3) / 1000, "liter", "l"] with {}
+given ctx_unit_Liter: DerivedUnit[Liter, (Meter ^ 3) / 1000, "liter", "l"] = DerivedUnit()
 
 final type Pound
-given ctx_unit_Pound: DerivedUnit[Pound, Kilogram * (45359237 / 100000000), "pound", "lb"] with {}
+given ctx_unit_Pound: DerivedUnit[Pound, Kilogram * (45359237 / 100000000), "pound", "lb"] = DerivedUnit()
 
 final type Minute
-given ctx_unit_Minute: DerivedUnit[Minute, Second * 60, "minute", "min"] with {}
+given ctx_unit_Minute: DerivedUnit[Minute, Second * 60, "minute", "min"] = DerivedUnit()
 
 final type Hour
-given ctx_unit_Hour: DerivedUnit[Hour, Minute * 60, "hour", "hr"] with {}
+given ctx_unit_Hour: DerivedUnit[Hour, Minute * 60, "hour", "hr"] = DerivedUnit()
 
 final type Kelvin
-given ctx_unit_Kelvin: BaseUnit[Kelvin, "kelvin", "K"] with {}
+given ctx_unit_Kelvin: BaseUnit[Kelvin, "kelvin", "K"] = BaseUnit()
 
 final type Celsius
-given ctx_unit_Celsius: DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] with {}
+given ctx_unit_Celsius: DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] = DeltaUnit()
 
 final type Fahrenheit
-given ctx_unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] with {}
+given ctx_unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] = DeltaUnit()
