@@ -99,57 +99,49 @@ object javatime:
         object scala:
             given ctx_Conversion_QD[V, U](using q2d: QuantityDuration[V, U]):
                     Conversion[Quantity[V, U], Duration] =
-                new Conversion[Quantity[V, U], Duration]:
-                    def apply(q: Quantity[V, U]): Duration = q2d(q)
+                (q: Quantity[V, U]) => q2d(q)
 
             given ctx_Conversion_DQ[V, U](using d2q: DurationQuantity[V, U]):
                     Conversion[Duration, Quantity[V, U]] =
-                new Conversion[Duration, Quantity[V, U]]:
-                    def apply(d: Duration): Quantity[V, U] = d2q(d)
+                (d: Duration) => d2q(d)
 
             given ctx_Conversion_EI[V, U](using q2d: QuantityDuration[V, U]):
                     Conversion[EpochTime[V, U], Instant] =
-                new Conversion[EpochTime[V, U], Instant]:
-                    def apply(e: EpochTime[V, U]): Instant =
-                        Instant.EPOCH.plus(q2d(e.value.withUnit[U]))
+                (e: EpochTime[V, U]) => Instant.EPOCH.plus(q2d(e.value.withUnit[U]))
 
             given ctx_Conversion_IE[V, U](using d2q: DurationQuantity[V, U]):
                     Conversion[Instant, EpochTime[V, U]] =
-                new Conversion[Instant, EpochTime[V, U]]:
-                    def apply(i: Instant): EpochTime[V, U] =
-                        val d = Duration.ofSeconds(i.getEpochSecond(), i.getNano())
-                        d2q(d).value.withEpochTime[U]
+                (i: Instant) =>
+                    val d = Duration.ofSeconds(i.getEpochSecond(), i.getNano())
+                    d2q(d).value.withEpochTime[U]
 
         object explicit:
             given ctx_DurationQuantity[V, U](using
                 uc: UnitConversion[Rational, Second, U],
                 vc: ValueConversion[Rational, V]
                     ): DurationQuantity[V, U] =
-                new DurationQuantity[V, U]:
-                    def apply(duration: Duration): Quantity[V, U] =
-                          val seconds: Long = duration.getSeconds()
-                          val nano: Int = duration.getNano()
-                          val qsec: Rational = Rational(seconds) + Rational(nano, 1000000000)
-                          vc(uc(qsec)).withUnit[U]
+                (duration: Duration) =>
+                    val seconds: Long = duration.getSeconds()
+                    val nano: Int = duration.getNano()
+                    val qsec: Rational = Rational(seconds) + Rational(nano, 1000000000)
+                    vc(uc(qsec)).withUnit[U]
 
             given ctx_TruncatingDurationQuantity[V, U](using
                 uc: UnitConversion[Rational, Second, U],
                 vc: TruncatingValueConversion[Rational, V]
                     ): TruncatingDurationQuantity[V, U] =
-                new TruncatingDurationQuantity[V, U]:
-                    def apply(duration: Duration): Quantity[V, U] =
-                          val seconds: Long = duration.getSeconds()
-                          val nano: Int = duration.getNano()
-                          val qsec: Rational = Rational(seconds) + Rational(nano, 1000000000)
-                          vc(uc(qsec)).withUnit[U]
+                (duration: Duration) =>
+                    val seconds: Long = duration.getSeconds()
+                    val nano: Int = duration.getNano()
+                    val qsec: Rational = Rational(seconds) + Rational(nano, 1000000000)
+                    vc(uc(qsec)).withUnit[U]
 
             given ctx_QuantityDuration[V, U](using
                 vc: ValueConversion[V, Rational],
                 uc: UnitConversion[Rational, U, Second]
                     ): QuantityDuration[V, U] =
-                new QuantityDuration[V, U]:
-                    def apply(q: Quantity[V, U]): Duration =
-                        val qsec: Rational = uc(vc(q.value))
-                        val secs: Long = qsec.toLong
-                        val nano: Int = ((qsec - Rational(secs)) * Rational(1000000000)).toInt
-                        Duration.ofSeconds(secs, nano)
+                (q: Quantity[V, U]) =>
+                    val qsec: Rational = uc(vc(q.value))
+                    val secs: Long = qsec.toLong
+                    val nano: Int = ((qsec - Rational(secs)) * Rational(1000000000)).toInt
+                    Duration.ofSeconds(secs, nano)
