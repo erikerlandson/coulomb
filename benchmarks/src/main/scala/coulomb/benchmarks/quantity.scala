@@ -32,9 +32,8 @@ class QuantityBenchmark:
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
     import coulomb.ops.algebra.all.given
-    import coulomb.ops.standard.given
-    import coulomb.ops.resolution.standard.given
-    import coulomb.conversion.standard.all.given
+
+    import coulomb.policy.standard.given
 
     var data: Vector[Quantity[Double, Meter]] = Vector.empty[Quantity[Double, Meter]]
 
