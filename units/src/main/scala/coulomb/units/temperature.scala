@@ -26,10 +26,10 @@ object temperature:
     export coulomb.units.si.{ Kelvin, ctx_unit_Kelvin }
 
     final type Celsius
-    given ctx_unit_Celsius: DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] with {}
+    given ctx_unit_Celsius: DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] = DeltaUnit()
 
     final type Fahrenheit
-    given ctx_unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] with {}
+    given ctx_unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] = DeltaUnit()
 
     final type Temperature[V, U] = DeltaQuantity[V, U, Kelvin]
 

@@ -26,25 +26,25 @@ object mksa:
     export coulomb.units.mks.{*, given}
     
     final type Coulomb
-    given ctx_unit_Coulomb: DerivedUnit[Coulomb, Ampere * Second, "coulomb", "C"] with {}
+    given ctx_unit_Coulomb: DerivedUnit[Coulomb, Ampere * Second, "coulomb", "C"] = DerivedUnit()
 
     final type Volt
-    given ctx_unit_Volt: DerivedUnit[Volt, Watt / Ampere, "volt", "V"] with {}
+    given ctx_unit_Volt: DerivedUnit[Volt, Watt / Ampere, "volt", "V"] = DerivedUnit()
 
     final type Ohm
-    given ctx_unit_Ohm: DerivedUnit[Ohm, Volt / Ampere, "ohm", "Ω"] with {}
+    given ctx_unit_Ohm: DerivedUnit[Ohm, Volt / Ampere, "ohm", "Ω"] = DerivedUnit()
 
     final type Farad
-    given ctx_unit_Farad: DerivedUnit[Farad, Coulomb / Volt, "farad", "F"] with {}
+    given ctx_unit_Farad: DerivedUnit[Farad, Coulomb / Volt, "farad", "F"] = DerivedUnit()
 
     final type Siemens
-    given ctx_unit_Siemens: DerivedUnit[Siemens, 1 / Ohm, "siemens", "S"] with {}
+    given ctx_unit_Siemens: DerivedUnit[Siemens, 1 / Ohm, "siemens", "S"] = DerivedUnit()
 
     final type Weber
-    given ctx_unit_Weber: DerivedUnit[Weber, Volt * Second, "weber", "Wb"] with {}
+    given ctx_unit_Weber: DerivedUnit[Weber, Volt * Second, "weber", "Wb"] = DerivedUnit()
 
     final type Tesla
-    given ctx_unit_Tesla: DerivedUnit[Tesla, Weber / (Meter ^ 2), "tesla", "T"] with {}
+    given ctx_unit_Tesla: DerivedUnit[Tesla, Weber / (Meter ^ 2), "tesla", "T"] = DerivedUnit()
 
     final type Henry
-    given ctx_unit_Henry: DerivedUnit[Henry, Weber / Ampere, "henry", "H"] with {}
+    given ctx_unit_Henry: DerivedUnit[Henry, Weber / Ampere, "henry", "H"] = DerivedUnit()
