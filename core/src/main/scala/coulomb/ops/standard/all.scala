@@ -16,20 +16,17 @@
 
 package coulomb.ops.standard
 
-// eventually these go in `object all`
-export neg.given
-export add.given
-export sub.given
-export mul.given
-export div.given
-export tquot.given
-export pow.given
-export tpow.given
-export ord.given
-export deltasub.given
-export deltasubq.given
-export deltaaddq.given
-export deltaord.given
-
-// will be exported via policies
-export coulomb.ops.simplification.standard.given
+object all:
+    export neg.given
+    export add.given
+    export sub.given
+    export mul.given
+    export div.given
+    export tquot.given
+    export pow.given
+    export tpow.given
+    export ord.given
+    export deltasub.given
+    export deltasubq.given
+    export deltaaddq.given
+    export deltaord.given

@@ -57,7 +57,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("toValue") {
-        import coulomb.conversion.standard.value.given
+        import coulomb.policy.standard.given
 
         1d.withEpochTime[Second].toValue[Float].assertDQ[Float, Second](1)
         1L.withEpochTime[Second].toValue[Int].assertDQ[Int, Second](1)
@@ -67,7 +67,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("toUnit") {
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         36d.withEpochTime[Hour].toUnit[Day].assertDQD[Double, Day](1.5)
 
@@ -77,8 +77,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("subtraction strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+        import coulomb.policy.strict.given
 
         (10d.withEpochTime[Second] - 1d.withEpochTime[Second]).assertQ[Double, Second](9)
         (10f.withEpochTime[Second] - 1f.withEpochTime[Second]).assertQ[Float, Second](9)
@@ -91,9 +90,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("subtraction standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         // different value type, same unit type 
         (61d.withEpochTime[Second] - 1f.withEpochTime[Second]).assertQ[Double, Second](60)
@@ -108,8 +105,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("quantity subtraction strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+        import coulomb.policy.strict.given
 
         (10d.withEpochTime[Second] - 1d.withUnit[Second]).assertDQ[Double, Second](9)
         (10f.withEpochTime[Second] - 1f.withUnit[Second]).assertDQ[Float, Second](9)
@@ -122,9 +118,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("quantity subtraction standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         // different value type, same unit type 
         (61d.withEpochTime[Second] - 1f.withUnit[Second]).assertDQ[Double, Second](60)
@@ -139,8 +133,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("quantity addition strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+        import coulomb.policy.strict.given
 
         (10d.withEpochTime[Second] + 1d.withUnit[Second]).assertDQ[Double, Second](11)
         (10f.withEpochTime[Second] + 1f.withUnit[Second]).assertDQ[Float, Second](11)
@@ -153,9 +146,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("quantity addition standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         // different value type, same unit type 
         (61d.withEpochTime[Second] + 1f.withUnit[Second]).assertDQ[Double, Second](62)
@@ -170,8 +161,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("less-than strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+        import coulomb.policy.strict.given
 
         assertEquals(3f.withEpochTime[Week] < 4f.withEpochTime[Week], true)
         assertEquals(4.withEpochTime[Week] < 4.withEpochTime[Week], false)
@@ -184,9 +174,7 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("less-than standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         assertEquals(4f.withEpochTime[Week] < 4d.withEpochTime[Week], false)
         assertEquals(3f.withEpochTime[Day] < 3f.withEpochTime[Week], true)
@@ -202,9 +190,9 @@ class JavaTimeSuite extends CoulombSuite:
     import coulomb.units.si.prefixes.{*, given}
     import coulomb.units.javatime.*
     import algebra.instances.all.given
+    import coulomb.policy.standard.given
 
     test("toQuantity") {
-        import coulomb.conversion.standard.all.given
         import coulomb.units.javatime.conversions.explicit.given
 
         val dur = Duration.ofSeconds(70, 400000000)
@@ -216,8 +204,6 @@ class JavaTimeSuite extends CoulombSuite:
     }
 
     test("toDuration") {
-        import coulomb.conversion.standard.all.given
-        import coulomb.ops.standard.given
         import coulomb.units.javatime.conversions.explicit.given
 
         val q = 1d.withUnit[Hour] + 777.1d.withUnit[Nano * Second]
@@ -227,7 +213,6 @@ class JavaTimeSuite extends CoulombSuite:
     }
 
     test("toEpochTime") {
-        import coulomb.conversion.standard.all.given
         import coulomb.units.javatime.conversions.explicit.given
 
         val ins = Instant.parse("1969-07-20T00:00:00Z")
@@ -239,7 +224,6 @@ class JavaTimeSuite extends CoulombSuite:
     }
 
     test("toInstant") {
-        import coulomb.conversion.standard.all.given
         import coulomb.units.javatime.conversions.explicit.given
 
         val et = (-165L).withEpochTime[Day]       
@@ -248,8 +232,6 @@ class JavaTimeSuite extends CoulombSuite:
 
     test("implicit Q -> D") {
         import scala.language.implicitConversions
-        import coulomb.conversion.standard.all.given
-        import coulomb.ops.standard.given
         import coulomb.units.javatime.conversions.all.given
         
         def f(d: Duration): (Long, Int) = (d.getSeconds(), d.getNano())
@@ -259,8 +241,6 @@ class JavaTimeSuite extends CoulombSuite:
 
     test("implicit D -> Q") {
         import scala.language.implicitConversions
-        import coulomb.conversion.standard.all.given
-        import coulomb.ops.standard.given
         import coulomb.units.javatime.conversions.all.given
 
         def f(q: Quantity[Float, Minute]): Float = q.value
@@ -270,8 +250,6 @@ class JavaTimeSuite extends CoulombSuite:
 
     test("implicit ET -> I") {
         import scala.language.implicitConversions
-        import coulomb.conversion.standard.all.given
-        import coulomb.ops.standard.given
         import coulomb.units.javatime.conversions.all.given
 
         def f(i: Instant): String = i.toString()
@@ -281,8 +259,6 @@ class JavaTimeSuite extends CoulombSuite:
 
     test("implicit I -> ET") {
         import scala.language.implicitConversions
-        import coulomb.conversion.standard.all.given
-        import coulomb.ops.standard.given
         import coulomb.units.javatime.conversions.all.given
 
         def f(et: EpochTime[Double, Day]): Double = et.value

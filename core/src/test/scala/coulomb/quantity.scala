@@ -54,8 +54,8 @@ class QuantitySuite extends CoulombSuite:
         assertEquals(1.withUnit[Second].showFull, "1 second")
     }
 
-    test("toValue standard") {
-        import coulomb.conversion.standard.value.given
+    test("toValue") {
+        import coulomb.policy.strict.given
 
         1.withUnit[Meter].toValue[Int].assertQ[Int, Meter](1)
         1.withUnit[Meter].toValue[Long].assertQ[Long, Meter](1)
@@ -76,10 +76,6 @@ class QuantitySuite extends CoulombSuite:
         assertCE("1d.withUnit[Meter].toValue[Long]")
         1d.withUnit[Meter].toValue[Float].assertQ[Float, Meter](1)
         1d.withUnit[Meter].toValue[Double].assertQ[Double, Meter](1)
-    }
-
-    test("toValue standard truncating") {
-        import coulomb.conversion.standard.value.given
 
         1.5f.withUnit[Meter].tToValue[Int].assertQ[Int, Meter](1)
         0.999f.withUnit[Meter].tToValue[Long].assertQ[Long, Meter](0)
@@ -88,28 +84,24 @@ class QuantitySuite extends CoulombSuite:
         0.999d.withUnit[Meter].tToValue[Long].assertQ[Long, Meter](0)
     }
 
-    test("toUnit standard") {
-        import coulomb.conversion.standard.explicit.given
+    test("toUnit") {
+        import coulomb.policy.strict.given
 
         1.5f.withUnit[Minute].toUnit[Second].assertQ[Float, Second](90)
         1d.withUnit[Meter].toUnit[Yard].assertQD[Double, Yard](1.0936132983377078)
 
         assertCE("1.withUnit[Minute].toUnit[Second]")
         assertCE("1L.withUnit[Yard].toUnit[Meter]")
-    }
-
-    test("toUnit standard truncating") {
-        import coulomb.conversion.standard.unit.given
 
         1.withUnit[Minute].tToUnit[Second].assertQ[Int, Second](60)
         1L.withUnit[Yard].tToUnit[Meter].assertQ[Long, Meter](0)
     }
 
     test("implicit conversions") {
-        import coulomb.conversion.standard.explicit.given
+        // strict policy does not include implicit conversions
+        import coulomb.policy.strict.given
 
-        // implicit conversions only happen if you import them,
-        // and set coulomb policy to allow them
+        // implicit conversions only happen if you import them into scope
         // https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
         def f(q: Quantity[Double, Meter]): Double = q.value
         assertCE("f(1d.withUnit[Yard])")
@@ -119,16 +111,15 @@ class QuantitySuite extends CoulombSuite:
         f(1.withUnit[Meter].toValue[Double]).assertVTD[Double](1.0)
 
         object t {
-            // enabling implicit conversions should allow them
+            // standard policy puts implicit conversions in scope
+            import coulomb.policy.standard.given
             import scala.language.implicitConversions
-            import coulomb.conversion.standard.scala.given
             f(1d.withUnit[Yard]).assertVTD[Double](0.9144)
         }
     }
 
-    test("addition standard strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+    test("addition strict") {
+        import coulomb.policy.strict.given
 
         // adding w/ same value and unit requires no implicit conversion
         (1d.withUnit[Second] + 1d.withUnit[Second]).assertQ[Double, Second](2)
@@ -146,9 +137,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("addition standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         // same value type, different units
         (1d.withUnit[Kilo * Second] + 1d.withUnit[Second]).assertQD[Double, Kilo * Second](1.001)
@@ -194,13 +183,8 @@ class QuantitySuite extends CoulombSuite:
         // unsafe truncating conversions should fail
         assertCE("1.withUnit[Meter] + 1.withUnit[Yard]")
         assertCE("1L.withUnit[Meter] + 1L.withUnit[Yard]")
-    }
 
-    test("addition standard truncating") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
-
+        // truncating
         (1L.withUnit[Second] + 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](61)
         (1L.withUnit[Second] + 1.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](61)
         (1.withUnit[Second] + 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](61)
@@ -217,9 +201,8 @@ class QuantitySuite extends CoulombSuite:
         (1L.withUnit[Yard] + 3L.withUnit[Foot].tToUnit[Yard]).assertQ[Long, Yard](2)
     }
 
-    test("subtraction standard strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+    test("subtraction strict") {
+        import coulomb.policy.strict.given
 
         // same value and unit requires no implicit conversion
         (3d.withUnit[Second] - 1d.withUnit[Second]).assertQ[Double, Second](2)
@@ -237,9 +220,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("subtraction standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         // same value type, different units
         (1d.withUnit[Kilo * Second] - 1d.withUnit[Second]).assertQD[Double, Kilo * Second](0.999)
@@ -285,13 +266,8 @@ class QuantitySuite extends CoulombSuite:
         // unsafe truncating conversions should fail
         assertCE("1.withUnit[Meter] - 1.withUnit[Yard]")
         assertCE("1L.withUnit[Meter] - 1L.withUnit[Yard]")
-    }
 
-    test("subtraction standard truncating") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
-
+        // truncating
         (61L.withUnit[Second] - 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](1)
         (61L.withUnit[Second] - 1.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](1)
         (61.withUnit[Second] - 1L.withUnit[Minute].tToUnit[Second]).assertQ[Long, Second](1)
@@ -308,9 +284,8 @@ class QuantitySuite extends CoulombSuite:
         (2L.withUnit[Yard] - 3L.withUnit[Foot].tToUnit[Yard]).assertQ[Long, Yard](1)
     }
 
-    test("multiplication standard strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+    test("multiplication strict") {
+        import coulomb.policy.strict.given
 
         // same value types require no implicit conversion
         (2d.withUnit[Meter] * 3d.withUnit[Meter]).assertQ[Double, Meter ^ 2](6)
@@ -327,9 +302,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("multiplication standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         // differing value types
         (3d.withUnit[Meter] * 5d.withUnit[Meter]).assertQ[Double, Meter ^ 2](15)
@@ -353,9 +326,8 @@ class QuantitySuite extends CoulombSuite:
         (3.withUnit[Second] * 5.withUnit[Kilogram]).assertQ[Int, Second * Kilogram](15)
     }
 
-    test("division standard strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+    test("division strict") {
+        import coulomb.policy.strict.given
 
         // same value types require no implicit conversion
         (12d.withUnit[Meter] / 3d.withUnit[Second]).assertQ[Double, Meter / Second](4)
@@ -373,9 +345,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("division standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         (5d.withUnit[Meter] / 2d.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
         (5d.withUnit[Meter] / 2f.withUnit[Second]).assertQ[Double, Meter / Second](2.5)
@@ -399,9 +369,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("truncating division standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         (5d.withUnit[Meter] `tquot` 2d.withUnit[Second]).assertQ[Double, Meter / Second](2)
         (5f.withUnit[Meter] `tquot` 2f.withUnit[Second]).assertQ[Float, Meter / Second](2)
@@ -414,8 +382,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("power standard") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         2d.withUnit[Meter].pow[0].assertQ[Double, 1](1)
         2d.withUnit[Meter].pow[2].assertQ[Double, Meter ^ 2](4)
@@ -444,8 +411,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("truncating power standard") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         10d.withUnit[Meter].tpow[0].assertQ[Double, 1](1)
         10d.withUnit[Meter].tpow[2].assertQ[Double, Meter ^ 2](100)
@@ -473,9 +439,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("constants in simplified unit types") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         // changes/improvements to simplification algorithm may change these -
         // it is more important that they be correct than have some particular form, but
@@ -489,7 +453,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("negation standard") {
-        import coulomb.ops.standard.given
+        import coulomb.policy.standard.given
 
         (-(7d.withUnit[Liter])).assertQ[Double, Liter](-7)
         (-(7f.withUnit[Liter])).assertQ[Float, Liter](-7)
@@ -497,9 +461,8 @@ class QuantitySuite extends CoulombSuite:
         (-(7.withUnit[Liter])).assertQ[Int, Liter](-7)
     }
 
-    test("equality standard strict") {
-        import coulomb.ops.standard.given
-        import coulomb.conversion.standard.explicit.given
+    test("equality strict") {
+        import coulomb.policy.strict.given
 
         assertEquals(1d.withUnit[Meter] === 1d.withUnit[Meter], true)
         assertEquals(1f.withUnit[Meter] === 1f.withUnit[Meter], true)
@@ -516,9 +479,7 @@ class QuantitySuite extends CoulombSuite:
     }
 
     test("equality standard") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
+        import coulomb.policy.standard.given
 
         assertEquals(2d.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], true)
         assertEquals(2d.withUnit[(1 / 2) * Meter] === 2f.withUnit[Meter], false)
@@ -539,13 +500,8 @@ class QuantitySuite extends CoulombSuite:
         assertEquals(2.withUnit[(1 / 2) * Meter] === 1f.withUnit[Meter], true)
         assertCE("2.withUnit[(1 / 2) * Meter] === 1L.withUnit[Meter]")
         assertCE("2.withUnit[(1 / 2) * Meter] === 1.withUnit[Meter]")
-    }
 
-    test("equality standard truncating") {
-        import coulomb.ops.standard.given
-        import coulomb.ops.resolution.standard.given
-        import coulomb.conversion.standard.all.given
-
+        // truncating
         assertEquals(2L.withUnit[(1 / 2) * Meter] === 1d.withUnit[Meter], true)
         assertEquals(2L.withUnit[(1 / 2) * Meter] === 2f.withUnit[Meter], false)
         assertEquals(2L.withUnit[(1 / 2) * Meter].tToUnit[Meter] === 1L.withUnit[Meter], true)
@@ -563,13 +519,12 @@ class OptimizedQuantitySuite extends CoulombSuite:
     import algebra.instances.all.given
     import coulomb.ops.algebra.all.given
 
-    import coulomb.conversion.standard.all.given
+    import coulomb.policy.standard.given
 
     // I need to test with optimizations in scope
     // it would be ideal to somehow compile the main QuantitySuite with
     // and without these optimizations
     import coulomb.ops.standard.optimizations.all.given
-    import coulomb.ops.standard.given
     // it is important that non-optimized be imported at the same scope level (or higher)
     // otherwise it will override the optimizations if it is at narrower scope
 
