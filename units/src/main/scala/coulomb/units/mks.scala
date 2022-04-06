@@ -29,22 +29,22 @@ object mks:
     }
 
     final type Radian
-    given ctx_unit_Radian: DerivedUnit[Radian, 1, "radian", "rad"] with {}
+    given ctx_unit_Radian: DerivedUnit[Radian, 1, "radian", "rad"] = DerivedUnit()
 
     final type Steradian
-    given ctx_unit_Steradian: DerivedUnit[Steradian, 1, "steradian", "sr"] with {}
+    given ctx_unit_Steradian: DerivedUnit[Steradian, 1, "steradian", "sr"] = DerivedUnit()
 
     final type Hertz
-    given ctx_unit_Hertz: DerivedUnit[Hertz, 1 / Second, "hertz", "Hz"] with {}
+    given ctx_unit_Hertz: DerivedUnit[Hertz, 1 / Second, "hertz", "Hz"] = DerivedUnit()
 
     final type Newton
-    given ctx_unit_Newton: DerivedUnit[Newton, Kilogram * Meter / (Second ^ 2), "newton", "N"] with {}
+    given ctx_unit_Newton: DerivedUnit[Newton, Kilogram * Meter / (Second ^ 2), "newton", "N"] = DerivedUnit()
 
     final type Joule
-    given ctx_unit_Joule: DerivedUnit[Joule, Newton * Meter, "joule", "J"] with {}
+    given ctx_unit_Joule: DerivedUnit[Joule, Newton * Meter, "joule", "J"] = DerivedUnit()
 
     final type Watt
-    given ctx_unit_Watt: DerivedUnit[Watt, Joule / Second, "watt", "W"] with {}
+    given ctx_unit_Watt: DerivedUnit[Watt, Joule / Second, "watt", "W"] = DerivedUnit()
 
     final type Pascal
-    given ctx_unit_Pascal: DerivedUnit[Pascal, Newton / (Meter ^ 2), "pascal", "Pa"] with {}
+    given ctx_unit_Pascal: DerivedUnit[Pascal, Newton / (Meter ^ 2), "pascal", "Pa"] = DerivedUnit()
