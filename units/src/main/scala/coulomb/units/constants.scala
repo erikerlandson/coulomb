@@ -20,6 +20,7 @@ object constants:
     import coulomb.*
     import coulomb.define.*
     import coulomb.rational.Rational
+    import coulomb.conversion.ValueConversion
 
     import coulomb.units.si.{*, given}
     import coulomb.units.mksa.{*, given}
@@ -30,20 +31,32 @@ object constants:
     final type PlanckConstant
     given ctx_unit_PlanckConstant: DerivedUnit[PlanckConstant, (662607015 * (10 ^ -42)) * Joule * Second, "planck-constant", "ℎ"] = DerivedUnit()
 
-    // would prefer to use something like `Quantity[Rational, ?]` instead of `Any` here
-    transparent inline def constq[CU]: Any = ${ meta.constq[CU] }
+    transparent inline def constant[V, CU](using
+        cq: ConstQ[CU],
+        vc: ValueConversion[Rational, V]
+            ): Quantity[V, cq.QU] =
+        vc(cq.value).withUnit[cq.QU]
 
-    object meta:
+    abstract class ConstQ[CU]:
+        type QU
+        val value: Rational
+
+    object ConstQ:
         import scala.quoted.*
         import coulomb.infra.meta.{*, given}
 
-        def constq[CU](using Quotes, Type[CU]): Expr[Any] =
+        class NC[CU, QUp](val value: Rational) extends ConstQ[CU]:
+            type QU = QUp
+
+        transparent inline given ctx_ConstQ[CU]: ConstQ[CU] = ${ constq[CU] }
+
+        def constq[CU](using Quotes, Type[CU]): Expr[ConstQ[CU]] =
             import quotes.reflect.*
             given sigmode: SigMode = SigMode.Separate
             TypeRepr.of[CU] match
                 case derivedunit(v, sig) =>
                     simplifysig(sig).asType match
-                        case '[qu] => '{ ${Expr(v)}.withUnit[qu] }
+                        case '[qu] => '{ new NC[CU, qu](${Expr(v)}) }
                 case u =>
                     report.error(s"unrecognized unit declaration: ${typestr(u)}")
-                    '{ Rational.const0.withUnit[Nothing] }
+                    '{ new NC[CU, Nothing](Rational.const0) }
