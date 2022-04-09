@@ -20,9 +20,44 @@ import coulomb.rational.Rational
 import coulomb.*
 import coulomb.define.*
 
+import java.lang.{ClassLoader, Package}
+
+def allDefinedPackages(loader: ClassLoader): Vector[Package] =
+    if (loader == null)
+        Vector.empty[Package]
+    else
+        allDefinedPackages(loader.getParent()) ++ loader.getDefinedPackages()
+     
+def allClassPathURLs(loader: ClassLoader): Vector[java.net.URL] =
+    loader match
+        case null => Vector.empty[java.net.URL]
+        case u: java.net.URLClassLoader => allClassPathURLs(loader.getParent) ++ u.getURLs()
+        case _ => allClassPathURLs(loader.getParent)
+
+inline def test(inline s: String): String = ${ meta.test('s) }
+
 object meta:
     import scala.quoted.*
     import scala.language.implicitConversions
+
+    def test(using Quotes)(s: Expr[String]): Expr[String] =
+        import quotes.reflect.*
+        //val sym = Symbol.requiredPackage(s.valueOrAbort)
+        val root = defn.RootPackage
+        val sym = root.declarations.find { s => s.toString() == "object coulomb" }
+        val defs = sym.get.declarations.map { s => (s.toString(), s.fullName, s.isPackageDef, s.isClassDef) }
+        //val sym2 = root.declarations.map { s => (s.toString(), s.fullName, s.isPackageDef, s.isClassDef) }
+        //Expr(s"${sym.fullName}: ${sym.exists} ${sym.isDefinedInCurrentRun} ${sym.maybeOwner.fullName}")
+        //Expr(defs.mkString("\n"))
+        val s2 = defn.RootPackage.declaredField(s.valueOrAbort)
+        Expr(s2.toString())
+
+    def test2(using Quotes)(s: String): Expr[String] = Expr("goo")
+      /*
+        import quotes.reflect.*
+        val s2 = defn.RootPackage.declaredField(s)
+        Expr(s2.toString())
+*/
 
     given ctx_RationalToExpr: ToExpr[Rational] with
         def apply(r: Rational)(using Quotes): Expr[Rational] = r match

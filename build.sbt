@@ -37,6 +37,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .settings(commonSettings :_*)
   .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.7.0")
   .jsSettings(Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*serde.scala")
+  .jvmSettings(libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value)
 
 lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
