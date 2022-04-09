@@ -27,6 +27,10 @@ object constants:
     import coulomb.conversion.ValueConversion
 
     export coulomb.units.mksa.{*, given}
+    export coulomb.units.si.{
+        Mole, ctx_unit_Mole,
+        Kelvin, ctx_unit_Kelvin
+    }
 
     /**
      * Obtain a Quantity representing a physical constant
@@ -67,6 +71,26 @@ object constants:
     /** Vacuum electric permittivity: 8.8541878128(13)×10−12 F/m */
     final type VacuumElectricPermittivity
     given ctx_unit_VacuumElectricPermittivity: DerivedUnit[VacuumElectricPermittivity, (88541878128L / (10 ^ 22)) * Farad / Meter, "vacuum-electric-permittivity", "ε₀"] = DerivedUnit() 
+
+    /** Vacuum magnetic permeability: 1.25663706212(19)×10−6 N⋅A−2 */
+    final type VacuumMagneticPermeability
+    given ctx_unit_VacuumMagneticPermeability: DerivedUnit[VacuumMagneticPermeability, (125663706212L / (10 ^ 17)) * Newton / (Ampere ^ 2), "vacuum-magnetic-permeability", "μ₀"] = DerivedUnit()
+
+    /** Characteristic impedance of vacuum: 376.730313668(57) Ω */
+    final type CharacteristicImpedanceOfVacuum
+    given ctx_unit_CharacteristicImpedanceOfVacuum: DerivedUnit[CharacteristicImpedanceOfVacuum, (376730313668L / (10 ^ 9)) * Ohm, "characteristic-impedance-of-vacuum", "Z₀"] = DerivedUnit()
+
+    /** The elementary charge: 1.602176634×10−19 C */
+    final type ElementaryCharge
+    given ctx_unit_ElementaryCharge: DerivedUnit[ElementaryCharge, (1602176634L / (10 ^ 28)) * Coulomb, "elementary-charge", "e"] = DerivedUnit()
+
+    /** Avogadro's number: 6.02214076×10+23 mol-1 */
+    final type AvogadroConstant
+    given ctx_unit_AvogadroConstant: DerivedUnit[AvogadroConstant, (602214076L * (10 ^ 15)) / Mole, "avogadro-constant", "Nₐ"] = DerivedUnit()
+
+    /** Boltzmann's constant: 1.380649×10−23 J⋅K−1 */
+    final type BoltzmannConstant
+    given ctx_unit_BoltzmannConstant: DerivedUnit[BoltzmannConstant, (1380649L / (10 ^ 29)) * Joule / Kelvin, "boltzmann-constant", "k"] = DerivedUnit()
 
     object infra:
         abstract class ConstQ[CU]:
