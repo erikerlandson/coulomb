@@ -42,10 +42,10 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  */
 inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
 
-export quantity.Quantity
-export quantity.withUnit
+export qopaque.Quantity
+export qopaque.withUnit
 
-object quantity:
+object qopaque:
     opaque type Quantity[V, U] = V
 
     // lift
@@ -141,4 +141,4 @@ object quantity:
         inline def >=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) >= 0
     end extension
-end quantity
+end qopaque

@@ -16,10 +16,10 @@
 
 package coulomb
 
-export deltaquantity.DeltaQuantity
-export deltaquantity.withDeltaUnit
+export dqopaque.DeltaQuantity
+export dqopaque.withDeltaUnit
 
-object deltaquantity:
+object dqopaque:
     import coulomb.ops.*
     import coulomb.conversion.*
 
@@ -103,4 +103,4 @@ object deltaquantity:
         inline def >=[VR, UR](qr: DeltaQuantity[VR, UR, B])(using ord: DeltaOrd[B, VL, UL, VR, UR]): Boolean =
             ord(ql, qr) >= 0
     end extension
-end deltaquantity
+end dqopaque

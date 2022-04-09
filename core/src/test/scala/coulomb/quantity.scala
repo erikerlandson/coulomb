@@ -449,7 +449,7 @@ class QuantitySuite extends CoulombSuite:
         (2.withUnit[Meter] * 3.withUnit[Meter * 1000]).assertQ[Int, (Meter ^ 2) * 1000](6)
 
         (5d.withUnit[((10 ^ 100)/3) * Meter] / 2d.withUnit[Second])
-            .assertQ[Double, ((10 ^ 100) * Meter) / (3 * Second)](2.5)
+            .assertQ[Double, (((10 ^ 100) / 3) * Meter) / Second](2.5)
     }
 
     test("negation standard") {
