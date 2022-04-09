@@ -21,7 +21,7 @@ import spire.math.{ Rational, SafeLong }
 import coulomb.rational.{ Rational => CoulombRational }
 
 object coefficients:
-    inline def coefficientRational[U1, U2]: Rational = ${ meta.coefficientRational[U1, U2] }
+    inline def coefficientRational[U1, U2]: Rational = ${ meta.coefficientSpireRational[U1, U2] }
 
     object meta:
         import scala.quoted.*
@@ -36,13 +36,13 @@ object coefficients:
                 case v if (v.isValidLong) => '{ SafeLong(${Expr(s.getLong.get)}) }
                 case _ => '{ SafeLong(${Expr(s.toBigInt)}) }
 
-        given ctx_RationalToExpr: ToExpr[Rational] with
+        given ctx_SpireRationalToExpr: ToExpr[Rational] with
             def apply(r: Rational)(using Quotes): Expr[Rational] = r match
                 case v if (v == Rational.zero) => '{ Rational.zero }
                 case v if (v == Rational.one) => '{ Rational.one }
                 case _ => '{ Rational(${Expr(r.numerator)}, ${Expr(r.denominator)}) }
 
-        def coefficientRational[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Rational] =
+        def coefficientSpireRational[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Rational] =
             import quotes.reflect.*
             val c: CoulombRational = coef(TypeRepr.of[U1], TypeRepr.of[U2])
             Expr(Rational(c.n, c.d))
