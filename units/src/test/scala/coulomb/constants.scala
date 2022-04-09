@@ -23,4 +23,7 @@ class ConstantsUnitsSuite extends CoulombSuite:
 
     test("physical constant values") {
         constant[Double, SpeedOfLight].assertQD[Double, Meter / Second](299792458)
+        constant[Double, PlanckConstant].assertQD[Double, Joule * Second](6.62607015e-34)
+        constant[Double, ElectronGFactor].assertQD[Double, 1](-2.00231930436256)
+        constant[Double, FermiCouplingConstant].assertQD[Double, 1 / ((Giga ^ 2) * (ElectronVolt ^ 2))](1.1663787e-5)
     }

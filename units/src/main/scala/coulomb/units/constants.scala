@@ -31,6 +31,9 @@ object constants:
         Mole, ctx_unit_Mole,
         Kelvin, ctx_unit_Kelvin
     }
+    export coulomb.units.si.prefixes.{
+        Giga, ctx_unit_Giga
+    }
 
     /**
      * Obtain a Quantity representing a physical constant
@@ -91,6 +94,66 @@ object constants:
     /** Boltzmann's constant: 1.380649×10−23 J⋅K−1 */
     final type BoltzmannConstant
     given ctx_unit_BoltzmannConstant: DerivedUnit[BoltzmannConstant, (1380649L / (10 ^ 29)) * Joule / Kelvin, "boltzmann-constant", "k"] = DerivedUnit()
+
+    /** Conductance quantum: 7.748091729...×10−5 S */
+    final type ConductanceQuantum
+    given ctx_unit_ConductanceQuantum: DerivedUnit[ConductanceQuantum, (7748091729L / (10 ^ 14)) * Siemens, "conductance-quantum", "G₀"] = DerivedUnit()
+
+    /** Josephson constant: 483597.8484...×10+9 Hz/V */
+    final type JosephsonConstant
+    given ctx_unit_JosephsonConstant: DerivedUnit[JosephsonConstant, (4835978484L * (10 ^ 5)) * Hertz / Volt, "josephson-constant", "Kⱼ"] = DerivedUnit()
+
+    /** Von Klitzing constant: 25812.80745... Ω */
+    final type VonKlitzingConstant
+    given ctx_unit_VonKlitzingConstant: DerivedUnit[VonKlitzingConstant, (2581280745L / (10 ^ 5)) * Ohm, "von-klitzing-constant", "Rₖ"] = DerivedUnit()
+
+    /** Magnetic flux quantum: 2.067833848...×10−15 Wb */
+    final type MagneticFluxQuantum
+    given ctx_unit_MagneticFluxQuantum: DerivedUnit[MagneticFluxQuantum, (2067833848L / (10 ^ 24)) * Weber, "magnetic-flux-quantum", "Φ₀"] = DerivedUnit()
+
+    /** Bohr magneton: 9.2740100783(28)×10−24 J/T */
+    final type BohrMagneton
+    given ctx_unit_BohrMagneton: DerivedUnit[BohrMagneton, (92740100783L / (10 ^ 34)) * Joule / Tesla, "bohr-magneton", "μB"] = DerivedUnit()
+
+    /** Nuclear magneton: 5.0507837461(15)×10−27 J/T */
+    final type NuclearMagneton
+    given ctx_unit_NuclearMagneton: DerivedUnit[NuclearMagneton, (50507837461L / (10 ^ 37)) * Joule / Tesla, "nuclear-magneton", "μₙ"] = DerivedUnit()
+
+    /** Fine structure constant: 7.2973525693(11)×10−3 */
+    final type FineStructureConstant
+    given ctx_unit_FineStructureConstant: DerivedUnit[FineStructureConstant, (72973525693L / (10 ^ 13)), "fine-structure-constant", "α"] = DerivedUnit()
+
+    /** Electron mass: 9.1093837015(28)×10−31 kg */
+    final type ElectronMass
+    given ctx_unit_ElectronMass: DerivedUnit[ElectronMass, (91093837015L / (10 ^ 41)) * Kilogram, "electron-mass", "mₑ"] = DerivedUnit()
+
+    /** Proton mass: 1.67262192369(51)×10−27 kg */
+    final type ProtonMass
+    given ctx_unit_ProtonMass: DerivedUnit[ProtonMass, (167262192369L / (10 ^ 38)) * Kilogram, "proton-mass", "mₚ"] = DerivedUnit()
+
+    /** Neutron mass: 1.67492749804(95)×10−27 kg */
+    final type NeutronMass
+    given ctx_unit_NeutronMass: DerivedUnit[NeutronMass, (167492749804L / (10 ^ 38)) * Kilogram, "neutron-mass", "mₚ"] = DerivedUnit()
+
+    /** Bohr radius: 5.29177210903(80)×10−11 m */
+    final type BohrRadius
+    given ctx_unit_BohrRadius: DerivedUnit[BohrRadius, (529177210903L / (10 ^ 22)) * Meter, "bohr-radius", "a₀"] = DerivedUnit()
+
+    /** Classical electron radius: 2.8179403262(13)×10−15 m */
+    final type ClassicalElectronRadius
+    given ctx_unit_ClassicalElectronRadius: DerivedUnit[ClassicalElectronRadius, (28179403262L / (10 ^ 25)) * Meter, "classical-electron-radius", "rₑ"] = DerivedUnit()
+
+    /** Electron g-factor: −2.00231930436256(35) */
+    final type ElectronGFactor
+    given ctx_unit_ElectronGFactor: DerivedUnit[ElectronGFactor, (-200231930436256L / (10 ^ 14)), "electron-g-factor", "rₑ"] = DerivedUnit()
+
+    /** Fermi coupling constant: 1.1663787(6)×10−5 GeV−2 */
+    final type FermiCouplingConstant
+    given ctx_unit_FermiCouplingConstant: DerivedUnit[FermiCouplingConstant, (11663787L / (10 ^ 12)) * ((Giga * ElectronVolt) ^ -2), "fermi-coupling-constant", "GF"] = DerivedUnit()
+
+    /** electron volt: 1.602176634×10−19 J */
+    final type ElectronVolt
+    given ctx_unit_ElectronVolt: DerivedUnit[ElectronVolt, (1602176634L / (10 ^ 28)) * Joule, "electron-volt", "eV"] = DerivedUnit()
 
     object infra:
         abstract class ConstQ[CU]:
