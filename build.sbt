@@ -46,6 +46,13 @@ lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .settings(commonSettings :_*)
   .jsSettings(libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M2" % Test)
 
+lazy val spire = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
+  .crossType(CrossType.Pure)
+  .in(file("spire"))
+  .settings(name := "coulomb-spire")
+  .dependsOn(core % "compile->compile;test->test")
+  .settings(commonSettings :_*)
+
 // a target for rolling up all subproject deps: a convenient
 // way to get a repl that has access to all subprojects
 // sbt all/console
