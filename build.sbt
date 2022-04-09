@@ -28,7 +28,7 @@ def commonSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject
-  .aggregate(core, units, unidocs)
+  .aggregate(core, units, spire, unidocs)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
@@ -50,7 +50,7 @@ lazy val spire = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
   .in(file("spire"))
   .settings(name := "coulomb-spire")
-  .dependsOn(core % "compile->compile;test->test")
+  .dependsOn(core % "compile->compile;test->test", units % Test)
   .settings(commonSettings :_*)
 
 // a target for rolling up all subproject deps: a convenient
@@ -58,7 +58,7 @@ lazy val spire = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
 // sbt all/console
 lazy val all = project
   .in(file("all")) // sbt will create this - it is unused
-  .dependsOn(core.jvm, units.jvm) // scala repl only needs JVMPlatform subproj builds
+  .dependsOn(core.jvm, units.jvm, spire.jvm) // scala repl only needs JVMPlatform subproj builds
   .settings(name := "coulomb-all")
   .enablePlugins(NoPublishPlugin) // don't publish
 
