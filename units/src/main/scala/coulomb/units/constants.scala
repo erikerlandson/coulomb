@@ -182,14 +182,18 @@ object constants:
     given ctx_unit_StefanBoltzmannConstant: DerivedUnit[StefanBoltzmannConstant, (5670374419L / (10 ^ 17)) * Watt / ((Meter ^ 2) * (Kelvin ^ 4)), "stefan-boltzmann-constant", "𝞼"] = DerivedUnit()
 
     object infra:
+        /** a typeclass for manifesting constant values and unit types */
         abstract class ConstQ[CU]:
+            /** this is the unit type of the constant */
             type QU
+            /** this is the numeric value of the constant */
             val value: Rational
 
         object ConstQ:
             import scala.quoted.*
             import coulomb.infra.meta.{*, given}
 
+            /** named (sub)class to avoid anonymous class code generation */
             class NC[CU, QUp](val value: Rational) extends ConstQ[CU]:
                 type QU = QUp
 
@@ -197,11 +201,14 @@ object constants:
 
             def constq[CU](using Quotes, Type[CU]): Expr[ConstQ[CU]] =
                 import quotes.reflect.*
+                // set "separate" mode to extract constant's value from its unit type
                 given sigmode: SigMode = SigMode.Separate
                 TypeRepr.of[CU] match
+                    // identify the DerivedUnit definition for the constant,
+                    // and obtain its value and unit type as separate objects
                     case derivedunit(v, sig) =>
                         simplifysig(sig).asType match
                             case '[qu] => '{ new NC[CU, qu](${Expr(v)}) }
                     case u =>
-                        report.error(s"unrecognized unit declaration: ${typestr(u)}")
+                        report.error(s"constq: unrecognized unit declaration: ${typestr(u)}")
                         '{ new NC[CU, Nothing](Rational.const0) }
