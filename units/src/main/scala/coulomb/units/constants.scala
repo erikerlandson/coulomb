@@ -48,13 +48,25 @@ object constants:
             ): Quantity[V, cq.QU] =
         vc(cq.value).withUnit[cq.QU]
 
-    /** Speed of light in a vacuum */
+    /** Speed of light in a vacuum: 299792458 m/s */
     final type SpeedOfLight
     given ctx_unit_SpeedOfLight: DerivedUnit[SpeedOfLight, 299792458 * Meter / Second, "speed-of-light", "c"] = DerivedUnit()
 
-    /** Planck's constant */
+    /** Planck's constant: 6.62607015×10−34 J⋅s */
     final type PlanckConstant
-    given ctx_unit_PlanckConstant: DerivedUnit[PlanckConstant, (662607015 * (10 ^ -42)) * Joule * Second, "planck-constant", "ℎ"] = DerivedUnit()
+    given ctx_unit_PlanckConstant: DerivedUnit[PlanckConstant, (662607015 / (10 ^ 42)) * Joule * Second, "planck-constant", "ℎ"] = DerivedUnit()
+
+    /** Reduced Planck Constant: 1.054571817×10−34 J⋅s */
+    final type ReducedPlanckConstant
+    given ctx_unit_ReducedPlanckConstant: DerivedUnit[ReducedPlanckConstant, (1054571817 / (10 ^ 43)) * Joule * Second, "reduced-planck-constant", "ℏ"] = DerivedUnit()
+
+    /** Newton's constant of gravitation: 6.67430(15)×10−11 m3⋅kg−1⋅s−2 */
+    final type GravitationalConstant
+    given ctx_unit_GravitationalConstant: DerivedUnit[GravitationalConstant, (667430 / (10 ^ 16)) * (Meter ^ 3) / (Kilogram * (Second ^ 2)), "gravitational-constant", "G"] = DerivedUnit()
+
+    /** Vacuum electric permittivity: 8.8541878128(13)×10−12 F/m */
+    final type VacuumElectricPermittivity
+    given ctx_unit_VacuumElectricPermittivity: DerivedUnit[VacuumElectricPermittivity, (88541878128L / (10 ^ 22)) * Farad / Meter, "vacuum-electric-permittivity", "ε₀"] = DerivedUnit() 
 
     object infra:
         abstract class ConstQ[CU]:
