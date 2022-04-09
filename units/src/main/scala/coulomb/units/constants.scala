@@ -17,8 +17,10 @@
 package coulomb.units
 
 /**
- * Physical constants as defined here:
+ * A selection of physical constants as defined in the following table:
  * https://en.wikipedia.org/wiki/List_of_physical_constants
+ * All units tagged as either "universal" or "frequently-used" in this table are defined.
+ * Other constant definitions can be included on request.
  */
 object constants:
     import coulomb.*
@@ -123,6 +125,10 @@ object constants:
     final type FineStructureConstant
     given ctx_unit_FineStructureConstant: DerivedUnit[FineStructureConstant, (72973525693L / (10 ^ 13)), "fine-structure-constant", "α"] = DerivedUnit()
 
+    /** Inverse fine structure constant: 137.035999084 */
+    final type InverseFineStructureConstant
+    given ctx_unit_InverseFineStructureConstant: DerivedUnit[InverseFineStructureConstant, (137035999084L / (10 ^ 9)), "inverse-fine-structure-constant", "α⁻ⁱ"] = DerivedUnit()
+
     /** Electron mass: 9.1093837015(28)×10−31 kg */
     final type ElectronMass
     given ctx_unit_ElectronMass: DerivedUnit[ElectronMass, (91093837015L / (10 ^ 41)) * Kilogram, "electron-mass", "mₑ"] = DerivedUnit()
@@ -154,6 +160,26 @@ object constants:
     /** electron volt: 1.602176634×10−19 J */
     final type ElectronVolt
     given ctx_unit_ElectronVolt: DerivedUnit[ElectronVolt, (1602176634L / (10 ^ 28)) * Joule, "electron-volt", "eV"] = DerivedUnit()
+
+    /** atomic mass constant: 1.66053906660(50)×10−27 kg */
+    final type AtomicMassConstant
+    given ctx_unit_AtomicMassConstant: DerivedUnit[AtomicMassConstant, (166053906660L / (10 ^ 38)) * Kilogram, "atomic-mass-constant", "mᵤ"] = DerivedUnit()
+
+    /** Faraday constant: 96485.33212... C/mol */
+    final type FaradayConstant
+    given ctx_unit_FaradayConstant: DerivedUnit[FaradayConstant, (9648533212L / (10 ^ 5)) * Coulomb / Mole, "faraday-constant", "F"] = DerivedUnit()
+
+    /** Molar gas constant: 8.314462618... J/(mol⋅K) */
+    final type MolarGasConstant
+    given ctx_unit_MolarGasConstant: DerivedUnit[MolarGasConstant, (8314462618L / (10 ^ 9)) * Joule / (Mole * Kelvin), "molar-gas-constant", "R"] = DerivedUnit()
+
+    /** Molar mass constant: 0.99999999965(30)×10−3 kg/mol */
+    final type MolarMassConstant
+    given ctx_unit_MolarMassConstant: DerivedUnit[MolarMassConstant, (99999999965L / (10 ^ 14)) * Kilogram / Mole, "molar-mass-constant", "Mᵤ"] = DerivedUnit()
+
+    /** Stefan-Boltzmann constant: 5.670374419...×10−8 W⋅m−2⋅K−4 */
+    final type StefanBoltzmannConstant
+    given ctx_unit_StefanBoltzmannConstant: DerivedUnit[StefanBoltzmannConstant, (5670374419L / (10 ^ 17)) * Watt / ((Meter ^ 2) * (Kelvin ^ 4)), "stefan-boltzmann-constant", "𝞼"] = DerivedUnit()
 
     object infra:
         abstract class ConstQ[CU]:
