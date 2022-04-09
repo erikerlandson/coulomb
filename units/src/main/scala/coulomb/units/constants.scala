@@ -16,47 +16,67 @@
 
 package coulomb.units
 
+/**
+ * Physical constants as defined here:
+ * https://en.wikipedia.org/wiki/List_of_physical_constants
+ */
 object constants:
     import coulomb.*
     import coulomb.define.*
     import coulomb.rational.Rational
     import coulomb.conversion.ValueConversion
 
-    import coulomb.units.si.{*, given}
-    import coulomb.units.mksa.{*, given}
+    export coulomb.units.mksa.{*, given}
 
-    final type SpeedOfLight
-    given ctx_unit_SpeedOfLight: DerivedUnit[SpeedOfLight, 299792458 * Meter / Second, "speed-of-light", "c"] = DerivedUnit()
-
-    final type PlanckConstant
-    given ctx_unit_PlanckConstant: DerivedUnit[PlanckConstant, (662607015 * (10 ^ -42)) * Joule * Second, "planck-constant", "ℎ"] = DerivedUnit()
-
+    /**
+     * Obtain a Quantity representing a physical constant
+     * @tparam V the desired value type of the constant
+     * @tparam CU the unit type name representing the constant
+     * @return a value Quantity[V, QU] where QU is the unit type of
+     * the constant
+     *
+     * {{{
+     * import coulomb.units.constants.{*, given}
+     *
+     * val planck = constant[Double, PlanckConstant]
+     * // planck.show => "6.62607015E-34 J s"
+     * }}}
+     */
     transparent inline def constant[V, CU](using
-        cq: ConstQ[CU],
+        cq: infra.ConstQ[CU],
         vc: ValueConversion[Rational, V]
             ): Quantity[V, cq.QU] =
         vc(cq.value).withUnit[cq.QU]
 
-    abstract class ConstQ[CU]:
-        type QU
-        val value: Rational
+    /** Speed of light in a vacuum */
+    final type SpeedOfLight
+    given ctx_unit_SpeedOfLight: DerivedUnit[SpeedOfLight, 299792458 * Meter / Second, "speed-of-light", "c"] = DerivedUnit()
 
-    object ConstQ:
-        import scala.quoted.*
-        import coulomb.infra.meta.{*, given}
+    /** Planck's constant */
+    final type PlanckConstant
+    given ctx_unit_PlanckConstant: DerivedUnit[PlanckConstant, (662607015 * (10 ^ -42)) * Joule * Second, "planck-constant", "ℎ"] = DerivedUnit()
 
-        class NC[CU, QUp](val value: Rational) extends ConstQ[CU]:
-            type QU = QUp
+    object infra:
+        abstract class ConstQ[CU]:
+            type QU
+            val value: Rational
 
-        transparent inline given ctx_ConstQ[CU]: ConstQ[CU] = ${ constq[CU] }
+        object ConstQ:
+            import scala.quoted.*
+            import coulomb.infra.meta.{*, given}
 
-        def constq[CU](using Quotes, Type[CU]): Expr[ConstQ[CU]] =
-            import quotes.reflect.*
-            given sigmode: SigMode = SigMode.Separate
-            TypeRepr.of[CU] match
-                case derivedunit(v, sig) =>
-                    simplifysig(sig).asType match
-                        case '[qu] => '{ new NC[CU, qu](${Expr(v)}) }
-                case u =>
-                    report.error(s"unrecognized unit declaration: ${typestr(u)}")
-                    '{ new NC[CU, Nothing](Rational.const0) }
+            class NC[CU, QUp](val value: Rational) extends ConstQ[CU]:
+                type QU = QUp
+
+            transparent inline given ctx_ConstQ[CU]: ConstQ[CU] = ${ constq[CU] }
+
+            def constq[CU](using Quotes, Type[CU]): Expr[ConstQ[CU]] =
+                import quotes.reflect.*
+                given sigmode: SigMode = SigMode.Separate
+                TypeRepr.of[CU] match
+                    case derivedunit(v, sig) =>
+                        simplifysig(sig).asType match
+                            case '[qu] => '{ new NC[CU, qu](${Expr(v)}) }
+                    case u =>
+                        report.error(s"unrecognized unit declaration: ${typestr(u)}")
+                        '{ new NC[CU, Nothing](Rational.const0) }
