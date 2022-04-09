@@ -52,6 +52,7 @@ lazy val spire = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .settings(name := "coulomb-spire")
   .dependsOn(core % "compile->compile;test->test", units % Test)
   .settings(commonSettings :_*)
+  .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0-M3" % Provided)
 
 // a target for rolling up all subproject deps: a convenient
 // way to get a repl that has access to all subprojects
