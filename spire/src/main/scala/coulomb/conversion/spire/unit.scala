@@ -17,5 +17,15 @@
 package coulomb.conversion.spire
 
 object unit:
+    import coulomb.conversion.*
+    import coulomb.conversion.spire.coefficients.*
+    import _root_.spire.math.Rational
+
     export coulomb.conversion.standard.unit.given
 
+    inline given ctx_UC_SpireRational[UF, UT]: UnitConversion[Rational, UF, UT] =
+        new infra.RationalUC[UF, UT](coefficientRational[UF, UT])
+
+    object infra:
+        class RationalUC[UF, UT](c: Rational) extends UnitConversion[Rational, UF, UT]:
+            def apply(v: Rational): Rational = c * v
