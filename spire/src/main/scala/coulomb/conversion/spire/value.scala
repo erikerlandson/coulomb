@@ -85,4 +85,3 @@ object value:
         def toType[B: ConvertableTo](a: CoulombRational): B = ConvertableTo[B].fromRational(toRational(a))
         def toString(a: CoulombRational): String = a.toString 
     }
-
