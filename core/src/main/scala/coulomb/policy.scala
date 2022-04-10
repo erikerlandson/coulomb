@@ -14,65 +14,67 @@
  * limitations under the License.
  */
 
-package coulomb
+package coulomb.policy
 
-object policy:
-    /**
-     * A policy that supports all standard operation definitions, including those involving
-     * implicit conversions of units or value types.
-     *
-     * {{{
-     * import coulomb.*
-     * import coulomb.policy.standard.given
-     *
-     * import algebra.instances.all.given
-     * import coulomb.ops.algebra.all.given
-     * }}}
-     */
-    object standard:
-        export coulomb.ops.standard.all.given
-        export coulomb.ops.simplification.standard.given
-        export coulomb.ops.resolution.standard.given
-        export coulomb.conversion.standard.value.given
-        export coulomb.conversion.standard.unit.given
-        export coulomb.conversion.standard.scala.given
+/**
+ * A policy that supports all standard operation definitions, including those involving
+ * implicit conversions of units or value types.
+ *
+ * {{{
+ * import coulomb.*
+ * import coulomb.policy.standard.given
+ *
+ * import algebra.instances.all.given
+ * import coulomb.ops.algebra.all.given
+ * }}}
+ */
+object standard:
+    export coulomb.ops.standard.all.given
+    export coulomb.ops.simplification.standard.given
+    export coulomb.ops.resolution.standard.given
+    export coulomb.conversion.standard.value.given
+    export coulomb.conversion.standard.unit.given
+    export coulomb.conversion.standard.scala.given
 
-    /**
-     * A policy that supports all standard operations, but does not support operations that
-     * involve any implicit conversions of either units or value types.
-     * For example, one may add two quantities having the same unit and value type, but
-     * not quantities differing in either their value type or unit.
-     *
-     * Explicit conversions such as `q.toUnit` or `q.toValue` are allowed.
-     *
-     * {{{
-     * import coulomb.*
-     * import coulomb.policy.strict.given
-     *
-     * import algebra.instances.all.given
-     * import coulomb.ops.algebra.all.given
-     * }}}
-     */
-    object strict:
-        export coulomb.ops.standard.all.given
-        export coulomb.ops.simplification.standard.given
-        export coulomb.conversion.standard.value.given
-        export coulomb.conversion.standard.unit.given
+/**
+ * A policy that supports all standard operations, but does not support operations that
+ * involve any implicit conversions of either units or value types.
+ * For example, one may add two quantities having the same unit and value type, but
+ * not quantities differing in either their value type or unit.
+ *
+ * Explicit conversions such as `q.toUnit` or `q.toValue` are allowed.
+ *
+ * {{{
+ * import coulomb.*
+ * import coulomb.policy.strict.given
+ *
+ * import algebra.instances.all.given
+ * import coulomb.ops.algebra.all.given
+ * }}}
+ */
+object strict:
+    export coulomb.ops.standard.all.given
+    export coulomb.ops.simplification.standard.given
+    export coulomb.conversion.standard.value.given
+    export coulomb.conversion.standard.unit.given
 
+
+/**
+ * By default, coulomb will treat any unrecognized type as a base unit.
+ * To disable this behavior and raise a compile error on any type not declared as
+ * a BaseUnit, DerivedUnit, etc:
+ *
+ * {{{
+ * import coulomb.policy.strictUnitExpressions.given
+ * }}}
+ */
+object strictUnitExpressions:
+    import coulomb.policy.infra.StrictUnitExpressions
+    given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
+
+object infra:
     /**
      * When a context variable of this type is in scope, coulomb will raise a compile error
      * if it encounters a type not declared as a unit.
      */
     sealed trait StrictUnitExpressions
-
-    /**
-     * By default, coulomb will treat any unrecognized type as a base unit.
-     * To disable this behavior and raise a compile error on any type not declared as
-     * a BaseUnit, DerivedUnit, etc:
-     *
-     * {{{
-     * import coulomb.policy.strictUnitExpressions.given
-     * }}}
-     */
-    object strictUnitExpressions:
-        given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
