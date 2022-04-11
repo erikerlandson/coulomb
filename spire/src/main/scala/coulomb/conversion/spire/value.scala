@@ -81,7 +81,6 @@ object value:
         def toAlgebraic(a: CoulombRational): Algebraic = Algebraic(toRational(a))
         def toReal(a: CoulombRational): Real = Real(toRational(a))
         def toNumber(a: CoulombRational): Number = Number(toRational(a))
-
         def toType[B: ConvertableTo](a: CoulombRational): B = ConvertableTo[B].fromRational(toRational(a))
         def toString(a: CoulombRational): String = a.toString 
     }
