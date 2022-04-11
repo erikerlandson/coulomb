@@ -21,7 +21,8 @@ import spire.math.{ Rational, SafeLong }
 import coulomb.rational.{ Rational => CoulombRational }
 
 object coefficients:
-    inline def coefficientRational[U1, U2]: Rational = ${ meta.coefficientSpireRational[U1, U2] }
+    inline def coefficientRational[UF, UT]: Rational = ${ meta.coefficientSpireRational[UF, UT] }
+    inline def coefficientBigDecimal[UF, UT]: BigDecimal = ${ meta.coefficientBigDecimal[UF, UT] }
 
     object meta:
         import scala.quoted.*
@@ -42,7 +43,13 @@ object coefficients:
                 case v if (v == Rational.one) => '{ Rational.one }
                 case _ => '{ Rational(${Expr(r.numerator)}, ${Expr(r.denominator)}) }
 
-        def coefficientSpireRational[U1, U2](using Quotes, Type[U1], Type[U2]): Expr[Rational] =
+        def coefficientSpireRational[UF, UT](using Quotes, Type[UF], Type[UT]): Expr[Rational] =
             import quotes.reflect.*
-            val c: CoulombRational = coef(TypeRepr.of[U1], TypeRepr.of[U2])
+            val c: CoulombRational = coef(TypeRepr.of[UF], TypeRepr.of[UT])
             Expr(Rational(c.n, c.d))
+
+        def coefficientBigDecimal[UF, UT](using Quotes, Type[UF], Type[UT]): Expr[BigDecimal] =
+            import quotes.reflect.*
+            val c: CoulombRational = coef(TypeRepr.of[UF], TypeRepr.of[UT])
+            val bd: BigDecimal = Rational(c.n, c.d).toBigDecimal(java.math.MathContext.DECIMAL128)
+            Expr(bd)

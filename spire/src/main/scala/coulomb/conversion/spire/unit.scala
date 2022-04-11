@@ -26,6 +26,12 @@ object unit:
     inline given ctx_UC_SpireRational[UF, UT]: UnitConversion[Rational, UF, UT] =
         new infra.RationalUC[UF, UT](coefficientRational[UF, UT])
 
+    inline given ctx_UC_BigDecimal[UF, UT]: UnitConversion[BigDecimal, UF, UT] =
+        new infra.BigDecimalUC[UF, UT](coefficientBigDecimal[UF, UT])
+
     object infra:
         class RationalUC[UF, UT](c: Rational) extends UnitConversion[Rational, UF, UT]:
             def apply(v: Rational): Rational = c * v
+
+        class BigDecimalUC[UF, UT](c: BigDecimal) extends UnitConversion[BigDecimal, UF, UT]:
+            def apply(v: BigDecimal): BigDecimal = c * v
