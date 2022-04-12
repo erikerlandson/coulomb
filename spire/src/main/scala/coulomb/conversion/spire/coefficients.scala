@@ -24,6 +24,9 @@ object coefficients:
     inline def coefficientRational[UF, UT]: Rational = ${ meta.coefficientSpireRational[UF, UT] }
     inline def coefficientBigDecimal[UF, UT]: BigDecimal = ${ meta.coefficientBigDecimal[UF, UT] }
 
+    inline def deltaOffsetRational[U, B]: Rational = ${ meta.deltaOffsetSpireRational[U, B] }
+    inline def deltaOffsetBigDecimal[U, B]: BigDecimal = ${ meta.deltaOffsetBigDecimal[U, B] }
+
     object meta:
         import scala.quoted.*
         import coulomb.infra.meta.{*, given}
@@ -52,4 +55,15 @@ object coefficients:
             import quotes.reflect.*
             val c: CoulombRational = coef(TypeRepr.of[UF], TypeRepr.of[UT])
             val bd: BigDecimal = Rational(c.n, c.d).toBigDecimal(java.math.MathContext.DECIMAL128)
+            Expr(bd)
+
+        def deltaOffsetSpireRational[U, B](using Quotes, Type[U], Type[B]): Expr[Rational] =
+            import quotes.reflect.*
+            val doff: CoulombRational = offset(TypeRepr.of[U], TypeRepr.of[B])
+            Expr(Rational(doff.n, doff.d))
+
+        def deltaOffsetBigDecimal[U, B](using Quotes, Type[U], Type[B]): Expr[BigDecimal] =
+            import quotes.reflect.*
+            val doff: CoulombRational = offset(TypeRepr.of[U], TypeRepr.of[B])
+            val bd: BigDecimal = Rational(doff.n, doff.d).toBigDecimal(java.math.MathContext.DECIMAL128)
             Expr(bd)
