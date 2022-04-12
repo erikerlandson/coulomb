@@ -46,6 +46,22 @@ object unit:
         new infra.BigDecimalDUC[B, UF, UT](
             coefficientBigDecimal[UF, UT], deltaOffsetBigDecimal[UF, B], deltaOffsetBigDecimal[UT, B])
 
+    inline given ctx_DUC_Algebraic[B, UF, UT]: DeltaUnitConversion[Algebraic, B, UF, UT] =
+        new infra.AlgebraicDUC[B, UF, UT](
+            Algebraic(coefficientRational[UF, UT]),
+            Algebraic(deltaOffsetRational[UF, B]),
+            Algebraic(deltaOffsetRational[UT, B]))
+
+    inline given ctx_DUC_Real[B, UF, UT]: DeltaUnitConversion[Real, B, UF, UT] =
+        new infra.RealDUC[B, UF, UT](
+            Real(coefficientRational[UF, UT]),
+            Real(deltaOffsetRational[UF, B]),
+            Real(deltaOffsetRational[UT, B]))
+
+    inline given ctx_TDUC_BigInt[B, UF, UT]: TruncatingDeltaUnitConversion[BigInt, B, UF, UT] =
+        new infra.BigIntTDUC[B, UF, UT](
+            coefficientRational[UF, UT], deltaOffsetRational[UF, B], deltaOffsetRational[UT, B])
+
     object infra:
         class RationalUC[UF, UT](c: Rational) extends UnitConversion[Rational, UF, UT]:
             def apply(v: Rational): Rational = c * v
@@ -67,3 +83,12 @@ object unit:
 
         class BigDecimalDUC[B, UF, UT](c: BigDecimal, df: BigDecimal, dt: BigDecimal) extends DeltaUnitConversion[BigDecimal, B, UF, UT]:
             def apply(v: BigDecimal): BigDecimal = ((v + df) * c) - dt
+
+        class AlgebraicDUC[B, UF, UT](c: Algebraic, df: Algebraic, dt: Algebraic) extends DeltaUnitConversion[Algebraic, B, UF, UT]:
+            def apply(v: Algebraic): Algebraic = ((v + df) * c) - dt
+
+        class RealDUC[B, UF, UT](c: Real, df: Real, dt: Real) extends DeltaUnitConversion[Real, B, UF, UT]:
+            def apply(v: Real): Real = ((v + df) * c) - dt
+
+        class BigIntTDUC[B, UF, UT](c: Rational, df: Rational, dt: Rational) extends TruncatingDeltaUnitConversion[BigInt, B, UF, UT]:
+            def apply(v: BigInt): BigInt = (((v + df) * c) - dt).toBigInt
