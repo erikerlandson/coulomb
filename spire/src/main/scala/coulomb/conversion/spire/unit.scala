@@ -35,6 +35,9 @@ object unit:
     inline given ctx_UC_Real[UF, UT]: UnitConversion[Real, UF, UT] =
         new infra.RealUC[UF, UT](Real(coefficientRational[UF, UT]))
 
+    inline given ctx_TUC_BigInt[UF, UT]: TruncatingUnitConversion[BigInt, UF, UT] =
+        new infra.BigIntTUC[UF, UT](coefficientRational[UF, UT])
+
     object infra:
         class RationalUC[UF, UT](c: Rational) extends UnitConversion[Rational, UF, UT]:
             def apply(v: Rational): Rational = c * v
@@ -47,3 +50,6 @@ object unit:
 
         class RealUC[UF, UT](c: Real) extends UnitConversion[Real, UF, UT]:
             def apply(v: Real): Real = c * v
+
+        class BigIntTUC[UF, UT](c: Rational) extends TruncatingUnitConversion[BigInt, UF, UT]:
+            def apply(v: BigInt): BigInt = (c * v).toBigInt
