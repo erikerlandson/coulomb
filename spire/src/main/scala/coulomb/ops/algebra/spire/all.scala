@@ -17,7 +17,11 @@
 package coulomb.ops.algebra.spire
 
 object all:
+    // this is a supserset of algebras provided by coulomb-core
     export coulomb.ops.algebra.all.given
 
     export rational.given
     export bigdecimal.given
+    export algebraic.given
+    export real.given
+    export bigint.given
