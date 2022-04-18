@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package coulomb.policy.spire
+package coulomb.ops.resolution
 
-object standard:
-    export coulomb.ops.standard.all.given
-    export coulomb.ops.simplification.standard.given
-    export coulomb.ops.resolution.spire.given
-    export coulomb.conversion.spire.value.given
-    export coulomb.conversion.spire.unit.given
-    export coulomb.conversion.standard.scala.given
+object spire:
+    import _root_.spire.math.*
 
-object strict:
-    export coulomb.ops.standard.all.given
-    export coulomb.ops.simplification.standard.given
-    export coulomb.conversion.spire.value.given
-    export coulomb.conversion.spire.unit.given
+    import coulomb.ops.ValuePromotionPolicy
+    import coulomb.ops.ValuePromotion.{ &:, TNil }
+
+    // ValuePromotion infers the transitive closure of all promotions
+    given ctx_vpp_spire: ValuePromotionPolicy[
+        (Int, Long) &: (Long, Float) &: (Float, Double) &:
+        (Double, BigDecimal) &: (BigDecimal, Rational) &:
+        (Long, BigInt) &: (BigInt, Float) &:
+        (Rational, Algebraic) &: (Algebraic, Real) &:
+        TNil
+    ] = ValuePromotionPolicy()
+
