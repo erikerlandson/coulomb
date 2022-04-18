@@ -89,6 +89,24 @@ abstract class DeltaAddQ[B, VL, UL, VR, UR]:
 @implicitNotFound("Ordering not defined in scope for DeltaQuantity[${VL}, ${UL}] and DeltaQuantity[${VR}, ${UR}]")
 abstract class DeltaOrd[B, VL, UL, VR, UR] extends ((DeltaQuantity[VL, UL, B], DeltaQuantity[VR, UR, B]) => Int)
 
+@implicitNotFound("Unable to simplify unit type ${U}")
+abstract class SimplifiedUnit[U]:
+    type UO
+
+object SimplifiedUnit:
+    import scala.quoted.*
+
+    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
+        ${ simplifiedUnit[U] }
+
+    class NC[U, UOp] extends SimplifiedUnit[U]:
+        type UO = UOp
+
+    private def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
+        import quotes.reflect.*
+        coulomb.infra.meta.simplify(TypeRepr.of[U]).asType match
+            case '[uo] => '{ new NC[U, uo] }
+
 /** Resolve the operator output type for left and right argument types */
 @implicitNotFound("No output type resolution in scope for argument value types ${VL} and ${VR}")
 abstract class ValueResolution[VL, VR]:
@@ -100,10 +118,6 @@ object ValueResolution:
     transparent inline given ctx_VR_RpL[VL, VR](using ValuePromotion[VR, VL]): ValueResolution[VL, VR] = new NC[VL, VR, VL]
     class NC[VL, VR, VOp] extends ValueResolution[VL, VR]:
         type VO = VOp
-
-@implicitNotFound("Unable to simplify unit type ${U}")
-abstract class SimplifiedUnit[U]:
-    type UO
 
 final class ValuePromotion[VF, VT]
 

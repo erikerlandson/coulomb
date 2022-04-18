@@ -18,7 +18,6 @@ package coulomb.policy.spire
 
 object standard:
     export coulomb.ops.standard.all.given
-    export coulomb.ops.simplification.standard.given
     export coulomb.ops.resolution.spire.given
     export coulomb.conversion.spire.value.given
     export coulomb.conversion.spire.unit.given
@@ -26,6 +25,5 @@ object standard:
 
 object strict:
     export coulomb.ops.standard.all.given
-    export coulomb.ops.simplification.standard.given
     export coulomb.conversion.spire.value.given
     export coulomb.conversion.spire.unit.given
