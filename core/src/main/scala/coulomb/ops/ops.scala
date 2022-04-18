@@ -105,7 +105,7 @@ object ValueResolution:
 abstract class SimplifiedUnit[U]:
     type UO
 
-class ValuePromotion[VF, VT]
+final class ValuePromotion[VF, VT]
 
 object ValuePromotion:
     import scala.quoted.*
@@ -116,12 +116,12 @@ object ValuePromotion:
     final type &:[H, T]
     final type TNil
  
-    type VppSet[T] = scala.collection.mutable.HashSet[T]
-    val VppSet = scala.collection.mutable.HashSet
-
     transparent inline given ctx_VP_Path[VF, VT]: ValuePromotion[VF, VT] = ${ vpPath[VF, VT] }
 
-    def vpPath[VF, VT](using Quotes, Type[VF], Type[VT]): Expr[ValuePromotion[VF, VT]] =
+    private type VppSet[T] = scala.collection.mutable.HashSet[T]
+    private val VppSet = scala.collection.mutable.HashSet
+
+    private def vpPath[VF, VT](using Quotes, Type[VF], Type[VT]): Expr[ValuePromotion[VF, VT]] =
         import quotes.reflect.*
         val (vf, vt) = (TypeRepr.of[VF], TypeRepr.of[VT])
         if (pathexists(vf.typeSymbol.fullName,
@@ -132,7 +132,7 @@ object ValuePromotion:
             report.error(s"no promotion from ${typestr(vf)} => ${typestr(vt)}")
             '{ new ValuePromotion[VF, VT] }
 
-    def getvpp(using Quotes): VppSet[(String, String)] =
+    private def getvpp(using Quotes): VppSet[(String, String)] =
         import quotes.reflect.*
         Implicits.search(TypeRepr.of[ValuePromotionPolicy].appliedTo(List(TypeBounds.empty))) match
             case iss: ImplicitSearchSuccess =>
@@ -142,7 +142,7 @@ object ValuePromotion:
                 report.error("no ValuePromotionPolicy was found in scope")
                 VppSet.empty[(String, String)]
 
-    def vpp2str(using Quotes)(vpp: quotes.reflect.TypeRepr): VppSet[(String, String)] =
+    private def vpp2str(using Quotes)(vpp: quotes.reflect.TypeRepr): VppSet[(String, String)] =
         import quotes.reflect.*
         vpp match
             case t if (t =:= TypeRepr.of[TNil]) => VppSet.empty[(String, String)]
@@ -154,7 +154,7 @@ object ValuePromotion:
                 report.error(s"type ${typestr(vpp)} is not a valid value promotion policy")
                 VppSet.empty[(String, String)]
 
-    def pathexists(vf: String, vt: String, edges: VppSet[(String, String)]): Boolean =
+    private def pathexists(vf: String, vt: String, edges: VppSet[(String, String)]): Boolean =
         val reachable = VppSet(vf)
         var haspath = false
         var done = false
@@ -169,12 +169,6 @@ object ValuePromotion:
                 done = true
         haspath
 
-class ValuePromotionPolicy[Pairs]
+final class ValuePromotionPolicy[Pairs]
 object ValuePromotionPolicy:
-    def apply[P](): ValuePromotionPolicy[P] = new ValuePromotionPolicy[P] {}
-
-object test:
-    import ValuePromotion.{ &:, TNil }
-    given ValuePromotionPolicy[
-        (Int, Long) &: (Long, Float) &: (Float, Double) &: TNil
-    ] = ValuePromotionPolicy()
+    def apply[P](): ValuePromotionPolicy[P] = new ValuePromotionPolicy[P]
