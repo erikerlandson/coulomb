@@ -50,3 +50,15 @@ class SpireQuantitySuite extends CoulombSuite:
         assertCE("BigDecimal(1).withUnit[Meter].toValue[BigInt]")
         BigDecimal(2.5).withUnit[Meter].tToValue[Long].assertQ[Long, Meter](2)
     }
+
+    test("toUnit") {
+        import coulomb.policy.spire.strict.given
+
+        Rational(1).withUnit[Yard].toUnit[Meter].assertQ[Rational, Meter](Rational(9144, 10000))
+        BigDecimal(1).withUnit[Yard].toUnit[Meter].assertQ[BigDecimal, Meter](BigDecimal(0.9144))
+        Algebraic(1).withUnit[Yard].toUnit[Meter].assertQ[Algebraic, Meter](Algebraic(0.9144))
+        Real(1).withUnit[Yard].toUnit[Meter].assertQ[Real, Meter](Real(Rational(9144, 10000)))
+
+        assertCE("BigInt(10).withUnit[Yard].toUnit[Meter]")
+        BigInt(10).withUnit[Yard].tToUnit[Meter].assertQ[BigInt, Meter](9)
+    }
