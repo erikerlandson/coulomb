@@ -137,7 +137,10 @@ object ValuePromotion:
 
     private def vpPath[VF, VT](using Quotes, Type[VF], Type[VT]): Expr[ValuePromotion[VF, VT]] =
         import quotes.reflect.*
-        val (vf, vt) = (TypeRepr.of[VF], TypeRepr.of[VT])
+        // Dealiasing is important because I am working with string type names.
+        // Ability to hash, == or < directly on TypeRepr objects might allow me to 
+        // use Set[TypeRepr] but not sure if it is possible. 
+        val (vf, vt) = (TypeRepr.of[VF].dealias, TypeRepr.of[VT].dealias)
         if (pathexists(vf.typeSymbol.fullName,
                        vt.typeSymbol.fullName,
                        getvpp))
@@ -162,7 +165,7 @@ object ValuePromotion:
             case t if (t =:= TypeRepr.of[TNil]) => VppSet.empty[(String, String)]
             case AppliedType(v, List(AppliedType(t2, List(vf, vt)), tail)) if ((v =:= TypeRepr.of[&:]) && (t2 =:= TypeRepr.of[Tuple2])) =>
                 val vppset = vpp2str(tail)
-                vppset.add((vf.typeSymbol.fullName, vt.typeSymbol.fullName))
+                vppset.add((vf.dealias.typeSymbol.fullName, vt.dealias.typeSymbol.fullName))
                 vppset
             case _ =>
                 report.error(s"type ${typestr(vpp)} is not a valid value promotion policy")
@@ -172,10 +175,12 @@ object ValuePromotion:
         val reachable = VppSet(vf)
         var haspath = false
         var done = false
+        // print(s"\n\nvf= $vf   vt= $vt\n")
         while (!done) do
             val prevsize = reachable.size
             val next = reachable.flatMap(r => edges.filter { (f, _) => f == r }.map { (_, t) => t })
             reachable.addAll(next)
+            // print(s"reachable= $reachable\n")
             if (reachable.contains(vt))
                 haspath = true
                 done = true
