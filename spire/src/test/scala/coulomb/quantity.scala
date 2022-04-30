@@ -62,3 +62,9 @@ class SpireQuantitySuite extends CoulombSuite:
         assertCE("BigInt(10).withUnit[Yard].toUnit[Meter]")
         BigInt(10).withUnit[Yard].tToUnit[Meter].assertQ[BigInt, Meter](9)
     }
+
+    test("addition strict") {
+        import coulomb.policy.spire.strict.given
+        (Rational(1).withUnit[Meter] + Rational(1).withUnit[Meter]).assertQ[Rational, Meter](Rational(2))
+    }
+
