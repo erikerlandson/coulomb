@@ -140,3 +140,27 @@ class SpireQuantitySuite extends CoulombSuite:
         BigInt(10).withUnit[Meter].tpow[1 / 2].assertQ[BigInt, Meter ^ (1 / 2)](BigInt(3))
         BigInt(10).withUnit[Meter].tpow[-1 / 2].assertQ[BigInt, 1 / (Meter ^ (1 / 2))](BigInt(0))
     }
+
+    test("< strict") {
+        import coulomb.policy.spire.strict.given
+
+        assertEquals(Rational(1).withUnit[Meter] < Rational(2).withUnit[Meter], true)
+        assertEquals(BigDecimal(2).withUnit[Meter] < BigDecimal(1).withUnit[Meter], false)
+        assertEquals(Algebraic(1).withUnit[Meter] < Algebraic(2).withUnit[Meter], true)
+        assertEquals(Real(2).withUnit[Meter] < Real(1).withUnit[Meter], false)
+        assertEquals(BigInt(1).withUnit[Meter] < BigInt(2).withUnit[Meter], true)
+    }
+
+    test("< standard") {
+        import coulomb.policy.spire.standard.given
+
+        assertEquals(Rational(1).withUnit[Yard] < Rational(1).withUnit[Meter], true)
+        assertEquals(BigDecimal(1).withUnit[Meter] < BigDecimal(1).withUnit[Yard], false)
+        assertEquals(Algebraic(1).withUnit[Yard] < Algebraic(1).withUnit[Meter], true)
+        assertEquals(Real(1).withUnit[Meter] < Real(1).withUnit[Yard], false)
+
+        assertEquals(Rational(1).withUnit[Yard] < BigInt(1).withUnit[Meter], true)
+        assertEquals(BigDecimal(1).withUnit[Meter] < Rational(1).withUnit[Yard], false)
+        assertEquals(Algebraic(1).withUnit[Yard] < Real(1).withUnit[Meter], true)
+        assertEquals(Rational(1).withUnit[Meter] < BigDecimal(1).withUnit[Yard], false)
+    }
