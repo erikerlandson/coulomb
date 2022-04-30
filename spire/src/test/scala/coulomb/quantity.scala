@@ -104,3 +104,39 @@ class SpireQuantitySuite extends CoulombSuite:
         (BigInt(1).withUnit[Meter] + BigInt(1).withUnit[Yard].tToUnit[Meter]).assertQ[BigInt, Meter](BigInt(1))
     }
 
+    test("tquot") {
+        import coulomb.policy.spire.standard.given
+
+        (BigInt(5).withUnit[Meter] `tquot` BigInt(2).withUnit[Second]).assertQ[BigInt, Meter / Second](BigInt(2))
+    }
+
+    test("pow") {
+        import coulomb.policy.spire.standard.given
+
+        Rational(2).withUnit[Meter].pow[0].assertQ[Rational, 1](Rational(1))
+        Rational(2).withUnit[Meter].pow[2].assertQ[Rational, Meter ^ 2](Rational(4))
+        Rational(2).withUnit[Meter].pow[-1].assertQ[Rational, 1 / Meter](Rational(1, 2))
+        Rational(2).withUnit[Meter].pow[1 / 2].assertQD[Rational, Meter ^ (1 / 2)](1.4142135623730951)
+        Rational(2).withUnit[Meter].pow[-1 / 2].assertQD[Rational, 1 / (Meter ^ (1 / 2))](0.7071067811865476)
+
+        BigDecimal(2).withUnit[Meter].pow[1 / 2].assertQD[BigDecimal, Meter ^ (1 / 2)](1.4142135623730951)
+        Algebraic(2).withUnit[Meter].pow[1 / 2].assertQD[Algebraic, Meter ^ (1 / 2)](1.4142135623730951)
+        Real(2).withUnit[Meter].pow[1 / 2].assertQD[Real, Meter ^ (1 / 2)](1.4142135623730951)
+
+        // positive integer exponents are supported via multiplicative semigroup
+        assertCE("BigInt(2).withUnit[Meter].pow[0]")
+        BigInt(2).withUnit[Meter].pow[2].assertQ[BigInt, Meter ^ 2](4)
+        assertCE("BigInt(2).withUnit[Meter].pow[-1]")
+        assertCE("BigInt(2).withUnit[Meter].pow[1 / 2]")
+        assertCE("BigInt(2).withUnit[Meter].pow[-1 / 2]")
+    }
+
+    test("tpow") {
+        import coulomb.policy.spire.standard.given
+
+        BigInt(10).withUnit[Meter].tpow[0].assertQ[BigInt, 1](BigInt(1))
+        BigInt(10).withUnit[Meter].tpow[2].assertQ[BigInt, Meter ^ 2](BigInt(100))
+        BigInt(10).withUnit[Meter].tpow[-1].assertQ[BigInt, 1 / Meter](BigInt(0))
+        BigInt(10).withUnit[Meter].tpow[1 / 2].assertQ[BigInt, Meter ^ (1 / 2)](BigInt(3))
+        BigInt(10).withUnit[Meter].tpow[-1 / 2].assertQ[BigInt, 1 / (Meter ^ (1 / 2))](BigInt(0))
+    }

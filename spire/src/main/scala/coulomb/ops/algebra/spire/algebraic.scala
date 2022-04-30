@@ -19,8 +19,14 @@ package coulomb.ops.algebra.spire
 object algebraic:
     import _root_.spire.math.*
     import coulomb.ops.algebra.*
+    import coulomb.conversion.ValueConversion
+    import coulomb.conversion.spire.value.given
 
     given ctx_Algebraic_is_FractionalPower: FractionalPower[Algebraic] =
-        (v: Algebraic, e: Double) =>
-            summon[Fractional[Algebraic]].fpow(v, e)
+        // Fractional[Algebraic] exists but throws errors, so
+        // do the fpow() in BigDecimal
+        val a2b = summon[ValueConversion[Algebraic, BigDecimal]]
+        val b2a = summon[ValueConversion[BigDecimal, Algebraic]]
+        val bf = summon[Fractional[BigDecimal]]
+        (v: Algebraic, e: Double) => b2a(bf.fpow(a2b(v), e))
 
