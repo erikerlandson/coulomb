@@ -62,7 +62,7 @@ class TemperatureUnitsSuite extends CoulombSuite:
         import coulomb.policy.strict.given
 
         37d.withTemperature[Celsius].toUnit[Fahrenheit].assertDQD[Double, Fahrenheit](98.6)
-        37.withTemperature[Celsius].tToUnit[Fahrenheit].assertDQD[Int, Fahrenheit](98)
+        37.withTemperature[Celsius].tToUnit[Fahrenheit].assertDQ[Int, Fahrenheit](98)
     }
 
     test("subtraction standard") {

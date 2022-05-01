@@ -36,3 +36,32 @@ class SpireTemperatureSuite extends CoulombSuite:
         Real(1).withTemperature[Celsius].tToValue[Long].assertDQ[Long, Celsius](1)
         Real(1).withTemperature[Celsius].tToValue[Int].assertDQ[Int, Celsius](1)
     }
+
+    test("toUnit") {
+        import coulomb.policy.spire.standard.given
+
+        Rational(37).withTemperature[Celsius].toUnit[Fahrenheit].assertDQD[Rational, Fahrenheit](98.6)
+        BigDecimal(37).withTemperature[Celsius].toUnit[Fahrenheit].assertDQD[BigDecimal, Fahrenheit](98.6)
+        Algebraic(37).withTemperature[Celsius].toUnit[Fahrenheit].assertDQD[Algebraic, Fahrenheit](98.6)
+        Real(37).withTemperature[Celsius].toUnit[Fahrenheit].assertDQD[Real, Fahrenheit](98.6)
+        BigInt(37).withTemperature[Celsius].tToUnit[Fahrenheit].assertDQ[BigInt, Fahrenheit](98)
+    }
+
+    test("subtraction") {
+        import coulomb.policy.spire.standard.given
+
+        (BigInt(100).withTemperature[Celsius] - Rational(122).withTemperature[Fahrenheit]).assertQ[Rational, Celsius](50)
+    }
+
+    test("quantity subtraction") {
+        import coulomb.policy.spire.standard.given
+
+        (100.withTemperature[Celsius] - BigDecimal(90).withUnit[Fahrenheit]).assertDQD[BigDecimal, Celsius](50)
+    }
+
+    test("less-than standard") {
+        import coulomb.policy.spire.standard.given
+
+        assertEquals(100d.withTemperature[Celsius] < Rational(100).withTemperature[Fahrenheit], false)
+        assertEquals(BigDecimal(0).withTemperature[Fahrenheit] < 0L.withTemperature[Celsius], true)
+    }
