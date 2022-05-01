@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package coulomb.ops.resolution
+package coulomb.ops.algebra.spire
 
-object standard:
-    import coulomb.ops.ValuePromotionPolicy
-    import coulomb.ops.ValuePromotion.{ &:, TNil }
+object bigdecimal:
+    import _root_.spire.math.*
+    import coulomb.ops.algebra.*
 
-    // ValuePromotion infers the transitive closure of all promotions
-    given ctx_vpp_standard: ValuePromotionPolicy[
-        (Int, Long) &: (Long, Float) &: (Float, Double) &: TNil
-    ] = ValuePromotionPolicy()
+    given ctx_BigDecimal_is_FractionalPower: FractionalPower[BigDecimal] =
+        (v: BigDecimal, e: Double) =>
+            summon[Fractional[BigDecimal]].fpow(v, e)
+

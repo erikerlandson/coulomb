@@ -19,19 +19,5 @@ package coulomb.ops.algebra
 import algebra.ring.TruncatedDivision
 
 object double:
-    given ctx_Double_is_FractionalPower: FractionalPower[Double] with
-        def pow(v: Double, e: Double): Double = math.pow(v, e)
-
-    given ctx_Double_is_TruncatingPower: TruncatingPower[Double] with
-        def tpow(v: Double, e: Double): Double = math.pow(v, e).toLong.toDouble
-
-    given ctx_Double_is_TruncatedDivision: TruncatedDivision[Double] with
-        def tquot(x: Double, y: Double): Double = (x / y).toLong.toDouble
-        // I don't care about these
-        def tmod(x: Double, y: Double): Double = ???
-        def fquot(x: Double, y: Double): Double = ???
-        def fmod(x: Double, y: Double): Double = ???
-        def abs(a: Double): Double = ???
-        def additiveCommutativeMonoid: algebra.ring.AdditiveCommutativeMonoid[Double] = ???
-        def order: cats.kernel.Order[Double] = ???
-        def signum(a: Double): Int = ???
+    given ctx_Double_is_FractionalPower: FractionalPower[Double] =
+        (v: Double, e: Double) => math.pow(v, e)

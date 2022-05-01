@@ -16,11 +16,18 @@
 
 package coulomb.ops.resolution
 
-object standard:
+object spire:
+    import _root_.spire.math.*
+
     import coulomb.ops.ValuePromotionPolicy
     import coulomb.ops.ValuePromotion.{ &:, TNil }
 
     // ValuePromotion infers the transitive closure of all promotions
-    given ctx_vpp_standard: ValuePromotionPolicy[
-        (Int, Long) &: (Long, Float) &: (Float, Double) &: TNil
+    given ctx_vpp_spire: ValuePromotionPolicy[
+        (Int, Long) &: (Long, Float) &: (Float, Double) &:
+        (Double, BigDecimal) &: (BigDecimal, Rational) &:
+        (Long, BigInt) &: (BigInt, Float) &:
+        (Rational, Algebraic) &: (Algebraic, Real) &:
+        TNil
     ] = ValuePromotionPolicy()
+

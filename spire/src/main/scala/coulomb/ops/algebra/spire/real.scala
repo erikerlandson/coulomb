@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package coulomb.ops.resolution
+package coulomb.ops.algebra.spire
 
-object standard:
-    import coulomb.ops.ValuePromotionPolicy
-    import coulomb.ops.ValuePromotion.{ &:, TNil }
+object real:
+    import _root_.spire.math.*
+    import coulomb.ops.algebra.*
 
-    // ValuePromotion infers the transitive closure of all promotions
-    given ctx_vpp_standard: ValuePromotionPolicy[
-        (Int, Long) &: (Long, Float) &: (Float, Double) &: TNil
-    ] = ValuePromotionPolicy()
+    given ctx_Real_is_FractionalPower: FractionalPower[Real] =
+        (v: Real, e: Double) =>
+            summon[Fractional[Real]].fpow(v, e)
+
+

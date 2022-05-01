@@ -206,7 +206,7 @@ object meta:
 
     def strictunitexprs(using Quotes): Boolean =
         import quotes.reflect.*
-        Implicits.search(TypeRepr.of[coulomb.policy.StrictUnitExpressions]) match
+        Implicits.search(TypeRepr.of[coulomb.policy.infra.StrictUnitExpressions]) match
             case _: ImplicitSearchSuccess => true
             case _ => false
 

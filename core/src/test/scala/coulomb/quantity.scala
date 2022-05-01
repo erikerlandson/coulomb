@@ -371,9 +371,6 @@ class QuantitySuite extends CoulombSuite:
     test("truncating division standard") {
         import coulomb.policy.standard.given
 
-        (5d.withUnit[Meter] `tquot` 2d.withUnit[Second]).assertQ[Double, Meter / Second](2)
-        (5f.withUnit[Meter] `tquot` 2f.withUnit[Second]).assertQ[Float, Meter / Second](2)
- 
         (5L.withUnit[Meter] `tquot` 2L.withUnit[Second]).assertQ[Long, Meter / Second](2)
         (5L.withUnit[Meter] `tquot` 2.withUnit[Second]).assertQ[Long, Meter / Second](2)
 
@@ -412,18 +409,6 @@ class QuantitySuite extends CoulombSuite:
 
     test("truncating power standard") {
         import coulomb.policy.standard.given
-
-        10d.withUnit[Meter].tpow[0].assertQ[Double, 1](1)
-        10d.withUnit[Meter].tpow[2].assertQ[Double, Meter ^ 2](100)
-        10d.withUnit[Meter].tpow[-1].assertQ[Double, 1 / Meter](0)
-        10d.withUnit[Meter].tpow[1 / 2].assertQ[Double, Meter ^ (1 / 2)](3)
-        10d.withUnit[Meter].tpow[-1 / 2].assertQ[Double, 1 / (Meter ^ (1 / 2))](0)
-
-        10f.withUnit[Meter].tpow[0].assertQ[Float, 1](1)
-        10f.withUnit[Meter].tpow[2].assertQ[Float, Meter ^ 2](100)
-        10f.withUnit[Meter].tpow[-1].assertQ[Float, 1 / Meter](0)
-        10f.withUnit[Meter].tpow[1 / 2].assertQ[Float, Meter ^ (1 / 2)](3)
-        10f.withUnit[Meter].tpow[-1 / 2].assertQ[Float, 1 / (Meter ^ (1 / 2))](0)
 
         10L.withUnit[Meter].tpow[0].assertQ[Long, 1](1)
         10L.withUnit[Meter].tpow[2].assertQ[Long, Meter ^ 2](100)

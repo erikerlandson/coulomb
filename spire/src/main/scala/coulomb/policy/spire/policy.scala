@@ -14,22 +14,16 @@
  * limitations under the License.
  */
 
-package coulomb.ops.simplification
+package coulomb.policy.spire
 
 object standard:
-    import coulomb.ops.SimplifiedUnit
+    export coulomb.ops.standard.all.given
+    export coulomb.ops.resolution.spire.given
+    export coulomb.conversion.spire.value.given
+    export coulomb.conversion.spire.unit.given
+    export coulomb.conversion.standard.scala.given
 
-    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
-        ${ infra.simplifiedUnit[U] }
-
-    object infra:
-        import scala.quoted.*
-
-        class SU[U, UOp] extends SimplifiedUnit[U]:
-            type UO = UOp
-
-        def simplifiedUnit[U](using Quotes, Type[U]): Expr[SimplifiedUnit[U]] =
-            import quotes.reflect.*
-            coulomb.infra.meta.simplify(TypeRepr.of[U]).asType match
-                case '[uo] => '{ new SU[U, uo] }
-
+object strict:
+    export coulomb.ops.standard.all.given
+    export coulomb.conversion.spire.value.given
+    export coulomb.conversion.spire.unit.given

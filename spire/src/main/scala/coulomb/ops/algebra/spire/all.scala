@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package coulomb.ops.resolution
+package coulomb.ops.algebra.spire
 
-object standard:
-    import coulomb.ops.ValuePromotionPolicy
-    import coulomb.ops.ValuePromotion.{ &:, TNil }
+object all:
+    // this is a supserset of algebras provided by coulomb-core
+    export coulomb.ops.algebra.all.given
 
-    // ValuePromotion infers the transitive closure of all promotions
-    given ctx_vpp_standard: ValuePromotionPolicy[
-        (Int, Long) &: (Long, Float) &: (Float, Double) &: TNil
-    ] = ValuePromotionPolicy()
+    export rational.given
+    export bigdecimal.given
+    export algebraic.given
+    export real.given
+    export bigint.given
