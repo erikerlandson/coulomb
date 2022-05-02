@@ -22,19 +22,59 @@ import coulomb.rational.Rational
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
 
-/** Represents the product of two unit expressions L and R */
+/**
+ * Represents the product of two unit expressions
+ * @tparam L the left-hand unit subexpression
+ * @tparam R the right-hand unit subexpression
+ * {{{
+ * type AcreFoot = (Acre * Foot)
+ * }}}
+ */
 final type *[L, R]
 
-/** Represents the unit division L / R */
+/**
+ * Represents unit division
+ * @tparam L the left-hand unit subexpression (numerator)
+ * @tparam R the right-hand unit subexpression (denominator)
+ * {{{
+ * type MPS = (Meter / Second)
+ * }}}
+ */
 final type /[L, R]
 
-/** Represents raising unit expression B to integer power E */
+/**
+ * Represents raising unit expression B to rational power E
+ * @tparam B a base unit expression
+ * @tparam E a rational exponent
+ * {{{
+ * type V = (Meter ^ 3)
+ * type H = (Second ^ -1)
+ * type R = (Meter ^ (1 / 2))
+ * }}}
+ */
 final type ^[B, E]
 
 @deprecated("Unitless should be replaced by integer literal type '1'")
 final type Unitless = 1
 
+/**
+ * obtain a string representation of a unit type, using unit abbreviation forms
+ * @tparam U the unit type
+ * @return the unit in string form
+ * {{{
+ * showUnit[Meter / Second] // => "m/s"
+ * }}}
+ */
 inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
+
+/**
+ * obtain a string representation of a unit type, using full unit names
+ * @tparam U the unit type
+ * @return the unit in string form
+ * {{{
+ * showUnitFull[Meter / Second] // => "meter/second"
+ * }}}
+ */
 inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
 
 /**
@@ -46,21 +86,38 @@ inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1,
 export qopaque.Quantity
 export qopaque.withUnit
 
+/**
+ * Defines the opaque type Quantity[V, U] and associated lift and extract functions
+ */
 object qopaque:
+    /**
+     * Represents a value with an associated unit type
+     * @tparam V the raw value type
+     * @tparam U the unit type
+     */
     opaque type Quantity[V, U] = V
 
-    // lift
+    /**
+     * Defines Quantity constructors that lift values into unit Quantities
+     */
     object Quantity extends QuantityLowPriority0:
+        /**
+         * Lift a raw value of type V into a unit quantity
+         * @tparam U the desired unit type
+         * @return a Quantity with given value and unit type
+         * {{{
+         * val distance = Quantity[Meter](1.0)
+         * }}}
+         */
         def apply[U](using a: Applier[U]) = a
-        def apply[U](v: Int): Quantity[Int, U] = v
-        def apply[U](v: Long): Quantity[Long, U] = v
-        def apply[U](v: Float): Quantity[Float, U] = v
-        def apply[U](v: Double): Quantity[Double, U] = v
 
-        abstract class Applier[U]:
-            def apply[V](v: V): Quantity[V, U]
+        /**
+         * A shim class for Quantity companion object constructors
+         */
+        class Applier[U]:
+            def apply[@specialized(Int, Long, Float, Double) V](v: V): Quantity[V, U] = v
         object Applier:
-            given [U]: Applier[U] = new Applier[U] { def apply[V](v: V): Quantity[V, U] = v }
+            given ctx_Applier[U]: Applier[U] = new Applier[U]
 
         inline given [V, U](using ord: Order[V]): Order[Quantity[V, U]] = ord
 
@@ -70,29 +127,27 @@ object qopaque:
     private[qopaque] sealed class QuantityLowPriority1:
         inline given [V, U](using eq: Eq[V]): Eq[Quantity[V, U]] = eq
 
-    // lift using withUnit method
-    extension[V](v: V)
+    extension[@specialized(Int, Long, Float, Double) V](v: V)
+        /**
+         * Lift a raw value into a unit quantity
+         * @tparam U the desired unit type
+         * @return a Quantity with given value and unit type
+         * {{{
+         * val distance = (1.0).withUnit[Meter]
+         * }}}
+         */
         def withUnit[U]: Quantity[V, U] = v
-    extension(v: Int)
-        def withUnit[U]: Quantity[Int, U] = v
-    extension(v: Long)
-        def withUnit[U]: Quantity[Long, U] = v
-    extension(v: Float)
-        def withUnit[U]: Quantity[Float, U] = v
-    extension(v: Double)
-        def withUnit[U]: Quantity[Double, U] = v
 
-    // extract
-    extension[V, U](ql: Quantity[V, U])
+    extension[@specialized(Int, Long, Float, Double) V, U](ql: Quantity[V, U])
+        /**
+         * extract the raw value of a unit quantity
+         * @return the underlying value, stripped of its unit information
+         * {{{
+         * val q = (1.5).withUnit[Meter]
+         * q.value // => 1.5
+         * }}}
+         */
         def value: V = ql
-    extension[U](ql: Quantity[Int, U])
-        def value: Int = ql
-    extension[U](ql: Quantity[Long, U])
-        def value: Long = ql
-    extension[U](ql: Quantity[Float, U])
-        def value: Float = ql
-    extension[U](ql: Quantity[Double, U])
-        def value: Double = ql
 
     extension[VL, UL](ql: Quantity[VL, UL])
         inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
