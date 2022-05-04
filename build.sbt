@@ -64,8 +64,13 @@ lazy val all = project
   .enablePlugins(NoPublishPlugin) // don't publish
 
 // a published artifact aggregating API docs for viewing at javadoc.io
+// build and view scaladocs locally:
+// sbt unidocs/doc
+// view at:  file:///your/path/to/coulomb/unidocs/target/scala-3.1.2/unidoc/index.html
+// serve locally:
+// python3 -m http.server -d unidocs/target/scala-3.1.2/unidoc/
 lazy val unidocs = project
-  .in(file("unidocs")) // sbt will create this - it is unused
+  .in(file("unidocs")) // sbt will create this
   .settings(name := "coulomb-docs") // the name of the artifact
   .enablePlugins(TypelevelUnidocPlugin) // enable Unidoc + publishing
 
