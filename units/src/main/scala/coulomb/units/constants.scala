@@ -17,8 +17,11 @@
 package coulomb.units
 
 /**
- * A selection of physical constants as defined in the following table:
- * https://en.wikipedia.org/wiki/List_of_physical_constants
+ * A selection of physical constants.
+ *
+ * Constants are as as defined in the following table:
+ * - https://en.wikipedia.org/wiki/List_of_physical_constants
+ *  
  * All units tagged as either "universal" or "frequently-used" in this table are defined.
  * Other constant definitions can be included on request.
  */
@@ -48,7 +51,7 @@ object constants:
      * import coulomb.units.constants.{*, given}
      *
      * val planck = constant[Double, PlanckConstant]
-     * // planck.show => "6.62607015E-34 J s"
+     * planck.show // => "6.62607015E-34 J s"
      * }}}
      */
     transparent inline def constant[V, CU](using
