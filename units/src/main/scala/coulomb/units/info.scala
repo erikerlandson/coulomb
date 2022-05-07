@@ -16,19 +16,56 @@
 
 package coulomb.units
 
+/**
+ * Units of information
+ *
+ * These definitions use byte as the base unit, and therefore may be thought of
+ * as "storage centric" as opposed to information centric:
+ * - https://en.wikipedia.org/wiki/Shannon_(unit)
+ *
+ * or physics centric:
+ * - https://en.wikipedia.org/wiki/Nat_(unit)#Entropy
+ * 
+ * For example in physics a nat is unitless, where in these definitions it is
+ * a derived unit of byte.
+ */
 object info:
     import coulomb.define.*
     import coulomb.{`*`, `/`, `^`}
 
+    /**
+     * A byte is 8 bits, and corresponds to one ASCII character in typical computer memory.
+     * @note care should be taken to distinguish from `scala.Byte`
+     */
     final type Byte
     given ctx_unit_Byte: BaseUnit[Byte, "byte", "B"] = BaseUnit()
 
+    /**
+     * The fundamental unit of information: a single "yes/no" answer.
+     * 
+     * Equivalent to one shannon:
+     * - https://en.wikipedia.org/wiki/Shannon_(unit)
+     */
     final type Bit
     given ctx_unit_Bit: DerivedUnit[Bit, Byte / 8, "bit", "b"] = DerivedUnit()
 
+    /**
+     * Logarithmic unit of information 
+     *
+     * The logarithmic form of Shannon entropy yields quantities in nats:
+     * - https://en.wikipedia.org/wiki/Entropy_(information_theory)
+     */
     final type Nat
     given ctx_unit_Nat: DerivedUnit[Nat, 1.4426950409 * Bit, "nat", "nat"] = DerivedUnit()
 
+    /**
+     * Standard binary prefixes
+     * 
+     * Binary prefixes used for computing storage
+     * - https://en.wikipedia.org/wiki/Binary_prefix
+     * 
+     * Standard SI base-10 prefixes are defined in [[coulomb.units.si.prefixes]]
+     */
     object prefixes:
         final type Kibi
         given ctx_unit_Kibi: DerivedUnit[Kibi, 1024, "kibi", "Ki"] = DerivedUnit()
