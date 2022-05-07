@@ -16,6 +16,9 @@
 
 package coulomb.units
 
+/**
+ * Units of time or duration
+ */
 object time:
     import coulomb.define.*
     import coulomb.{`*`, `/`, `^`}
@@ -25,23 +28,43 @@ object time:
 
     export coulomb.units.si.{ Second, ctx_unit_Second }
 
+    /** A duration of 60 seconds */
     final type Minute
     given ctx_unit_Minute: DerivedUnit[Minute, 60 * Second, "minute", "min"] = DerivedUnit()
 
+    /** A duration of 60 minutes or 3600 seconds */
     final type Hour
     given ctx_unit_Hour: DerivedUnit[Hour, 3600 * Second, "hour", "h"] = DerivedUnit()
 
+    /** A duration of 24 hours */
     final type Day
     given ctx_unit_Day: DerivedUnit[Day, 86400 * Second, "day", "d"] = DerivedUnit()
 
+    /** A duration of 7 days */
     final type Week
     given ctx_unit_Week: DerivedUnit[Week, 604800 * Second, "week", "wk"] = DerivedUnit()
 
+    /**
+     * Represents an instant in time measured with respect to the
+     * standard unix epoch `00:00:00 UTC January 1, 1970`
+     * - https://en.wikipedia.org/wiki/Unix_time
+     *
+     * @tparam V the value type containing the time quantity
+     * @tparam U the unit type, requiring base unit [[coulomb.units.si.Second]]
+     */
     final type EpochTime[V, U] = DeltaQuantity[V, U, Second]
 
     object EpochTime:
+        /**
+         * Creates an epoch time using a given unit type
+         * {{{
+         * // the instant in time one billion minutes from Jan 1, 1970
+         * val instant = EpochTime[Minute](1e9)
+         * }}}
+         */
         def apply[U](using a: Applier[U]) = a
 
+        /** a shim class for the EpochTime companion `apply` method */
         abstract class Applier[U]:
             def apply[V](v: V): EpochTime[V, U]
         object Applier:
@@ -50,6 +73,14 @@ object time:
                     def apply[V](v: V): EpochTime[V, U] = v.withDeltaUnit[U, Second]
 
     extension[V](v: V)
+        /**
+         * Lift a raw value to an EpochTime instant
+         * @tparam U the unit type to use, expected to have base unit [[coulomb.units.si.Second]]
+         * {{{
+         * // the instant in time one million hours from Jan 1, 1970
+         * val instant = (1e6).withEpochTime[Hour]
+         * }}}
+         */
         def withEpochTime[U]: EpochTime[V, U] = v.withDeltaUnit[U, Second]
 
 object javatime:
