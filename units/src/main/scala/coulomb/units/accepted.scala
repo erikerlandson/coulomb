@@ -16,6 +16,15 @@
 
 package coulomb.units
 
+/**
+ * Accepted historic SI metric units
+ *
+ * Selection of units from the following table, along with other commonly used "metric" units.
+ * - https://en.wikipedia.org/wiki/International_System_of_Units#Non-SI_units_accepted_for_use_with_SI
+ *
+ * Time units are defined in [[coulomb.units.time]].
+ * Degrees Celsius are defined in [[coulomb.units.temperature]].
+ */
 object accepted:
     import coulomb.define.*
     import coulomb.{`*`, `/`, `^`}
