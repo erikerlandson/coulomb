@@ -57,6 +57,7 @@ object time:
     object EpochTime:
         /**
          * Creates an epoch time using a given unit type
+         * @example
          * {{{
          * // the instant in time one billion minutes from Jan 1, 1970
          * val instant = EpochTime[Minute](1e9)
@@ -75,7 +76,10 @@ object time:
     extension[V](v: V)
         /**
          * Lift a raw value to an EpochTime instant
+         
          * @tparam U the unit type to use, expected to have base unit [[coulomb.units.si.Second]]
+         * @return an EpochTime object representing desired instant
+         * @example
          * {{{
          * // the instant in time one million hours from Jan 1, 1970
          * val instant = (1e6).withEpochTime[Hour]
@@ -83,6 +87,9 @@ object time:
          */
         def withEpochTime[U]: EpochTime[V, U] = v.withDeltaUnit[U, Second]
 
+/**
+ * Conversions between `coulomb` types and `java.time` types
+ */
 object javatime:
     import java.time.{ Duration, Instant }
     import coulomb.*
@@ -92,24 +99,93 @@ object javatime:
     import _root_.scala.Conversion
 
     extension(duration: Duration)
+        /**
+         * Convert a `Duration` to a coulomb `Quantity`
+         * @tparam V the desired value type
+         * @tparam U the desired unit type
+         * @return the quantity object equivalent to the Duration
+         * @example
+         * {{{
+         * val d: Duration = ...
+         * // convert d to seconds
+         * d.toQuantity[Double, Second]
+         * }}}
+         */
         def toQuantity[V, U](using d2q: DurationQuantity[V, U]): Quantity[V, U] = d2q(duration)
+
+        /**
+         * Convert a `Duration` to a coulomb `Quantity` using a truncating conversion
+         * @tparam V the desired value type - integral
+         * @tparam U the desired unit type
+         * @return the quantity object equivalent to the Duration
+         * @example
+         * {{{
+         * val d: Duration = ...
+         * // convert to an integral quantity of seconds
+         * d.tToQuantity[Long, Second]
+         * }}}
+         */
         def tToQuantity[V, U](using d2q: TruncatingDurationQuantity[V, U]): Quantity[V, U] = d2q(duration)
 
     extension[V, U](quantity: Quantity[V, U])
+        /**
+         * Convert a coulomb Quantity to `java.time.Duration`
+         * @return a `Duration` equivalent to the original `Quantity`
+         * @example
+         * {{{
+         * val q: Quantity[Double, Minute] = ...
+         * // convert to an equivalent Duration
+         * q.toDuration
+         * }}}
+         */
         def toDuration(using q2d: QuantityDuration[V, U]): Duration = q2d(quantity)
 
     extension(instant: Instant)
+        /**
+         * Convert a java.time Instant to an EpochTime value
+         * @tparam V the desired value type
+         * @tparam U the desired unit type
+         * @return equivalent EpochTime value
+         * @example
+         * {{{
+         * val i: Instant = ...
+         * // convert i to days from Jan 1, 1970
+         * i.toEpochTime[Double, Day]
+         * }}}
+         */
         def toEpochTime[V, U](using d2q: DurationQuantity[V, U]): EpochTime[V, U] =
             // this is cheating a bit, but it works because both Instant and Epochtime
             // are based on 1970 epoch
             val d = Duration.ofSeconds(instant.getEpochSecond(), instant.getNano())
             d2q(d).value.withEpochTime[U]
 
+        /**
+         * Convert a java.time Instant to an EpochTime value using a truncating conversion
+         * @tparam V a desired integral value type
+         * @tparam U the desired unit type
+         * @return equivalent EpochTime value
+         * @example
+         * {{{
+         * val i: Instant = ...
+         * // convert i to an integer number of days from Jan 1, 1970
+         * i.tToEpochTime[Long, Day]
+         * }}}
+         */
         def tToEpochTime[V, U](using d2q: TruncatingDurationQuantity[V, U]): EpochTime[V, U] =
             val d = Duration.ofSeconds(instant.getEpochSecond(), instant.getNano())
             d2q(d).value.withEpochTime[U]
 
     extension[V, U](epochTime: EpochTime[V, U])
+        /**
+         * Convert an EpochTime value to a java.time Instant
+         * @return the equivalent Instant value
+         * @example
+         * {{{
+         * val e: EpochTime[Double, Hour] = ...
+         * // convert to an equivalent java.time Instant
+         * e.toInstant
+         * }}}
+         */
         def toInstant(using q2d: QuantityDuration[V, U]): Instant =
             // taking advantage of Instant and EpochTime sharing same 1970 reference
             Instant.EPOCH.plus(q2d(epochTime.value.withUnit[U]))
