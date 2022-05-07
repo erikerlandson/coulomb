@@ -67,26 +67,34 @@ object info:
      * Standard SI base-10 prefixes are defined in [[coulomb.units.si.prefixes]]
      */
     object prefixes:
+        /** Binary prefix for 1024 */
         final type Kibi
         given ctx_unit_Kibi: DerivedUnit[Kibi, 1024, "kibi", "Ki"] = DerivedUnit()
 
+        /** Binary prefix for 1024 ^ 2 */
         final type Mebi
         given ctx_unit_Mebi: DerivedUnit[Mebi, 1024 ^ 2, "mebi", "Mi"] = DerivedUnit()
 
+        /** Binary prefix for 1024 ^ 3 */
         final type Gibi
         given ctx_unit_Gibi: DerivedUnit[Gibi, 1024 ^ 3, "gibi", "Gi"] = DerivedUnit()
 
+        /** Binary prefix for 1024 ^ 4 */
         final type Tebi
         given ctx_unit_Tebi: DerivedUnit[Tebi, 1024 ^ 4, "tebi", "Ti"] = DerivedUnit()
 
+        /** Binary prefix for 1024 ^ 5 */
         final type Pebi
         given ctx_unit_Pebi: DerivedUnit[Pebi, 1024 ^ 5, "pebi", "Pi"] = DerivedUnit()
 
+        /** Binary prefix for 1024 ^ 6 */
         final type Exbi
         given ctx_unit_Exbi: DerivedUnit[Exbi, 1024 ^ 6, "exbi", "Ei"] = DerivedUnit()
 
+        /** Binary prefix for 1024 ^ 7 */
         final type Zebi
         given ctx_unit_Zebi: DerivedUnit[Zebi, 1024 ^ 7, "zebi", "Zi"] = DerivedUnit()
 
+        /** Binary prefix for 1024 ^ 8 */
         final type Yobi
         given ctx_unit_Yobi: DerivedUnit[Yobi, 1024 ^ 8, "yobi", "Yi"] = DerivedUnit()
