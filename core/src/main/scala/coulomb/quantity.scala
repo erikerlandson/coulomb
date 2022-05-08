@@ -150,16 +150,82 @@ object qopaque:
         def value: V = ql
 
     extension[VL, UL](ql: Quantity[VL, UL])
+        /**
+         * returns a string representing this Quantity, using unit abbreviations
+         * @example
+         * {{{
+         * val q = (1.5).withUnit[Meter / Second]
+         * q.show // => "1.5 m/s"
+         * }}}
+         */
         inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
+
+        /**
+         * returns a string representing this Quantity, using full unit names
+         * @example
+         * {{{
+         * val q = (1.5).withUnit[Meter / Second]
+         * q.showFull // => "1.5 meter/second"
+         * }}}
+         */
         inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
 
+        /**
+         * convert a quantity to a new value type
+         * @tparam V the new value type to use
+         * @return a new `Quantity` having value type `V`
+         * @example
+         * {{{
+         * val q = (1.0).withUnit[Meter]
+         * // convert to value type Float
+         * q.toValue[Float]
+         * }}}
+         */
         inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
             conv(ql.value).withUnit[UL]
+
+        /**
+         * convert a quantity to a new unit type
+         * @tparam U the new unit type
+         * @return a new `Quantity` having unit type `U`
+         * @note attempting to convert to an incompatible unit will result in a compile error
+         * @example
+         * {{{
+         * val q = (1.0).withUnit[Meter ^ 3]
+         * // convert to unit type Liter
+         * q.toUnit[Liter]
+         * // this will result in a compile error
+         * q.toUnit[Hectare]
+         * }}}
+         */
         inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
             conv(ql.value).withUnit[U]
 
+        /**
+         * convert a quantity to an integer value type from a fractional type
+         * @tparam V a new integral value type
+         * @return a new `Quantity` having value type `V`
+         * @example
+         * {{{
+         * val q = (1.0).withUnit[Meter]
+         * // convert to an integral value type
+         * q.tToUnit[Long]
+         * }}}
+         */
         inline def tToValue[V](using conv: TruncatingValueConversion[VL, V]): Quantity[V, UL] =
             conv(ql.value).withUnit[UL]
+
+        /**
+         * convert a quantity to a new unit type, using an integral value type
+         * @tparam U the new unit type
+         * @return a new `Quantity` having unit type `U`
+         * @note attempting to convert to an incompatible unit will result in a compile error
+         * @example
+         * {{{
+         * val q = 10.withUnit[Yard]
+         * q.tToUnit[Meter] // => Quantity[Meter](9)
+         * }}}
+         */
         inline def tToUnit[U](using conv: TruncatingUnitConversion[VL, UL, U]): Quantity[VL, U] =
             conv(ql.value).withUnit[U]
 
