@@ -16,6 +16,10 @@
 
 package coulomb.units
 
+/**
+ * Common mechanical units derived from Meter, Kilogram and Second (MKS)
+ * - https://en.wikipedia.org/wiki/MKS_system_of_units#Mechanical_units 
+ */
 object mks:
     import coulomb.define.*
     import coulomb.{`*`, `/`, `^`}
@@ -28,23 +32,30 @@ object mks:
         Second, ctx_unit_Second
     }
 
+    /** Unit of planar angle. */
     final type Radian
     given ctx_unit_Radian: DerivedUnit[Radian, 1, "radian", "rad"] = DerivedUnit()
 
+    /** Unit of solid angle */
     final type Steradian
     given ctx_unit_Steradian: DerivedUnit[Steradian, 1, "steradian", "sr"] = DerivedUnit()
 
+    /** Unit of temporal frequency */
     final type Hertz
     given ctx_unit_Hertz: DerivedUnit[Hertz, 1 / Second, "hertz", "Hz"] = DerivedUnit()
 
+    /** Unit of mechanical force */
     final type Newton
     given ctx_unit_Newton: DerivedUnit[Newton, Kilogram * Meter / (Second ^ 2), "newton", "N"] = DerivedUnit()
 
+    /** Unit of energy */
     final type Joule
     given ctx_unit_Joule: DerivedUnit[Joule, Newton * Meter, "joule", "J"] = DerivedUnit()
 
+    /** Unit of power */
     final type Watt
     given ctx_unit_Watt: DerivedUnit[Watt, Joule / Second, "watt", "W"] = DerivedUnit()
 
+    /** Unit of pressure */
     final type Pascal
     given ctx_unit_Pascal: DerivedUnit[Pascal, Newton / (Meter ^ 2), "pascal", "Pa"] = DerivedUnit()
