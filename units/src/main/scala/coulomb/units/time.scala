@@ -57,6 +57,8 @@ object time:
     object EpochTime:
         /**
          * Creates an epoch time using a given unit type
+         * @tparam U unit type, requiring base unit [[coulomb.units.si.Second]]
+         * @return the new EpochTime quantity
          * @example
          * {{{
          * // the instant in time one billion minutes from Jan 1, 1970
@@ -76,7 +78,6 @@ object time:
     extension[V](v: V)
         /**
          * Lift a raw value to an EpochTime instant
-         
          * @tparam U the unit type to use, expected to have base unit [[coulomb.units.si.Second]]
          * @return an EpochTime object representing desired instant
          * @example
