@@ -88,7 +88,7 @@ object time:
         def withEpochTime[U]: EpochTime[V, U] = v.withDeltaUnit[U, Second]
 
 /**
- * Conversions between `coulomb` types and `java.time` types
+ * Conversion methods between `coulomb` types and `java.time` types
  */
 object javatime:
     import java.time.{ Duration, Instant }
@@ -190,19 +190,56 @@ object javatime:
             // taking advantage of Instant and EpochTime sharing same 1970 reference
             Instant.EPOCH.plus(q2d(epochTime.value.withUnit[U]))
 
+    /**
+     * Conversion typeclasses between `coulomb` types and `java.time` types
+     */
     object conversions:
         import coulomb.conversion.*
         import coulomb.rational.Rational
 
+        /**
+         * A typeclass for converting a `Duration` to an equivalent `Quantity`
+         * @tparam V the quantity value type
+         * @tparam U the quantity unit type
+         */
         abstract class DurationQuantity[V, U] extends (Duration => Quantity[V, U])
+
+        /**
+         * A typeclass for converting a `Quantity` to an equivalent `Duration`
+         * @tparam V the quantity value type
+         * @tparam U the quantity unit type
+         */
         abstract class QuantityDuration[V, U] extends (Quantity[V, U] => Duration)
         // Quantity -> Duration will never truncate
+
+        /**
+         * A typeclass for converting a `Duration` to an equivalent `Quantity` involving a truncation
+         * to some integral value type
+         * @tparam V the quantity value type
+         * @tparam U the quantity unit type
+         */
         abstract class TruncatingDurationQuantity[V, U] extends (Duration => Quantity[V, U])
 
+        /**
+         * exports both explicit and implicit conversion typeclasses
+         * @example
+         * {{{
+         * // import both explicit and implicit conversion typeclasses into scope
+         * import coulomb.units.javatime.conversions.all.given
+         * }}}
+         */
         object all:
             export coulomb.units.javatime.conversions.scala.given
             export coulomb.units.javatime.conversions.explicit.given
 
+        /**
+         * defines implicit `scala.Conversion` typeclasses
+         * @example
+         * {{{
+         * // import implicit conversion typeclasses into scope
+         * import coulomb.units.javatime.conversions.scala.given
+         * }}}
+         */
         object scala:
             given ctx_Conversion_QD[V, U](using q2d: QuantityDuration[V, U]):
                     Conversion[Quantity[V, U], Duration] =
@@ -222,6 +259,14 @@ object javatime:
                     val d = Duration.ofSeconds(i.getEpochSecond(), i.getNano())
                     d2q(d).value.withEpochTime[U]
 
+        /**
+         * defines typeclasses for explicit conversions
+         * @example
+         * {{{
+         * // import typeclasses for explicit conversions into scope
+         * import coulomb.units.javatime.conversions.explicit.given
+         * }}}
+         */
         object explicit:
             given ctx_DurationQuantity[V, U](using
                 uc: UnitConversion[Rational, Second, U],
