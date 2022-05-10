@@ -177,8 +177,7 @@ object qopaque:
          * @example
          * {{{
          * val q = (1.0).withUnit[Meter]
-         * // convert to value type Float
-         * q.toValue[Float]
+         * q.toValue[Float] // => Quantity[Meter](1.0f)
          * }}}
          */
         inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
@@ -192,10 +191,8 @@ object qopaque:
          * @example
          * {{{
          * val q = (1.0).withUnit[Meter ^ 3]
-         * // convert to unit type Liter
-         * q.toUnit[Liter]
-         * // this will result in a compile error
-         * q.toUnit[Hectare]
+         * q.toUnit[Liter] // => Quantity[Liter](1000.0)
+         * q.toUnit[Hectare] // => compile error
          * }}}
          */
         inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
@@ -208,8 +205,7 @@ object qopaque:
          * @example
          * {{{
          * val q = (1.0).withUnit[Meter]
-         * // convert to an integral value type
-         * q.tToUnit[Long]
+         * q.tToUnit[Long] // => Quantity[Meter](1L)
          * }}}
          */
         inline def tToValue[V](using conv: TruncatingValueConversion[VL, V]): Quantity[V, UL] =
@@ -229,9 +225,33 @@ object qopaque:
         inline def tToUnit[U](using conv: TruncatingUnitConversion[VL, UL, U]): Quantity[VL, U] =
             conv(ql.value).withUnit[U]
 
+        /**
+         * negate the value of a `Quantity`
+         * @return a `Quantity` having the negative of the original value
+         * @example
+         * {{{
+         * val q = 1.withUnit[Meter]
+         * -q // => Quantity[Meter](-1)
+         * }}}
+         */
         inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
             neg(ql)
 
+        /**
+         * add this quantity to another
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the sum of this quantity with `qr`
+         * @example
+         * {{{
+         * val q1 = 1.withUnit[Meter]
+         * val q2 = (1.0).withUnit[Yard]
+         * q1 + q2 // => Quantity[Meter](1.9144)
+         * }}}
+         * @note unit types `UL` and `UR` must be convertable
+         * @note result of addition may depend on what algebras, policies, and other typeclasses are in scope
+         */
         transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
             add.eval(ql, qr)
 
