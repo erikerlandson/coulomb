@@ -33,9 +33,22 @@ object meta:
 
     sealed class SigMode
     object SigMode:
+        /**
+         * Canonical mode yields signatures fully expand down to base units.
+         * Its primary purpose is to compute coefficients of unit conversion,
+         * or determine whether two unit types are convertable.
+         */
         case object Canonical extends SigMode
-        case object Standard extends SigMode
-        case object Separate extends SigMode
+        /**
+         * Simplify mode is for constructing operator output types.
+         * It does not expand derived units, and respects type aliases.
+         */
+        case object Simplify extends SigMode
+        /**
+         * Constant mode is for extracting constant coefficents from derived unit definitions.
+         * It is used by the physical-constants library.
+         */
+        case object Constant extends SigMode
 
     object rationalTE:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Rational] =
@@ -92,7 +105,7 @@ object meta:
 
     def offset(using Quotes)(u: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
-        given sigmode: SigMode = SigMode.Standard
+        given sigmode: SigMode = SigMode.Simplify
         u match
             case deltaunit(offset, db) =>
                 if (matchingdelta(db, b)) offset else
@@ -116,16 +129,20 @@ object meta:
         rsig == Nil
 
     // returns tuple: (expr-for-coef, type-of-Res)
-    def cansig(using qq: Quotes, mode: SigMode)(u: quotes.reflect.TypeRepr):
+    def cansig(using qq: Quotes, mode: SigMode)(uu: quotes.reflect.TypeRepr):
             (Rational, List[(quotes.reflect.TypeRepr, Rational)]) =
         import quotes.reflect.*
+        val u = mode match
+            // in simplification mode we respect type aliases
+            case SigMode.Simplify => uu
+            case _ => uu.dealias
         // if this encounters a unit type pattern it cannot expand to a canonical signature,
         // at any level, it raises a compile-time error such that the context parameter search fails.
         u match
             // identify embedded coefficients (includes '1' aka unitless)
             case unitconst(c) => mode match
-                case SigMode.Standard =>
-                    // in standard mode we preserve constants in the signature
+                case SigMode.Simplify =>
+                    // in simplify mode we preserve constants in the signature
                     if (c == 1) (Rational.const1, Nil)
                     else (Rational.const1, (u, Rational.const1) :: Nil)
                 case _ => (c, Nil)
@@ -178,7 +195,7 @@ object meta:
 
     def simplify(using Quotes)(u: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
         import quotes.reflect.*
-        given sigmode: SigMode = SigMode.Standard
+        given sigmode: SigMode = SigMode.Simplify
         simplifysig(cansig(u)._2)
 
     def simplifysig(using Quotes)(sig: List[(quotes.reflect.TypeRepr, Rational)]): quotes.reflect.TypeRepr =
@@ -235,8 +252,8 @@ object meta:
             import quotes.reflect.*
             Implicits.search(TypeRepr.of[DerivedUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
                 case iss: ImplicitSearchSuccess => mode match
-                    case SigMode.Standard =>
-                        // don't unpack the signature definition in standard mode
+                    case SigMode.Simplify =>
+                        // don't expand the signature definition in simplify mode
                         Some((Rational.const1, (u, Rational.const1) :: Nil))
                     case _ =>
                         val AppliedType(_, List(_, d, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
