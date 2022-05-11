@@ -498,6 +498,31 @@ class QuantitySuite extends CoulombSuite:
         assertEquals(2.withUnit[(1 / 2) * Meter].tToUnit[Meter] === 1.withUnit[Meter], true)
     }
 
+    test("type aliases") {
+        import coulomb.policy.standard.given
+
+        // units mixed in with type aliases
+        object defs {
+            import coulomb.define.*
+            type Thousand = 1000
+            type KiloMeter = Thousand * Meter
+            final type MegaMeter
+            given DerivedUnit[MegaMeter, Thousand * KiloMeter, "megameter", "mm"] = DerivedUnit()
+        }
+        import defs.{*, given}
+
+        // unit conversions should expand type aliases fully 
+        1d.withUnit[MegaMeter].toUnit[Meter].assertQ[Double, Meter](1e6)
+
+        // conversion in operators should also operate correctly
+        (1d.withUnit[MegaMeter] + 1d.withUnit[KiloMeter]).assertQD[Double, MegaMeter](1.001)
+        (1d.withUnit[KiloMeter] + 1d.withUnit[Meter]).assertQD[Double, KiloMeter](1.001)
+
+        // type aliases should be respected (not expanded) in simplification mode,
+        // for constructing the output unit types
+        (2d.withUnit[KiloMeter / Second] * 3d.withUnit[Second / Thousand]).assertQ[Double, KiloMeter / Thousand](6)
+    }
+
 class OptimizedQuantitySuite extends CoulombSuite:
     import coulomb.*
     import coulomb.testing.units.{*, given}

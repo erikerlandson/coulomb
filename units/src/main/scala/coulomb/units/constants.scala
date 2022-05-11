@@ -201,8 +201,8 @@ object constants:
 
             def constq[CU](using Quotes, Type[CU]): Expr[ConstQ[CU]] =
                 import quotes.reflect.*
-                // set "separate" mode to extract constant's value from its unit type
-                given sigmode: SigMode = SigMode.Separate
+                // set the signature mode to extract constant's value from its unit type
+                given sigmode: SigMode = SigMode.Constant
                 TypeRepr.of[CU] match
                     // identify the DerivedUnit definition for the constant,
                     // and obtain its value and unit type as separate objects
