@@ -16,6 +16,7 @@
 
 package coulomb
 
+import cats.kernel.{Eq, Hash, Order}
 import coulomb.ops.*
 import coulomb.rational.Rational
 import coulomb.conversion.{ValueConversion, UnitConversion}
@@ -49,7 +50,7 @@ object qopaque:
     opaque type Quantity[V, U] = V
 
     // lift
-    object Quantity:
+    object Quantity extends QuantityLowPriority0:
         def apply[U](using a: Applier[U]) = a
         def apply[U](v: Int): Quantity[Int, U] = v
         def apply[U](v: Long): Quantity[Long, U] = v
@@ -59,7 +60,15 @@ object qopaque:
         abstract class Applier[U]:
             def apply[V](v: V): Quantity[V, U]
         object Applier:
-            given [U]: Applier[U] = new Applier[U] { def apply[V](v: V): Quantity[V, U] = v } 
+            given [U]: Applier[U] = new Applier[U] { def apply[V](v: V): Quantity[V, U] = v }
+
+        inline given [V, U](using ord: Order[V]): Order[Quantity[V, U]] = ord
+
+    private[qopaque] sealed class QuantityLowPriority0 extends QuantityLowPriority1:
+        inline given [V, U](using hash: Hash[V]): Hash[Quantity[V, U]] = hash
+
+    private[qopaque] sealed class QuantityLowPriority1:
+        inline given [V, U](using eq: Eq[V]): Eq[Quantity[V, U]] = eq
 
     // lift using withUnit method
     extension[V](v: V)
