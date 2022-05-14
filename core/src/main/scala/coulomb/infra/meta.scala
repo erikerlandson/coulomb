@@ -303,6 +303,9 @@ object meta:
     def typestr(using Quotes)(t: quotes.reflect.TypeRepr): String =
         import quotes.reflect.*
         def work(tr: TypeRepr): String = tr match
+            // The policy goal here is that type aliases are never expanded.
+            case typealias(_) => tr.typeSymbol.name
+            case unitconst(v) => s"$v"
             case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[*] =>
                 s"(${work(lhs)} * ${work(rhs)})"
             case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[/] =>
@@ -315,5 +318,11 @@ object meta:
                 if (as.length == 0) tcn else
                     tcn + "[" + as.mkString(",") + "]"
             case t => t.typeSymbol.name
-        val ts = work(t.dealias)
-        ts
+        work(t)
+
+    object typealias:
+        def unapply(using Quotes)(t: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+            import quotes.reflect.*
+            val d = t.dealias
+            // "=:=" doesn't work here, it will test 'true' even if dealiasing happened
+            if (d.typeSymbol.name == t.typeSymbol.name) None else Some(d)

@@ -500,6 +500,7 @@ class QuantitySuite extends CoulombSuite:
 
     test("type aliases") {
         import coulomb.policy.standard.given
+        import coulomb.ops.{ShowUnit, ShowUnitFull}
 
         // units mixed in with type aliases
         object defs {
@@ -507,20 +508,60 @@ class QuantitySuite extends CoulombSuite:
             type Thousand = 1000
             type KiloMeter = Thousand * Meter
             final type MegaMeter
-            given DerivedUnit[MegaMeter, Thousand * KiloMeter, "megameter", "mm"] = DerivedUnit()
+            given DerivedUnit[MegaMeter, Thousand * KiloMeter, "megameter", "Mm"] = DerivedUnit()
         }
         import defs.{*, given}
+
+        // My policy goal for type aliases is that type aliases are never expanded.
+        // However, scala's implicit resolution logic undermines this somewhat because it
+        // pre-dealiases type aliases, so the "outer" type is always dealiases
+        // by the time my metaprogramming sees it.
+        // Note that type *parameters* are not de-aliased, so any aliased types that
+        // occur in a type parameter list will not be altered by Scala.
 
         // unit conversions should expand type aliases fully 
         1d.withUnit[MegaMeter].toUnit[Meter].assertQ[Double, Meter](1e6)
 
         // conversion in operators should also operate correctly
         (1d.withUnit[MegaMeter] + 1d.withUnit[KiloMeter]).assertQD[Double, MegaMeter](1.001)
-        (1d.withUnit[KiloMeter] + 1d.withUnit[Meter]).assertQD[Double, KiloMeter](1.001)
+
+        // scala's implicit resolution appears to "pre-dealias", and so the result type is
+        // not KiloMeter but its expansion.  Note that type parameters to '*' are NOT
+        // expanded (so we still see Thousand).
+        (1d.withUnit[KiloMeter] + 1d.withUnit[Meter]).assertQD[Double, Thousand * Meter](1.001)
 
         // type aliases should be respected (not expanded) in simplification mode,
         // for constructing the output unit types
         (2d.withUnit[KiloMeter / Second] * 3d.withUnit[Second / Thousand]).assertQ[Double, KiloMeter / Thousand](6)
+
+        // scala is de-aliasing KiloMeter
+        // using Int here helps JS tests work same as JVM
+        assertEquals(1.withUnit[KiloMeter].show, "1 Thousand m")
+        assertEquals(1.withUnit[KiloMeter].showFull, "1 Thousand meter")
+
+        // standard derived units work as usual
+        assertEquals(summon[ShowUnit[MegaMeter]].value, "Mm")
+        assertEquals(summon[ShowUnitFull[MegaMeter]].value, "megameter")
+
+        // scala de-aliasing KiloMeter again
+        assertEquals(summon[ShowUnit[KiloMeter]].value, "Thousand m")
+        assertEquals(summon[ShowUnitFull[KiloMeter]].value, "Thousand meter")
+
+        // calling inline function directly: scala is not de-aliasing KiloMeter
+        // and so my "respect aliases" policy is in full effect:
+        assertEquals(coulomb.showUnit[KiloMeter], "KiloMeter")
+        assertEquals(coulomb.showUnitFull[KiloMeter], "KiloMeter")
+
+        object su {
+            import coulomb.define.ShowUnitAlias
+            // customize a show-unit string
+            given ShowUnitAlias[KiloMeter, "kilometer", "km"] = ShowUnitAlias()
+        }
+
+        // Overriding default ShowUnit defs for a type
+        import su.given
+        assertEquals(summon[ShowUnit[KiloMeter]].value, "km")
+        assertEquals(summon[ShowUnitFull[KiloMeter]].value, "kilometer")
     }
 
 class OptimizedQuantitySuite extends CoulombSuite:
