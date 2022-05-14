@@ -535,8 +535,9 @@ class QuantitySuite extends CoulombSuite:
         (2d.withUnit[KiloMeter / Second] * 3d.withUnit[Second / Thousand]).assertQ[Double, KiloMeter / Thousand](6)
 
         // scala is de-aliasing KiloMeter
-        assertEquals(1d.withUnit[KiloMeter].show, "1.0 Thousand m")
-        assertEquals(1d.withUnit[KiloMeter].showFull, "1.0 Thousand meter")
+        // using Int here helps JS tests work same as JVM
+        assertEquals(1.withUnit[KiloMeter].show, "1 Thousand m")
+        assertEquals(1.withUnit[KiloMeter].showFull, "1 Thousand meter")
 
         // standard derived units work as usual
         assertEquals(summon[ShowUnit[MegaMeter]].value, "Mm")
