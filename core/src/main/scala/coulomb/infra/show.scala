@@ -45,6 +45,16 @@ object show:
     def showrender(using Quotes)(u: quotes.reflect.TypeRepr, render: quotes.reflect.TypeRepr => String): String =
         import quotes.reflect.*
         u match
+            // named unit defs take highest priority
+            case namedunit(nu) => render(nu)
+            // The policy goal here is that type aliases are never expanded
+            // (unless covered by some namedunit(_) above).  However,
+            // scala's implicit resolution logic undermines this somewhat because it
+            // pre-dealiases type aliases, so the "outer" type is always dealiases
+            // by the time my metaprogramming sees it.
+            case typealias(_) => typestr(u)
+            case unitconst(v) =>
+                if (v.d == 1) v.n.toString else s"${v.n.toString}/${v.d.toString}"
             case flatmul(t) => termstr(t, render)
             case AppliedType(op, List(lu, unitconst1())) if (op =:= TypeRepr.of[/]) =>
                 showrender(lu, render)
@@ -54,9 +64,6 @@ object show:
             case AppliedType(op, List(b, e)) if (op =:= TypeRepr.of[^]) =>
                 val (bs, es) = (paren(b, render), powstr(e))
                 s"${bs}^${es}"
-            case unitconst(v) =>
-                if (v.d == 1) v.n.toString else s"(${v.n.toString}/${v.d.toString})"
-            case namedunit(nu) => render(nu)
             case _ if (!strictunitexprs) => typestr(u)
             case _ =>
                 report.error(s"unrecognized unit pattern $u")
@@ -108,19 +115,28 @@ object show:
     def atomic(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
         import quotes.reflect.*
         u match
-            case unitconst(_) => true
             case namedunit(_) => true
+            case unitconst(_) => true
             case AppliedType(op, List(namedunit(_), _)) if (op =:= TypeRepr.of[^]) => true
             case AppliedType(op, List(flatmul(namedPU(_) +: namedunit(_) +: Nil), _)) if (op =:= TypeRepr.of[^]) => true
             case flatmul(namedPU(_) +: namedunit(_) +: Nil) => true
-            case _ => false
+            case AppliedType(_, _) => false
+            case _ => true
 
     object namedunit:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
             u match
+                case namedSU(nu) => Some(nu)
                 case namedBU(nu) => Some(nu)
                 case namedDU(nu) => Some(nu)
+                case _ => None
+
+    object namedSU:
+        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+            import quotes.reflect.*
+            Implicits.search(TypeRepr.of[ShowUnitAlias].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))) match
+                case iss: ImplicitSearchSuccess => Some(iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol))
                 case _ => None
 
     object namedPU:

@@ -95,3 +95,13 @@ object DeltaUnit:
 
     /** internal named class for avoiding anonymous class code generation */
     class NC[U, D, O, Name, Abbv] extends DeltaUnit[U, D, O, Name, Abbv]
+
+abstract class ShowUnitAlias[U, Name, Abbv] extends NamedUnit[Name, Abbv]
+
+/** Companion object utilities for defining name or abbv for aliased types */
+object ShowUnitAlias:
+    def apply[U, Name, Abbv](): ShowUnitAlias[U, Name, Abbv] =
+        new NC[U, Name, Abbv]
+
+    /** internal named class for avoiding anonymous class code generation */
+    class NC[U, Name, Abbv] extends ShowUnitAlias[U, Name, Abbv]

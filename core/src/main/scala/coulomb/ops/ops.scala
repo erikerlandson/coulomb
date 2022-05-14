@@ -191,3 +191,11 @@ object ValuePromotion:
 final class ValuePromotionPolicy[Pairs]
 object ValuePromotionPolicy:
     def apply[P](): ValuePromotionPolicy[P] = new ValuePromotionPolicy[P]
+
+final case class ShowUnit[U](value: String)
+object ShowUnit:
+    inline given ctx_ShowUnit[U]: ShowUnit[U] = ShowUnit[U](coulomb.showUnit[U])
+
+final case class ShowUnitFull[U](value: String)
+object ShowUnitFull:
+    inline given ctx_ShowUnitFull[U]: ShowUnitFull[U] = ShowUnitFull[U](coulomb.showUnitFull[U])
