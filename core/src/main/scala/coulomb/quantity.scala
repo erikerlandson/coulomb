@@ -250,29 +250,113 @@ object qopaque:
          * q1 + q2 // => Quantity[Meter](1.9144)
          * }}}
          * @note unit types `UL` and `UR` must be convertable
-         * @note result of addition may depend on what algebras, policies, and other typeclasses are in scope
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
          */
         transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
             add.eval(ql, qr)
 
+        /**
+         * subtract another quantity from this one
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the result of subtracting `qr` from this
+         * @example
+         * {{{
+         * val q1 = 1.withUnit[Meter]
+         * val q2 = (1.0).withUnit[Yard]
+         * q1 - q2 // => Quantity[Meter](0.0856)
+         * }}}
+         * @note unit types `UL` and `UR` must be convertable
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: Sub[VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
             sub.eval(ql, qr)
 
+        /**
+         * multiply this quantity by another
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the product of this quantity with `qr`
+         * @example
+         * {{{
+         * val q1 = 2.withUnit[Meter]
+         * val q2 = (3.0).withUnit[Meter]
+         * q1 * q2 // => Quantity[Meter ^ 2](6.0)
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[VL, UL, VR, UR]): Quantity[mul.VO, mul.UO] =
             mul.eval(ql, qr)
 
+        /**
+         * divide this quantity by another
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the quotient of this quantity with `qr`
+         * @example
+         * {{{
+         * val q1 = 3.withUnit[Meter]
+         * val q2 = (2.0).withUnit[Second]
+         * q1 / q2 // => Quantity[Meter / Second](1.5)
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[VL, UL, VR, UR]): Quantity[div.VO, div.UO] =
             div.eval(ql, qr)
 
+        /**
+         * divide this quantity by another, using truncating (integer) division
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the integral quotient of this quantity with `qr`
+         * @example
+         * {{{
+         * val q1 = 5.withUnit[Meter]
+         * val q2 = 2L.withUnit[Second]
+         * q1.tquot(q2) // => Quantity[Meter / Second](2L)
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using tq: TQuot[VL, UL, VR, UR]): Quantity[tq.VO, tq.UO] =
             tq.eval(ql, qr)
 
+        /**
+         * raise this quantity to a rational or integer power
+         * @tparam P the power, or exponent
+         * @return this quantity raised to exponent `P`
+         * @example
+         * {{{
+         * val q = (2.0).withUnit[Meter]
+         * q.pow[2]  // => Quantity[Meter ^ 2](4.0)
+         * q.pow[1/2]  // => Quantity[Meter ^ (1/2)](1.4142135623730951)
+         * q.pow[-1]  // => Quantity[1 / Meter](0.5)
+         * }}}
+         */
         transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
             pow.eval(ql)
 
+        /**
+         * raise this quantity to a rational or integer power, with integer truncated result
+         * @tparam P the power, or exponent
+         * @return this quantity raised to exponent `P`, truncated to integer type
+         * @example
+         * {{{
+         * val q = 10.withUnit[Meter]
+         * q.tpow[2]  // => Quantity[Meter ^ 2](100)
+         * q.tpow[1/2]  // => Quantity[Meter ^ (1/2)](3)
+         * q.tpow[-1]  // => Quantity[1 / Meter](0)
+         * }}}
+         */
         transparent inline def tpow[P](using tp: TPow[VL, UL, P]): Quantity[tp.VO, tp.UO] =
             tp.eval(ql)
 
+        /**
+         * test this quantity for equality with another
+         */
         inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) == 0
 
