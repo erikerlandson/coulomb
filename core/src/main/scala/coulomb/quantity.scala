@@ -83,62 +83,57 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  */
 inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
 
-export qopaque.Quantity
-export qopaque.withUnit
+extension[V](v: V)
+    /**
+     * Lift a raw value into a unit quantity
+     * @tparam U the desired unit type
+     * @return a Quantity with given value and unit type
+     * {{{
+     * val distance = (1.0).withUnit[Meter]
+     * }}}
+     */
+    def withUnit[U]: Quantity[V, U] = v
 
 /**
- * Defines the opaque type Quantity[V, U] and associated lift and extract functions
+ * Represents a value with an associated unit type
+ * @tparam V the raw value type
+ * @tparam U the unit type
  */
-object qopaque:
+opaque type Quantity[V, U] = V
+
+/*
+sealed class QuantityLowPriority0 extends QuantityLowPriority1:
+    inline given [V, U](using hash: Hash[V]): Hash[Quantity[V, U]] = hash
+
+sealed class QuantityLowPriority1:
+    inline given [V, U](using eq: Eq[V]): Eq[Quantity[V, U]] = eq
+*/
+
+/**
+ * Defines Quantity constructors that lift values into unit Quantities
+ */
+object Quantity: // extends QuantityLowPriority0:
     /**
-     * Represents a value with an associated unit type
-     * @tparam V the raw value type
-     * @tparam U the unit type
+     * Lift a raw value of type V into a unit quantity
+     * @tparam U the desired unit type
+     * @return a Quantity with given value and unit type
+     * {{{
+     * val distance = Quantity[Meter](1.0)
+     * }}}
      */
-    opaque type Quantity[V, U] = V
+    def apply[U](using a: Applier[U]) = a
 
     /**
-     * Defines Quantity constructors that lift values into unit Quantities
+     * A shim class for Quantity companion object constructors
      */
-    object Quantity extends QuantityLowPriority0:
-        /**
-         * Lift a raw value of type V into a unit quantity
-         * @tparam U the desired unit type
-         * @return a Quantity with given value and unit type
-         * {{{
-         * val distance = Quantity[Meter](1.0)
-         * }}}
-         */
-        def apply[U](using a: Applier[U]) = a
+    class Applier[U]:
+        def apply[V](v: V): Quantity[V, U] = v
+    object Applier:
+        given ctx_Applier[U]: Applier[U] = new Applier[U]
 
-        /**
-         * A shim class for Quantity companion object constructors
-         */
-        class Applier[U]:
-            def apply[@specialized(Int, Long, Float, Double) V](v: V): Quantity[V, U] = v
-        object Applier:
-            given ctx_Applier[U]: Applier[U] = new Applier[U]
+    //inline given [V, U](using ord: Order[V]): Order[Quantity[V, U]] = ord
 
-        inline given [V, U](using ord: Order[V]): Order[Quantity[V, U]] = ord
-
-    private[qopaque] sealed class QuantityLowPriority0 extends QuantityLowPriority1:
-        inline given [V, U](using hash: Hash[V]): Hash[Quantity[V, U]] = hash
-
-    private[qopaque] sealed class QuantityLowPriority1:
-        inline given [V, U](using eq: Eq[V]): Eq[Quantity[V, U]] = eq
-
-    extension[@specialized(Int, Long, Float, Double) V](v: V)
-        /**
-         * Lift a raw value into a unit quantity
-         * @tparam U the desired unit type
-         * @return a Quantity with given value and unit type
-         * {{{
-         * val distance = (1.0).withUnit[Meter]
-         * }}}
-         */
-        def withUnit[U]: Quantity[V, U] = v
-
-    extension[@specialized(Int, Long, Float, Double) V, U](ql: Quantity[V, U])
+    extension[VL, UL](ql: Quantity[VL, UL])
         /**
          * extract the raw value of a unit quantity
          * @return the underlying value, stripped of its unit information
@@ -147,9 +142,8 @@ object qopaque:
          * q.value // => 1.5
          * }}}
          */
-        def value: V = ql
+        def value: VL = ql
 
-    extension[VL, UL](ql: Quantity[VL, UL])
         /**
          * returns a string representing this Quantity, using unit abbreviations
          * @example
@@ -374,5 +368,3 @@ object qopaque:
 
         inline def >=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) >= 0
-    end extension
-end qopaque
