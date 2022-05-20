@@ -44,7 +44,7 @@ lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .settings(name := "coulomb-units")
   .dependsOn(core % "compile->compile;test->test")
   .settings(commonSettings :_*)
-  .jsSettings(libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M2" % Test)
+  .jsSettings(libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M3" % Test)
 
 lazy val spire = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
   .crossType(CrossType.Pure)
