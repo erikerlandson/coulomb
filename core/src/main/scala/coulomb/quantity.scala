@@ -83,16 +83,20 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  */
 inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
 
-extension[V](v: V)
-    /**
-     * Lift a raw value into a unit quantity
-     * @tparam U the desired unit type
-     * @return a Quantity with given value and unit type
-     * {{{
-     * val distance = (1.0).withUnit[Meter]
-     * }}}
-     */
-    def withUnit[U]: Quantity[V, U] = v
+package syntax {
+    // this has to be in a separated namespace:
+    // https://github.com/lampepfl/dotty/issues/15255
+    extension[V](v: V)
+        /**
+         * Lift a raw value into a unit quantity
+         * @tparam U the desired unit type
+         * @return a Quantity with given value and unit type
+         * {{{
+         * val distance = (1.0).withUnit[Meter]
+         * }}}
+         */
+        def withUnit[U]: Quantity[V, U] = Quantity[U](v)
+}
 
 /**
  * Represents a value with an associated unit type
@@ -112,7 +116,9 @@ sealed class QuantityLowPriority1:
 /**
  * Defines Quantity constructors that lift values into unit Quantities
  */
-object Quantity: // extends QuantityLowPriority0:
+object Quantity: // extends quantity.QuantityLowPriority0:
+    import syntax.withUnit
+
     /**
      * Lift a raw value of type V into a unit quantity
      * @tparam U the desired unit type
@@ -131,7 +137,7 @@ object Quantity: // extends QuantityLowPriority0:
     object Applier:
         given ctx_Applier[U]: Applier[U] = new Applier[U]
 
-    //inline given [V, U](using ord: Order[V]): Order[Quantity[V, U]] = ord
+    inline given [V, U](using ord: Order[V]): Order[Quantity[V, U]] = ord
 
     extension[VL, UL](ql: Quantity[VL, UL])
         /**

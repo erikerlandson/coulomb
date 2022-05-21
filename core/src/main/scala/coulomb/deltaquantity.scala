@@ -20,6 +20,7 @@ export dqopaque.DeltaQuantity
 export dqopaque.withDeltaUnit
 
 object dqopaque:
+    import coulomb.syntax.*
     import coulomb.ops.*
     import coulomb.conversion.*
 

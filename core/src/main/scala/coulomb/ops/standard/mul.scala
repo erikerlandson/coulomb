@@ -22,7 +22,8 @@ object mul:
 
     import algebra.ring.MultiplicativeSemigroup
 
-    import coulomb.{`*`, Quantity, withUnit}
+    import coulomb.{`*`, Quantity}
+    import coulomb.syntax.withUnit
     import coulomb.ops.{Mul, SimplifiedUnit, ValueResolution}
 
     transparent inline given ctx_mul_1V2U[VL, UL, VR, UR](using

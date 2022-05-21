@@ -22,7 +22,8 @@ object div:
 
     import algebra.ring.MultiplicativeGroup
 
-    import coulomb.{`/`, Quantity, withUnit}
+    import coulomb.{`/`, Quantity}
+    import coulomb.syntax.withUnit
     import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
 
     transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
