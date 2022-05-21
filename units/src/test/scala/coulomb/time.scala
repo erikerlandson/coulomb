@@ -18,6 +18,7 @@ import coulomb.testing.CoulombSuite
 
 class TimeUnitsSuite extends CoulombSuite:
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.units.time.{*, given}
     import algebra.instances.all.given
 
@@ -186,6 +187,7 @@ class TimeUnitsSuite extends CoulombSuite:
 class JavaTimeSuite extends CoulombSuite:
     import java.time.{ Duration, Instant }
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.units.time.{*, given}
     import coulomb.units.si.prefixes.{*, given}
     import coulomb.units.javatime.*

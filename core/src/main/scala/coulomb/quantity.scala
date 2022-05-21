@@ -95,7 +95,7 @@ package syntax {
          * val distance = (1.0).withUnit[Meter]
          * }}}
          */
-        def withUnit[U]: Quantity[V, U] = Quantity[U](v)
+        inline def withUnit[U]: Quantity[V, U] = Quantity[U](v)
 }
 
 /**
@@ -148,7 +148,7 @@ object Quantity: // extends quantity.QuantityLowPriority0:
          * q.value // => 1.5
          * }}}
          */
-        def value: VL = ql
+        inline def value: VL = ql
 
         /**
          * returns a string representing this Quantity, using unit abbreviations

@@ -19,6 +19,7 @@ import coulomb.testing.CoulombSuite
 class SpireTemperatureSuite extends CoulombSuite:
     import spire.math.*
     import coulomb.*
+    import coulomb.syntax.*
 
     import algebra.instances.all.given
 

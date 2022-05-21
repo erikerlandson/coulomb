@@ -18,11 +18,9 @@ package coulomb.units
 
 /** Temperature units and values */
 object temperature:
-    import coulomb.define.*
-    import coulomb.{`*`, `/`, `^`}
-    import coulomb.units.si.Kelvin
-
     import coulomb.*
+    import coulomb.syntax.*
+    import coulomb.define.*
 
     export coulomb.units.si.{ Kelvin, ctx_unit_Kelvin }
 

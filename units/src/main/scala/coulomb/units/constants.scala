@@ -27,6 +27,7 @@ package coulomb.units
  */
 object constants:
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.define.*
     import coulomb.rational.Rational
     import coulomb.conversion.ValueConversion

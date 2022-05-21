@@ -18,6 +18,7 @@ import coulomb.testing.CoulombSuite
 
 class TemperatureUnitsSuite extends CoulombSuite:
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.units.temperature.{*, given}
     import algebra.instances.all.given
 
