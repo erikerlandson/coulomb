@@ -16,7 +16,6 @@
 
 package coulomb
 
-import cats.kernel.{Eq, Hash, Order}
 import coulomb.ops.*
 import coulomb.rational.Rational
 import coulomb.conversion.{ValueConversion, UnitConversion}
@@ -105,18 +104,10 @@ package syntax {
  */
 opaque type Quantity[V, U] = V
 
-/*
-sealed class QuantityLowPriority0 extends QuantityLowPriority1:
-    inline given [V, U](using hash: Hash[V]): Hash[Quantity[V, U]] = hash
-
-sealed class QuantityLowPriority1:
-    inline given [V, U](using eq: Eq[V]): Eq[Quantity[V, U]] = eq
-*/
-
 /**
  * Defines Quantity constructors that lift values into unit Quantities
  */
-object Quantity: // extends quantity.QuantityLowPriority0:
+object Quantity:
     import syntax.withUnit
 
     /**
@@ -136,8 +127,6 @@ object Quantity: // extends quantity.QuantityLowPriority0:
         def apply[V](v: V): Quantity[V, U] = v
     object Applier:
         given ctx_Applier[U]: Applier[U] = new Applier[U]
-
-    inline given [V, U](using ord: Order[V]): Order[Quantity[V, U]] = ord
 
     extension[VL, UL](ql: Quantity[VL, UL])
         /**
