@@ -14,18 +14,8 @@
  * limitations under the License.
  */
 
-package coulomb.policy.spire
+package coulomb.cats
 
-object standard:
-    export coulomb.ops.standard.all.given
-    export coulomb.ops.resolution.spire.given
-    export coulomb.conversion.spire.value.given
-    export coulomb.conversion.spire.unit.given
-    export coulomb.conversion.standard.scala.given
-    export coulomb.cats.all.given
-
-object strict:
-    export coulomb.ops.standard.all.given
-    export coulomb.conversion.spire.value.given
-    export coulomb.conversion.spire.unit.given
-    export coulomb.cats.all.given
+object all:
+    export quantity.given
+    export deltaquantity.given

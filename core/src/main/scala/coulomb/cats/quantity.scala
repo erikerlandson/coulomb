@@ -18,7 +18,7 @@ package coulomb.cats
 
 import scala.util.NotGiven
 import _root_.cats.kernel.{Eq, Hash, Order}
-import coulomb.{DeltaQuantity, Quantity}
+import coulomb.Quantity
 
 object quantity:
     given ctx_Quantity_Order[V, U](using ord: Order[V]): Order[Quantity[V, U]] =
@@ -27,10 +27,7 @@ object quantity:
     given ctx_Quantity_Hash[V, U](using h: Hash[V]): Hash[Quantity[V, U]] =
         new infra.QHash[V, U](h)
 
-    given ctx_Quantity_Eq[V, U](using
-        nohash: NotGiven[Hash[V]],
-        e: Eq[V]
-            ): Eq[Quantity[V, U]] =
+    given ctx_Quantity_Eq[V, U](using noh: NotGiven[Hash[V]], e: Eq[V]): Eq[Quantity[V, U]] =
         new infra.QEq[V, U](e)
 
     object infra:
