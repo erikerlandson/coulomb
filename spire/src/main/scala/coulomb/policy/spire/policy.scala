@@ -22,10 +22,8 @@ object standard:
     export coulomb.conversion.spire.value.given
     export coulomb.conversion.spire.unit.given
     export coulomb.conversion.standard.scala.given
-    export coulomb.cats.all.given
 
 object strict:
     export coulomb.ops.standard.all.given
     export coulomb.conversion.spire.value.given
     export coulomb.conversion.spire.unit.given
-    export coulomb.cats.all.given

@@ -34,7 +34,6 @@ object standard:
     export coulomb.conversion.standard.value.given
     export coulomb.conversion.standard.unit.given
     export coulomb.conversion.standard.scala.given
-    export coulomb.cats.all.given
 
 /**
  * A policy that supports all standard operations, but does not support operations that
@@ -56,7 +55,6 @@ object strict:
     export coulomb.ops.standard.all.given
     export coulomb.conversion.standard.value.given
     export coulomb.conversion.standard.unit.given
-    export coulomb.cats.all.given
 
 /**
  * By default, coulomb will treat any unrecognized type as a base unit.
