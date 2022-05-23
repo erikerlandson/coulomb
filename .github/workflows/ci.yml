@@ -89,15 +89,15 @@ jobs:
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
 
       - name: Make target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3' || github.ref == 'refs/heads/make-opaque-type-work-somehow')
         run: mkdir -p spire/.js/target spire/.jvm/target benchmarks/target target all/target units/.jvm/target unidocs/target .js/target site/target core/.js/target core/.jvm/target .jvm/target .native/target units/.js/target project/target
 
       - name: Compress target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3' || github.ref == 'refs/heads/make-opaque-type-work-somehow')
         run: tar cf targets.tar spire/.js/target spire/.jvm/target benchmarks/target target all/target units/.jvm/target unidocs/target .js/target site/target core/.js/target core/.jvm/target .jvm/target .native/target units/.js/target project/target
 
       - name: Upload target directories
-        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3')
+        if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3' || github.ref == 'refs/heads/make-opaque-type-work-somehow')
         uses: actions/upload-artifact@v2
         with:
           name: target-${{ matrix.os }}-${{ matrix.java }}-${{ matrix.scala }}-${{ matrix.project }}
@@ -106,7 +106,7 @@ jobs:
   publish:
     name: Publish Artifacts
     needs: [build]
-    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3')
+    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/scala3' || github.ref == 'refs/heads/make-opaque-type-work-somehow')
     strategy:
       matrix:
         os: [ubuntu-latest]
