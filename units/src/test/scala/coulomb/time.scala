@@ -47,14 +47,11 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("show") {
-        // currently the compiler is confused by 'type EpochTime[V, U]'
-        assertEquals(1.withEpochTime[Hour]
-            .asInstanceOf[DeltaQuantity[Int, Hour, Second]].show, "1 h")
+        assertEquals(1.withEpochTime[Hour].show, "1 h")
     }
 
     test("showFull") {
-        assertEquals(1.withEpochTime[Day]
-            .asInstanceOf[DeltaQuantity[Int, Day, Second]].showFull, "1 day")
+        assertEquals(1.withEpochTime[Day].showFull, "1 day")
     }
 
     test("toValue") {
