@@ -14,8 +14,6 @@ ThisBuild / startYear := Some(2022)
 
 // ci settings
 ThisBuild / tlCiReleaseBranches := Seq("scala3")
-// temporary
-ThisBuild / tlCiReleaseBranches += "make-opaque-type-work-somehow"
 // don't overwrite the site published from develop branch for now
 // to enable, set this to whatever main branch is to enable (e.g. develop, main, etc)
 ThisBuild / tlSitePublishBranch := Some("no-such-branch")
