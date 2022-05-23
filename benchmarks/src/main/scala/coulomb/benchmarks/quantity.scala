@@ -29,6 +29,7 @@ import org.openjdk.jmh.annotations.*
 class QuantityBenchmark:
     import scala.language.implicitConversions
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
     import coulomb.ops.algebra.all.given

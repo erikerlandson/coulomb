@@ -18,6 +18,7 @@ import coulomb.testing.CoulombSuite
 
 class TemperatureUnitsSuite extends CoulombSuite:
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.units.temperature.{*, given}
     import algebra.instances.all.given
 
@@ -41,14 +42,11 @@ class TemperatureUnitsSuite extends CoulombSuite:
     }
 
     test("show") {
-        // currently the compiler is confused by 'type Temperature[V, U]'
-        assertEquals(1.withTemperature[Celsius]
-            .asInstanceOf[DeltaQuantity[Int, Celsius, Kelvin]].show, "1 °C")
+        assertEquals(1.withTemperature[Celsius].show, "1 °C")
     }
 
     test("showFull") {
-        assertEquals(1.withTemperature[Celsius]
-            .asInstanceOf[DeltaQuantity[Int, Celsius, Kelvin]].showFull, "1 celsius")
+        assertEquals(1.withTemperature[Celsius].showFull, "1 celsius")
     }
 
     test("toValue") {

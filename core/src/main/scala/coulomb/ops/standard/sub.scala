@@ -22,7 +22,8 @@ object sub:
 
     import algebra.ring.AdditiveGroup
 
-    import coulomb.{Quantity, withUnit}
+    import coulomb.Quantity
+    import coulomb.syntax.withUnit
     import coulomb.ops.{Sub, ValueResolution}
 
     transparent inline given ctx_sub_1V1U[VL, UL, VR, UR](using

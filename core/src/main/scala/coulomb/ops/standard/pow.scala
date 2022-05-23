@@ -22,7 +22,8 @@ object pow:
     import algebra.ring.MultiplicativeSemigroup
     import algebra.ring.MultiplicativeGroup
 
-    import coulomb.{`^`, Quantity, withUnit}
+    import coulomb.{`^`, Quantity}
+    import coulomb.syntax.withUnit
     import coulomb.ops.{Pow, SimplifiedUnit}
     import coulomb.rational.typeexpr
     import coulomb.ops.algebra.FractionalPower

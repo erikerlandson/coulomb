@@ -18,6 +18,7 @@ import coulomb.testing.CoulombSuite
 
 class TimeUnitsSuite extends CoulombSuite:
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.units.time.{*, given}
     import algebra.instances.all.given
 
@@ -46,14 +47,11 @@ class TimeUnitsSuite extends CoulombSuite:
     }
 
     test("show") {
-        // currently the compiler is confused by 'type EpochTime[V, U]'
-        assertEquals(1.withEpochTime[Hour]
-            .asInstanceOf[DeltaQuantity[Int, Hour, Second]].show, "1 h")
+        assertEquals(1.withEpochTime[Hour].show, "1 h")
     }
 
     test("showFull") {
-        assertEquals(1.withEpochTime[Day]
-            .asInstanceOf[DeltaQuantity[Int, Day, Second]].showFull, "1 day")
+        assertEquals(1.withEpochTime[Day].showFull, "1 day")
     }
 
     test("toValue") {
@@ -186,6 +184,7 @@ class TimeUnitsSuite extends CoulombSuite:
 class JavaTimeSuite extends CoulombSuite:
     import java.time.{ Duration, Instant }
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.units.time.{*, given}
     import coulomb.units.si.prefixes.{*, given}
     import coulomb.units.javatime.*

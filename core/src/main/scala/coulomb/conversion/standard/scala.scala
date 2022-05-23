@@ -20,6 +20,7 @@ object scala:
     import _root_.scala.Conversion
     import coulomb.conversion.*
     import coulomb.*
+    import coulomb.syntax.*
 
     // Enable the compiler to implicitly convert Quantity[V1, U1] -> Quantity[V2, U2], 
     // whenever a valid conversion exists:

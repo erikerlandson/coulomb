@@ -19,7 +19,8 @@ package coulomb.ops.standard
 object neg:
     import algebra.ring.AdditiveGroup
 
-    import coulomb.{Quantity, withUnit}
+    import coulomb.Quantity
+    import coulomb.syntax.withUnit
     import coulomb.ops.Neg
 
     given ctx_quantity_neg[V, U](using alg: AdditiveGroup[V]): Neg[V, U] =

@@ -18,6 +18,8 @@ import coulomb.testing.CoulombSuite
 
 class SIUnitsSuite extends CoulombSuite:
     import coulomb.*
+    import coulomb.syntax.*
+
     import coulomb.units.si.{*, given}
     import coulomb.units.si.prefixes.{*, given}
 

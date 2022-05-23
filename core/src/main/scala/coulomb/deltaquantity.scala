@@ -16,53 +16,29 @@
 
 package coulomb
 
-export dqopaque.DeltaQuantity
-export dqopaque.withDeltaUnit
+import coulomb.syntax.*
+import coulomb.ops.*
+import coulomb.conversion.*
 
-object dqopaque:
-    import coulomb.ops.*
-    import coulomb.conversion.*
-
-    opaque type DeltaQuantity[V, U, B] = V
-
-    // lift
-    object DeltaQuantity:
-        def apply[U, B](using a: Applier[U, B]) = a
-        def apply[U, B](v: Int): DeltaQuantity[Int, U, B] = v
-        def apply[U, B](v: Long): DeltaQuantity[Long, U, B] = v
-        def apply[U, B](v: Float): DeltaQuantity[Float, U, B] = v
-        def apply[U, B](v: Double): DeltaQuantity[Double, U, B] = v
-
-        abstract class Applier[U, B]:
-            def apply[V](v: V): DeltaQuantity[V, U, B]
-        object Applier:
-            given [U, B]: Applier[U, B] = new Applier[U, B] { def apply[V](v: V): DeltaQuantity[V, U, B] = v } 
-
+package syntax {
     // lift using withDeltaUnit method
     extension[V](v: V)
-        def withDeltaUnit[U, B]: DeltaQuantity[V, U, B] = v
-    extension(v: Int)
-        def withDeltaUnit[U, B]: DeltaQuantity[Int, U, B] = v
-    extension(v: Long)
-        def withDeltaUnit[U, B]: DeltaQuantity[Long, U, B] = v
-    extension(v: Float)
-        def withDeltaUnit[U, B]: DeltaQuantity[Float, U, B] = v
-    extension(v: Double)
-        def withDeltaUnit[U, B]: DeltaQuantity[Double, U, B] = v
+        inline def withDeltaUnit[U, B]: DeltaQuantity[V, U, B] = DeltaQuantity[U, B](v)
+}
 
-    // extract
-    extension[V, U, B](ql: DeltaQuantity[V, U, B])
-        def value: V = ql
-    extension[U, B](ql: DeltaQuantity[Int, U, B])
-        def value: Int = ql
-    extension[U, B](ql: DeltaQuantity[Long, U, B])
-        def value: Long = ql
-    extension[U, B](ql: DeltaQuantity[Float, U, B])
-        def value: Float = ql
-    extension[U, B](ql: DeltaQuantity[Double, U, B])
-        def value: Double = ql
+opaque type DeltaQuantity[V, U, B] = V
+
+object DeltaQuantity:
+    def apply[U, B](using a: Applier[U, B]) = a
+
+    abstract class Applier[U, B]:
+        def apply[V](v: V): DeltaQuantity[V, U, B]
+    object Applier:
+        given [U, B]: Applier[U, B] = new Applier[U, B] { def apply[V](v: V): DeltaQuantity[V, U, B] = v } 
 
     extension[VL, UL, B](ql: DeltaQuantity[VL, UL, B])
+        inline def value: VL = ql
+
         inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
         inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
 
@@ -102,5 +78,3 @@ object dqopaque:
 
         inline def >=[VR, UR](qr: DeltaQuantity[VR, UR, B])(using ord: DeltaOrd[B, VL, UL, VR, UR]): Boolean =
             ord(ql, qr) >= 0
-    end extension
-end dqopaque

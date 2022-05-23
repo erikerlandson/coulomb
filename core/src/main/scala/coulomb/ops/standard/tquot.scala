@@ -22,7 +22,8 @@ object tquot:
 
     import algebra.ring.TruncatedDivision
 
-    import coulomb.{`/`, Quantity, withUnit}
+    import coulomb.{`/`, Quantity}
+    import coulomb.syntax.withUnit
     import coulomb.ops.{TQuot, SimplifiedUnit, ValueResolution}
 
     transparent inline given ctx_tquot_1V2U[VL, UL, VR, UR](using

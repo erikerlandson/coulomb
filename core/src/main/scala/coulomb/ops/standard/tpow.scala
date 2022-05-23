@@ -19,7 +19,8 @@ package coulomb.ops.standard
 object tpow:
     import scala.util.NotGiven
 
-    import coulomb.{`^`, Quantity, withUnit}
+    import coulomb.{`^`, Quantity}
+    import coulomb.syntax.withUnit
     import coulomb.ops.{TPow, SimplifiedUnit}
     import coulomb.ops.algebra.TruncatingPower
     import coulomb.rational.typeexpr

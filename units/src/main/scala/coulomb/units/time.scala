@@ -20,12 +20,11 @@ package coulomb.units
  * Units of time or duration
  */
 object time:
-    import coulomb.define.*
-    import coulomb.{`*`, `/`, `^`}
-    import coulomb.units.si.*
-
     import coulomb.*
+    import coulomb.syntax.*
+    import coulomb.define.*
 
+    import coulomb.units.si.*
     export coulomb.units.si.{ Second, ctx_unit_Second }
 
     /** A duration of 60 seconds */
@@ -94,6 +93,7 @@ object time:
 object javatime:
     import java.time.{ Duration, Instant }
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.units.time.*
 
     import conversions.*

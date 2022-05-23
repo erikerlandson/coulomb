@@ -56,7 +56,6 @@ object strict:
     export coulomb.conversion.standard.value.given
     export coulomb.conversion.standard.unit.given
 
-
 /**
  * By default, coulomb will treat any unrecognized type as a base unit.
  * To disable this behavior and raise a compile error on any type not declared as

@@ -23,6 +23,7 @@ object deltasubq:
     import algebra.ring.AdditiveGroup
 
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.ops.{DeltaSubQ, ValueResolution}
 
     transparent inline given ctx_deltasubq_1V1U[B, VL, UL, VR, UR](using

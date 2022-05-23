@@ -20,7 +20,8 @@ import scala.util.NotGiven
 import scala.Conversion
 
 import coulomb.{`*`, `/`, `^`}
-import coulomb.{Quantity, withUnit}
+import coulomb.Quantity
+import coulomb.syntax.withUnit
 import coulomb.ops.*
 import coulomb.ops.standard.named.*
 import coulomb.conversion.coefficients.*

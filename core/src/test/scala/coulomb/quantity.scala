@@ -18,6 +18,7 @@ import coulomb.testing.CoulombSuite
 
 class QuantitySuite extends CoulombSuite:
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
     import coulomb.ops.algebra.all.given
@@ -566,6 +567,7 @@ class QuantitySuite extends CoulombSuite:
 
 class OptimizedQuantitySuite extends CoulombSuite:
     import coulomb.*
+    import coulomb.syntax.*
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
     import coulomb.ops.algebra.all.given
