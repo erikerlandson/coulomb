@@ -20,24 +20,24 @@ import scala.util.NotGiven
 import _root_.cats.kernel.{Eq, Hash, Order}
 import coulomb.Quantity
 
-object quantity extends quantityprios.quantityPrio1:
+object quantity extends quantityprios.prio1:
     given ctx_Quantity_Order[V, U](using ord: Order[V]): Order[Quantity[V, U]] =
-        new QOrder[V, U](ord)
+        new quantityprios.QOrder[V, U](ord)
 
 object quantityprios:
-    class quantityPrio2:
-        class QOrder[V, U](ord: Order[V]) extends Order[Quantity[V, U]]:
-            def compare(x: Quantity[V, U], y: Quantity[V, U]) = ord.compare(x.value, y.value)
+    class QOrder[V, U](ord: Order[V]) extends Order[Quantity[V, U]]:
+        def compare(x: Quantity[V, U], y: Quantity[V, U]) = ord.compare(x.value, y.value)
 
-        class QEq[V, U](e: Eq[V]) extends Eq[Quantity[V, U]]:
-            def eqv(x: Quantity[V, U], y: Quantity[V, U]) = e.eqv(x.value, y.value)
+    class QEq[V, U](e: Eq[V]) extends Eq[Quantity[V, U]]:
+        def eqv(x: Quantity[V, U], y: Quantity[V, U]) = e.eqv(x.value, y.value)
 
-        class QHash[V, U](h: Hash[V]) extends QEq[V, U](h) with Hash[Quantity[V, U]]:
-            def hash(x: Quantity[V, U]) = h.hash(x.value)
+    class QHash[V, U](h: Hash[V]) extends QEq[V, U](h) with Hash[Quantity[V, U]]:
+        def hash(x: Quantity[V, U]) = h.hash(x.value)
 
+    class prio2:
         given ctx_Quantity_Eq[V, U](using e: Eq[V]): Eq[Quantity[V, U]] =
             new QEq[V, U](e)
 
-    class quantityPrio1 extends quantityPrio2:
+    class prio1 extends prio2:
         given ctx_Quantity_Hash[V, U](using h: Hash[V]): Hash[Quantity[V, U]] =
             new QHash[V, U](h)

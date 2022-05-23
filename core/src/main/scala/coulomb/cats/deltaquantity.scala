@@ -20,22 +20,24 @@ import scala.util.NotGiven
 import _root_.cats.kernel.{Eq, Hash, Order}
 import coulomb.DeltaQuantity
 
-object deltaquantity:
+object deltaquantity extends deltaquantityprios.prio1:
     given ctx_DeltaQuantity_Order[V, U, B](using ord: Order[V]): Order[DeltaQuantity[V, U, B]] =
-        new infra.DQOrder[V, U, B](ord)
+        new deltaquantityprios.QOrder[V, U, B](ord)
 
-    given ctx_DeltaQuantity_Hash[V, U, B](using h: Hash[V]): Hash[DeltaQuantity[V, U, B]] =
-        new infra.DQHash[V, U, B](h)
+object deltaquantityprios:
+    class QOrder[V, U, B](ord: Order[V]) extends Order[DeltaQuantity[V, U, B]]:
+        def compare(x: DeltaQuantity[V, U, B], y: DeltaQuantity[V, U, B]) = ord.compare(x.value, y.value)
 
-    given ctx_DeltaQuantity_Eq[V, U, B](using noh: NotGiven[Hash[V]], e: Eq[V]): Eq[DeltaQuantity[V, U, B]] =
-        new infra.DQEq[V, U, B](e)
+    class QEq[V, U, B](e: Eq[V]) extends Eq[DeltaQuantity[V, U, B]]:
+        def eqv(x: DeltaQuantity[V, U, B], y: DeltaQuantity[V, U, B]) = e.eqv(x.value, y.value)
 
-    object infra:
-        class DQOrder[V, U, B](ord: Order[V]) extends Order[DeltaQuantity[V, U, B]]:
-            def compare(x: DeltaQuantity[V, U, B], y: DeltaQuantity[V, U, B]) = ord.compare(x.value, y.value)
+    class QHash[V, U, B](h: Hash[V]) extends QEq[V, U, B](h) with Hash[DeltaQuantity[V, U, B]]:
+        def hash(x: DeltaQuantity[V, U, B]) = h.hash(x.value)
 
-        class DQEq[V, U, B](e: Eq[V]) extends Eq[DeltaQuantity[V, U, B]]:
-            def eqv(x: DeltaQuantity[V, U, B], y: DeltaQuantity[V, U, B]) = e.eqv(x.value, y.value)
+    class prio2:
+        given ctx_DeltaQuantity_Eq[V, U, B](using e: Eq[V]): Eq[DeltaQuantity[V, U, B]] =
+            new QEq[V, U, B](e)
 
-        class DQHash[V, U, B](h: Hash[V]) extends DQEq[V, U, B](h) with Hash[DeltaQuantity[V, U, B]]:
-            def hash(x: DeltaQuantity[V, U, B]) = h.hash(x.value)
+    class prio1 extends prio2:
+        given ctx_DeltaQuantity_Hash[V, U, B](using h: Hash[V]): Hash[DeltaQuantity[V, U, B]] =
+            new QHash[V, U, B](h)
