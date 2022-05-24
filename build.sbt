@@ -5,6 +5,8 @@
 // base version for assessing MIMA
 ThisBuild / tlBaseVersion := "0.6"
 
+ThisBuild / version := "0.6.0-M1"
+
 // publish settings
 ThisBuild / developers += tlGitHubDev("erikerlandson", "Erik Erlandson")
 ThisBuild / organization := "com.manyangled"
