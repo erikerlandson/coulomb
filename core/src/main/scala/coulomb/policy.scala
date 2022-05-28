@@ -16,6 +16,22 @@
 
 package coulomb.policy
 
+/*
+object priority:
+    // lower number = higher priority
+    class Prio0 extends Prio1
+    object Prio0 { given Prio0() }
+
+    class Prio1 extends Prio2
+    object Prio1 { given Prio1() }
+
+    class Prio2 extends Prio3
+    object Prio2 { given Prio2() }
+
+    class Prio3
+    object Prio3 { given Prio3() }
+*/
+
 /**
  * A policy that supports all standard operation definitions, including those involving
  * implicit conversions of units or value types.
