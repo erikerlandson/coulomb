@@ -345,21 +345,105 @@ object Quantity:
 
         /**
          * test this quantity for equality with another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if right hand value equals the left (after any conversions), false otherwise
+         * @example
+         * {{{
+         * val q1 = 1000.withUnit[Liter]
+         * val q2 = 1.withUnit[Meter ^ 3]
+         * q1 === q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
          */
         inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) == 0
 
+        /**
+         * test this quantity for inequality with another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if right hand value does not equal left (after any conversions), false otherwise
+         * @example
+         * {{{
+         * val q1 = 1000.withUnit[Liter]
+         * val q2 = 2.withUnit[Meter ^ 3]
+         * q1 =!= q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         inline def =!=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) != 0
 
+        /**
+         * test if this quantity is less than another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if left-hand value is less than the right (after any conversions), false otherwise
+         * @example
+         * {{{
+         * val q1 = 1000.withUnit[Liter]
+         * val q2 = 2.withUnit[Meter ^ 3]
+         * q1 < q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         inline def <[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) < 0
 
+        /**
+         * test if this quantity is less than or equal to another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if left-hand value is less than or equal to the right (after any conversions),
+         * false otherwise
+         * @example
+         * {{{
+         * val q1 = 1000.withUnit[Liter]
+         * val q2 = 2.withUnit[Meter ^ 3]
+         * q1 <= q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         inline def <=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) <= 0
 
+        /**
+         * test if this quantity is greater than another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if left-hand value is greater than the right (after any conversions),
+         * false otherwise
+         * @example
+         * {{{
+         * val q1 = 2000.withUnit[Liter]
+         * val q2 = 1.withUnit[Meter ^ 3]
+         * q1 > q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         inline def >[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) > 0
 
+        /**
+         * test if this quantity is greater than or equal to another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if left-hand value is greater than or equal to the right (after any conversions),
+         * false otherwise
+         * @example
+         * {{{
+         * val q1 = 2000.withUnit[Liter]
+         * val q2 = 1.withUnit[Meter ^ 3]
+         * q1 >= q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
         inline def >=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
             ord(ql, qr) >= 0
