@@ -24,35 +24,35 @@ ThisBuild / crossScalaVersions := Seq("3.1.2")
 Test / parallelExecution := false
 
 def commonSettings = Seq(
-    libraryDependencies += "org.scalameta" %%% "munit" % "0.7.29" % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M5" % Test
 )
 
 lazy val root = tlCrossRootProject
   .aggregate(core, units, spire, unidocs)
 
-lazy val core = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
+lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("core"))
   .settings(name := "coulomb-core")
   .settings(commonSettings :_*)
-  .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.7.0")
-  .jsSettings(Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*serde.scala")
+  .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.8.0")
+  .platformsSettings(JSPlatform, NativePlatform)(Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*serde.scala")
 
-lazy val units = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
+lazy val units = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("units"))
   .settings(name := "coulomb-units")
   .dependsOn(core % "compile->compile;test->test")
   .settings(commonSettings :_*)
-  .jsSettings(libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M3" % Test)
+  .platformsSettings(JSPlatform, NativePlatform)(libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.4.0-M3" % Test)
 
-lazy val spire = crossProject(JVMPlatform, JSPlatform/*, NativePlatform*/)
+lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .in(file("spire"))
   .settings(name := "coulomb-spire")
   .dependsOn(core % "compile->compile;test->test", units % Test)
   .settings(commonSettings :_*)
-  .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0-M3")
+  .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
 
 // a target for rolling up all subproject deps: a convenient
 // way to get a repl that has access to all subprojects
