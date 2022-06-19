@@ -16,6 +16,27 @@
 
 import coulomb.testing.CoulombSuite
 
+object repro {
+    import coulomb.*
+    import coulomb.syntax.*
+
+    import algebra.instances.all.given
+    import coulomb.ops.algebra.spire.all.given
+
+    import coulomb.policy.spire.standard.given
+    import coulomb.units.si.*
+    import coulomb.units.si.given
+    import scala.math._
+
+    object ItcImpl2 {
+        val expTime: Quantity[BigDecimal, Second]   = BigDecimal(1).withUnit[Second]
+        val nExp                                    = 1
+        val t = nExp.withUnit[Unitless]
+        val totalTime: Quantity[BigDecimal, Second] =
+          expTime * nExp.withUnit[Unitless]
+    }
+}
+
 class SpireQuantitySuite extends CoulombSuite:
     import spire.math.*
     import coulomb.*

@@ -105,7 +105,7 @@ package syntax {
 opaque type Quantity[V, U] = V
 
 /**
- * Defines Quantity constructors that lift values into unit Quantities
+ * Defines Quantity constructors and extension methods
  */
 object Quantity:
     import syntax.withUnit
@@ -352,7 +352,7 @@ object Quantity:
          * @example
          * {{{
          * val q1 = 1000.withUnit[Liter]
-         * val q2 = 1.withUnit[Meter ^ 3]
+         * val q2 = (1.0).withUnit[Meter ^ 3]
          * q1 === q2 // => true
          * }}}
          * @note result may depend on what algebras, policies, and other typeclasses are in scope
@@ -369,7 +369,7 @@ object Quantity:
          * @example
          * {{{
          * val q1 = 1000.withUnit[Liter]
-         * val q2 = 2.withUnit[Meter ^ 3]
+         * val q2 = (2.0).withUnit[Meter ^ 3]
          * q1 =!= q2 // => true
          * }}}
          * @note result may depend on what algebras, policies, and other typeclasses are in scope
@@ -386,7 +386,7 @@ object Quantity:
          * @example
          * {{{
          * val q1 = 1000.withUnit[Liter]
-         * val q2 = 2.withUnit[Meter ^ 3]
+         * val q2 = (2.0).withUnit[Meter ^ 3]
          * q1 < q2 // => true
          * }}}
          * @note result may depend on what algebras, policies, and other typeclasses are in scope
@@ -404,7 +404,7 @@ object Quantity:
          * @example
          * {{{
          * val q1 = 1000.withUnit[Liter]
-         * val q2 = 2.withUnit[Meter ^ 3]
+         * val q2 = (2.0).withUnit[Meter ^ 3]
          * q1 <= q2 // => true
          * }}}
          * @note result may depend on what algebras, policies, and other typeclasses are in scope
@@ -422,7 +422,7 @@ object Quantity:
          * @example
          * {{{
          * val q1 = 2000.withUnit[Liter]
-         * val q2 = 1.withUnit[Meter ^ 3]
+         * val q2 = (1.0).withUnit[Meter ^ 3]
          * q1 > q2 // => true
          * }}}
          * @note result may depend on what algebras, policies, and other typeclasses are in scope
@@ -440,7 +440,7 @@ object Quantity:
          * @example
          * {{{
          * val q1 = 2000.withUnit[Liter]
-         * val q2 = 1.withUnit[Meter ^ 3]
+         * val q2 = (1.0).withUnit[Meter ^ 3]
          * q1 >= q2 // => true
          * }}}
          * @note result may depend on what algebras, policies, and other typeclasses are in scope
