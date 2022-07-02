@@ -74,7 +74,11 @@ lazy val unidocs = project
   .settings(name := "coulomb-docs") // the name of the artifact
   .enablePlugins(TypelevelUnidocPlugin) // enable Unidoc + publishing
 
+// https://typelevel.org/sbt-typelevel/site.html
+// sbt docs/tlSitePreview
+// http://localhost:4242
 lazy val docs = project.in(file("site"))
+  .dependsOn(core.jvm, units.jvm, spire.jvm)
   .enablePlugins(TypelevelSitePlugin)
 
 // https://github.com/sbt/sbt-jmh
