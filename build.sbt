@@ -24,7 +24,7 @@ ThisBuild / crossScalaVersions := Seq("3.1.3")
 Test / parallelExecution := false
 
 def commonSettings = Seq(
-    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M5" % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M6" % Test
 )
 
 lazy val root = tlCrossRootProject
