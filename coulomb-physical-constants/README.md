@@ -19,7 +19,7 @@ of binary compatible dependency versions:
 libraryDependencies ++= Seq(
   // basic coulomb dependencies
   "com.manyangled" %% "coulomb" % "0.5.8",
-  "org.typelevel" %% "spire" % "0.18.0-M3",
+  "org.typelevel" %% "spire" % "0.18.0",
   "eu.timepit" %% "singleton-ops" % "0.5.2",
   // constant dependency
   "com.manyangled" %% "coulomb-physical-constants" % "0.5.8",
