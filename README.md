@@ -33,7 +33,7 @@ package is also a dependency, but is included transitively via `spire`.
 ```scala
 libraryDependencies ++= Seq(
   "com.manyangled" %% "coulomb" % "0.5.8",
-  "org.typelevel" %% "spire" % "0.18.0-M3",
+  "org.typelevel" %% "spire" % "0.18.0",
   "eu.timepit" %% "singleton-ops" % "0.5.2"
 )
 ```
