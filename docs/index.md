@@ -48,3 +48,11 @@ val v = a * t
 val x = a * (t.pow[2]) / 2.withUnit[1]
 ```
 
+Improper unit analysis is a compile-time failure.
+```scala mdoc:fail
+val time = 1.withUnit[Second]
+val dist = 1.withUnit[Meter]
+
+// Incompatible unit operations are a compile-time type error
+val fail = time + dist
+```
