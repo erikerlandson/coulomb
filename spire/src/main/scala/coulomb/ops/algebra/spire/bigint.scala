@@ -33,5 +33,5 @@ object bigint:
         def fmod(x: BigInt, y: BigInt): BigInt = ???
         def abs(a: BigInt): BigInt = ???
         def additiveCommutativeMonoid: algebra.ring.AdditiveCommutativeMonoid[BigInt] = ???
-        def order: cats.kernel.Order[BigInt] = ???
+        def order: _root_.cats.kernel.Order[BigInt] = ???
         def signum(a: BigInt): Int = ???
