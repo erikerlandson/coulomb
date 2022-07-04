@@ -565,6 +565,28 @@ class QuantitySuite extends CoulombSuite:
         assertEquals(summon[ShowUnitFull[KiloMeter]].value, "kilometer")
     }
 
+    test("cats Eq, Ord, Hash") {
+        import cats.kernel.{Eq, Hash, Order}
+        import coulomb.policy.strict.given
+
+        val q1 = 1.withUnit[Meter]
+        val q2 = 1.withUnit[Meter]
+        val q3 = 2.withUnit[Meter]
+
+        val eqv = summon[Eq[Quantity[Int, Meter]]]
+        assertEquals(eqv.eqv(q1, q2), true)
+        assertEquals(eqv.eqv(q1, q3), false)
+
+        val ord = summon[Order[Quantity[Int, Meter]]]
+        assertEquals(ord.compare(q1, q2), 0)
+        assertEquals(ord.compare(q1, q3), -1)
+        assertEquals(ord.compare(q3, q1), 1)
+
+        val hash = summon[Hash[Quantity[Int, Meter]]]
+        assertEquals(hash.hash(q1), hash.hash(q2))
+        assertNotEquals(hash.hash(q1), hash.hash(q3))
+    }
+
 class OptimizedQuantitySuite extends CoulombSuite:
     import coulomb.*
     import coulomb.syntax.*

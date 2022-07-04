@@ -180,3 +180,25 @@ class DeltaQuantitySuite extends CoulombSuite:
         // 2V2U
         assertEquals(38d.withDeltaUnit[Celsius, Kelvin] < 98.6f.withDeltaUnit[Fahrenheit, Kelvin], false)
     }
+
+    test("cats Eq, Ord, Hash") {
+        import cats.kernel.{Eq, Hash, Order}
+        import coulomb.policy.strict.given
+
+        val q1 = 1.withDeltaUnit[Meter, Meter]
+        val q2 = 1.withDeltaUnit[Meter, Meter]
+        val q3 = 2.withDeltaUnit[Meter, Meter]
+
+        val eqv = summon[Eq[DeltaQuantity[Int, Meter, Meter]]]
+        assertEquals(eqv.eqv(q1, q2), true)
+        assertEquals(eqv.eqv(q1, q3), false)
+
+        val ord = summon[Order[DeltaQuantity[Int, Meter, Meter]]]
+        assertEquals(ord.compare(q1, q2), 0)
+        assertEquals(ord.compare(q1, q3), -1)
+        assertEquals(ord.compare(q3, q1), 1)
+
+        val hash = summon[Hash[DeltaQuantity[Int, Meter, Meter]]]
+        assertEquals(hash.hash(q1), hash.hash(q2))
+        assertNotEquals(hash.hash(q1), hash.hash(q3))
+    }
