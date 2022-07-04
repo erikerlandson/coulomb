@@ -30,5 +30,5 @@ object long:
         def fmod(x: Long, y: Long): Long = ???
         def abs(a: Long): Long = ???
         def additiveCommutativeMonoid: algebra.ring.AdditiveCommutativeMonoid[Long] = ???
-        def order: cats.kernel.Order[Long] = ???
+        def order: _root_.cats.kernel.Order[Long] = ???
         def signum(a: Long): Int = ???
