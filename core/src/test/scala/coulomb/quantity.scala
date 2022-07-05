@@ -394,14 +394,14 @@ class QuantitySuite extends CoulombSuite:
         2f.withUnit[Meter].pow[1 / 2].assertQD[Float, Meter ^ (1 / 2)](1.4142135623730951)
         2f.withUnit[Meter].pow[-1 / 2].assertQD[Float, 1 / (Meter ^ (1 / 2))](0.7071067811865476)
 
-        // positive integer exponents are supported via multiplicative semigroup
-        assertCE("2L.withUnit[Meter].pow[0]")
+        // non-negative integer exponents are supported via multiplicative monoid
+        2L.withUnit[Meter].pow[0].assertQ[Long, 1](1)
         2L.withUnit[Meter].pow[2].assertQ[Long, Meter ^ 2](4)
         assertCE("2L.withUnit[Meter].pow[-1]")
         assertCE("2L.withUnit[Meter].pow[1 / 2]")
         assertCE("2L.withUnit[Meter].pow[-1 / 2]")
 
-        assertCE("2.withUnit[Meter].pow[0]")
+        2.withUnit[Meter].pow[0].assertQ[Int, 1](1)
         2.withUnit[Meter].pow[2].assertQ[Int, Meter ^ 2](4)
         assertCE("2.withUnit[Meter].pow[-1]")
         assertCE("2.withUnit[Meter].pow[1 / 2]")
