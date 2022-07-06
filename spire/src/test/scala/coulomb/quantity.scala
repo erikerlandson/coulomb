@@ -124,8 +124,7 @@ class SpireQuantitySuite extends CoulombSuite:
         Algebraic(2).withUnit[Meter].pow[1 / 2].assertQD[Algebraic, Meter ^ (1 / 2)](1.4142135623730951)
         Real(2).withUnit[Meter].pow[1 / 2].assertQD[Real, Meter ^ (1 / 2)](1.4142135623730951)
 
-        // positive integer exponents are supported via multiplicative semigroup
-        assertCE("BigInt(2).withUnit[Meter].pow[0]")
+        BigInt(2).withUnit[Meter].pow[0].assertQ[BigInt, 1](1)
         BigInt(2).withUnit[Meter].pow[2].assertQ[BigInt, Meter ^ 2](4)
         assertCE("BigInt(2).withUnit[Meter].pow[-1]")
         assertCE("BigInt(2).withUnit[Meter].pow[1 / 2]")

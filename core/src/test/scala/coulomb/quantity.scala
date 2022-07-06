@@ -394,14 +394,14 @@ class QuantitySuite extends CoulombSuite:
         2f.withUnit[Meter].pow[1 / 2].assertQD[Float, Meter ^ (1 / 2)](1.4142135623730951)
         2f.withUnit[Meter].pow[-1 / 2].assertQD[Float, 1 / (Meter ^ (1 / 2))](0.7071067811865476)
 
-        // positive integer exponents are supported via multiplicative semigroup
-        assertCE("2L.withUnit[Meter].pow[0]")
+        // non-negative integer exponents are supported via multiplicative monoid
+        2L.withUnit[Meter].pow[0].assertQ[Long, 1](1)
         2L.withUnit[Meter].pow[2].assertQ[Long, Meter ^ 2](4)
         assertCE("2L.withUnit[Meter].pow[-1]")
         assertCE("2L.withUnit[Meter].pow[1 / 2]")
         assertCE("2L.withUnit[Meter].pow[-1 / 2]")
 
-        assertCE("2.withUnit[Meter].pow[0]")
+        2.withUnit[Meter].pow[0].assertQ[Int, 1](1)
         2.withUnit[Meter].pow[2].assertQ[Int, Meter ^ 2](4)
         assertCE("2.withUnit[Meter].pow[-1]")
         assertCE("2.withUnit[Meter].pow[1 / 2]")
@@ -563,6 +563,28 @@ class QuantitySuite extends CoulombSuite:
         import su.given
         assertEquals(summon[ShowUnit[KiloMeter]].value, "km")
         assertEquals(summon[ShowUnitFull[KiloMeter]].value, "kilometer")
+    }
+
+    test("cats Eq, Ord, Hash") {
+        import cats.kernel.{Eq, Hash, Order}
+        import coulomb.policy.strict.given
+
+        val q1 = 1.withUnit[Meter]
+        val q2 = 1.withUnit[Meter]
+        val q3 = 2.withUnit[Meter]
+
+        val eqv = summon[Eq[Quantity[Int, Meter]]]
+        assertEquals(eqv.eqv(q1, q2), true)
+        assertEquals(eqv.eqv(q1, q3), false)
+
+        val ord = summon[Order[Quantity[Int, Meter]]]
+        assertEquals(ord.compare(q1, q2), 0)
+        assertEquals(ord.compare(q1, q3), -1)
+        assertEquals(ord.compare(q3, q1), 1)
+
+        val hash = summon[Hash[Quantity[Int, Meter]]]
+        assertEquals(hash.hash(q1), hash.hash(q2))
+        assertNotEquals(hash.hash(q1), hash.hash(q3))
     }
 
 class OptimizedQuantitySuite extends CoulombSuite:

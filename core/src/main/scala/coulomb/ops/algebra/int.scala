@@ -30,6 +30,6 @@ object int:
         def fmod(x: Int, y: Int): Int = ???
         def abs(a: Int): Int = ???
         def additiveCommutativeMonoid: algebra.ring.AdditiveCommutativeMonoid[Int] = ???
-        def order: cats.kernel.Order[Int] = ???
+        def order: _root_.cats.kernel.Order[Int] = ???
         def signum(a: Int): Int = ???
 
