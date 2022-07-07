@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package coulomb.testkit
+package coulomb
+package testkit
 
 import coulomb.rational.*
+import coulomb.syntax.*
 import org.scalacheck.*
 
 given Arbitrary[Rational] = Arbitrary(
@@ -27,3 +29,13 @@ given Arbitrary[Rational] = Arbitrary(
 )
 
 given Cogen[Rational] = summon[Cogen[(BigInt, BigInt)]].contramap(r => (r.n, r.d))
+
+given [V, U](using arbV: Arbitrary[V]): Arbitrary[Quantity[V, U]] =
+  Arbitrary(arbV.arbitrary.map(_.withUnit[U]))
+
+given [V, U, B](using arbV: Arbitrary[V]): Arbitrary[DeltaQuantity[V, U, B]] =
+  Arbitrary(arbV.arbitrary.map(_.withDeltaUnit[U, B]))
+
+given [V, U](using cogenV: Cogen[V]): Cogen[Quantity[V, U]] = cogenV.contramap(_.value)
+
+given [V, U, B](using cogenV: Cogen[V]): Cogen[DeltaQuantity[V, U, B]] = cogenV.contramap(_.value)

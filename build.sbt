@@ -61,6 +61,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     name := "coulomb-testkit",
     libraryDependencies ++= Seq(
       "org.scalacheck" %%% "scalacheck" % "1.16.0",
+      "org.scalameta" %%% "munit-scalacheck" % "1.0.0-M6" % Test,
     )
   )
   .dependsOn(core % "compile->compile;test->test")
