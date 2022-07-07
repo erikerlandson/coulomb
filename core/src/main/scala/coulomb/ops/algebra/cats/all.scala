@@ -19,3 +19,4 @@ package coulomb.ops.algebra.cats
 object all:
     export quantity.given
     export deltaquantity.given
+    export rational.given

@@ -16,11 +16,14 @@
 
 package coulomb.testkit
 
+import algebra.laws.*
+import cats.kernel.laws.discipline.*
+import coulomb.ops.algebra.cats.all.given
 import coulomb.rational.*
-import munit.ScalaCheckSuite
+import munit.DisciplineSuite
 import org.scalacheck.Prop.*
 
-class RationalSuite extends ScalaCheckSuite:
+class RationalSuite extends DisciplineSuite:
   property("rational identity") {
     forAll { (r: Rational) =>
       r == Rational.const0 || (Rational.const1 / r) * r == Rational.const1
@@ -32,3 +35,7 @@ class RationalSuite extends ScalaCheckSuite:
       x != y || f(x) == f(y)
     }
   }
+
+  checkAll("Rational", RingLaws[Rational].field)
+  checkAll("Rational", OrderTests[Rational].order)
+  checkAll("Rational", HashTests[Rational].hash)
