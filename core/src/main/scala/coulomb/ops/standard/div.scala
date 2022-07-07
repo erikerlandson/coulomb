@@ -16,49 +16,35 @@
 
 package coulomb.ops.standard
 
-import scala.util.NotGiven
+object div:
+    import scala.util.NotGiven
+    import scala.Conversion
 
-import coulomb.{`*`, `/`, `^`}
-import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
-import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.policy.AllowImplicitConversions
+    import algebra.ring.MultiplicativeGroup
 
-transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-        Div[Double, UL, Double, UR] =
-    new Div[Double, UL, Double, UR]:
-        type VO = Double
-        type UO = su.UO
-        def apply(vl: Double, vr: Double): Double = vl / vr
+    import coulomb.{`/`, Quantity}
+    import coulomb.syntax.withUnit
+    import coulomb.ops.{Div, SimplifiedUnit, ValueResolution}
 
-transparent inline given ctx_div_Float_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-        Div[Float, UL, Float, UR] =
-    new Div[Float, UL, Float, UR]:
-        type VO = Float
-        type UO = su.UO
-        def apply(vl: Float, vr: Float): Float = vl / vr
+    transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
+        // https://github.com/lampepfl/dotty/issues/14585
+        eqv: VR =:= VL,
+        alg: MultiplicativeGroup[VL],
+        su: SimplifiedUnit[UL / UR]
+            ): Div[VL, UL, VR, UR] =
+        new infra.DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.div(ql.value, eqv(qr.value)).withUnit[su.UO])
 
-transparent inline given ctx_div_1V2U[VL, UL, VR, UR](using
-    // https://github.com/lampepfl/dotty/issues/14585
-    eqv: VR =:= VL,
-    alg: CanDiv[VL],
-    su: SimplifiedUnit[UL * UR]
-        ): Div[VL, UL, VR, UR] =
-    new Div[VL, UL, VR, UR]:
-        type VO = VL
-        type UO = su.UO
-        def apply(vl: VL, vr: VR): VL = alg.div(vl, eqv(vr))
+    transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
+        nev: NotGiven[VR =:= VL],
+        vres: ValueResolution[VL, VR],
+        icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+        icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
+        alg: MultiplicativeGroup[vres.VO],
+        su: SimplifiedUnit[UL / UR]
+            ): Div[VL, UL, VR, UR] =
+        new infra.DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.div(icl(ql).value, icr(qr).value).withUnit[su.UO])
 
-transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
-    nev: NotGiven[VL =:= VR],
-    ice: AllowImplicitConversions,
-    vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
-    alg: CanDiv[vres.VO],
-    su: SimplifiedUnit[UL * UR]
-        ): Div[VL, UL, VR, UR] =
-    new Div[VL, UL, VR, UR]:
-        type VO = vres.VO
-        type UO = su.UO
-        def apply(vl: VL, vr: VR): VO = alg.div(vlvo(vl), vrvo(vr))
-
+    object infra:
+        class DivNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Div[VL, UL, VR, UR]:
+            type VO = VOp
+            type UO = UOp

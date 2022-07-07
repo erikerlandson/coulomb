@@ -142,22 +142,73 @@ object Rational:
 end Rational
 
 
-/** type classes that are useful for testing rational type-expressions */
+/** Obtaining values from Rational type expressions */
 object typeexpr:
     import scala.annotation.implicitNotFound
 
-    @implicitNotFound("Cannot parse type ${E} into a Rational value")
-    abstract class RationalTE[E]:
-        val value: Rational
+    inline def rational[E]: Rational = ${ meta.teToRational[E] }
+    inline def bigInt[E]: BigInt = ${ meta.teToBigInt[E] }
+    inline def double[E]: Double = ${ meta.teToDouble[E] }
 
-    object RationalTE:
-        transparent inline given ctx_RationalTE[E]: RationalTE[E] =
-            ${ coulomb.infra.meta.parseRationalTE[E] }
+    @implicitNotFound("type expr ${E} is not a non-negative Int")
+    class NonNegInt[E](val value: Int)
+    object NonNegInt:
+        // interesting, this has to be 'transparent' to work with NotGiven
+        transparent inline given ctx_NonNegInt[E]: NonNegInt[E] = ${ meta.teToNonNegInt[E] }
 
-    @implicitNotFound("Cannot parse type ${E} into a BigInt value")
-    abstract class BigIntTE[E]:
-        val value: BigInt
+    @implicitNotFound("type expr ${E} is not a positive Int")
+    class PosInt[E](val value: Int)
+    object PosInt:
+        transparent inline given ctx_PosInt[E]: PosInt[E] = ${ meta.teToPosInt[E] }
 
-    object BigIntTE:
-        transparent inline given ctx_BigIntTE[E]: BigIntTE[E] =
-            ${ coulomb.infra.meta.parseBigIntTE[E] }
+    @implicitNotFound("type expr ${E} is not an Int")
+    class AllInt[E](val value: Int)
+    object AllInt:
+        transparent inline given ctx_AllInt[E]: AllInt[E] = ${ meta.teToInt[E] }
+
+    object meta:
+        import scala.quoted.*
+        import scala.language.implicitConversions
+        import coulomb.infra.meta.{rationalTE, bigintTE, ctx_RationalToExpr, typestr}
+
+        def teToRational[E](using Quotes, Type[E]): Expr[Rational] =
+            import quotes.reflect.*
+            val rationalTE(v) = TypeRepr.of[E]
+            Expr(v)
+
+        def teToBigInt[E](using Quotes, Type[E]): Expr[BigInt] =
+            import quotes.reflect.*
+            val bigintTE(v) = TypeRepr.of[E]
+            Expr(v)
+
+        def teToDouble[E](using Quotes, Type[E]): Expr[Double] =
+            import quotes.reflect.*
+            val rationalTE(v) = TypeRepr.of[E]
+            Expr(v.toDouble)
+
+        def teToNonNegInt[E](using Quotes, Type[E]): Expr[NonNegInt[E]] =
+            import quotes.reflect.*
+            val rationalTE(v) = TypeRepr.of[E]
+            if ((v.d == 1) && (v.n >= 0) && (v.n.isValidInt)) then
+                '{ new NonNegInt[E](${Expr(v.n.toInt)})}
+            else
+                report.error(s"type expr ${typestr(TypeRepr.of[E])} is not a non-negative Int")
+                '{ new NonNegInt[E](0) }
+
+        def teToPosInt[E](using Quotes, Type[E]): Expr[PosInt[E]] =
+            import quotes.reflect.*
+            val rationalTE(v) = TypeRepr.of[E]
+            if ((v.d == 1) && (v.n > 0) && (v.n.isValidInt)) then
+                '{ new PosInt[E](${Expr(v.n.toInt)}) }
+            else
+                report.error(s"type expr ${typestr(TypeRepr.of[E])} is not a positive Int")
+                '{ new PosInt[E](0) }
+
+        def teToInt[E](using Quotes, Type[E]): Expr[AllInt[E]] =
+            import quotes.reflect.*
+            val rationalTE(v) = TypeRepr.of[E]
+            if ((v.d == 1) && (v.n.isValidInt)) then
+                '{ new AllInt[E](${Expr(v.n.toInt)})}
+            else
+                report.error(s"type expr ${typestr(TypeRepr.of[E])} is not an Int")
+                '{ new AllInt[E](0)}

@@ -16,14 +16,14 @@
 
 package coulomb.testing
 
-import coulomb.Quantity
+import coulomb.{DeltaQuantity, Quantity}
 import coulomb.conversion.ValueConversion
 
 abstract class CoulombSuite extends munit.FunSuite:
     import coulomb.testing.types.*
 
     extension[V, U](q: Quantity[V, U])
-        transparent inline def assertQ[VT, UT](vt: VT): Unit =
+        inline def assertQ[VT, UT](vt: VT): Unit =
             // checking types first
             // checking in string form gives better idiomatic test failure outputs
             assertEquals(typeStr[V], typeStr[VT])
@@ -31,7 +31,24 @@ abstract class CoulombSuite extends munit.FunSuite:
             // if types check, then asInstanceOf should succeed
             assertEquals(q.value.asInstanceOf[VT], vt)
 
-        transparent inline def assertQD[VT, UT](vt: Double, eps: Option[Double] = None)(using
+        inline def assertQD[VT, UT](vt: Double, eps: Option[Double] = None)(using
+                vc: ValueConversion[V, Double]): Unit =
+            assertEquals(typeStr[V], typeStr[VT])
+            assertEquals(typeStr[U], typeStr[UT])
+            // epsilon governed by V, but scale by |vt|
+            val e = math.abs(vt) * eps.getOrElse(typeEps[V])
+            assertEqualsDouble(vc(q.value), vt, e)
+
+    extension[V, U, B](q: DeltaQuantity[V, U, B])
+        inline def assertDQ[VT, UT](vt: VT): Unit =
+            // checking types first
+            // checking in string form gives better idiomatic test failure outputs
+            assertEquals(typeStr[V], typeStr[VT])
+            assertEquals(typeStr[U], typeStr[UT])
+            // if types check, then asInstanceOf should succeed
+            assertEquals(q.value.asInstanceOf[VT], vt)
+
+        inline def assertDQD[VT, UT](vt: Double, eps: Option[Double] = None)(using
                 vc: ValueConversion[V, Double]): Unit =
             assertEquals(typeStr[V], typeStr[VT])
             assertEquals(typeStr[U], typeStr[UT])
@@ -40,11 +57,11 @@ abstract class CoulombSuite extends munit.FunSuite:
             assertEqualsDouble(vc(q.value), vt, e)
 
     extension[V](v: V)
-        transparent inline def assertVT[VT](vt: VT): Unit =
+        inline def assertVT[VT](vt: VT): Unit =
             assertEquals(typeStr[V], typeStr[VT])
             assertEquals(v.asInstanceOf[VT], vt)
 
-        transparent inline def assertVTD[VT](vt: Double, eps: Option[Double] = None)(using
+        inline def assertVTD[VT](vt: Double, eps: Option[Double] = None)(using
                 vc: ValueConversion[V, Double]): Unit =
             assertEquals(typeStr[V], typeStr[VT])
             val e = math.abs(vt) * eps.getOrElse(typeEps[V])
@@ -57,9 +74,18 @@ object types:
     import scala.quoted.*
 
     /** typeStr(type.path.Foo[type.path.Bar]) => Foo[Bar] */
-    transparent inline def typeStr[T]: String = ${ tsmeta[T] }
-    transparent inline def typesEq[T1, T2]: Boolean = ${ temeta[T1, T2] }
-    transparent inline def typeEps[V]: Double = ${ tepsmeta[V] }
+    inline def typeStr[T]: String = ${ tsmeta[T] }
+    inline def typesEq[T1, T2]: Boolean = ${ temeta[T1, T2] }
+    inline def typeEps[V]: Double = ${ tepsmeta[V] }
+
+    private def tsmeta[T](using Type[T], Quotes): Expr[String] =
+        import quotes.reflect.*
+        Expr(coulomb.infra.meta.typestr(TypeRepr.of[T]))
+
+    private def temeta[T1, T2](using Type[T1], Type[T2], Quotes): Expr[Boolean] =
+        import quotes.reflect.*
+        val eql = TypeRepr.of[T1] =:= TypeRepr.of[T2]
+        Expr(eql)
 
     private def tepsmeta[V](using Type[V], Quotes): Expr[Double] =
         import quotes.reflect.*
@@ -68,22 +94,23 @@ object types:
             case vt if vt =:= TypeRepr.of[Double] => Expr(1e-10)
             case _ => Expr(1e-10)
 
-    private def tsmeta[T](using Type[T], Quotes): Expr[String] =
-        import quotes.reflect.*
-        def work(tr: TypeRepr): String = tr match
-            case AppliedType(tc, ta) =>
-                val tcn = tc.typeSymbol.name
-                val as = ta.map(work)
-                if (as.length == 0) tcn else
-                    tcn + "[" + as.mkString(",") + "]"
-            case t => t.typeSymbol.name
-        val t = TypeRepr.of[T].dealias
-        val ts = work(t)
-        Expr(ts)
+object serde:
+    import java.io.*
 
-    private def temeta[T1, T2](using Type[T1], Type[T2], Quotes): Expr[Boolean] =
-        import quotes.reflect.*
-        val eql = TypeRepr.of[T1] =:= TypeRepr.of[T2]
-        Expr(eql)
+    private class SerDeInputStream(inputStream: InputStream) extends ObjectInputStream(inputStream):
+        override def resolveClass(desc: ObjectStreamClass): Class[?] =
+            try
+                Class.forName(desc.getName, false, getClass.getClassLoader)
+            catch
+                case ex: ClassNotFoundException => super.resolveClass(desc)
 
+    def roundTripSerDe[T](v: T): T =
+        val bufout = new ByteArrayOutputStream()
+        val obout = new ObjectOutputStream(bufout)
 
+        obout.writeObject(v)
+
+        val bufin = new ByteArrayInputStream(bufout.toByteArray)
+        val obin = new SerDeInputStream(bufin)
+
+        obin.readObject().asInstanceOf[T]

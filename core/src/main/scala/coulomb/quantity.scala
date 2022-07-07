@@ -16,72 +16,64 @@
 
 package coulomb
 
-/** Represents the product of two unit expressions L and R */
+import coulomb.ops.*
+import coulomb.rational.Rational
+import coulomb.conversion.{ValueConversion, UnitConversion}
+import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
+
+/**
+ * Represents the product of two unit expressions
+ * @tparam L the left-hand unit subexpression
+ * @tparam R the right-hand unit subexpression
+ * {{{
+ * type AcreFoot = (Acre * Foot)
+ * }}}
+ */
 final type *[L, R]
 
-/** Represents the unit division L / R */
+/**
+ * Represents unit division
+ * @tparam L the left-hand unit subexpression (numerator)
+ * @tparam R the right-hand unit subexpression (denominator)
+ * {{{
+ * type MPS = (Meter / Second)
+ * }}}
+ */
 final type /[L, R]
 
-/** Represents raising unit expression B to integer power E */
+/**
+ * Represents raising unit expression B to rational power E
+ * @tparam B a base unit expression
+ * @tparam E a rational exponent
+ * {{{
+ * type V = (Meter ^ 3)
+ * type H = (Second ^ -1)
+ * type R = (Meter ^ (1 / 2))
+ * }}}
+ */
 final type ^[B, E]
 
 @deprecated("Unitless should be replaced by integer literal type '1'")
 final type Unitless = 1
 
-export quantity.Quantity as Quantity
-export quantity.withUnit as withUnit
-
-object quantity:
-    opaque type Quantity[V, U] = V
-
-    // The only two methods I need in scope of the opaque type
-    // are a way to lift raw values into a Quantity
-    // and a way to extract raw values from a quantity
-
-    abstract class Applier[U]:
-        def apply[V](v: V): Quantity[V, U]
-    object Applier:
-        given [U]: Applier[U] = new Applier[U] { def apply[V](v: V): Quantity[V, U] = v } 
-
-    // lift
-    object Quantity:
-        def apply[U](using a: Applier[U]) = a
-        def apply[U](v: Int): Quantity[Int, U] = v
-        def apply[U](v: Long): Quantity[Long, U] = v
-        def apply[U](v: Float): Quantity[Float, U] = v
-        def apply[U](v: Double): Quantity[Double, U] = v
-    end Quantity
-
-    // extract
-    extension[V, U](ql: Quantity[V, U])
-        def value: V = ql
-    extension[U](ql: Quantity[Int, U])
-        def value: Int = ql
-    extension[U](ql: Quantity[Long, U])
-        def value: Long = ql
-    extension[U](ql: Quantity[Float, U])
-        def value: Float = ql
-    extension[U](ql: Quantity[Double, U])
-        def value: Double = ql
-
-    extension[V](v: V)
-        def withUnit[U]: Quantity[V, U] = v
-    extension(v: Int)
-        def withUnit[U]: Quantity[Int, U] = v
-    extension(v: Long)
-        def withUnit[U]: Quantity[Long, U] = v
-    extension(v: Float)
-        def withUnit[U]: Quantity[Float, U] = v
-    extension(v: Double)
-        def withUnit[U]: Quantity[Double, U] = v
-
-end quantity
-
-import coulomb.ops.*
-import coulomb.rational.Rational
-import coulomb.conversion.{ValueConversion, UnitConversion}
-
+/**
+ * obtain a string representation of a unit type, using unit abbreviation forms
+ * @tparam U the unit type
+ * @return the unit in string form
+ * {{{
+ * showUnit[Meter / Second] // => "m/s"
+ * }}}
+ */
 inline def showUnit[U]: String = ${ coulomb.infra.show.show[U] }
+
+/**
+ * obtain a string representation of a unit type, using full unit names
+ * @tparam U the unit type
+ * @return the unit in string form
+ * {{{
+ * showUnitFull[Meter / Second] // => "meter/second"
+ * }}}
+ */
 inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
 
 /**
@@ -90,29 +82,368 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  */
 inline def coefficient[U1, U2]: Rational = ${ coulomb.infra.meta.coefficient[U1, U2] }
 
-extension[VL, UL](ql: Quantity[VL, UL])
-    inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
-    inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
+package syntax {
+    // this has to be in a separated namespace:
+    // https://github.com/lampepfl/dotty/issues/15255
+    extension[V](v: V)
+        /**
+         * Lift a raw value into a unit quantity
+         * @tparam U the desired unit type
+         * @return a Quantity with given value and unit type
+         * {{{
+         * val distance = (1.0).withUnit[Meter]
+         * }}}
+         */
+        inline def withUnit[U]: Quantity[V, U] = Quantity[U](v)
+}
 
-    inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
-        conv(ql.value).withUnit[UL]
-    inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
-        conv(ql.value).withUnit[U]
+/**
+ * Represents a value with an associated unit type
+ * @tparam V the raw value type
+ * @tparam U the unit type
+ */
+opaque type Quantity[V, U] = V
 
-    transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
-        add(ql.value, qr.value).withUnit[add.UO]
+/**
+ * Defines Quantity constructors and extension methods
+ */
+object Quantity:
+    import syntax.withUnit
 
-    transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: Sub[VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
-        sub(ql.value, qr.value).withUnit[sub.UO]
+    /**
+     * Lift a raw value of type V into a unit quantity
+     * @tparam U the desired unit type
+     * @return a Quantity with given value and unit type
+     * {{{
+     * val distance = Quantity[Meter](1.0)
+     * }}}
+     */
+    def apply[U](using a: Applier[U]) = a
 
-    transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[VL, UL, VR, UR]): Quantity[mul.VO, mul.UO] =
-        mul(ql.value, qr.value).withUnit[mul.UO]
+    /**
+     * A shim class for Quantity companion object constructors
+     */
+    class Applier[U]:
+        def apply[V](v: V): Quantity[V, U] = v
+    object Applier:
+        given ctx_Applier[U]: Applier[U] = new Applier[U]
 
-    transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[VL, UL, VR, UR]): Quantity[div.VO, div.UO] =
-        div(ql.value, qr.value).withUnit[div.UO]
+    extension[VL, UL](ql: Quantity[VL, UL])
+        /**
+         * extract the raw value of a unit quantity
+         * @return the underlying value, stripped of its unit information
+         * {{{
+         * val q = (1.5).withUnit[Meter]
+         * q.value // => 1.5
+         * }}}
+         */
+        inline def value: VL = ql
 
-    transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
-        pow(ql.value).withUnit[pow.UO]
+        /**
+         * returns a string representing this Quantity, using unit abbreviations
+         * @example
+         * {{{
+         * val q = (1.5).withUnit[Meter / Second]
+         * q.show // => "1.5 m/s"
+         * }}}
+         */
+        inline def show: String = s"${ql.value.toString} ${showUnit[UL]}"
 
-    transparent inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
-        neg(ql.value).withUnit[UL]
+        /**
+         * returns a string representing this Quantity, using full unit names
+         * @example
+         * {{{
+         * val q = (1.5).withUnit[Meter / Second]
+         * q.showFull // => "1.5 meter/second"
+         * }}}
+         */
+        inline def showFull: String = s"${ql.value.toString} ${showUnitFull[UL]}"
+
+        /**
+         * convert a quantity to a new value type
+         * @tparam V the new value type to use
+         * @return a new `Quantity` having value type `V`
+         * @example
+         * {{{
+         * val q = (1.0).withUnit[Meter]
+         * q.toValue[Float] // => Quantity[Meter](1.0f)
+         * }}}
+         */
+        inline def toValue[V](using conv: ValueConversion[VL, V]): Quantity[V, UL] =
+            conv(ql.value).withUnit[UL]
+
+        /**
+         * convert a quantity to a new unit type
+         * @tparam U the new unit type
+         * @return a new `Quantity` having unit type `U`
+         * @note attempting to convert to an incompatible unit will result in a compile error
+         * @example
+         * {{{
+         * val q = (1.0).withUnit[Meter ^ 3]
+         * q.toUnit[Liter] // => Quantity[Liter](1000.0)
+         * q.toUnit[Hectare] // => compile error
+         * }}}
+         */
+        inline def toUnit[U](using conv: UnitConversion[VL, UL, U]): Quantity[VL, U] =
+            conv(ql.value).withUnit[U]
+
+        /**
+         * convert a quantity to an integer value type from a fractional type
+         * @tparam V a new integral value type
+         * @return a new `Quantity` having value type `V`
+         * @example
+         * {{{
+         * val q = (1.0).withUnit[Meter]
+         * q.tToUnit[Long] // => Quantity[Meter](1L)
+         * }}}
+         */
+        inline def tToValue[V](using conv: TruncatingValueConversion[VL, V]): Quantity[V, UL] =
+            conv(ql.value).withUnit[UL]
+
+        /**
+         * convert a quantity to a new unit type, using an integral value type
+         * @tparam U the new unit type
+         * @return a new `Quantity` having unit type `U`
+         * @note attempting to convert to an incompatible unit will result in a compile error
+         * @example
+         * {{{
+         * val q = 10.withUnit[Yard]
+         * q.tToUnit[Meter] // => Quantity[Meter](9)
+         * }}}
+         */
+        inline def tToUnit[U](using conv: TruncatingUnitConversion[VL, UL, U]): Quantity[VL, U] =
+            conv(ql.value).withUnit[U]
+
+        /**
+         * negate the value of a `Quantity`
+         * @return a `Quantity` having the negative of the original value
+         * @example
+         * {{{
+         * val q = 1.withUnit[Meter]
+         * -q // => Quantity[Meter](-1)
+         * }}}
+         */
+        inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
+            neg(ql)
+
+        /**
+         * add this quantity to another
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the sum of this quantity with `qr`
+         * @example
+         * {{{
+         * val q1 = 1.withUnit[Meter]
+         * val q2 = (1.0).withUnit[Yard]
+         * q1 + q2 // => Quantity[Meter](1.9144)
+         * }}}
+         * @note unit types `UL` and `UR` must be convertable
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using add: Add[VL, UL, VR, UR]): Quantity[add.VO, add.UO] =
+            add.eval(ql, qr)
+
+        /**
+         * subtract another quantity from this one
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the result of subtracting `qr` from this
+         * @example
+         * {{{
+         * val q1 = 1.withUnit[Meter]
+         * val q2 = (1.0).withUnit[Yard]
+         * q1 - q2 // => Quantity[Meter](0.0856)
+         * }}}
+         * @note unit types `UL` and `UR` must be convertable
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using sub: Sub[VL, UL, VR, UR]): Quantity[sub.VO, sub.UO] =
+            sub.eval(ql, qr)
+
+        /**
+         * multiply this quantity by another
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the product of this quantity with `qr`
+         * @example
+         * {{{
+         * val q1 = 2.withUnit[Meter]
+         * val q2 = (3.0).withUnit[Meter]
+         * q1 * q2 // => Quantity[Meter ^ 2](6.0)
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[VL, UL, VR, UR]): Quantity[mul.VO, mul.UO] =
+            mul.eval(ql, qr)
+
+        /**
+         * divide this quantity by another
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the quotient of this quantity with `qr`
+         * @example
+         * {{{
+         * val q1 = 3.withUnit[Meter]
+         * val q2 = (2.0).withUnit[Second]
+         * q1 / q2 // => Quantity[Meter / Second](1.5)
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[VL, UL, VR, UR]): Quantity[div.VO, div.UO] =
+            div.eval(ql, qr)
+
+        /**
+         * divide this quantity by another, using truncating (integer) division
+         * @tparam VR right hand value type
+         * @tparam UR right hand unit type
+         * @param qr right hand quantity
+         * @return the integral quotient of this quantity with `qr`
+         * @example
+         * {{{
+         * val q1 = 5.withUnit[Meter]
+         * val q2 = 2L.withUnit[Second]
+         * q1.tquot(q2) // => Quantity[Meter / Second](2L)
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using tq: TQuot[VL, UL, VR, UR]): Quantity[tq.VO, tq.UO] =
+            tq.eval(ql, qr)
+
+        /**
+         * raise this quantity to a rational or integer power
+         * @tparam P the power, or exponent
+         * @return this quantity raised to exponent `P`
+         * @example
+         * {{{
+         * val q = (2.0).withUnit[Meter]
+         * q.pow[2]  // => Quantity[Meter ^ 2](4.0)
+         * q.pow[1/2]  // => Quantity[Meter ^ (1/2)](1.4142135623730951)
+         * q.pow[-1]  // => Quantity[1 / Meter](0.5)
+         * }}}
+         */
+        transparent inline def pow[P](using pow: Pow[VL, UL, P]): Quantity[pow.VO, pow.UO] =
+            pow.eval(ql)
+
+        /**
+         * raise this quantity to a rational or integer power, with integer truncated result
+         * @tparam P the power, or exponent
+         * @return this quantity raised to exponent `P`, truncated to integer type
+         * @example
+         * {{{
+         * val q = 10.withUnit[Meter]
+         * q.tpow[2]  // => Quantity[Meter ^ 2](100)
+         * q.tpow[1/2]  // => Quantity[Meter ^ (1/2)](3)
+         * q.tpow[-1]  // => Quantity[1 / Meter](0)
+         * }}}
+         */
+        transparent inline def tpow[P](using tp: TPow[VL, UL, P]): Quantity[tp.VO, tp.UO] =
+            tp.eval(ql)
+
+        /**
+         * test this quantity for equality with another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if right hand value equals the left (after any conversions), false otherwise
+         * @example
+         * {{{
+         * val q1 = 1000.withUnit[Liter]
+         * val q2 = (1.0).withUnit[Meter ^ 3]
+         * q1 === q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        inline def ===[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) == 0
+
+        /**
+         * test this quantity for inequality with another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if right hand value does not equal left (after any conversions), false otherwise
+         * @example
+         * {{{
+         * val q1 = 1000.withUnit[Liter]
+         * val q2 = (2.0).withUnit[Meter ^ 3]
+         * q1 =!= q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        inline def =!=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) != 0
+
+        /**
+         * test if this quantity is less than another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if left-hand value is less than the right (after any conversions), false otherwise
+         * @example
+         * {{{
+         * val q1 = 1000.withUnit[Liter]
+         * val q2 = (2.0).withUnit[Meter ^ 3]
+         * q1 < q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        inline def <[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) < 0
+
+        /**
+         * test if this quantity is less than or equal to another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if left-hand value is less than or equal to the right (after any conversions),
+         * false otherwise
+         * @example
+         * {{{
+         * val q1 = 1000.withUnit[Liter]
+         * val q2 = (2.0).withUnit[Meter ^ 3]
+         * q1 <= q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        inline def <=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) <= 0
+
+        /**
+         * test if this quantity is greater than another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if left-hand value is greater than the right (after any conversions),
+         * false otherwise
+         * @example
+         * {{{
+         * val q1 = 2000.withUnit[Liter]
+         * val q2 = (1.0).withUnit[Meter ^ 3]
+         * q1 > q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        inline def >[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) > 0
+
+        /**
+         * test if this quantity is greater than or equal to another
+         * @tparam VR value type of the right hand quantity
+         * @tparam UR unit type of the right hand quantity
+         * @param qr the right hand quantity
+         * @return true if left-hand value is greater than or equal to the right (after any conversions),
+         * false otherwise
+         * @example
+         * {{{
+         * val q1 = 2000.withUnit[Liter]
+         * val q2 = (1.0).withUnit[Meter ^ 3]
+         * q1 >= q2 // => true
+         * }}}
+         * @note result may depend on what algebras, policies, and other typeclasses are in scope
+         */
+        inline def >=[VR, UR](qr: Quantity[VR, UR])(using ord: Ord[VL, UL, VR, UR]): Boolean =
+            ord(ql, qr) >= 0

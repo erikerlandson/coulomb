@@ -16,92 +16,53 @@
 
 package coulomb.ops.standard
 
-import scala.util.NotGiven
+object sub:
+    import scala.util.NotGiven
+    import scala.Conversion
 
-import coulomb.ops.{Sub, ValueResolution}
-import coulomb.conversion.{ValueConversion, UnitConversion}
-import coulomb.policy.AllowImplicitConversions
+    import algebra.ring.AdditiveGroup
 
-transparent inline given ctx_sub_Double_1U[U]: Sub[Double, U, Double, U] =
-    new Sub[Double, U, Double, U]:
-        type VO = Double
-        type UO = U
-        def apply(vl: Double, vr: Double): Double = vl - vr
+    import coulomb.Quantity
+    import coulomb.syntax.withUnit
+    import coulomb.ops.{Sub, ValueResolution}
 
-transparent inline given ctx_sub_Float_1U[U]: Sub[Float, U, Float, U] =
-    new Sub[Float, U, Float, U]:
-        type VO = Float
-        type UO = U
-        def apply(vl: Float, vr: Float): Float = vl - vr
+    transparent inline given ctx_sub_1V1U[VL, UL, VR, UR](using
+        // https://github.com/lampepfl/dotty/issues/14585
+        eqv: VR =:= VL,
+        equ: UR =:= UL,
+        alg: AdditiveGroup[VL]
+            ): Sub[VL, UL, VR, UR] =
+        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(ql.value, eqv(qr.value)).withUnit[UL])
 
-transparent inline given ctx_sub_Double_2U[UL, UR](using
-    AllowImplicitConversions,
-    NotGiven[UL =:= UR]
-        ): Sub[Double, UL, Double, UR] =
-    val c = coulomb.conversion.infra.coefficientDouble[UR, UL]
-    new Sub[Double, UL, Double, UR]:
-        type VO = Double
-        type UO = UL
-        def apply(vl: Double, vr: Double): Double = vl - (c * vr)
+    transparent inline given ctx_sub_1V2U[VL, UL, VR, UR](using
+        eqv: VR =:= VL,
+        neu: NotGiven[UR =:= UL],
+        icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
+        alg: AdditiveGroup[VL]
+            ): Sub[VL, UL, VR, UR] =
+        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(ql.value, icr(qr).value).withUnit[UL])
 
-transparent inline given ctx_sub_Float_2U[UL, UR](using
-    AllowImplicitConversions,
-    NotGiven[UL =:= UR]
-        ): Sub[Float, UL, Float, UR] =
-    val c = coulomb.conversion.infra.coefficientFloat[UR, UL]
-    new Sub[Float, UL, Float, UR]:
-        type VO = Float
-        type UO = UL
-        def apply(vl: Float, vr: Float): Float = vl - (c * vr)
+    transparent inline given ctx_sub_2V1U[VL, UL, VR, UR](using
+        nev: NotGiven[VR =:= VL],
+        equ: UR =:= UL,
+        vres: ValueResolution[VL, VR],
+        icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+        icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
+        alg: AdditiveGroup[vres.VO]
+            ): Sub[VL, UL, VR, UR] =
+        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(icl(ql).value, icr(qr).value).withUnit[UL])
 
-transparent inline given ctx_sub_1V1U[VL, UL, VR, UR](using
-    // https://github.com/lampepfl/dotty/issues/14585
-    eqv: VR =:= VL,
-    equ: UR =:= UL,
-    alg: CanSub[VL]
-        ): Sub[VL, UL, VR, UR] =
-    new Sub[VL, UL, VR, UR]:
-        type VO = VL
-        type UO = UL
-        def apply(vl: VL, vr: VR): VL = alg.sub(vl, eqv(vr))
+    transparent inline given ctx_sub_2V2U[VL, UL, VR, UR](using
+        nev: NotGiven[VR =:= VL],
+        neu: NotGiven[UR =:= UL],
+        vres: ValueResolution[VL, VR],
+        icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+        icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
+        alg: AdditiveGroup[vres.VO]
+            ): Sub[VL, UL, VR, UR] =
+        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(icl(ql).value, icr(qr).value).withUnit[UL])
 
-transparent inline given ctx_sub_1V2U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
-    eqv: VR =:= VL,
-    neu: NotGiven[UR =:= UL],
-    ucv: UnitConversion[VL, UR, UL],
-    alg: CanSub[VL]
-        ): Sub[VL, UL, VR, UR] =
-    new Sub[VL, UL, VR, UR]:
-        type VO = VL
-        type UO = UL
-        def apply(vl: VL, vr: VR): VL = alg.sub(vl, ucv(eqv(vr)))
-
-transparent inline given ctx_sub_2V1U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
-    nev: NotGiven[VR =:= VL],
-    equ: UR =:= UL,
-    vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
-    alg: CanSub[vres.VO]
-        ): Sub[VL, UL, VR, UR] =
-    new Sub[VL, UL, VR, UR]:
-        type VO = vres.VO
-        type UO = UL
-        def apply(vl: VL, vr: VR): VO = alg.sub(vlvo(vl), vrvo(vr))
-
-transparent inline given ctx_sub_2V2U[VL, UL, VR, UR](using
-    ice: AllowImplicitConversions,
-    nev: NotGiven[VL =:= VR],
-    neu: NotGiven[UL =:= UR],
-    vres: ValueResolution[VL, VR],
-    vlvo: ValueConversion[VL, vres.VO],
-    vrvo: ValueConversion[VR, vres.VO],
-    ucvo: UnitConversion[vres.VO, UR, UL],
-    alg: CanSub[vres.VO]
-        ): Sub[VL, UL, VR, UR] =
-    new Sub[VL, UL, VR, UR]:
-        type VO = vres.VO
-        type UO = UL
-        def apply(vl: VL, vr: VR): VO = alg.sub(vlvo(vl), ucvo(vrvo(vr)))
+    object infra:
+        class SubNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Sub[VL, UL, VR, UR]:
+            type VO = VOp
+            type UO = UOp
