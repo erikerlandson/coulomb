@@ -41,7 +41,6 @@ final class Rational private (val n: BigInt, val d: BigInt) extends Serializable
         if (e < 0) then
             canonical(d.pow(-e), n.pow(-e))
         else if (e == 0) then
-            require(n != 0)
             canonical(1, 1)
         else if (e == 1) then
             this
@@ -78,6 +77,8 @@ final class Rational private (val n: BigInt, val d: BigInt) extends Serializable
         case v: Int => (n == v) && (d == 1)
         case v: Long => (n == v) && (d == 1)
         case _ => false
+
+    override def hashCode: Int = 29 * (37 * n.## + d.##)
 
     inline def < (rhs: Rational): Boolean = (n * rhs.d) < (rhs.n * d)
     inline def > (rhs: Rational): Boolean = rhs < this

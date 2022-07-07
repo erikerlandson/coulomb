@@ -28,7 +28,7 @@ def commonSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject
-  .aggregate(core, units, spire, unidocs)
+  .aggregate(core, units, spire, testkit, unidocs)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -53,6 +53,21 @@ lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .dependsOn(core % "compile->compile;test->test", units % Test)
   .settings(commonSettings :_*)
   .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
+
+lazy val testkit = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+  .crossType(CrossType.Pure)
+  .in(file("testkit"))
+  .settings(
+    name := "coulomb-testkit",
+    libraryDependencies ++= Seq(
+      "org.scalacheck" %%% "scalacheck" % "1.16.0",
+      "org.scalameta" %%% "munit-scalacheck" % "1.0.0-M6" % Test,
+      "org.typelevel" %%% "algebra-laws" % "2.8.0" % Test,
+      "org.typelevel" %%% "discipline-munit" % "2.0.0-M3" % Test,
+    )
+  )
+  .dependsOn(core % "compile->compile;test->test")
+  .settings(commonSettings :_*)
 
 // a target for rolling up all subproject deps: a convenient
 // way to get a repl that has access to all subprojects
