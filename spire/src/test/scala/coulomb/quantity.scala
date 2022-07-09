@@ -22,7 +22,7 @@ class SpireQuantitySuite extends CoulombSuite:
     import coulomb.syntax.*
 
     import algebra.instances.all.given
-    import coulomb.ops.algebra.spire.all.given
+    import coulomb.ops.algebra.spire.all.{*, given}
 
     import coulomb.units.si.{*, given}
     import coulomb.units.si.prefixes.{*, given}
@@ -139,6 +139,19 @@ class SpireQuantitySuite extends CoulombSuite:
         BigInt(10).withUnit[Meter].tpow[-1].assertQ[BigInt, 1 / Meter](BigInt(0))
         BigInt(10).withUnit[Meter].tpow[1 / 2].assertQ[BigInt, Meter ^ (1 / 2)](BigInt(3))
         BigInt(10).withUnit[Meter].tpow[-1 / 2].assertQ[BigInt, 1 / (Meter ^ (1 / 2))](BigInt(0))
+    }
+
+    test("mul and div by lifted unitless values") {
+        import coulomb.policy.spire.standard.given
+        import scala.language.implicitConversions
+
+        val q = 2.withUnit[Meter]
+
+        (Rational(2) * q).assertQ[Rational, Meter](4)
+        (Rational(2) / q).assertQ[Rational, 1 / Meter](1)
+
+        (q * Rational(2)).assertQ[Rational, Meter](4)
+        (q / Rational(2)).assertQ[Rational, Meter](1)
     }
 
     test("< strict") {

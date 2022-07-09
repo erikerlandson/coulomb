@@ -43,4 +43,3 @@ object int:
 
         transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[Int, 1, VR, UR]): Quantity[div.VO, div.UO] =
             div.eval(vl.withUnit[1], qr)
-
