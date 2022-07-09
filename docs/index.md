@@ -27,6 +27,7 @@ import coulomb.ops.algebra.all.given
 
 // unit and value type policies for operations
 import coulomb.policy.standard.given
+import scala.language.implicitConversions
 
 // unit definitions
 import coulomb.units.si.{*, given}
@@ -45,7 +46,7 @@ val t = 10.withUnit[Second]
 val v = a * t
 
 // position
-val x = a * (t.pow[2]) / 2.withUnit[1]
+val x = a * (t.pow[2]) / 2
 ```
 
 Improper unit analysis is a compile-time failure.
