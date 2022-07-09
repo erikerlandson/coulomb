@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/erikerlandson/coulomb/scala3/docs/assets/coulomb-splash-800x400.png" alt="coulomb: a statically typed unit analysis library for Scala" width="300" height="150">
+<img src="/docs/assets/coulomb-splash-800x400.png" alt="coulomb: a statically typed unit analysis library for Scala" width="300" height="150">
 
  ![Build Status](https://github.com/erikerlandson/coulomb/workflows/Continuous%20Integration/badge.svg?branch=scala3)
  [![Sonatype Nexus](https://img.shields.io/nexus/r/https/oss.sonatype.org/com.manyangled/coulomb-core_3.svg)](https://oss.sonatype.org/content/repositories/releases/com/manyangled/coulomb-core_3/)
