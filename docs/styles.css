@@ -1,4 +1,9 @@
-pre {
+/* when mdoc renders "long" comments, clip them and provide a scrollbar */
+.comment {
+  /* set display as block or the other settings don't work */
+  display: block;
+  /* most comments are short, and display normally */
   max-height: 100px;
-  overflow: scroll;
+  /* add a scrollbar only when necessary */
+  overflow: auto;
 }
