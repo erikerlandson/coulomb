@@ -84,7 +84,12 @@ in programming languages such as Scala.
 Like data types, unit analysis provides us information about what operations may be allowed or disallowed.
 Just as
 [Scala's type system](https://docs.scala-lang.org/scala3/book/types-introduction.html)
-informs us that the expression `"foo" + 7` is not a valid expression,
+informs us that the expression `"foo" + 7` is not a valid expression:
+
+```scala mdoc:nest:fail
+val bad = "foo" + 7
+```
+
 unit analysis informs us that adding `meters + seconds` is not a valid computation.
 
 As such, unit analysis is an excellent use case for representation in programming language type systems.
