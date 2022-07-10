@@ -18,6 +18,17 @@ package coulomb.ops.algebra
 
 import algebra.ring.TruncatedDivision
 
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.ops.*
+
 object float:
     given ctx_Float_is_FractionalPower: FractionalPower[Float] =
         (v: Float, e: Double) => math.pow(v.toDouble, e).toFloat
+
+    extension(vl: Float)
+        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[Float, 1, VR, UR]): Quantity[mul.VO, mul.UO] =
+            mul.eval(vl.withUnit[1], qr)
+
+        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[Float, 1, VR, UR]): Quantity[div.VO, div.UO] =
+            div.eval(vl.withUnit[1], qr)

@@ -21,7 +21,7 @@ class QuantitySuite extends CoulombSuite:
     import coulomb.syntax.*
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
-    import coulomb.ops.algebra.all.given
+    import coulomb.ops.algebra.all.{*, given}
 
     test("lift via Quantity") {
         Quantity[Meter](3.14).assertQ[Double, Meter](3.14)
@@ -445,6 +445,23 @@ class QuantitySuite extends CoulombSuite:
         (-(7f.withUnit[Liter])).assertQ[Float, Liter](-7)
         (-(7L.withUnit[Liter])).assertQ[Long, Liter](-7)
         (-(7.withUnit[Liter])).assertQ[Int, Liter](-7)
+    }
+
+    test("mul and div by lifted unitless values") {
+        import coulomb.policy.standard.given
+        import scala.language.implicitConversions
+
+        val q = 2.withUnit[Meter]
+
+        // left-hand arguments have to be defined on per type basis
+        // I did this in coulomb.ops.algebra.{double, float, etc}
+        (2.0 * q).assertQ[Double, Meter](4.0)
+        (2.0 / q).assertQ[Double, 1 / Meter](1.0)
+
+        // right-hand arguments require implicit conversion
+        // I defined in coulomb.conversion.standard.scala
+        (q * 2.0).assertQ[Double, Meter](4.0)
+        (q / 2.0).assertQ[Double, Meter](1.0)
     }
 
     test("equality strict") {

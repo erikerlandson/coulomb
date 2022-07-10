@@ -16,8 +16,12 @@
 
 package coulomb.ops.algebra.spire
 
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.ops.*
+
 object bigint:
-    import algebra.ring.TruncatedDivision
+    import _root_.algebra.ring.TruncatedDivision
     import _root_.spire.math.*
     import coulomb.ops.algebra.*
 
@@ -32,6 +36,13 @@ object bigint:
         def fquot(x: BigInt, y: BigInt): BigInt = ???
         def fmod(x: BigInt, y: BigInt): BigInt = ???
         def abs(a: BigInt): BigInt = ???
-        def additiveCommutativeMonoid: algebra.ring.AdditiveCommutativeMonoid[BigInt] = ???
+        def additiveCommutativeMonoid: _root_.algebra.ring.AdditiveCommutativeMonoid[BigInt] = ???
         def order: _root_.cats.kernel.Order[BigInt] = ???
         def signum(a: BigInt): Int = ???
+
+    extension(vl: BigInt)
+        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[BigInt, 1, VR, UR]): Quantity[mul.VO, mul.UO] =
+            mul.eval(vl.withUnit[1], qr)
+
+        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[BigInt, 1, VR, UR]): Quantity[div.VO, div.UO] =
+            div.eval(vl.withUnit[1], qr)

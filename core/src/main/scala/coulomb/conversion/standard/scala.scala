@@ -50,3 +50,7 @@ object scala:
         uc: DeltaUnitConversion[VT, B, UF, UT]
             ): Conversion[DeltaQuantity[VF, UF, B], DeltaQuantity[VT, UT, B]] =
         (q: DeltaQuantity[VF, UF, B]) => uc(vc(q.value)).withDeltaUnit[UT, B]
+
+    // also support implicit lift of values to unitless quantity
+    given ctx_Value_to_Unitless[V]: Conversion[V, Quantity[V, 1]] =
+        (v: V) => v.withUnit[1]
