@@ -18,6 +18,7 @@ ThisBuild / tlCiReleaseBranches := Seq("scala3")
 // to enable, set this to whatever main branch is to enable (e.g. develop, main, etc)
 ThisBuild / tlSitePublishBranch := Some("no-such-branch")
 
+ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 ThisBuild / crossScalaVersions := Seq("3.1.3")
 
 // run tests sequentially for easier failure debugging
