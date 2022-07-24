@@ -127,4 +127,44 @@ val speed = 100.0.withUnit[Meter / Second]
 val force = 5.0.withUnit[Kilogram * Meter / (Second ^ 2)]
 ```
 
+### Unit Conversions
+
+In unit analysis, some units are convertible (aka
+[commensurable](https://en.wikipedia.org/wiki/Dimensional_analysis)
+): for example one may convert a quantity of kilometers to miles, or meter/second to miles/hour,
+or cubic meters to liters:
+
+```scala mdoc:nest
+import coulomb.units.si.prefixes.{*, given}
+import coulomb.units.us.{*, given}
+import coulomb.units.accepted.{*, given}
+import coulomb.units.time.{*, given}
+
+val distance = 100.0.withUnit[Kilo * Meter]
+
+distance.toUnit[Mile].show
+
+val speed = 10.0.withUnit[Meter / Second]
+
+speed.toUnit[Mile / Hour].show
+
+val volume = 1.0.withUnit[Meter ^ 3]
+
+volume.toUnit[Liter].show
+```
+
+Other quantities are *not* convertible (aka incommensurable).
+Attempting to convert such quantities in `coulomb` is a compile time type error.
+
+```scala mdoc:fail
+// acre-feet is a unit of volume, and so will succeed:
+volume.toUnit[Acre * Foot].show
+
+// converting a volume to an area is a type error!
+volume.toUnit[Acre].show
+```
+
+The `coulomb` library performs unit conversions, and corresponding checks for convertability or inconvertability,
+using "algorithmic unit analysis" which is discussed in
+[this blog post](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/).
 
