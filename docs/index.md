@@ -168,3 +168,15 @@ The `coulomb` library performs unit conversions, and corresponding checks for co
 using "algorithmic unit analysis" which is discussed in
 [this blog post](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/).
 
+
+## Explore
+
+The following resources expand the concepts behind `coulomb` and typelevel unit analysis:
+
+- [API documentation for `coulomb`](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/index.html)
+- [github discussions](https://github.com/erikerlandson/coulomb/discussions)
+- [Your Data Type is a Unit](http://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/)
+- [Why Your Data Schema Should Include Units](https://www.youtube.com/watch?v=qrQmB2KFKE8)
+- [Algorithmic Unit Analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/)
+- [A Unit Analysis of Linear Regression](http://erikerlandson.github.io/blog/2020/05/06/unit-analysis-for-linear-regression/)
+
