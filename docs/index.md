@@ -185,11 +185,15 @@ volume.toUnit[Acre].show
 
 ### Prefix Units
 
-### Coulomb Policies
-
 ### Value Types
 
+### Numeric Operations
+
 ### ValueConversion and UnitConversion
+
+### Coulomb Policies
+
+### Time and Temperature
 
 ## Explore
 
