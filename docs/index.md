@@ -76,7 +76,7 @@ Unit analysis - aka
 [dimensional analysis](https://en.wikipedia.org/wiki/Dimensional_analysis)
 - is the practice of tracking units of measure along with numeric computations as an informational aid and consistency check.
 For example, if one has a duration `t = 10 seconds` and a distance `d = 100 meters`,
-then unit analysis tells us that the value `d/t` has the unit `meters / second`.
+then unit analysis tells us that the value `d/t` has the unit `meters/second`.
 
 Unit analysis performs a very similar role to a
 [type system](https://en.wikipedia.org/wiki/Type_system)
@@ -127,13 +127,30 @@ val speed = 100.0.withUnit[Meter / Second]
 val force = 5.0.withUnit[Kilogram * Meter / (Second ^ 2)]
 ```
 
+Unit expression types in `coulomb` can be composed to express units with arbitrary complexity.
+
+```scala mdoc:nest
+import coulomb.units.mksa.{*, given}
+
+// Electrical resistance expressed with SI base units
+val resistance = 1.0.withUnit[(Kilogram * (Meter ^ 2)) / ((Second ^ 3) * (Ampere ^ 2))]
+
+resistance.show
+
+// a shorter but equivalent unit type
+resistance.toUnit[Ohm].show
+```
+
 ### Unit Conversions
 
 In unit analysis, some units are convertible (aka
-[commensurable](https://en.wikipedia.org/wiki/Dimensional_analysis)
-): for example one may convert a quantity of kilometers to miles, or meter/second to miles/hour,
-or cubic meters to liters:
+[commensurable](https://en.wikipedia.org/wiki/Dimensional_analysis)).
+The `coulomb` library performs unit conversions, and corresponding checks for convertability or inconvertability,
+using
+[algorithmic unit analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/).
 
+For example one may convert a quantity of kilometers to miles, or meter/second to miles/hour,
+or cubic meters to liters:
 ```scala mdoc:nest
 import coulomb.units.si.prefixes.{*, given}
 import coulomb.units.us.{*, given}
@@ -163,11 +180,6 @@ volume.toUnit[Acre * Foot].show
 // converting a volume to an area is a type error!
 volume.toUnit[Acre].show
 ```
-
-The `coulomb` library performs unit conversions, and corresponding checks for convertability or inconvertability,
-using "algorithmic unit analysis" which is discussed in
-[this blog post](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/).
-
 
 ## Explore
 
