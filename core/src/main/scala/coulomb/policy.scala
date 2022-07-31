@@ -89,23 +89,3 @@ object strict:
     export coulomb.conversion.standard.value.given
     export coulomb.conversion.standard.unit.given
     export coulomb.ops.algebra.cats.all.given
-
-/**
- * By default, coulomb will treat any unrecognized type as a base unit.
- * To disable this behavior and raise a compile error on any type not declared as
- * a BaseUnit, DerivedUnit, etc:
- *
- * {{{
- * import coulomb.policy.strictUnitExpressions.given
- * }}}
- */
-object strictUnitExpressions:
-    import coulomb.policy.infra.StrictUnitExpressions
-    given ctx_StrictUnitExpressions: StrictUnitExpressions with {}
-
-object infra:
-    /**
-     * When a context variable of this type is in scope, coulomb will raise a compile error
-     * if it encounters a type not declared as a unit.
-     */
-    sealed trait StrictUnitExpressions
