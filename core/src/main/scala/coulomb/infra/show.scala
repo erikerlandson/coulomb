@@ -64,10 +64,9 @@ object show:
             case AppliedType(op, List(b, e)) if (op =:= TypeRepr.of[^]) =>
                 val (bs, es) = (paren(b, render), powstr(e))
                 s"${bs}^${es}"
-            case _ if (!strictunitexprs) => typestr(u)
-            case _ =>
-                report.error(s"unrecognized unit pattern $u")
-                ""
+            // treat any other type as if it is a BaseUnit,
+            // with its name and abbv defined as its type-string
+            case _ => typestr(u)
 
     def termstr(using Quotes)(terms: List[quotes.reflect.TypeRepr], render: quotes.reflect.TypeRepr => String): String =
         import quotes.reflect.*

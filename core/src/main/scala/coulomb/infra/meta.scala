@@ -176,14 +176,9 @@ object meta:
             case derivedunit(ucoef, usig) => mode match
                 case SigMode.Canonical => (ucoef, usig)
                 case _ => (Rational.const1, (u, Rational.const1) :: Nil)
-            case _ if (!strictunitexprs) =>
-                // we consider any other type for "promotion" to base-unit only if
-                // it does not match the strict unit expression forms above, and
-                // if the strict unit expression policy has not been enabled
-                (Rational.const1, (u, Rational.const1) :: Nil)
             case _ =>
-                report.error(s"unknown unit expression in cansig: ${typestr(u)}")
-                (Rational.const0, Nil)
+                // treat any other type as if it were a BaseUnit
+                (Rational.const1, (u, Rational.const1) :: Nil)
 
     def sortsig(using Quotes)(sig: List[(quotes.reflect.TypeRepr, Rational)]):
             (List[(quotes.reflect.TypeRepr, Rational)], List[(quotes.reflect.TypeRepr, Rational)]) =
@@ -220,12 +215,6 @@ object meta:
     def uTerm(using Quotes)(u: quotes.reflect.TypeRepr, p: Rational): quotes.reflect.TypeRepr =
         import quotes.reflect.*
         if (p == 1) u else TypeRepr.of[^].appliedTo(List(u, rationalTE(p)))
-
-    def strictunitexprs(using Quotes): Boolean =
-        import quotes.reflect.*
-        Implicits.search(TypeRepr.of[coulomb.policy.infra.StrictUnitExpressions]) match
-            case _: ImplicitSearchSuccess => true
-            case _ => false
 
     object unitconst1:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
