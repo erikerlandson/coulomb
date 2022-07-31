@@ -78,11 +78,11 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
 
 /**
  * Obtain the coefficient of conversion from one unit expression to another
- * @tparam UF the input unit type
- * @tparam UT the output unit type
+ * @tparam UF the input unit expression
+ * @tparam UT the output unit expression
  * @tparam V the value type to return
  * @return the coefficient of conversion from UF to UT
- * If U1 and U2 are not convertible, causes a compilation failure.
+ * If UF and UT are not convertible, causes a compilation failure.
  */
 inline def coefficient[V, UF, UT](using vc: ValueConversion[Rational, V]): V =
     import coulomb.conversion.coefficients.coefficientRational
