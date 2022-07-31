@@ -183,11 +183,76 @@ volume.toUnit[Acre].show
 
 ### Base Units and Derived Units
 
+In unit analysis,
+[base units](https://en.wikipedia.org/wiki/Dimensional_analysis#Concrete_numbers_and_base_units)
+are the axiomatic units.
+They typically express fundamental quantites, for example meters, seconds or kilograms in the
+[SI unit system](https://en.wikipedia.org/wiki/International_System_of_Units).
+
+The `coulomb-units` package defines the
+[SI base units](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/units/si$.html)
+but `coulomb` also makes it easy to define your own base units:
+
+```scala mdoc
+// a new base unit for spicy heat
+object spicy:
+    import coulomb.define.*
+
+    final type Scoville
+    given unit_Scoville: BaseUnit[Scoville, "scoville", "sco"] = BaseUnit()
+
+import spicy.{*, given}
+
+val jalapeno = 5000.withUnit[Scoville]
+
+val ghost = 1000000.withUnit[Scoville]
+```
+
+Other units may be defined as compositions of base units.
+These are referred to as derived units, or compound units.
+
+```scala mdoc
+object nautical:
+    import coulomb.define.*
+
+    export coulomb.units.si.{ Meter, ctx_unit_Meter }
+    export coulomb.units.time.{ Hour, ctx_unit_Hour }
+
+    final type NauticalMile
+    given unit_NauticalMile: DerivedUnit[NauticalMile, 1852 * Meter, "nmile", "nmi"] =
+        DerivedUnit()
+
+    final type Knot
+    given unit_Knot: DerivedUnit[Knot, NauticalMile / Hour, "knot", "kt"] =
+        DerivedUnit()
+
+import nautical.{*, given}
+
+val dist = (1.0.withUnit[Knot] * 1.0.withUnit[Hour]).toUnit[Meter]
+```
+
+`coulomb` permits any type to be treated as a unit.
+Types not explicitly defined as units are treated as base units.
+
+```scala mdoc
+class Apple
+
+val apples = 1.withUnit[Apple] + 2.withUnit[Apple]
+
+val s = apples.show
+```
+
+Allowing arbitrary types to be manipulated as units introduces some interesting programming possibilities,
+which are discussed in
+[this blog post](http://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/).
+
 ### Prefix Units
 
 ### Value Types
 
 ### Numeric Operations
+
+### Truncating and Non Truncating Operations
 
 ### ValueConversion and UnitConversion
 
