@@ -44,6 +44,9 @@ object value:
         new TruncatingValueConversion[VF, Int]:
             def apply(v: VF): Int = num.toInt(v)
 
+    given ctx_VC_Rational_Rational: ValueConversion[Rational, Rational] with
+        def apply(v: Rational): Rational = v
+
     given ctx_VC_Rational_Double: ValueConversion[Rational, Double] with
         def apply(v: Rational): Double = v.toDouble
 
