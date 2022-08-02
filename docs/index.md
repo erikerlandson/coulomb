@@ -60,14 +60,6 @@ val dist = 1.withUnit[Meter]
 val fail = time + dist
 ```
 
-## Code of Conduct
-
-The `coulomb` project supports the
-[Scala Code of Conduct](https://typelevel.org/code-of-conduct.html).
-All contributors are expected to respect this code.
-Any violations of this code of conduct should be reported to
-[the author](https://github.com/erikerlandson/).
-
 ## Resources
 
 The following resources expand the concepts behind `coulomb` and typelevel unit analysis:
@@ -78,4 +70,12 @@ The following resources expand the concepts behind `coulomb` and typelevel unit 
 - [Why Your Data Schema Should Include Units](https://www.youtube.com/watch?v=qrQmB2KFKE8)
 - [Algorithmic Unit Analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/)
 - [A Unit Analysis of Linear Regression](http://erikerlandson.github.io/blog/2020/05/06/unit-analysis-for-linear-regression/)
+
+## Code of Conduct
+
+The `coulomb` project supports the
+[Scala Code of Conduct](https://typelevel.org/code-of-conduct.html).
+All contributors are expected to respect this code.
+Any violations of this code of conduct should be reported to
+[the author](https://github.com/erikerlandson/).
 
