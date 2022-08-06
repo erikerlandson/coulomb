@@ -246,6 +246,51 @@ object prefixes:
 
 ## Value Types
 
+Each `coulomb` quantity `Quantity[V, U]` pairs a value type `V` with a unit type `U`.
+Value types are often numeric, however `coulomb` places no restriction on value types.
+We have already seen that there are also no restrictions on unit type,
+and so the following are perfectly legitimate:
+
+```scala mdoc
+case class Wrapper[T](t: T)
+
+val w = Wrapper(42f).withUnit[Meter]
+
+w.show
+
+val w2 = Wrapper(37D).withUnit[Vector[Int]]
+
+w2.show
+```
+
+Although value and unit types are arbitrary for a `Quantity`, there is no free lunch.
+Operations on quantity objects will only work if they are defined.
+The following example will not compile because we have not defined what it means to add `Wrapper` objects:
+
+```scala mdoc:fail
+// addition has not been defined for Wrapper types
+val wsum = w + w
+```
+
+The compiler error above indicates that it was unable to find an algebra that tells coulomb's
+standard predefined rules how to add `Wrapper` objects.
+Providing such a definition allows our example to compile.
+
+```scala mdoc
+object wrapperalgebra:
+    import algebra.ring.AdditiveSemigroup
+    given add_Wrapper[V](using vadd: AdditiveSemigroup[V]): AdditiveSemigroup[Wrapper[V]] =
+        new AdditiveSemigroup[Wrapper[V]]:
+            def plus(x: Wrapper[V], y: Wrapper[V]): Wrapper[V] =
+                Wrapper(vadd.plus(x.t, y.t))
+
+// import Wrapper algebras into scope
+import wrapperalgebra.given
+
+// adding Wrapper objects works now that we have defined an algebra
+val wsum = w + w
+```
+
 ## Numeric Operations
 
 ## Truncating and Non Truncating Operations
