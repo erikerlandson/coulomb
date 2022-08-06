@@ -195,11 +195,37 @@ which are discussed in
 
 ## Prefix Units
 
-The SI unit system defines standard
+The standard SI unit system
 [prefixes](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/units/si$$prefixes$.html)
-such as "kilo" to represent 1000, "micro" to represent 10^-6, etc.
+such as "kilo" to represent 1000, "micro" to represent 10^-6, etc, are provided by the `coulomb-units` package.
+
+```scala mdoc:nest
+import coulomb.units.si.prefixes.{*, given}
+
+val dist = 5.0.withUnit[Kilo * Meter]
+
+dist.toUnit[Meter].show
+```
+
+The standard
+[binary prefixes](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/units/info$$prefixes$.html)
+which are frequently used in computing are also provided.
+
+```scala mdoc:nest
+import coulomb.units.info.{*, given}
+import coulomb.units.info.prefixes.{*, given}
+
+val memory = 1.0.withUnit[Mebi * Byte]
+
+memory.toUnit[Byte].show
+```
+
 Unit prefixes in `coulomb` take advantage of Scala literal types,
-and are defined as `DerivedUnit` for a types that encode Rational numbers.
+and are defined as `DerivedUnit` for types that encode Rational numbers.
+The numeric literal types `Int`, `Long`, `Float` and `Double` can all be
+combined with the operator types `*`, `/` and `^` to express numeric constants.
+Numeric values are processed at compile-time as arbitrary precision rationals,
+and so you can easily express values with high precision and magnitudes.
 
 ```scala mdoc
 object prefixes:
@@ -210,6 +236,12 @@ object prefixes:
 
     final type Googol
     given unit_Googol: DerivedUnit[Googol, 10 ^ 100, "googol", "gog"] = DerivedUnit()
+
+    final type Percent
+    given unit_Percent: DerivedUnit[Percent, 1 / 100, "percent", "%"] = DerivedUnit()
+
+    final type Degree
+    given unit_Degree: DerivedUnit[Degree, 3.14159265 / 180, "degree", "deg"] = DerivedUnit()
 ```
 
 ## Value Types
