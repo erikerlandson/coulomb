@@ -263,6 +263,8 @@ val w2 = Wrapper(37D).withUnit[Vector[Int]]
 w2.show
 ```
 
+### Value Types and Algebras
+
 Although value and unit types are arbitrary for a `Quantity`, there is no free lunch.
 Operations on quantity objects will only work if they are defined.
 The following example will not compile because we have not defined what it means to add `Wrapper` objects:
