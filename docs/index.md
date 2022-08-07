@@ -1,6 +1,6 @@
 ![coulomb splash](/assets/coulomb-splash-800x400.png)
 
-# coulomb: Unit Analysis for Scala
+# Introduction to coulomb
 
 ## Quick Start
 

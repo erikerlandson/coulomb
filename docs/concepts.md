@@ -1,4 +1,4 @@
-# Concepts
+# coulomb Concepts
 
 ```scala mdoc:invisible
 // fundamental coulomb types and methods
@@ -294,6 +294,8 @@ val wsum = w + w
 ```
 
 ## Numeric Operations
+
+
 
 ## Truncating and Non Truncating Operations
 
