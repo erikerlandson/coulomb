@@ -295,13 +295,232 @@ val wsum = w + w
 
 ## Numeric Operations
 
+`coulomb` supports the following numeric operations for any value type that defines the required algebras:
 
+```scala mdoc
+val v = 2.0.withUnit[Meter]
 
-## Truncating and Non Truncating Operations
+// negation
+-v
+
+// addition
+v + v
+
+// subtraction
+v - v
+
+// multiplication
+v * v
+
+// division
+v / v
+
+// power
+v.pow[3]
+
+// comparisons
+
+v <= v
+
+v > v
+
+v === v
+
+v =!= v
+```
+
+## Truncating Operations
+
+Some operations involving integral types such as `Int`, `Long`, or `BigInt`,
+are considered "truncating" - they lose the fractional component of the result.
+In coulomb these are distinguished with specific "truncating" operators:
+
+```scala mdoc
+// fractional values (Double, Float, BigDecimal, Rational, etc)
+val fractional = 10.5.withUnit[Meter]
+
+// truncating value conversions (fractional -> integral)
+val integral = fractional.tToValue[Int]
+
+// truncating unit conversions
+integral.tToUnit[Yard]
+
+// truncating division
+integral `tquot` 3
+
+// truncating power
+integral.tpow[1/2]
+```
+
+Non-truncating operations are defined in cases where the result will not discard fractional components:
+```scala mdoc
+// "normal" (aka truncating) operations work when fractional component of results are preserved
+fractional / 3
+```
+
+Non-truncating operations are undefined on types that would cause truncation.
+```scala mdoc:fail
+// standard division is undefined for cases that would truncate
+integral / 3
+```
 
 ## ValueConversion and UnitConversion
+
+In `coulomb`, a `Quantity[V, U]` may experience conversions along two possible axes:
+converting value type `V` to a new value type `V2`, or converting unit `U` to a new unit `U2`:
+
+```scala mdoc
+val q = 10d.withUnit[Meter]
+
+// convert value type
+q.toValue[Float]
+
+// convert unit type
+q.toUnit[Yard]
+```
+
+Value conversions are successful whenever the corresponding `ValueConversion[VF, VT]` context is in scope,
+and similarly unit conversions are successful whenever the necessary `UnitConversion[V, UF, UT]` is in scope.
+
+As you can see from the signature `UnitConversion[V, UF, UT]`, any unit conversion is with respect to a particular value type.
+This is because the best way of converting from unit `UF` to `UT` will depend on the specific value type being converted.
+You can look at examples of unit conversions defined in `coulomb-core`
+[here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/conversion/standard/unit$.html).
+
+### truncating conversions
+
+As we saw in
+[previous sections][Truncating Operations],
+some operations on coulomb quantities may result in "truncation" - the loss of fractional parts of values.
+As with operations, truncating conversions are represented by distinct conversions
+`TruncatingValueConversion[VF, VT]` and `TruncatingUnitConversion[V, UF, UT]`.
+
+```scala mdoc
+// a truncating value conversion (fractional -> integral)
+val qi = q.tToValue[Int]
+
+// a truncating unit conversion (on an integral type)
+qi.tToUnit[Yard]
+```
+
+### implicit conversions
+
+In Scala 3, implicit conversions are represented by `scala.Conversion[F, T]`,
+which you can read more about
+[here](https://scala-lang.org/api/3.x/scala/Conversion.html).
+
+The `coulomb-core` library
+[pre-defines](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/conversion/standard/scala$.html)
+such implicit conversions,
+based on ValueConversion and UnitConversion context in scope.
+By convention, `coulomb` performs value conversions first, then unit conversions.
+
+Implicit quantity conversions can be used in typical Scala scenarios:
+
+```scala mdoc
+// implicitly convert double to float, and then cubic meters to liters
+val iconv: Quantity[Float, Liter] = 1.0.withUnit[Meter ^ 3]
+```
+
+However, numeric operators in `coulomb` may also make use of these implicit conversions:
+```scala mdoc
+val q1 = 1d.withUnit[Second]
+val q2 = 1.withUnit[Minute]
+
+// in this operation, q2's integer value is implicitly converted to double,
+// and then minutes are converted to seconds, and added to q1:
+q1 + q2
+```
+
+### defining conversions
+
+The `coulomb-core` and `coulomb-spire` libraries define value and unit conversions for a wide variety of
+popular numeric types, however you can also easily define your own.
+
+```scala mdoc
+object wrapperconv:
+    import coulomb.conversion.*
+
+    given vconv_Wrapper[VF, VT](using vcv: ValueConversion[VF, VT]): ValueConversion[Wrapper[VF], Wrapper[VT]] =
+        new ValueConversion[Wrapper[VF], Wrapper[VT]]:
+            def apply(w: Wrapper[VF]): Wrapper[VT] = Wrapper[VT](vcv(w.t))
+
+    given uconv_Wrapper[V, UF, UT](using ucv: UnitConversion[V, UF, UT]): UnitConversion[Wrapper[V], UF, UT] =
+        new UnitConversion[Wrapper[V], UF, UT]:
+            def apply(w: Wrapper[V]): Wrapper[V] = Wrapper[V](ucv(w.t))
+
+import wrapperconv.given
+
+val wq = Wrapper(1d).withUnit[Minute]
+
+wq.toUnit[Second]
+
+wq.toValue[Wrapper[Float]]
+```
+
+## ValuePromotion
+
+We saw in our
+[earlier example][implicit conversions]
+that `coulomb` can perform implicit value and unit conversions when doing numeric operations.
+The high level logic (implemented in chained context rules) is:
+
+1. "Resolve" left and right value types (`VL` and `VR`) into a final output type `VO`
+1. Apply implicit conversion `Quantity[VL, UL]` -> `Quantity[VO, UL]`
+1. Apply implicit conversion `Quantity[VR, UR]` -> `Quantity[VO, UL]`
+1. Perform the relevant algebraic operation, in value space `VO`
+1. Return the resulting value as `Quantity[VO, UL]`
+
+Note that not all numeric operations require all of these steps,
+however here is an example fragment of such code for addition which demonstrates them all:
+
+```scala
+transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
+    vres: ValueResolution[VL, VR],
+    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
+    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
+    alg: AdditiveSemigroup[vres.VO]
+        ): Add[VL, UL, VR, UR] =
+    new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(icl(ql).value, icr(qr).value).withUnit[UL])
+```
+
+In the example above, you can see that the context object that maps
+`(VL, VR) => VO` is of type `ValueResolution[VL, VR]`.
+
+It is possible to define all the necessary `ValueResolution[VL, VR]` for all possible pairs of
+`(VL, VR)`, however for more than a small number of such types the number of pairs grows unwieldy
+rather fast (quadratically fast in fact).
+However, there is another preferred alternative that allows you to only define "key" pairs that
+define a Directed Acyclic Graph, and the `coulomb` typeclass system will efficiently search this
+space to identify the correct value of `ValueResolution[VL, VR]` at compile time.
+
+Here is one example that captures the "total ordering" relation among value type resolutions
+for `{Int, Long, Float, Double}` that comes with `coulomb-core`:
+
+```scala
+// ValuePromotion infers the transitive closure of all promotions
+given ctx_vpp_standard: ValuePromotionPolicy[
+    (Int, Long) &: (Long, Float) &: (Float, Double) &: TNil
+] = ValuePromotionPolicy()
+```
+
+Using this, we can finish off our `Wrapper` example with some rules for generating `ValueResolution`.
+
+```scala mdoc
+object wrappervr:
+    import coulomb.ops.*
+    transparent inline given vr_Wrapper[VL, VR](using vres: ValueResolution[VL, VR]): ValueResolution[Wrapper[VL], Wrapper[VR]] =
+        new ValueResolution[Wrapper[VL], Wrapper[VR]]:
+            type VO = Wrapper[vres.VO]
+
+import wrappervr.given
+
+val wq1 = Wrapper(1d).withUnit[Second]
+val wq2 = Wrapper(1f).withUnit[Minute]
+
+wq1 + wq2
+```
 
 ## Coulomb Policies
 
 ## Time and Temperature
-
