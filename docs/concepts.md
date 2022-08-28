@@ -364,7 +364,7 @@ Non-truncating operations are undefined on types that would cause truncation.
 integral / 3
 ```
 
-## ValueConversion and UnitConversion
+## Value and Unit Conversions
 
 In `coulomb`, a `Quantity[V, U]` may experience conversions along two possible axes:
 converting value type `V` to a new value type `V2`, or converting unit `U` to a new unit `U2`:
@@ -458,7 +458,7 @@ wq.toUnit[Second]
 wq.toValue[Wrapper[Float]]
 ```
 
-## ValuePromotion
+## Value Promotion and Resolution
 
 We saw in our
 [earlier example][implicit conversions]
