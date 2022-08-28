@@ -521,6 +521,8 @@ val wq2 = Wrapper(1f).withUnit[Minute]
 wq1 + wq2
 ```
 
+## Time and Temperature
+
 ## Coulomb Policies
 
 The `coulomb-core` library is designed so that very few typeclasses are hard-coded.
@@ -610,5 +612,3 @@ support the standard Scala numeric types as well as spire's specialized types.
 If you import `coulomb-spire` policies, do not also import `coulomb-core` policies.
 Only one policy at a time should be imported.
 @:@
-
-## Time and Temperature
