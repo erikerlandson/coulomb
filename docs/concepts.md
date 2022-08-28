@@ -523,4 +523,92 @@ wq1 + wq2
 
 ## Coulomb Policies
 
+The `coulomb-core` library is designed so that very few typeclasses are hard-coded.
+As previous sections demonstrate, it is relatively easy to implement your own typeclasses
+if you need to work with custom types, or would prefer behaviors that are different than
+available out-of-box typeclasses.
+
+However, one tradeoff is that to obtain out-of-box features,
+the programmer needs to import a somewhat unweildy number of typeclasses.
+
+To help reduce the number of imports and make it easier to understand various behavior options,
+`coulomb` takes advantage of the new Scala 3
+[export clauses](https://docs.scala-lang.org/scala3/reference/other-new-features/export.html)
+to provide predefined groupings of imports which represent different "policies" for behavior.
+
+The `coulomb-core` library defines two policies, which you can import from `coulomb.policy`.
+The first, which is used by most of the examples in this documentation, is `coulomb.policy.standard`.
+This policy supports:
+
+- implicit value type promotions
+- implicit unit conversions
+- implicit value conversions
+
+Here is an example of using `coulomb.policy.standard`
+
+```scala mdoc:nest
+// note this does not include other necessary imports
+import coulomb.policy.standard.given
+import scala.language.implicitConversions
+
+val q1 = 1d.withUnit[Liter]
+val q2 = 1.withUnit[Meter ^ 3]
+
+// with "standard" policy, coulomb can resolve differing value types and unit types
+q1 + q2
+```
+
+```scala mdoc:reset:invisible
+// here we are resetting the compile context
+// to demonstrate strict policy
+
+// fundamental coulomb types and methods
+import coulomb.*
+import coulomb.syntax.*
+
+// algebraic definitions
+import algebra.instances.all.given
+import coulomb.ops.algebra.all.given
+
+// unit definitions
+import coulomb.units.si.{*, given}
+import coulomb.units.mksa.{*, given}
+import coulomb.units.time.{*, given}
+import coulomb.units.accepted.{*, given}
+```
+
+The second pre-defined policy is `couomb.policy.strict`,
+which does *not* allow implicit conversions of values or units.
+Operations involving identical value and unit types are always allowed,
+as are *explicit* conversions:
+
+```scala mdoc
+import coulomb.policy.strict.given
+
+val q1 = 1d.withUnit[Liter]
+val q2 = 2d.withUnit[Liter]
+
+// strict policy allows operating with same unit and value
+q1 + q2
+
+// explicit value and unit conversions are always allowed
+q1.toValue[Float]
+q1.toUnit[Meter ^ 3]
+```
+
+```scala mdoc:fail
+val q3 = 1.withUnit[Meter ^ 3]
+
+// strict policy does not allow implicit value or unit conversions
+q1 + q3
+```
+
+The `coulomb-spire` library provides additional predefined policies that
+support the standard Scala numeric types as well as spire's specialized types.
+
+@:callout(info)
+If you import `coulomb-spire` policies, do not also import `coulomb-core` policies.
+Only one policy at a time should be imported.
+@:@
+
 ## Time and Temperature
