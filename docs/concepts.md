@@ -521,7 +521,36 @@ val wq2 = Wrapper(1f).withUnit[Minute]
 wq1 + wq2
 ```
 
-## Time and Temperature
+## Temperature and Time
+
+The `coulomb-units` library defines units for temperature and time.
+When working with temperatures,
+one must distinguish between absolute temperatures, and units of degrees.
+Similarly, one must distinguish between absolute moments in time
+(aka timestamps, or instants)
+and units of duration.
+Consider the following example:
+
+```scala mdoc
+import coulomb.units.temperature.{*, given}
+
+// Here are two absolute temperatures
+val cels1 = 10d.withTemperature[Celsius]
+val cels2 = 20d.withTemperature[Celsius]
+
+// subtracting temperatures yields a Quantity of degrees:
+val dcels = cels2 - cels1
+
+// you can add or subtract a quantity from a temperature, and get a new temperature
+cels2 + dcels
+cels2 - dcels
+```
+
+It's an error to add or subtract two absolute temperatures
+```scala mdoc:fail
+// adding or subtracting absolute temperatures is a type error!
+cels1 + cels2
+```
 
 ## Coulomb Policies
 
