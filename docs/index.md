@@ -60,9 +60,9 @@ val dist = 1.withUnit[Meter]
 val fail = time + dist
 ```
 
-## Libraries
+## Packages
 
-`coulomb` includes the following libraries
+`coulomb` publishes the following packages
 
 | name | description |
 | ---: | :--- |
