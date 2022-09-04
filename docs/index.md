@@ -60,6 +60,17 @@ val dist = 1.withUnit[Meter]
 val fail = time + dist
 ```
 
+## Libraries
+
+`coulomb` includes the following libraries
+
+| name | description |
+| ---: | :--- |
+| `coulomb-core` | Provides core `coulomb` logic. Defines policies for `Int`, `Long`, `Float`, `Double`. |
+| `coulomb-units` | Defines common units, including SI, MKSA, Accepted, time, temperature, and US traditional |
+| `coulomb-spire` | Defines policies for working with Spire and Scala numeric types |
+
+
 ## Resources
 
 The following resources expand the concepts behind `coulomb` and typelevel unit analysis:
