@@ -546,10 +546,59 @@ cels2 + dcels
 cels2 - dcels
 ```
 
-It's an error to add or subtract two absolute temperatures
+As we saw in the example above, subtracting two absolute temperatures yields a Quantity of degrees.
+However, temperature scales are "anchored" at an absolute reference point,
+which makes _adding_ absolute temperatures undefined.
+For example `10C + 20C` does not equal `30C`.
+Hence, it's an error to add two absolute temperatures.
+
 ```scala mdoc:fail
-// adding or subtracting absolute temperatures is a type error!
+// adding absolute temperatures is a type error!
 cels1 + cels2
+```
+
+We can see that `coulomb` time units support an algebra that behaves the same as temperatures above:
+
+```scala mdoc
+import coulomb.units.time.{*, given}
+
+// Two absolute timestamps, relative to Jan 1 1970 (Unix epoch)
+val date1 = 50d.withEpochTime[365 * Day]
+val date2 = 51d.withEpochTime[365 * Day]
+
+// subtracting two absolute times yields a Quantity of time units
+val dyear = date2 - date1
+
+// one can add or subtract a Quantity from an absolute time
+date2 + dyear
+date2 - dyear
+```
+
+```scala mdoc:fail
+// adding absolute time values is an error
+date1 + date2
+```
+
+### Delta Units
+
+As these examples show, time and temperature units both involve a distinction between
+"absolute" or "positional" values, and standard "quantities", and the algebras
+of these absolute values are the same under the hood.
+
+In `coulomb-core` these kinds of absolute value are represented by a type `DeltaUnit[V, U, B]`,
+where `V` and `U` are standard value and unit types, and `B` represents a base unit.
+In the case of temperatures, the base unit is `Kelvin`, and in the case of time it is `Second`.
+
+@:callout(info)
+`DeltaUnit[V, U, B]` is so named because the only algebraic operation one can do with
+a pair of Delta Units is to subtract them.
+@:@
+
+The `DeltaUnit[V, U, B]` type supports the following algebra:
+```
+DeltaUnit - DeltaUnit => Quantity
+DeltaUnit + Quantity => DeltaUnit
+DeltaUnit - Quantity => DeltaUnit
 ```
 
 ## Coulomb Policies
