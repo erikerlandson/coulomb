@@ -63,7 +63,8 @@ import coulomb.units.us.{*, given}
 // coulomb-spire policies allow the use of spire and Scala types
 val rq = Rational(3, 2).withUnit[Meter]
 val bq = BigDecimal(1).withUnit[Yard]
+val iq = 1.withUnit[Meter]
 
 // The standard policy supports implicit conversions of unit and value types
-rq + bq
+rq + bq + iq
 ```
