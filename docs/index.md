@@ -82,6 +82,22 @@ The following resources expand the concepts behind `coulomb` and typelevel unit 
 - [Algorithmic Unit Analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/)
 - [A Unit Analysis of Linear Regression](http://erikerlandson.github.io/blog/2020/05/06/unit-analysis-for-linear-regression/)
 
+## Previous versions
+
+Versions of `coulomb` beginning with 0.6 require Scala 3,
+and are not compatible with Scala 2.13.
+
+`coulomb` versions <= 0.5.x require Scala 2.13.
+The 0.5.x series will continue to be supported on a maintenance basis only.
+
+You can browse the legacy scala doc for the `*_2.13` packages
+[here](https://www.javadoc.io/doc/com.manyangled).
+
+The legacy tutorial documentation will continue to be viewable
+[here](https://github.com/erikerlandson/coulomb/blob/develop/README.md).
+
+The `develop` branch of `coulomb` on github will continue to hold coulomb <= 0.5.x
+
 ## Code of Conduct
 
 The `coulomb` project supports the
