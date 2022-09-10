@@ -153,7 +153,7 @@ object ValuePromotion:
         import quotes.reflect.*
         Implicits.search(TypeRepr.of[ValuePromotionPolicy].appliedTo(List(TypeBounds.empty))) match
             case iss: ImplicitSearchSuccess =>
-                val AppliedType(_, List(vppt)) = iss.tree.tpe.baseType(TypeRepr.of[ValuePromotionPolicy].typeSymbol)
+                val AppliedType(_, List(vppt)) = iss.tree.tpe.baseType(TypeRepr.of[ValuePromotionPolicy].typeSymbol): @unchecked
                 vpp2str(vppt)
             case _ =>
                 report.error("no ValuePromotionPolicy was found in scope")

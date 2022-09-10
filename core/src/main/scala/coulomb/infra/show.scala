@@ -25,8 +25,8 @@ object show:
     def show[U](using Quotes, Type[U]): Expr[String] =
         import quotes.reflect.*
         val render = (tr: TypeRepr) => {
-            val AppliedType(_, List(_, a)) = tr
-            val ConstantType(StringConstant(abbv)) = a
+            val AppliedType(_, List(_, a)) = tr: @unchecked
+            val ConstantType(StringConstant(abbv)) = a: @unchecked
             abbv
         }
         val str = showrender(TypeRepr.of[U], render)
@@ -35,8 +35,8 @@ object show:
     def showFull[U](using Quotes, Type[U]): Expr[String] =
         import quotes.reflect.*
         val render = (tr: TypeRepr) => {
-            val AppliedType(_, List(n, _)) = tr
-            val ConstantType(StringConstant(name)) = n
+            val AppliedType(_, List(n, _)) = tr: @unchecked
+            val ConstantType(StringConstant(name)) = n: @unchecked
             name
         }
         val str = showrender(TypeRepr.of[U], render)

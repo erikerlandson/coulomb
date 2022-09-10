@@ -173,22 +173,22 @@ object typeexpr:
 
         def teToRational[E](using Quotes, Type[E]): Expr[Rational] =
             import quotes.reflect.*
-            val rationalTE(v) = TypeRepr.of[E]
+            val rationalTE(v) = TypeRepr.of[E]: @unchecked
             Expr(v)
 
         def teToBigInt[E](using Quotes, Type[E]): Expr[BigInt] =
             import quotes.reflect.*
-            val bigintTE(v) = TypeRepr.of[E]
+            val bigintTE(v) = TypeRepr.of[E]: @unchecked
             Expr(v)
 
         def teToDouble[E](using Quotes, Type[E]): Expr[Double] =
             import quotes.reflect.*
-            val rationalTE(v) = TypeRepr.of[E]
+            val rationalTE(v) = TypeRepr.of[E]: @unchecked
             Expr(v.toDouble)
 
         def teToNonNegInt[E](using Quotes, Type[E]): Expr[NonNegInt[E]] =
             import quotes.reflect.*
-            val rationalTE(v) = TypeRepr.of[E]
+            val rationalTE(v) = TypeRepr.of[E]: @unchecked
             if ((v.d == 1) && (v.n >= 0) && (v.n.isValidInt)) then
                 '{ new NonNegInt[E](${Expr(v.n.toInt)})}
             else
@@ -197,7 +197,7 @@ object typeexpr:
 
         def teToPosInt[E](using Quotes, Type[E]): Expr[PosInt[E]] =
             import quotes.reflect.*
-            val rationalTE(v) = TypeRepr.of[E]
+            val rationalTE(v) = TypeRepr.of[E]: @unchecked
             if ((v.d == 1) && (v.n > 0) && (v.n.isValidInt)) then
                 '{ new PosInt[E](${Expr(v.n.toInt)}) }
             else
@@ -206,7 +206,7 @@ object typeexpr:
 
         def teToInt[E](using Quotes, Type[E]): Expr[AllInt[E]] =
             import quotes.reflect.*
-            val rationalTE(v) = TypeRepr.of[E]
+            val rationalTE(v) = TypeRepr.of[E]: @unchecked
             if ((v.d == 1) && (v.n.isValidInt)) then
                 '{ new AllInt[E](${Expr(v.n.toInt)})}
             else

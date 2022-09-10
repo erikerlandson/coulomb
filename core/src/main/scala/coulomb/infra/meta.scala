@@ -21,6 +21,7 @@ import coulomb.*
 import coulomb.define.*
 
 object meta:
+    import scala.unchecked
     import scala.quoted.*
     import scala.language.implicitConversions
 
@@ -161,7 +162,7 @@ object meta:
                 (lcoef / rcoef, usig)
             case AppliedType(op, List(b, p)) if (op =:= TypeRepr.of[^]) =>
                 val (bcoef, bsig) = cansig(b)
-                val rationalTE(e) = p
+                val rationalTE(e) = p: @unchecked
                 if (e == 0) (Rational.const1, Nil)
                 else if (e == 1) (bcoef, bsig)
                 else if (e.n.isValidInt && e.d.isValidInt)
@@ -245,7 +246,7 @@ object meta:
                         // don't expand the signature definition in simplify mode
                         Some((Rational.const1, (u, Rational.const1) :: Nil))
                     case _ =>
-                        val AppliedType(_, List(_, d, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol)
+                        val AppliedType(_, List(_, d, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DerivedUnit].typeSymbol): @unchecked
                         Some(cansig(d))
                 case _ => None
 
@@ -254,8 +255,8 @@ object meta:
             import quotes.reflect.*
             Implicits.search(TypeRepr.of[DeltaUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
                 case iss: ImplicitSearchSuccess =>
-                    val AppliedType(_, List(_, b, o, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DeltaUnit].typeSymbol)
-                    val rationalTE(offset) = o
+                    val AppliedType(_, List(_, b, o, _, _)) = iss.tree.tpe.baseType(TypeRepr.of[DeltaUnit].typeSymbol): @unchecked
+                    val rationalTE(offset) = o: @unchecked
                     Some((offset, b))
                 case _ => None
 
