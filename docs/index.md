@@ -96,7 +96,7 @@ You can browse the legacy scala doc for the `*_2.13` packages
 The legacy tutorial documentation will continue to be viewable
 [here](https://github.com/erikerlandson/coulomb/blob/develop/README.md).
 
-The `branch-0.5` branch of `coulomb` on github will continue to hold coulomb <= 0.5.x
+The `scala2` branch of `coulomb` on github will continue to hold coulomb <= 0.5.x
 
 ## Code of Conduct
 
