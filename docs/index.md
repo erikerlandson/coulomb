@@ -94,7 +94,7 @@ You can browse the legacy scala doc for the `*_2.13` packages
 [here](https://www.javadoc.io/doc/com.manyangled).
 
 The legacy tutorial documentation will continue to be viewable
-[here](https://github.com/erikerlandson/coulomb/blob/develop/README.md).
+[here](https://github.com/erikerlandson/coulomb/blob/scala2/README.md).
 
 The `scala2` branch of `coulomb` on github will continue to hold coulomb <= 0.5.x
 

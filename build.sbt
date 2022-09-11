@@ -16,7 +16,7 @@ ThisBuild / startYear := Some(2022)
 ThisBuild / tlCiReleaseBranches := Seq("scala3")
 // don't overwrite the site published from develop branch for now
 // to enable, set this to whatever main branch is to enable (e.g. develop, main, etc)
-ThisBuild / tlSitePublishBranch := Some("no-such-branch")
+ThisBuild / tlSitePublishBranch := Some("scala3")
 
 ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 ThisBuild / crossScalaVersions := Seq("3.2.0")
