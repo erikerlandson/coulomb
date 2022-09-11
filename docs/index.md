@@ -1,4 +1,9 @@
-![coulomb splash](/assets/coulomb-splash-800x400.png)
+@:image(assets/coulomb-splash-800x400.png) {
+    intrinsicWidth = 800
+    intrinsicHeight = 400
+    alt = coulomb splash
+}
+
 
 # Introduction to coulomb
 
