@@ -7,6 +7,11 @@
 
  ![Cats Friendly Badge](https://typelevel.org/cats/img/cats-badge-tiny.png)
 
+### Documentation
+
+- [coulomb concepts](https://erikerlandson.github.io/coulomb/)
+- [coulomb API](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/index.html)
+
 ### Code of Conduct
 The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
 all contributors are expected to respect this code.
