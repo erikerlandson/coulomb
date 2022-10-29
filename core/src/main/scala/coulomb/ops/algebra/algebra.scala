@@ -32,4 +32,4 @@ abstract class FractionalPower[V]:
 @implicitNotFound("Truncating power not defined for value type ${V}")
 abstract class TruncatingPower[V]:
     /** returns v^e, truncated to integer value (toward zero) */
-    def tpow(v: V, e: Double): V 
+    def tpow(v: V, e: Double): V

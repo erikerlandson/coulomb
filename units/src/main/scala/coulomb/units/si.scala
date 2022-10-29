@@ -38,7 +38,7 @@ object si:
 
     /** The SI unit for electric current */
     final type Ampere
-    given ctx_unit_Ampere: BaseUnit[Ampere, "ampere", "A"] = BaseUnit() 
+    given ctx_unit_Ampere: BaseUnit[Ampere, "ampere", "A"] = BaseUnit()
 
     /** The SI unit for amount of substance */
     final type Mole
@@ -68,76 +68,95 @@ object si:
 
         /** SI prefix for 100 */
         final type Hecto
-        given ctx_unit_Hecto: DerivedUnit[Hecto, 100, "hecto", "h"] = DerivedUnit()
+        given ctx_unit_Hecto: DerivedUnit[Hecto, 100, "hecto", "h"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ 3 */
         final type Kilo
-        given ctx_unit_Kilo: DerivedUnit[Kilo, 10 ^ 3, "kilo", "k"] = DerivedUnit()
+        given ctx_unit_Kilo: DerivedUnit[Kilo, 10 ^ 3, "kilo", "k"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ 6 */
         final type Mega
-        given ctx_unit_Mega: DerivedUnit[Mega, 10 ^ 6, "mega", "M"] = DerivedUnit()
+        given ctx_unit_Mega: DerivedUnit[Mega, 10 ^ 6, "mega", "M"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ 9 */
         final type Giga
-        given ctx_unit_Giga: DerivedUnit[Giga, 10 ^ 9, "giga", "G"] = DerivedUnit()
+        given ctx_unit_Giga: DerivedUnit[Giga, 10 ^ 9, "giga", "G"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ 12 */
         final type Tera
-        given ctx_unit_Tera: DerivedUnit[Tera, 10 ^ 12, "tera", "T"] = DerivedUnit()
+        given ctx_unit_Tera: DerivedUnit[Tera, 10 ^ 12, "tera", "T"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ 15 */
         final type Peta
-        given ctx_unit_Peta: DerivedUnit[Peta, 10 ^ 15, "peta", "P"] = DerivedUnit()
+        given ctx_unit_Peta: DerivedUnit[Peta, 10 ^ 15, "peta", "P"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ 18 */
         final type Exa
-        given ctx_unit_Exa: DerivedUnit[Exa, 10 ^ 18, "exa", "E"] = DerivedUnit()
+        given ctx_unit_Exa: DerivedUnit[Exa, 10 ^ 18, "exa", "E"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ 21 */
         final type Zetta
-        given ctx_unit_Zetta: DerivedUnit[Zetta, 10 ^ 21, "zetta", "Z"] = DerivedUnit()
+        given ctx_unit_Zetta: DerivedUnit[Zetta, 10 ^ 21, "zetta", "Z"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ 24 */
         final type Yotta
-        given ctx_unit_Yotta: DerivedUnit[Yotta, 10 ^ 24, "yotta", "Y"] = DerivedUnit()
+        given ctx_unit_Yotta: DerivedUnit[Yotta, 10 ^ 24, "yotta", "Y"] =
+            DerivedUnit()
 
         /** SI prefix for 1/10 */
         final type Deci
-        given ctx_unit_Deci: DerivedUnit[Deci, 1 / 10, "deci", "d"] = DerivedUnit()
+        given ctx_unit_Deci: DerivedUnit[Deci, 1 / 10, "deci", "d"] =
+            DerivedUnit()
 
         /** SI prefix for 1/100 */
         final type Centi
-        given ctx_unit_Centi: DerivedUnit[Centi, 1 / 100, "centi", "c"] = DerivedUnit()
+        given ctx_unit_Centi: DerivedUnit[Centi, 1 / 100, "centi", "c"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ -3 */
         final type Milli
-        given ctx_unit_Milli: DerivedUnit[Milli, 10 ^ -3, "milli", "m"] = DerivedUnit()
+        given ctx_unit_Milli: DerivedUnit[Milli, 10 ^ -3, "milli", "m"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ -6 */
         final type Micro
-        given ctx_unit_Micro: DerivedUnit[Micro, 10 ^ -6, "micro", "μ"] = DerivedUnit()
+        given ctx_unit_Micro: DerivedUnit[Micro, 10 ^ -6, "micro", "μ"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ -9 */
         final type Nano
-        given ctx_unit_Nano: DerivedUnit[Nano, 10 ^ -9, "nano", "n"] = DerivedUnit()
+        given ctx_unit_Nano: DerivedUnit[Nano, 10 ^ -9, "nano", "n"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ -12 */
         final type Pico
-        given ctx_unit_Pico: DerivedUnit[Pico, 10 ^ -12, "pico", "p"] = DerivedUnit()
+        given ctx_unit_Pico: DerivedUnit[Pico, 10 ^ -12, "pico", "p"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ -15 */
         final type Femto
-        given ctx_unit_Femto: DerivedUnit[Femto, 10 ^ -15, "femto", "f"] = DerivedUnit()
+        given ctx_unit_Femto: DerivedUnit[Femto, 10 ^ -15, "femto", "f"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ -18 */
         final type Atto
-        given ctx_unit_Atto: DerivedUnit[Atto, 10 ^ -18, "atto", "a"] = DerivedUnit()
+        given ctx_unit_Atto: DerivedUnit[Atto, 10 ^ -18, "atto", "a"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ -21 */
         final type Zepto
-        given ctx_unit_Zepto: DerivedUnit[Zepto, 10 ^ -21, "zepto", "z"] = DerivedUnit()
+        given ctx_unit_Zepto: DerivedUnit[Zepto, 10 ^ -21, "zepto", "z"] =
+            DerivedUnit()
 
         /** SI prefix for 10 ^ -24 */
         final type Yocto
-        given ctx_unit_Yocto: DerivedUnit[Yocto, 10 ^ -24, "yocto", "y"] = DerivedUnit()
+        given ctx_unit_Yocto: DerivedUnit[Yocto, 10 ^ -24, "yocto", "y"] =
+            DerivedUnit()

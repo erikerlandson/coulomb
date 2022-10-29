@@ -51,7 +51,19 @@ class SIUnitsSuite extends CoulombSuite:
         assertEquals(1d.withUnit[Pico].toUnit[1].value, 1e-12)
         assertEquals(1d.withUnit[Femto].toUnit[1].value, 1e-15)
         // picking up a bit of fp artifacts at least significant bits on very small vals
-        assertEqualsDouble(1d.withUnit[Atto].toUnit[1].value, 1e-18, 1e-18 * 1e-15)
-        assertEqualsDouble(1d.withUnit[Zepto].toUnit[1].value, 1e-21, 1e-21 * 1e-15)
-        assertEqualsDouble(1d.withUnit[Yocto].toUnit[1].value, 1e-24, 1e-24 * 1e-15)
+        assertEqualsDouble(
+            1d.withUnit[Atto].toUnit[1].value,
+            1e-18,
+            1e-18 * 1e-15
+        )
+        assertEqualsDouble(
+            1d.withUnit[Zepto].toUnit[1].value,
+            1e-21,
+            1e-21 * 1e-15
+        )
+        assertEqualsDouble(
+            1d.withUnit[Yocto].toUnit[1].value,
+            1e-24,
+            1e-24 * 1e-15
+        )
     }

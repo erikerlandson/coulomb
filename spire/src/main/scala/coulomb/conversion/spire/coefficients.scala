@@ -16,16 +16,24 @@
 
 package coulomb.conversion.spire
 
-import spire.math.{ Rational, SafeLong }
+import spire.math.{Rational, SafeLong}
 
-import coulomb.rational.{ Rational => CoulombRational }
+import coulomb.rational.{Rational => CoulombRational}
 
 object coefficients:
-    inline def coefficientRational[UF, UT]: Rational = ${ meta.coefficientSpireRational[UF, UT] }
-    inline def coefficientBigDecimal[UF, UT]: BigDecimal = ${ meta.coefficientBigDecimal[UF, UT] }
+    inline def coefficientRational[UF, UT]: Rational = ${
+        meta.coefficientSpireRational[UF, UT]
+    }
+    inline def coefficientBigDecimal[UF, UT]: BigDecimal = ${
+        meta.coefficientBigDecimal[UF, UT]
+    }
 
-    inline def deltaOffsetRational[U, B]: Rational = ${ meta.deltaOffsetSpireRational[U, B] }
-    inline def deltaOffsetBigDecimal[U, B]: BigDecimal = ${ meta.deltaOffsetBigDecimal[U, B] }
+    inline def deltaOffsetRational[U, B]: Rational = ${
+        meta.deltaOffsetSpireRational[U, B]
+    }
+    inline def deltaOffsetBigDecimal[U, B]: BigDecimal = ${
+        meta.deltaOffsetBigDecimal[U, B]
+    }
 
     object meta:
         import scala.quoted.*
@@ -36,34 +44,62 @@ object coefficients:
         given ctx_SafeLongToExpr: ToExpr[SafeLong] with
             def apply(s: SafeLong)(using Quotes): Expr[SafeLong] = s match
                 case v if (v == SafeLong.zero) => '{ SafeLong.zero }
-                case v if (v == SafeLong.one) => '{ SafeLong.one }
-                case v if (v.isValidLong) => '{ SafeLong(${Expr(s.getLong.get)}) }
-                case _ => '{ SafeLong(${Expr(s.toBigInt)}) }
+                case v if (v == SafeLong.one)  => '{ SafeLong.one }
+                case v if (v.isValidLong) =>
+                    '{ SafeLong(${ Expr(s.getLong.get) }) }
+                case _ => '{ SafeLong(${ Expr(s.toBigInt) }) }
 
         given ctx_SpireRationalToExpr: ToExpr[Rational] with
             def apply(r: Rational)(using Quotes): Expr[Rational] = r match
                 case v if (v == Rational.zero) => '{ Rational.zero }
-                case v if (v == Rational.one) => '{ Rational.one }
-                case _ => '{ Rational(${Expr(r.numerator)}, ${Expr(r.denominator)}) }
+                case v if (v == Rational.one)  => '{ Rational.one }
+                case _ =>
+                    '{
+                        Rational(
+                            ${ Expr(r.numerator) },
+                            ${ Expr(r.denominator) }
+                        )
+                    }
 
-        def coefficientSpireRational[UF, UT](using Quotes, Type[UF], Type[UT]): Expr[Rational] =
+        def coefficientSpireRational[UF, UT](using
+            Quotes,
+            Type[UF],
+            Type[UT]
+        ): Expr[Rational] =
             import quotes.reflect.*
             val c: CoulombRational = coef(TypeRepr.of[UF], TypeRepr.of[UT])
             Expr(Rational(c.n, c.d))
 
-        def coefficientBigDecimal[UF, UT](using Quotes, Type[UF], Type[UT]): Expr[BigDecimal] =
+        def coefficientBigDecimal[UF, UT](using
+            Quotes,
+            Type[UF],
+            Type[UT]
+        ): Expr[BigDecimal] =
             import quotes.reflect.*
             val c: CoulombRational = coef(TypeRepr.of[UF], TypeRepr.of[UT])
-            val bd: BigDecimal = Rational(c.n, c.d).toBigDecimal(java.math.MathContext.DECIMAL128)
+            val bd: BigDecimal = Rational(c.n, c.d).toBigDecimal(
+                java.math.MathContext.DECIMAL128
+            )
             Expr(bd)
 
-        def deltaOffsetSpireRational[U, B](using Quotes, Type[U], Type[B]): Expr[Rational] =
+        def deltaOffsetSpireRational[U, B](using
+            Quotes,
+            Type[U],
+            Type[B]
+        ): Expr[Rational] =
             import quotes.reflect.*
             val doff: CoulombRational = offset(TypeRepr.of[U], TypeRepr.of[B])
             Expr(Rational(doff.n, doff.d))
 
-        def deltaOffsetBigDecimal[U, B](using Quotes, Type[U], Type[B]): Expr[BigDecimal] =
+        def deltaOffsetBigDecimal[U, B](using
+            Quotes,
+            Type[U],
+            Type[B]
+        ): Expr[BigDecimal] =
             import quotes.reflect.*
             val doff: CoulombRational = offset(TypeRepr.of[U], TypeRepr.of[B])
-            val bd: BigDecimal = Rational(doff.n, doff.d).toBigDecimal(java.math.MathContext.DECIMAL128)
+            val bd: BigDecimal =
+                Rational(doff.n, doff.d).toBigDecimal(
+                    java.math.MathContext.DECIMAL128
+                )
             Expr(bd)

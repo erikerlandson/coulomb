@@ -31,8 +31,10 @@ object mul:
         eqv: VR =:= VL,
         alg: MultiplicativeSemigroup[VL],
         su: SimplifiedUnit[UL * UR]
-            ): Mul[VL, UL, VR, UR] =
-        new infra.MulNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.times(ql.value, eqv(qr.value)).withUnit[su.UO])
+    ): Mul[VL, UL, VR, UR] =
+        new infra.MulNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.times(ql.value, eqv(qr.value)).withUnit[su.UO]
+        )
 
     transparent inline given ctx_mul_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -41,10 +43,14 @@ object mul:
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
         alg: MultiplicativeSemigroup[vres.VO],
         su: SimplifiedUnit[UL * UR]
-            ): Mul[VL, UL, VR, UR] =
-        new infra.MulNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.times(icl(ql).value, icr(qr).value).withUnit[su.UO])
+    ): Mul[VL, UL, VR, UR] =
+        new infra.MulNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.times(icl(ql).value, icr(qr).value).withUnit[su.UO]
+        )
 
     object infra:
-        class MulNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Mul[VL, UL, VR, UR]:
+        class MulNC[VL, UL, VR, UR, VOp, UOp](
+            val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]
+        ) extends Mul[VL, UL, VR, UR]:
             type VO = VOp
             type UO = UOp

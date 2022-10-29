@@ -31,16 +31,20 @@ object add:
         eqv: VR =:= VL,
         equ: UR =:= UL,
         alg: AdditiveSemigroup[VL]
-            ): Add[VL, UL, VR, UR] =
-        new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(ql.value, eqv(qr.value)).withUnit[UL])
+    ): Add[VL, UL, VR, UR] =
+        new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.plus(ql.value, eqv(qr.value)).withUnit[UL]
+        )
 
     transparent inline given ctx_add_1V2U[VL, UL, VR, UR](using
         eqv: VR =:= VL,
         neu: NotGiven[UR =:= UL],
         icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
         alg: AdditiveSemigroup[VL]
-            ): Add[VL, UL, VR, UR] =
-        new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(ql.value, icr(qr).value).withUnit[UL])
+    ): Add[VL, UL, VR, UR] =
+        new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.plus(ql.value, icr(qr).value).withUnit[UL]
+        )
 
     transparent inline given ctx_add_2V1U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -49,8 +53,10 @@ object add:
         icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveSemigroup[vres.VO]
-            ): Add[VL, UL, VR, UR] =
-        new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(icl(ql).value, icr(qr).value).withUnit[UL])
+    ): Add[VL, UL, VR, UR] =
+        new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.plus(icl(ql).value, icr(qr).value).withUnit[UL]
+        )
 
     transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -59,10 +65,14 @@ object add:
         icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveSemigroup[vres.VO]
-            ): Add[VL, UL, VR, UR] =
-        new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(icl(ql).value, icr(qr).value).withUnit[UL])
+    ): Add[VL, UL, VR, UR] =
+        new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.plus(icl(ql).value, icr(qr).value).withUnit[UL]
+        )
 
     object infra:
-        class AddNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Add[VL, UL, VR, UR]:
+        class AddNC[VL, UL, VR, UR, VOp, UOp](
+            val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]
+        ) extends Add[VL, UL, VR, UR]:
             type VO = VOp
             type UO = UOp

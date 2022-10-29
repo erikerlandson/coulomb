@@ -22,20 +22,23 @@ import coulomb.syntax.*
 import org.scalacheck.*
 
 given Arbitrary[Rational] = Arbitrary(
-  for
-    n <- Arbitrary.arbitrary[BigInt]
-    d <- Arbitrary.arbitrary[BigInt].suchThat(_ != 0)
-  yield Rational(n, d)
+    for
+        n <- Arbitrary.arbitrary[BigInt]
+        d <- Arbitrary.arbitrary[BigInt].suchThat(_ != 0)
+    yield Rational(n, d)
 )
 
-given Cogen[Rational] = summon[Cogen[(BigInt, BigInt)]].contramap(r => (r.n, r.d))
+given Cogen[Rational] =
+    summon[Cogen[(BigInt, BigInt)]].contramap(r => (r.n, r.d))
 
 given [V, U](using arbV: Arbitrary[V]): Arbitrary[Quantity[V, U]] =
-  Arbitrary(arbV.arbitrary.map(_.withUnit[U]))
+    Arbitrary(arbV.arbitrary.map(_.withUnit[U]))
 
 given [V, U, B](using arbV: Arbitrary[V]): Arbitrary[DeltaQuantity[V, U, B]] =
-  Arbitrary(arbV.arbitrary.map(_.withDeltaUnit[U, B]))
+    Arbitrary(arbV.arbitrary.map(_.withDeltaUnit[U, B]))
 
-given [V, U](using cogenV: Cogen[V]): Cogen[Quantity[V, U]] = cogenV.contramap(_.value)
+given [V, U](using cogenV: Cogen[V]): Cogen[Quantity[V, U]] =
+    cogenV.contramap(_.value)
 
-given [V, U, B](using cogenV: Cogen[V]): Cogen[DeltaQuantity[V, U, B]] = cogenV.contramap(_.value)
+given [V, U, B](using cogenV: Cogen[V]): Cogen[DeltaQuantity[V, U, B]] =
+    cogenV.contramap(_.value)

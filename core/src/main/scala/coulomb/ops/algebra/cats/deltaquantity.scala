@@ -21,22 +21,32 @@ object deltaquantity:
     import coulomb.DeltaQuantity
     import coulomb.policy.priority.*
 
-    given ctx_DeltaQuantity_Order[V, U, B](using Prio0)(using ord: Order[V]): Order[DeltaQuantity[V, U, B]] =
+    given ctx_DeltaQuantity_Order[V, U, B](using Prio0)(using
+        ord: Order[V]
+    ): Order[DeltaQuantity[V, U, B]] =
         new infra.QOrder[V, U, B](ord)
 
-    given ctx_DeltaQuantity_Hash[V, U, B](using Prio1)(using h: Hash[V]): Hash[DeltaQuantity[V, U, B]] =
+    given ctx_DeltaQuantity_Hash[V, U, B](using Prio1)(using
+        h: Hash[V]
+    ): Hash[DeltaQuantity[V, U, B]] =
         new infra.QHash[V, U, B](h)
 
-    given ctx_DeltaQuantity_Eq[V, U, B](using Prio2)(using e: Eq[V]): Eq[DeltaQuantity[V, U, B]] =
+    given ctx_DeltaQuantity_Eq[V, U, B](using Prio2)(using
+        e: Eq[V]
+    ): Eq[DeltaQuantity[V, U, B]] =
         new infra.QEq[V, U, B](e)
 
     object infra:
-        class QOrder[V, U, B](ord: Order[V]) extends Order[DeltaQuantity[V, U, B]]:
-            def compare(x: DeltaQuantity[V, U, B], y: DeltaQuantity[V, U, B]) = ord.compare(x.value, y.value)
+        class QOrder[V, U, B](ord: Order[V])
+            extends Order[DeltaQuantity[V, U, B]]:
+            def compare(x: DeltaQuantity[V, U, B], y: DeltaQuantity[V, U, B]) =
+                ord.compare(x.value, y.value)
 
         class QEq[V, U, B](e: Eq[V]) extends Eq[DeltaQuantity[V, U, B]]:
-            def eqv(x: DeltaQuantity[V, U, B], y: DeltaQuantity[V, U, B]) = e.eqv(x.value, y.value)
+            def eqv(x: DeltaQuantity[V, U, B], y: DeltaQuantity[V, U, B]) =
+                e.eqv(x.value, y.value)
 
-        class QHash[V, U, B](h: Hash[V]) extends QEq[V, U, B](h) with Hash[DeltaQuantity[V, U, B]]:
+        class QHash[V, U, B](h: Hash[V])
+            extends QEq[V, U, B](h)
+            with Hash[DeltaQuantity[V, U, B]]:
             def hash(x: DeltaQuantity[V, U, B]) = h.hash(x.value)
-

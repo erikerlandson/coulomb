@@ -31,27 +31,41 @@ object double:
         (q: Quantity[Double, U]) => (-(q.value)).withUnit[U]
 
     transparent inline given ctx_add_Double_1U[U]: Add[Double, U, Double, U] =
-        new AddNC((ql: Quantity[Double, U], qr: Quantity[Double, U]) => (ql.value + qr.value).withUnit[U]) 
+        new AddNC((ql: Quantity[Double, U], qr: Quantity[Double, U]) =>
+            (ql.value + qr.value).withUnit[U]
+        )
 
     transparent inline given ctx_add_Double_2U[UL, UR](using
         Conversion[Quantity[Double, UR], Quantity[Double, UL]]
-            ): Add[Double, UL, Double, UR] =
+    ): Add[Double, UL, Double, UR] =
         val c = coefficientDouble[UR, UL]
-        new AddNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) => (ql.value + (c*qr.value)).withUnit[UL]) 
-        
+        new AddNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) =>
+            (ql.value + (c * qr.value)).withUnit[UL]
+        )
+
     transparent inline given ctx_sub_Double_1U[U]: Sub[Double, U, Double, U] =
-        new SubNC((ql: Quantity[Double, U], qr: Quantity[Double, U]) => (ql.value - qr.value).withUnit[U])
+        new SubNC((ql: Quantity[Double, U], qr: Quantity[Double, U]) =>
+            (ql.value - qr.value).withUnit[U]
+        )
 
     transparent inline given ctx_sub_Double_2U[UL, UR](using
         Conversion[Quantity[Double, UR], Quantity[Double, UL]]
-            ): Sub[Double, UL, Double, UR] =
+    ): Sub[Double, UL, Double, UR] =
         val c = coefficientDouble[UR, UL]
-        new SubNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) => (ql.value - (c*qr.value)).withUnit[UL]) 
+        new SubNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) =>
+            (ql.value - (c * qr.value)).withUnit[UL]
+        )
 
-    transparent inline given ctx_mul_Double_2U[UL, UR](using su: SimplifiedUnit[UL * UR]):
-            Mul[Double, UL, Double, UR] =
-        new MulNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) => (ql.value * qr.value).withUnit[su.UO]) 
+    transparent inline given ctx_mul_Double_2U[UL, UR](using
+        su: SimplifiedUnit[UL * UR]
+    ): Mul[Double, UL, Double, UR] =
+        new MulNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) =>
+            (ql.value * qr.value).withUnit[su.UO]
+        )
 
-    transparent inline given ctx_div_Double_2U[UL, UR](using su: SimplifiedUnit[UL / UR]):
-            Div[Double, UL, Double, UR] =
-        new DivNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) => (ql.value / qr.value).withUnit[su.UO]) 
+    transparent inline given ctx_div_Double_2U[UL, UR](using
+        su: SimplifiedUnit[UL / UR]
+    ): Div[Double, UL, Double, UR] =
+        new DivNC((ql: Quantity[Double, UL], qr: Quantity[Double, UR]) =>
+            (ql.value / qr.value).withUnit[su.UO]
+        )

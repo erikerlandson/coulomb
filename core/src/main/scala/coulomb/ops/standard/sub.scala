@@ -31,16 +31,20 @@ object sub:
         eqv: VR =:= VL,
         equ: UR =:= UL,
         alg: AdditiveGroup[VL]
-            ): Sub[VL, UL, VR, UR] =
-        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(ql.value, eqv(qr.value)).withUnit[UL])
+    ): Sub[VL, UL, VR, UR] =
+        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.minus(ql.value, eqv(qr.value)).withUnit[UL]
+        )
 
     transparent inline given ctx_sub_1V2U[VL, UL, VR, UR](using
         eqv: VR =:= VL,
         neu: NotGiven[UR =:= UL],
         icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
         alg: AdditiveGroup[VL]
-            ): Sub[VL, UL, VR, UR] =
-        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(ql.value, icr(qr).value).withUnit[UL])
+    ): Sub[VL, UL, VR, UR] =
+        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.minus(ql.value, icr(qr).value).withUnit[UL]
+        )
 
     transparent inline given ctx_sub_2V1U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -49,8 +53,10 @@ object sub:
         icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveGroup[vres.VO]
-            ): Sub[VL, UL, VR, UR] =
-        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(icl(ql).value, icr(qr).value).withUnit[UL])
+    ): Sub[VL, UL, VR, UR] =
+        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.minus(icl(ql).value, icr(qr).value).withUnit[UL]
+        )
 
     transparent inline given ctx_sub_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -59,10 +65,14 @@ object sub:
         icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveGroup[vres.VO]
-            ): Sub[VL, UL, VR, UR] =
-        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.minus(icl(ql).value, icr(qr).value).withUnit[UL])
+    ): Sub[VL, UL, VR, UR] =
+        new infra.SubNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.minus(icl(ql).value, icr(qr).value).withUnit[UL]
+        )
 
     object infra:
-        class SubNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Sub[VL, UL, VR, UR]:
+        class SubNC[VL, UL, VR, UR, VOp, UOp](
+            val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]
+        ) extends Sub[VL, UL, VR, UR]:
             type VO = VOp
             type UO = UOp

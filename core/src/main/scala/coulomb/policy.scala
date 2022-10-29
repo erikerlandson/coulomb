@@ -22,7 +22,7 @@ object priority:
     object Prio0 { given p: Prio0 = Prio0() }
 
     class Prio1 extends Prio2
-    object Prio1 { given p: Prio1 =  Prio1() }
+    object Prio1 { given p: Prio1 = Prio1() }
 
     class Prio2 extends Prio3
     object Prio2 { given p: Prio2 = Prio2() }
@@ -45,12 +45,12 @@ object priority:
     class Prio8 extends Prio9
     object Prio8 { given p: Prio8 = Prio8() }
 
-    class Prio9 
+    class Prio9
     object Prio9 { given p: Prio9 = Prio9() }
 
 /**
- * A policy that supports all standard operation definitions, including those involving
- * implicit conversions of units or value types.
+ * A policy that supports all standard operation definitions, including those
+ * involving implicit conversions of units or value types.
  *
  * {{{
  * import coulomb.*
@@ -69,10 +69,10 @@ object standard:
     export coulomb.ops.algebra.cats.all.given
 
 /**
- * A policy that supports all standard operations, but does not support operations that
- * involve any implicit conversions of either units or value types.
- * For example, one may add two quantities having the same unit and value type, but
- * not quantities differing in either their value type or unit.
+ * A policy that supports all standard operations, but does not support
+ * operations that involve any implicit conversions of either units or value
+ * types. For example, one may add two quantities having the same unit and value
+ * type, but not quantities differing in either their value type or unit.
  *
  * Explicit conversions such as `q.toUnit` or `q.toValue` are allowed.
  *

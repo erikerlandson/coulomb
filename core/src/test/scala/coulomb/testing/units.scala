@@ -41,28 +41,37 @@ final type Micro
 given ctx_unit_Micro: DerivedUnit[Micro, 10 ^ -6, "micro", "μ"] = DerivedUnit()
 
 final type Yard
-given ctx_unit_Yard: DerivedUnit[Yard, Meter *  (9144 / 10000), "yard", "yd"] = DerivedUnit()
+given ctx_unit_Yard: DerivedUnit[Yard, Meter * (9144 / 10000), "yard", "yd"] =
+    DerivedUnit()
 
 final type Foot
 given ctx_unit_Foot: DerivedUnit[Foot, Yard / 3, "foot", "ft"] = DerivedUnit()
 
 final type Liter
-given ctx_unit_Liter: DerivedUnit[Liter, (Meter ^ 3) / 1000, "liter", "l"] = DerivedUnit()
+given ctx_unit_Liter: DerivedUnit[Liter, (Meter ^ 3) / 1000, "liter", "l"] =
+    DerivedUnit()
 
 final type Pound
-given ctx_unit_Pound: DerivedUnit[Pound, Kilogram * (45359237 / 100000000), "pound", "lb"] = DerivedUnit()
+given ctx_unit_Pound
+    : DerivedUnit[Pound, Kilogram * (45359237 / 100000000), "pound", "lb"] =
+    DerivedUnit()
 
 final type Minute
-given ctx_unit_Minute: DerivedUnit[Minute, Second * 60, "minute", "min"] = DerivedUnit()
+given ctx_unit_Minute: DerivedUnit[Minute, Second * 60, "minute", "min"] =
+    DerivedUnit()
 
 final type Hour
-given ctx_unit_Hour: DerivedUnit[Hour, Minute * 60, "hour", "hr"] = DerivedUnit()
+given ctx_unit_Hour: DerivedUnit[Hour, Minute * 60, "hour", "hr"] =
+    DerivedUnit()
 
 final type Kelvin
 given ctx_unit_Kelvin: BaseUnit[Kelvin, "kelvin", "K"] = BaseUnit()
 
 final type Celsius
-given ctx_unit_Celsius: DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] = DeltaUnit()
+given ctx_unit_Celsius
+    : DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] = DeltaUnit()
 
 final type Fahrenheit
-given ctx_unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] = DeltaUnit()
+given ctx_unit_Fahrenheit
+    : DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] =
+    DeltaUnit()

@@ -31,35 +31,49 @@ object pow:
     transparent inline given ctx_pow_FractionalPower[V, U, E](using Prio0)(using
         alg: FractionalPower[V],
         su: SimplifiedUnit[U ^ E]
-            ): Pow[V, U, E] =
+    ): Pow[V, U, E] =
         val e = typeexpr.double[E]
-        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.pow(q.value, e).withUnit[su.UO])
+        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) =>
+            alg.pow(q.value, e).withUnit[su.UO]
+        )
 
-    transparent inline given ctx_pow_MultiplicativeGroup[V, U, E](using Prio1)(using
+    transparent inline given ctx_pow_MultiplicativeGroup[V, U, E](using Prio1)(
+        using
         alg: MultiplicativeGroup[V],
         aie: typeexpr.AllInt[E],
         su: SimplifiedUnit[U ^ E]
-            ): Pow[V, U, E] =
+    ): Pow[V, U, E] =
         val e = aie.value
-        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.pow(q.value, e).withUnit[su.UO])
+        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) =>
+            alg.pow(q.value, e).withUnit[su.UO]
+        )
 
-    transparent inline given ctx_pow_MultiplicativeMonoid[V, U, E](using Prio2)(using
+    transparent inline given ctx_pow_MultiplicativeMonoid[V, U, E](using Prio2)(
+        using
         alg: MultiplicativeMonoid[V],
         nnie: typeexpr.NonNegInt[E],
         su: SimplifiedUnit[U ^ E]
-            ): Pow[V, U, E] =
+    ): Pow[V, U, E] =
         val e = nnie.value
-        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.pow(q.value, e).withUnit[su.UO])
+        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) =>
+            alg.pow(q.value, e).withUnit[su.UO]
+        )
 
-    transparent inline given ctx_pow_MultiplicativeSemigroup[V, U, E](using Prio3)(using
+    transparent inline given ctx_pow_MultiplicativeSemigroup[V, U, E](using
+        Prio3
+    )(using
         alg: MultiplicativeSemigroup[V],
         pie: typeexpr.PosInt[E],
         su: SimplifiedUnit[U ^ E]
-            ): Pow[V, U, E] =
+    ): Pow[V, U, E] =
         val e = pie.value
-        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.pow(q.value, e).withUnit[su.UO])
+        new infra.PowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) =>
+            alg.pow(q.value, e).withUnit[su.UO]
+        )
 
     object infra:
-        class PowNC[V, U, E, VOp, UOp](val eval: Quantity[V, U] => Quantity[VOp, UOp]) extends Pow[V, U, E]:
+        class PowNC[V, U, E, VOp, UOp](
+            val eval: Quantity[V, U] => Quantity[VOp, UOp]
+        ) extends Pow[V, U, E]:
             type VO = VOp
             type UO = UOp

@@ -30,38 +30,61 @@ object deltasubq:
         eqv: VR =:= VL,
         equ: UR =:= UL,
         alg: AdditiveGroup[VL]
-            ): DeltaSubQ[B, VL, UL, VR, UR] =
-        new infra.DeltaSubQNC((ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]) => alg.minus(ql.value, eqv(qr.value)).withDeltaUnit[UL, B])
+    ): DeltaSubQ[B, VL, UL, VR, UR] =
+        new infra.DeltaSubQNC(
+            (ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]) =>
+                alg.minus(ql.value, eqv(qr.value)).withDeltaUnit[UL, B]
+        )
 
     transparent inline given ctx_deltasubq_1V2U[B, VL, UL, VR, UR](using
         eqv: VR =:= VL,
         neu: NotGiven[UR =:= UL],
         icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
         alg: AdditiveGroup[VL]
-            ): DeltaSubQ[B, VL, UL, VR, UR] =
-        new infra.DeltaSubQNC((ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]) => alg.minus(ql.value, icr(qr).value).withDeltaUnit[UL, B])
+    ): DeltaSubQ[B, VL, UL, VR, UR] =
+        new infra.DeltaSubQNC(
+            (ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]) =>
+                alg.minus(ql.value, icr(qr).value).withDeltaUnit[UL, B]
+        )
 
     transparent inline given ctx_deltasubq_2V1U[B, VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
         equ: UR =:= UL,
         vres: ValueResolution[VL, VR],
-        icl: Conversion[DeltaQuantity[VL, UL, B], DeltaQuantity[vres.VO, UL, B]],
+        icl: Conversion[
+            DeltaQuantity[VL, UL, B],
+            DeltaQuantity[vres.VO, UL, B]
+        ],
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveGroup[vres.VO]
-            ): DeltaSubQ[B, VL, UL, VR, UR] =
-        new infra.DeltaSubQNC((ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]) => alg.minus(icl(ql).value, icr(qr).value).withDeltaUnit[UL, B])
+    ): DeltaSubQ[B, VL, UL, VR, UR] =
+        new infra.DeltaSubQNC(
+            (ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]) =>
+                alg.minus(icl(ql).value, icr(qr).value).withDeltaUnit[UL, B]
+        )
 
     transparent inline given ctx_deltasubq_2V2U[B, VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
         neu: NotGiven[UR =:= UL],
         vres: ValueResolution[VL, VR],
-        icl: Conversion[DeltaQuantity[VL, UL, B], DeltaQuantity[vres.VO, UL, B]],
+        icl: Conversion[
+            DeltaQuantity[VL, UL, B],
+            DeltaQuantity[vres.VO, UL, B]
+        ],
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         alg: AdditiveGroup[vres.VO]
-            ): DeltaSubQ[B, VL, UL, VR, UR] =
-        new infra.DeltaSubQNC((ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]) => alg.minus(icl(ql).value, icr(qr).value).withDeltaUnit[UL, B])
+    ): DeltaSubQ[B, VL, UL, VR, UR] =
+        new infra.DeltaSubQNC(
+            (ql: DeltaQuantity[VL, UL, B], qr: Quantity[VR, UR]) =>
+                alg.minus(icl(ql).value, icr(qr).value).withDeltaUnit[UL, B]
+        )
 
     object infra:
-        class DeltaSubQNC[B, VL, UL, VR, UR, VOp, UOp](val eval: (DeltaQuantity[VL, UL, B], Quantity[VR, UR]) => DeltaQuantity[VOp, UOp, B]) extends DeltaSubQ[B, VL, UL, VR, UR]:
+        class DeltaSubQNC[B, VL, UL, VR, UR, VOp, UOp](
+            val eval: (
+                DeltaQuantity[VL, UL, B],
+                Quantity[VR, UR]
+            ) => DeltaQuantity[VOp, UOp, B]
+        ) extends DeltaSubQ[B, VL, UL, VR, UR]:
             type VO = VOp
             type UO = UOp

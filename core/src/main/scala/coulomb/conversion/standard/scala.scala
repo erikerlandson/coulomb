@@ -22,33 +22,34 @@ object scala:
     import coulomb.*
     import coulomb.syntax.*
 
-    // Enable the compiler to implicitly convert Quantity[V1, U1] -> Quantity[V2, U2], 
+    // Enable the compiler to implicitly convert Quantity[V1, U1] -> Quantity[V2, U2],
     // whenever a valid conversion exists:
     // https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
 
-    given ctx_Quantity_Conversion_1V1U[V, U]: Conversion[Quantity[V, U], Quantity[V, U]] =
+    given ctx_Quantity_Conversion_1V1U[V, U]
+        : Conversion[Quantity[V, U], Quantity[V, U]] =
         (q: Quantity[V, U]) => q
 
     given ctx_Quantity_Conversion_1V2U[V, UF, UT](using
         uc: UnitConversion[V, UF, UT]
-            ): Conversion[Quantity[V, UF], Quantity[V, UT]] =
+    ): Conversion[Quantity[V, UF], Quantity[V, UT]] =
         (q: Quantity[V, UF]) => uc(q.value).withUnit[UT]
 
     given ctx_Quantity_Conversion_2V1U[U, VF, VT](using
-        vc: ValueConversion[VF, VT],
-            ): Conversion[Quantity[VF, U], Quantity[VT, U]] =
+        vc: ValueConversion[VF, VT]
+    ): Conversion[Quantity[VF, U], Quantity[VT, U]] =
         (q: Quantity[VF, U]) => vc(q.value).withUnit[U]
 
     given ctx_Quantity_Conversion_2V2U[VF, UF, VT, UT](using
         vc: ValueConversion[VF, VT],
         uc: UnitConversion[VT, UF, UT]
-            ): Conversion[Quantity[VF, UF], Quantity[VT, UT]] =
+    ): Conversion[Quantity[VF, UF], Quantity[VT, UT]] =
         (q: Quantity[VF, UF]) => uc(vc(q.value)).withUnit[UT]
 
     given ctx_DeltaQuantity_conversion_2V2U[B, VF, UF, VT, UT](using
         vc: ValueConversion[VF, VT],
         uc: DeltaUnitConversion[VT, B, UF, UT]
-            ): Conversion[DeltaQuantity[VF, UF, B], DeltaQuantity[VT, UT, B]] =
+    ): Conversion[DeltaQuantity[VF, UF, B], DeltaQuantity[VT, UT, B]] =
         (q: DeltaQuantity[VF, UF, B]) => uc(vc(q.value)).withDeltaUnit[UT, B]
 
     // also support implicit lift of values to unitless quantity
