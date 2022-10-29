@@ -31,8 +31,10 @@ object div:
         eqv: VR =:= VL,
         alg: MultiplicativeGroup[VL],
         su: SimplifiedUnit[UL / UR]
-            ): Div[VL, UL, VR, UR] =
-        new infra.DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.div(ql.value, eqv(qr.value)).withUnit[su.UO])
+    ): Div[VL, UL, VR, UR] =
+        new infra.DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.div(ql.value, eqv(qr.value)).withUnit[su.UO]
+        )
 
     transparent inline given ctx_div_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -41,10 +43,14 @@ object div:
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UR]],
         alg: MultiplicativeGroup[vres.VO],
         su: SimplifiedUnit[UL / UR]
-            ): Div[VL, UL, VR, UR] =
-        new infra.DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.div(icl(ql).value, icr(qr).value).withUnit[su.UO])
+    ): Div[VL, UL, VR, UR] =
+        new infra.DivNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            alg.div(icl(ql).value, icr(qr).value).withUnit[su.UO]
+        )
 
     object infra:
-        class DivNC[VL, UL, VR, UR, VOp, UOp](val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]) extends Div[VL, UL, VR, UR]:
+        class DivNC[VL, UL, VR, UR, VOp, UOp](
+            val eval: (Quantity[VL, UL], Quantity[VR, UR]) => Quantity[VOp, UOp]
+        ) extends Div[VL, UL, VR, UR]:
             type VO = VOp
             type UO = UOp

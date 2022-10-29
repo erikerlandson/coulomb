@@ -30,16 +30,18 @@ object ord:
         eqv: VR =:= VL,
         equ: UR =:= UL,
         ord: Order[VL]
-            ): Ord[VL, UL, VR, UR] =
-        (ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => ord.compare(ql.value, eqv(qr.value))
+    ): Ord[VL, UL, VR, UR] =
+        (ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            ord.compare(ql.value, eqv(qr.value))
 
     given ctx_ord_1V2U[VL, UL, VR, UR](using
         eqv: VR =:= VL,
         neu: NotGiven[UR =:= UL],
         icr: Conversion[Quantity[VR, UR], Quantity[VL, UL]],
         ord: Order[VL]
-            ): Ord[VL, UL, VR, UR] =
-        (ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => ord.compare(ql.value, icr(qr).value)
+    ): Ord[VL, UL, VR, UR] =
+        (ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            ord.compare(ql.value, icr(qr).value)
 
     given ctx_ord_2V1U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -48,8 +50,9 @@ object ord:
         icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         ord: Order[vres.VO]
-            ): Ord[VL, UL, VR, UR] =
-        (ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => ord.compare(icl(ql).value, icr(qr).value)
+    ): Ord[VL, UL, VR, UR] =
+        (ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            ord.compare(icl(ql).value, icr(qr).value)
 
     given ctx_ord_2V2U[VL, UL, VR, UR](using
         nev: NotGiven[VR =:= VL],
@@ -58,5 +61,6 @@ object ord:
         icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
         icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
         ord: Order[vres.VO]
-            ): Ord[VL, UL, VR, UR] =
-        (ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => ord.compare(icl(ql).value, icr(qr).value)
+    ): Ord[VL, UL, VR, UR] =
+        (ql: Quantity[VL, UL], qr: Quantity[VR, UR]) =>
+            ord.compare(icl(ql).value, icr(qr).value)

@@ -19,8 +19,10 @@ package coulomb.conversion.standard
 object value:
     import coulomb.conversion.*
     import coulomb.rational.Rational
- 
-    given ctx_VC_Double[VF](using num: Numeric[VF]): ValueConversion[VF, Double] =
+
+    given ctx_VC_Double[VF](using
+        num: Numeric[VF]
+    ): ValueConversion[VF, Double] =
         new ValueConversion[VF, Double]:
             def apply(v: VF): Double = num.toDouble(v)
 
@@ -32,7 +34,9 @@ object value:
         new ValueConversion[VF, Long]:
             def apply(v: VF): Long = num.toLong(v)
 
-    given ctx_TVC_Long[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Long] =
+    given ctx_TVC_Long[VF](using
+        num: Fractional[VF]
+    ): TruncatingValueConversion[VF, Long] =
         new TruncatingValueConversion[VF, Long]:
             def apply(v: VF): Long = num.toLong(v)
 
@@ -40,7 +44,9 @@ object value:
         new ValueConversion[VF, Int]:
             def apply(v: VF): Int = num.toInt(v)
 
-    given ctx_TVC_Int[VF](using num: Fractional[VF]): TruncatingValueConversion[VF, Int] =
+    given ctx_TVC_Int[VF](using
+        num: Fractional[VF]
+    ): TruncatingValueConversion[VF, Int] =
         new TruncatingValueConversion[VF, Int]:
             def apply(v: VF): Int = num.toInt(v)
 

@@ -17,15 +17,20 @@
 package coulomb.define
 
 /**
- * @tparam Name unit name
- * @tparam Abbv unit abbreviation
+ * @tparam Name
+ *   unit name
+ * @tparam Abbv
+ *   unit abbreviation
  */
 abstract class NamedUnit[Name, Abbv]
 
 /**
- * @tparam U unit type
- * @tparam Name unit name
- * @tparam Abbv unit abbreviation
+ * @tparam U
+ *   unit type
+ * @tparam Name
+ *   unit name
+ * @tparam Abbv
+ *   unit abbreviation
  *
  * {{{
  * import coulomb.define.*
@@ -46,10 +51,14 @@ object BaseUnit:
     class NC[U, Name, Abbv] extends BaseUnit[U, Name, Abbv]
 
 /**
- * @tparam U unit type
- * @tparam D unit it is derived from
- * @tparam Name unit name
- * @tparam Abbv unit abbreviation
+ * @tparam U
+ *   unit type
+ * @tparam D
+ *   unit it is derived from
+ * @tparam Name
+ *   unit name
+ * @tparam Abbv
+ *   unit abbreviation
  *
  * {{{
  * import coulomb.define.*
@@ -71,22 +80,29 @@ object DerivedUnit:
     class NC[U, D, Name, Abbv] extends DerivedUnit[U, D, Name, Abbv]
 
 /**
- * Delta Units represent units with an offset in their transforms, for example temperatures or times
+ * Delta Units represent units with an offset in their transforms, for example
+ * temperatures or times
  *
- * @tparam U unit type
- * @tparam D unit it is derived from
- * @tparam O unit transform offset
- * @tparam Name unit name
- * @tparam Abbv unit abbreviation
- * {{{
+ * @tparam U
+ *   unit type
+ * @tparam D
+ *   unit it is derived from
+ * @tparam O
+ *   unit transform offset
+ * @tparam Name
+ *   unit name
+ * @tparam Abbv
+ *   unit abbreviation
+ *   {{{
  * import coulomb.define.*
  * import coulomb.units.si.{*, given}
  *
  * type Fahrenheit
  * given unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "F"] = DeltaUnit()
- * }}}
+ *   }}}
  */
-abstract class DeltaUnit[U, D, O, Name, Abbv] extends DerivedUnit[U, D, Name, Abbv]
+abstract class DeltaUnit[U, D, O, Name, Abbv]
+    extends DerivedUnit[U, D, Name, Abbv]
 
 /** Companion object utilities for DeltaUnit declarations */
 object DeltaUnit:

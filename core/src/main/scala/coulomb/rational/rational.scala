@@ -16,7 +16,8 @@
 
 package coulomb.rational
 
-final class Rational private (val n: BigInt, val d: BigInt) extends Serializable:
+final class Rational private (val n: BigInt, val d: BigInt)
+    extends Serializable:
     import Rational.canonical
 
     override def toString: String =
@@ -38,22 +39,16 @@ final class Rational private (val n: BigInt, val d: BigInt) extends Serializable
         canonical(-n, d)
 
     def pow(e: Int): Rational =
-        if (e < 0) then
-            canonical(d.pow(-e), n.pow(-e))
-        else if (e == 0) then
-            canonical(1, 1)
-        else if (e == 1) then
-            this
-        else
-            canonical(n.pow(e), d.pow(e))
+        if (e < 0) then canonical(d.pow(-e), n.pow(-e))
+        else if (e == 0) then canonical(1, 1)
+        else if (e == 1) then this
+        else canonical(n.pow(e), d.pow(e))
 
     def root(e: Int): Rational =
         import scala.math
         require(e != 0)
-        if (e < 0) then
-            canonical(d, n).root(-e)
-        else if (e == 1) then
-            this
+        if (e < 0) then canonical(d, n).root(-e)
+        else if (e == 1) then this
         else if (n < 0) then
             require(e % 2 == 1)
             -((-this).root(e))
@@ -62,8 +57,7 @@ final class Rational private (val n: BigInt, val d: BigInt) extends Serializable
             val dr = math.pow(d.toDouble, 1.0 / e.toDouble)
             if ((nr == math.rint(nr)) && (dr == math.rint(dr))) then
                 canonical(nr.toLong, dr.toLong)
-            else
-                Rational(nr / dr)
+            else Rational(nr / dr)
 
     inline def pow(e: Rational): Rational = this.pow(e.n.toInt).root(e.d.toInt)
 
@@ -74,16 +68,16 @@ final class Rational private (val n: BigInt, val d: BigInt) extends Serializable
 
     override def equals(rhs: Any): Boolean = rhs match
         case v: Rational => (n == v.n) && (d == v.d)
-        case v: Int => (n == v) && (d == 1)
-        case v: Long => (n == v) && (d == 1)
-        case _ => false
+        case v: Int      => (n == v) && (d == 1)
+        case v: Long     => (n == v) && (d == 1)
+        case _           => false
 
     override def hashCode: Int = 29 * (37 * n.## + d.##)
 
-    inline def < (rhs: Rational): Boolean = (n * rhs.d) < (rhs.n * d)
-    inline def > (rhs: Rational): Boolean = rhs < this
-    inline def <= (rhs: Rational): Boolean = !(this > rhs)
-    inline def >= (rhs: Rational): Boolean = !(this < rhs)
+    inline def <(rhs: Rational): Boolean = (n * rhs.d) < (rhs.n * d)
+    inline def >(rhs: Rational): Boolean = rhs < this
+    inline def <=(rhs: Rational): Boolean = !(this > rhs)
+    inline def >=(rhs: Rational): Boolean = !(this < rhs)
 end Rational
 
 object Rational:
@@ -110,7 +104,7 @@ object Rational:
 
     // intended to be the single safe way to construct a canonical rational
     // every construction of a new Rational should reduce to some call to this method
-    private [rational] def canonical(n: BigInt, d: BigInt): Rational =
+    private[rational] def canonical(n: BigInt, d: BigInt): Rational =
         require(d != 0, "Rational denominator cannot be zero")
         if (n == 0)
             // canonical zero is 0/1
@@ -141,7 +135,6 @@ object Rational:
     given CanEqual[Rational, Long] = CanEqual.derived
 end Rational
 
-
 /** Obtaining values from Rational type expressions */
 object typeexpr:
     import scala.annotation.implicitNotFound
@@ -154,12 +147,16 @@ object typeexpr:
     class NonNegInt[E](val value: Int)
     object NonNegInt:
         // interesting, this has to be 'transparent' to work with NotGiven
-        transparent inline given ctx_NonNegInt[E]: NonNegInt[E] = ${ meta.teToNonNegInt[E] }
+        transparent inline given ctx_NonNegInt[E]: NonNegInt[E] = ${
+            meta.teToNonNegInt[E]
+        }
 
     @implicitNotFound("type expr ${E} is not a positive Int")
     class PosInt[E](val value: Int)
     object PosInt:
-        transparent inline given ctx_PosInt[E]: PosInt[E] = ${ meta.teToPosInt[E] }
+        transparent inline given ctx_PosInt[E]: PosInt[E] = ${
+            meta.teToPosInt[E]
+        }
 
     @implicitNotFound("type expr ${E} is not an Int")
     class AllInt[E](val value: Int)
@@ -169,7 +166,12 @@ object typeexpr:
     object meta:
         import scala.quoted.*
         import scala.language.implicitConversions
-        import coulomb.infra.meta.{rationalTE, bigintTE, ctx_RationalToExpr, typestr}
+        import coulomb.infra.meta.{
+            rationalTE,
+            bigintTE,
+            ctx_RationalToExpr,
+            typestr
+        }
 
         def teToRational[E](using Quotes, Type[E]): Expr[Rational] =
             import quotes.reflect.*
@@ -190,25 +192,31 @@ object typeexpr:
             import quotes.reflect.*
             val rationalTE(v) = TypeRepr.of[E]: @unchecked
             if ((v.d == 1) && (v.n >= 0) && (v.n.isValidInt)) then
-                '{ new NonNegInt[E](${Expr(v.n.toInt)})}
+                '{ new NonNegInt[E](${ Expr(v.n.toInt) }) }
             else
-                report.error(s"type expr ${typestr(TypeRepr.of[E])} is not a non-negative Int")
+                report.error(
+                    s"type expr ${typestr(TypeRepr.of[E])} is not a non-negative Int"
+                )
                 '{ new NonNegInt[E](0) }
 
         def teToPosInt[E](using Quotes, Type[E]): Expr[PosInt[E]] =
             import quotes.reflect.*
             val rationalTE(v) = TypeRepr.of[E]: @unchecked
             if ((v.d == 1) && (v.n > 0) && (v.n.isValidInt)) then
-                '{ new PosInt[E](${Expr(v.n.toInt)}) }
+                '{ new PosInt[E](${ Expr(v.n.toInt) }) }
             else
-                report.error(s"type expr ${typestr(TypeRepr.of[E])} is not a positive Int")
+                report.error(
+                    s"type expr ${typestr(TypeRepr.of[E])} is not a positive Int"
+                )
                 '{ new PosInt[E](0) }
 
         def teToInt[E](using Quotes, Type[E]): Expr[AllInt[E]] =
             import quotes.reflect.*
             val rationalTE(v) = TypeRepr.of[E]: @unchecked
             if ((v.d == 1) && (v.n.isValidInt)) then
-                '{ new AllInt[E](${Expr(v.n.toInt)})}
+                '{ new AllInt[E](${ Expr(v.n.toInt) }) }
             else
-                report.error(s"type expr ${typestr(TypeRepr.of[E])} is not an Int")
-                '{ new AllInt[E](0)}
+                report.error(
+                    s"type expr ${typestr(TypeRepr.of[E])} is not an Int"
+                )
+                '{ new AllInt[E](0) }

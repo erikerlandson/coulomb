@@ -40,11 +40,11 @@ class DeltaQuantitySuite extends CoulombSuite:
     }
 
     test("value") {
-       7d.withDeltaUnit[Meter, Meter].value.assertVT[Double](7)
-       73f.withDeltaUnit[Second, Meter].value.assertVT[Float](73)
-       37L.withDeltaUnit[Kilogram, Kilogram].value.assertVT[Long](37)
-       13.withDeltaUnit[Liter, Liter].value.assertVT[Int](13)
-       "foo".withDeltaUnit[Minute, Minute].value.assertVT[String]("foo")
+        7d.withDeltaUnit[Meter, Meter].value.assertVT[Double](7)
+        73f.withDeltaUnit[Second, Meter].value.assertVT[Float](73)
+        37L.withDeltaUnit[Kilogram, Kilogram].value.assertVT[Long](37)
+        13.withDeltaUnit[Liter, Liter].value.assertVT[Int](13)
+        "foo".withDeltaUnit[Minute, Minute].value.assertVT[String]("foo")
     }
 
     test("show") {
@@ -58,127 +58,220 @@ class DeltaQuantitySuite extends CoulombSuite:
     test("toValue") {
         import coulomb.policy.strict.given
 
-        100.withDeltaUnit[Celsius, Kelvin].toValue[Int].assertDQ[Int, Celsius](100)
-        100.withDeltaUnit[Celsius, Kelvin].toValue[Long].assertDQ[Long, Celsius](100)
-        100.withDeltaUnit[Celsius, Kelvin].toValue[Float].assertDQ[Float, Celsius](100)
-        100.withDeltaUnit[Celsius, Kelvin].toValue[Double].assertDQ[Double, Celsius](100)
+        100.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Int]
+            .assertDQ[Int, Celsius](100)
+        100.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Long]
+            .assertDQ[Long, Celsius](100)
+        100.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Float]
+            .assertDQ[Float, Celsius](100)
+        100.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Double]
+            .assertDQ[Double, Celsius](100)
 
-        100L.withDeltaUnit[Celsius, Kelvin].toValue[Int].assertDQ[Int, Celsius](100)
-        100L.withDeltaUnit[Celsius, Kelvin].toValue[Long].assertDQ[Long, Celsius](100)
-        100L.withDeltaUnit[Celsius, Kelvin].toValue[Float].assertDQ[Float, Celsius](100)
-        100L.withDeltaUnit[Celsius, Kelvin].toValue[Double].assertDQ[Double, Celsius](100)
+        100L.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Int]
+            .assertDQ[Int, Celsius](100)
+        100L.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Long]
+            .assertDQ[Long, Celsius](100)
+        100L.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Float]
+            .assertDQ[Float, Celsius](100)
+        100L.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Double]
+            .assertDQ[Double, Celsius](100)
 
         assertCE("100f.withDeltaUnit[Celsius, Kelvin].toValue[Int]")
         assertCE("100f.withDeltaUnit[Celsius, Kelvin].toValue[Long]")
-        100f.withDeltaUnit[Celsius, Kelvin].toValue[Float].assertDQ[Float, Celsius](100)
-        100f.withDeltaUnit[Celsius, Kelvin].toValue[Double].assertDQ[Double, Celsius](100)
+        100f.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Float]
+            .assertDQ[Float, Celsius](100)
+        100f.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Double]
+            .assertDQ[Double, Celsius](100)
 
         assertCE("100d.withDeltaUnit[Celsius, Kelvin].toValue[Int]")
         assertCE("100d.withDeltaUnit[Celsius, Kelvin].toValue[Long]")
-        100d.withDeltaUnit[Celsius, Kelvin].toValue[Float].assertDQ[Float, Celsius](100)
-        100d.withDeltaUnit[Celsius, Kelvin].toValue[Double].assertDQ[Double, Celsius](100)
+        100d.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Float]
+            .assertDQ[Float, Celsius](100)
+        100d.withDeltaUnit[Celsius, Kelvin]
+            .toValue[Double]
+            .assertDQ[Double, Celsius](100)
 
-        1.999f.withDeltaUnit[Minute, Second].tToValue[Int].assertDQ[Int, Minute](1)
-        0.999f.withDeltaUnit[Minute, Second].tToValue[Long].assertDQ[Long, Minute](0)
+        1.999f
+            .withDeltaUnit[Minute, Second]
+            .tToValue[Int]
+            .assertDQ[Int, Minute](1)
+        0.999f
+            .withDeltaUnit[Minute, Second]
+            .tToValue[Long]
+            .assertDQ[Long, Minute](0)
 
-        1.999d.withDeltaUnit[Minute, Second].tToValue[Int].assertDQ[Int, Minute](1)
-        0.999d.withDeltaUnit[Minute, Second].tToValue[Long].assertDQ[Long, Minute](0)
+        1.999d
+            .withDeltaUnit[Minute, Second]
+            .tToValue[Int]
+            .assertDQ[Int, Minute](1)
+        0.999d
+            .withDeltaUnit[Minute, Second]
+            .tToValue[Long]
+            .assertDQ[Long, Minute](0)
     }
 
     test("toUnit") {
         import coulomb.policy.strict.given
 
-        37d.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit].assertDQD[Double, Fahrenheit](98.6)
-        37f.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit].assertDQD[Float, Fahrenheit](98.6)
+        37d.withDeltaUnit[Celsius, Kelvin]
+            .toUnit[Fahrenheit]
+            .assertDQD[Double, Fahrenheit](98.6)
+        37f.withDeltaUnit[Celsius, Kelvin]
+            .toUnit[Fahrenheit]
+            .assertDQD[Float, Fahrenheit](98.6)
 
         assertCE("37L.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit]")
         assertCE("37.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit]")
 
-        37L.withDeltaUnit[Celsius, Kelvin].tToUnit[Fahrenheit].assertDQ[Long, Fahrenheit](98)
-        37.withDeltaUnit[Celsius, Kelvin].tToUnit[Fahrenheit].assertDQ[Int, Fahrenheit](98)
+        37L.withDeltaUnit[Celsius, Kelvin]
+            .tToUnit[Fahrenheit]
+            .assertDQ[Long, Fahrenheit](98)
+        37.withDeltaUnit[Celsius, Kelvin]
+            .tToUnit[Fahrenheit]
+            .assertDQ[Int, Fahrenheit](98)
     }
 
     test("subtraction strict") {
         import coulomb.policy.strict.given
 
         // 1V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 50d.withDeltaUnit[Celsius, Kelvin]).assertQ[Double, Celsius](50)
-        (10f.withDeltaUnit[Minute, Second] - 5f.withDeltaUnit[Minute, Second]).assertQ[Float, Minute](5)
-        (100L.withDeltaUnit[Kelvin, Kelvin] - 50L.withDeltaUnit[Kelvin, Kelvin]).assertQ[Long, Kelvin](50)
-        (10.withDeltaUnit[Second, Second] - 5.withDeltaUnit[Second, Second]).assertQ[Int, Second](5)
-    } 
+        (100d.withDeltaUnit[Celsius, Kelvin] - 50d
+            .withDeltaUnit[Celsius, Kelvin])
+            .assertQ[Double, Celsius](50)
+        (10f.withDeltaUnit[Minute, Second] - 5f.withDeltaUnit[Minute, Second])
+            .assertQ[Float, Minute](5)
+        (100L.withDeltaUnit[Kelvin, Kelvin] - 50L.withDeltaUnit[Kelvin, Kelvin])
+            .assertQ[Long, Kelvin](50)
+        (10.withDeltaUnit[Second, Second] - 5.withDeltaUnit[Second, Second])
+            .assertQ[Int, Second](5)
+    }
 
     test("subtraction standard") {
         import coulomb.policy.standard.given
 
         // 2V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 50f.withDeltaUnit[Celsius, Kelvin]).assertQ[Double, Celsius](50)
+        (100d.withDeltaUnit[Celsius, Kelvin] - 50f
+            .withDeltaUnit[Celsius, Kelvin])
+            .assertQ[Double, Celsius](50)
         // 1V2U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 122d.withDeltaUnit[Fahrenheit, Kelvin]).assertQD[Double, Celsius](50)
+        (100d.withDeltaUnit[Celsius, Kelvin] - 122d
+            .withDeltaUnit[Fahrenheit, Kelvin])
+            .assertQD[Double, Celsius](50)
         // 2V2U
-        (100f.withDeltaUnit[Celsius, Kelvin] - 122d.withDeltaUnit[Fahrenheit, Kelvin]).assertQD[Double, Celsius](50)
-    } 
+        (100f.withDeltaUnit[Celsius, Kelvin] - 122d
+            .withDeltaUnit[Fahrenheit, Kelvin])
+            .assertQD[Double, Celsius](50)
+    }
 
     test("quantity subtraction strict") {
         import coulomb.policy.strict.given
 
         // 1V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 50d.withUnit[Celsius]).assertDQ[Double, Celsius](50)
-        (10f.withDeltaUnit[Minute, Second] - 5f.withUnit[Minute]).assertDQ[Float, Minute](5)
-        (100L.withDeltaUnit[Kelvin, Kelvin] - 50L.withUnit[Kelvin]).assertDQ[Long, Kelvin](50)
-        (10.withDeltaUnit[Second, Second] - 5.withUnit[Second]).assertDQ[Int, Second](5)
+        (100d.withDeltaUnit[Celsius, Kelvin] - 50d.withUnit[Celsius])
+            .assertDQ[Double, Celsius](50)
+        (10f.withDeltaUnit[Minute, Second] - 5f.withUnit[Minute])
+            .assertDQ[Float, Minute](5)
+        (100L.withDeltaUnit[Kelvin, Kelvin] - 50L.withUnit[Kelvin])
+            .assertDQ[Long, Kelvin](50)
+        (10.withDeltaUnit[Second, Second] - 5.withUnit[Second])
+            .assertDQ[Int, Second](5)
     }
 
     test("quantity subtraction standard") {
         import coulomb.policy.standard.given
 
         // 2V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 50f.withUnit[Celsius]).assertDQ[Double, Celsius](50)
+        (100d.withDeltaUnit[Celsius, Kelvin] - 50f.withUnit[Celsius])
+            .assertDQ[Double, Celsius](50)
         // 1V2U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](50)
+        (100d.withDeltaUnit[Celsius, Kelvin] - 90d.withUnit[Fahrenheit])
+            .assertDQD[Double, Celsius](50)
         // 2V2U
-        (100f.withDeltaUnit[Celsius, Kelvin] - 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](50)
-    } 
+        (100f.withDeltaUnit[Celsius, Kelvin] - 90d.withUnit[Fahrenheit])
+            .assertDQD[Double, Celsius](50)
+    }
 
     test("quantity addition strict") {
         import coulomb.policy.strict.given
 
         // 1V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] + 50d.withUnit[Celsius]).assertDQ[Double, Celsius](150)
-        (10f.withDeltaUnit[Minute, Second] + 5f.withUnit[Minute]).assertDQ[Float, Minute](15)
-        (100L.withDeltaUnit[Kelvin, Kelvin] + 50L.withUnit[Kelvin]).assertDQ[Long, Kelvin](150)
-        (10.withDeltaUnit[Second, Second] + 5.withUnit[Second]).assertDQ[Int, Second](15)
+        (100d.withDeltaUnit[Celsius, Kelvin] + 50d.withUnit[Celsius])
+            .assertDQ[Double, Celsius](150)
+        (10f.withDeltaUnit[Minute, Second] + 5f.withUnit[Minute])
+            .assertDQ[Float, Minute](15)
+        (100L.withDeltaUnit[Kelvin, Kelvin] + 50L.withUnit[Kelvin])
+            .assertDQ[Long, Kelvin](150)
+        (10.withDeltaUnit[Second, Second] + 5.withUnit[Second])
+            .assertDQ[Int, Second](15)
     }
 
     test("quantity addition standard") {
         import coulomb.policy.standard.given
 
         // 2V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] + 50f.withUnit[Celsius]).assertDQ[Double, Celsius](150)
+        (100d.withDeltaUnit[Celsius, Kelvin] + 50f.withUnit[Celsius])
+            .assertDQ[Double, Celsius](150)
         // 1V2U
-        (100d.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](150)
+        (100d.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit])
+            .assertDQD[Double, Celsius](150)
         // 2V2U
-        (100f.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit]).assertDQD[Double, Celsius](150)
-    } 
+        (100f.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit])
+            .assertDQD[Double, Celsius](150)
+    }
 
     test("less-than strict") {
         import coulomb.policy.strict.given
 
-        assertEquals(7d.withDeltaUnit[Minute, Second] < 8d.withDeltaUnit[Minute, Second], true)
-        assertEquals(7f.withDeltaUnit[Minute, Second] < 7f.withDeltaUnit[Minute, Second], false)
-        assertEquals(7L.withDeltaUnit[Minute, Second] < 8L.withDeltaUnit[Minute, Second], true)
-        assertEquals(7.withDeltaUnit[Minute, Second] < 7.withDeltaUnit[Minute, Second], false)
+        assertEquals(
+            7d.withDeltaUnit[Minute, Second] < 8d.withDeltaUnit[Minute, Second],
+            true
+        )
+        assertEquals(
+            7f.withDeltaUnit[Minute, Second] < 7f.withDeltaUnit[Minute, Second],
+            false
+        )
+        assertEquals(
+            7L.withDeltaUnit[Minute, Second] < 8L.withDeltaUnit[Minute, Second],
+            true
+        )
+        assertEquals(
+            7.withDeltaUnit[Minute, Second] < 7.withDeltaUnit[Minute, Second],
+            false
+        )
     }
 
     test("less-than standard") {
         import coulomb.policy.standard.given
 
         // 1V2U
-        assertEquals(36d.withDeltaUnit[Celsius, Kelvin] < 98.6d.withDeltaUnit[Fahrenheit, Kelvin], true)
+        assertEquals(
+            36d.withDeltaUnit[Celsius, Kelvin] < 98.6d
+                .withDeltaUnit[Fahrenheit, Kelvin],
+            true
+        )
         // 2V1U
-        assertEquals(36f.withDeltaUnit[Celsius, Kelvin] < 36d.withDeltaUnit[Celsius, Kelvin], false)
+        assertEquals(
+            36f.withDeltaUnit[Celsius, Kelvin] < 36d
+                .withDeltaUnit[Celsius, Kelvin],
+            false
+        )
         // 2V2U
-        assertEquals(38d.withDeltaUnit[Celsius, Kelvin] < 98.6f.withDeltaUnit[Fahrenheit, Kelvin], false)
+        assertEquals(
+            38d.withDeltaUnit[Celsius, Kelvin] < 98.6f
+                .withDeltaUnit[Fahrenheit, Kelvin],
+            false
+        )
     }
 
     test("cats Eq, Ord, Hash") {

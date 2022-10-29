@@ -28,11 +28,15 @@ object tpow:
     transparent inline given ctx_quantity_tpow[V, U, E](using
         alg: TruncatingPower[V],
         su: SimplifiedUnit[U ^ E]
-            ): TPow[V, U, E] =
+    ): TPow[V, U, E] =
         val e = typeexpr.double[E]
-        new infra.TPowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) => alg.tpow(q.value, e).withUnit[su.UO])
+        new infra.TPowNC[V, U, E, V, su.UO]((q: Quantity[V, U]) =>
+            alg.tpow(q.value, e).withUnit[su.UO]
+        )
 
     object infra:
-        class TPowNC[V, U, E, VOp, UOp](val eval: Quantity[V, U] => Quantity[VOp, UOp]) extends TPow[V, U, E]:
+        class TPowNC[V, U, E, VOp, UOp](
+            val eval: Quantity[V, U] => Quantity[VOp, UOp]
+        ) extends TPow[V, U, E]:
             type VO = VOp
             type UO = UOp

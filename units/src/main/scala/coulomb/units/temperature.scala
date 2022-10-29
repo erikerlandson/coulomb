@@ -22,33 +22,44 @@ object temperature:
     import coulomb.syntax.*
     import coulomb.define.*
 
-    export coulomb.units.si.{ Kelvin, ctx_unit_Kelvin }
+    export coulomb.units.si.{Kelvin, ctx_unit_Kelvin}
 
     /** Celsius degree, aka Centigrade */
     final type Celsius
-    given ctx_unit_Celsius: DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] = DeltaUnit()
+    given ctx_unit_Celsius
+        : DeltaUnit[Celsius, Kelvin, 27315 / 100, "celsius", "°C"] = DeltaUnit()
 
     /** Fahrenheit degree */
     final type Fahrenheit
-    given ctx_unit_Fahrenheit: DeltaUnit[Fahrenheit, (5 / 9) * Kelvin, 45967 / 100, "fahrenheit", "°F"] = DeltaUnit()
+    given ctx_unit_Fahrenheit: DeltaUnit[
+        Fahrenheit,
+        (5 / 9) * Kelvin,
+        45967 / 100,
+        "fahrenheit",
+        "°F"
+    ] = DeltaUnit()
 
     /**
      * A temperature value
-     * @tparam V the underlying value type
-     * @tparam U a temperature unit type, having base unit [[coulomb.units.si.Kelvin]]
+     * @tparam V
+     *   the underlying value type
+     * @tparam U
+     *   a temperature unit type, having base unit [[coulomb.units.si.Kelvin]]
      */
     final type Temperature[V, U] = DeltaQuantity[V, U, Kelvin]
 
     object Temperature:
         /**
          * obtain a new temperature value
-         * @tparam U temperature unit type, having base unit [[coulomb.units.si.Kelvin]]
-         * @return the new Temperature quantity
+         * @tparam U
+         *   temperature unit type, having base unit [[coulomb.units.si.Kelvin]]
+         * @return
+         *   the new Temperature quantity
          * @example
-         * {{{
+         *   {{{
          * // standard human body temperature in Fahrenheit
          * val bodytemp = Temperature[Fahrenheit](98.6)
-         * }}}
+         *   }}}
          */
         def apply[U](using a: Applier[U]) = a
 
@@ -58,17 +69,21 @@ object temperature:
         object Applier:
             given [U]: Applier[U] =
                 new Applier[U]:
-                    def apply[V](v: V): Temperature[V, U] = v.withDeltaUnit[U, Kelvin]
+                    def apply[V](v: V): Temperature[V, U] =
+                        v.withDeltaUnit[U, Kelvin]
 
-    extension[V](v: V)
+    extension [V](v: V)
         /**
          * Lift a raw value to a Temperature
-         * @tparam U the temperature unit type to use, having base unit [[coulomb.units.si.Kelvin]]
-         * @return a Temperature object
+         * @tparam U
+         *   the temperature unit type to use, having base unit
+         *   [[coulomb.units.si.Kelvin]]
+         * @return
+         *   a Temperature object
          * @example
-         * {{{
+         *   {{{
          * // the freezing point of water on the Celsius scale
          * val freeze = (0.0).withTemperature[Celsius]
-         * }}}
+         *   }}}
          */
         def withTemperature[U]: Temperature[V, U] = v.withDeltaUnit[U, Kelvin]

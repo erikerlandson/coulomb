@@ -69,7 +69,7 @@ class TimeUnitsSuite extends CoulombSuite:
 
         36d.withEpochTime[Hour].toUnit[Day].assertDQD[Double, Day](1.5)
 
-        //truncating
+        // truncating
         assertCE("36.withEpochTime[Hour].toUnit[Day]")
         36.withEpochTime[Hour].tToUnit[Day].assertDQD[Int, Day](1)
     }
@@ -77,85 +77,117 @@ class TimeUnitsSuite extends CoulombSuite:
     test("subtraction strict") {
         import coulomb.policy.strict.given
 
-        (10d.withEpochTime[Second] - 1d.withEpochTime[Second]).assertQ[Double, Second](9)
-        (10f.withEpochTime[Second] - 1f.withEpochTime[Second]).assertQ[Float, Second](9)
-        (10L.withEpochTime[Second] - 1L.withEpochTime[Second]).assertQ[Long, Second](9)
-        (10.withEpochTime[Second] - 1.withEpochTime[Second]).assertQ[Int, Second](9)
+        (10d.withEpochTime[Second] - 1d.withEpochTime[Second])
+            .assertQ[Double, Second](9)
+        (10f.withEpochTime[Second] - 1f.withEpochTime[Second])
+            .assertQ[Float, Second](9)
+        (10L.withEpochTime[Second] - 1L.withEpochTime[Second])
+            .assertQ[Long, Second](9)
+        (10.withEpochTime[Second] - 1.withEpochTime[Second])
+            .assertQ[Int, Second](9)
 
         assertCE("61d.withEpochTime[Second] - 1f.withEpochTime[Second]")
         assertCE("61d.withEpochTime[Second] - 1d.withEpochTime[Minute]")
-        (61.withEpochTime[Second].toValue[Double] - 1d.withEpochTime[Minute].toUnit[Second]).assertQ[Double, Second](1)
+        (61.withEpochTime[Second]
+            .toValue[Double] - 1d.withEpochTime[Minute].toUnit[Second])
+            .assertQ[Double, Second](1)
     }
 
     test("subtraction standard") {
         import coulomb.policy.standard.given
 
-        // different value type, same unit type 
-        (61d.withEpochTime[Second] - 1f.withEpochTime[Second]).assertQ[Double, Second](60)
+        // different value type, same unit type
+        (61d.withEpochTime[Second] - 1f.withEpochTime[Second])
+            .assertQ[Double, Second](60)
         // same value type, different unit type
-        (61d.withEpochTime[Second] - 1d.withEpochTime[Minute]).assertQ[Double, Second](1)
+        (61d.withEpochTime[Second] - 1d.withEpochTime[Minute])
+            .assertQ[Double, Second](1)
         // both different
-        (61L.withEpochTime[Second] - 1f.withEpochTime[Minute]).assertQ[Float, Second](1)
+        (61L.withEpochTime[Second] - 1f.withEpochTime[Minute])
+            .assertQ[Float, Second](1)
 
         // truncating
         assertCE("61.withEpochTime[Second] - 1.withEpochTime[Minute]")
-        (61f.withEpochTime[Second].tToValue[Int] - 1.withEpochTime[Minute].tToUnit[Second]).assertQ[Int, Second](1)
+        (61f.withEpochTime[Second]
+            .tToValue[Int] - 1.withEpochTime[Minute].tToUnit[Second])
+            .assertQ[Int, Second](1)
     }
 
     test("quantity subtraction strict") {
         import coulomb.policy.strict.given
 
-        (10d.withEpochTime[Second] - 1d.withUnit[Second]).assertDQ[Double, Second](9)
-        (10f.withEpochTime[Second] - 1f.withUnit[Second]).assertDQ[Float, Second](9)
-        (10L.withEpochTime[Second] - 1L.withUnit[Second]).assertDQ[Long, Second](9)
+        (10d.withEpochTime[Second] - 1d.withUnit[Second])
+            .assertDQ[Double, Second](9)
+        (10f.withEpochTime[Second] - 1f.withUnit[Second])
+            .assertDQ[Float, Second](9)
+        (10L.withEpochTime[Second] - 1L.withUnit[Second])
+            .assertDQ[Long, Second](9)
         (10.withEpochTime[Second] - 1.withUnit[Second]).assertDQ[Int, Second](9)
 
         assertCE("61d.withEpochTime[Second] - 1f.withUnit[Second]")
         assertCE("61d.withEpochTime[Second] - 1d.withUnit[Minute]")
-        (61.withEpochTime[Second].toValue[Double] - 1d.withUnit[Minute].toUnit[Second]).assertDQ[Double, Second](1)
+        (61.withEpochTime[Second]
+            .toValue[Double] - 1d.withUnit[Minute].toUnit[Second])
+            .assertDQ[Double, Second](1)
     }
 
     test("quantity subtraction standard") {
         import coulomb.policy.standard.given
 
-        // different value type, same unit type 
-        (61d.withEpochTime[Second] - 1f.withUnit[Second]).assertDQ[Double, Second](60)
+        // different value type, same unit type
+        (61d.withEpochTime[Second] - 1f.withUnit[Second])
+            .assertDQ[Double, Second](60)
         // same value type, different unit type
-        (61d.withEpochTime[Second] - 1d.withUnit[Minute]).assertDQ[Double, Second](1)
+        (61d.withEpochTime[Second] - 1d.withUnit[Minute])
+            .assertDQ[Double, Second](1)
         // both different
-        (61L.withEpochTime[Second] - 1f.withUnit[Minute]).assertDQ[Float, Second](1)
+        (61L.withEpochTime[Second] - 1f.withUnit[Minute])
+            .assertDQ[Float, Second](1)
 
         // truncating
         assertCE("61.withEpochTime[Second] - 1.withUnit[Minute]")
-        (61f.withEpochTime[Second].tToValue[Int] - 1.withUnit[Minute].tToUnit[Second]).assertDQ[Int, Second](1)
+        (61f.withEpochTime[Second]
+            .tToValue[Int] - 1.withUnit[Minute].tToUnit[Second])
+            .assertDQ[Int, Second](1)
     }
 
     test("quantity addition strict") {
         import coulomb.policy.strict.given
 
-        (10d.withEpochTime[Second] + 1d.withUnit[Second]).assertDQ[Double, Second](11)
-        (10f.withEpochTime[Second] + 1f.withUnit[Second]).assertDQ[Float, Second](11)
-        (10L.withEpochTime[Second] + 1L.withUnit[Second]).assertDQ[Long, Second](11)
-        (10.withEpochTime[Second] + 1.withUnit[Second]).assertDQ[Int, Second](11)
+        (10d.withEpochTime[Second] + 1d.withUnit[Second])
+            .assertDQ[Double, Second](11)
+        (10f.withEpochTime[Second] + 1f.withUnit[Second])
+            .assertDQ[Float, Second](11)
+        (10L.withEpochTime[Second] + 1L.withUnit[Second])
+            .assertDQ[Long, Second](11)
+        (10.withEpochTime[Second] + 1.withUnit[Second])
+            .assertDQ[Int, Second](11)
 
         assertCE("61d.withEpochTime[Second] + 1f.withUnit[Second]")
         assertCE("61d.withEpochTime[Second] + 1d.withUnit[Minute]")
-        (61.withEpochTime[Second].toValue[Double] + 1d.withUnit[Minute].toUnit[Second]).assertDQ[Double, Second](121)
+        (61.withEpochTime[Second]
+            .toValue[Double] + 1d.withUnit[Minute].toUnit[Second])
+            .assertDQ[Double, Second](121)
     }
 
     test("quantity addition standard") {
         import coulomb.policy.standard.given
 
-        // different value type, same unit type 
-        (61d.withEpochTime[Second] + 1f.withUnit[Second]).assertDQ[Double, Second](62)
+        // different value type, same unit type
+        (61d.withEpochTime[Second] + 1f.withUnit[Second])
+            .assertDQ[Double, Second](62)
         // same value type, different unit type
-        (61d.withEpochTime[Second] + 1d.withUnit[Minute]).assertDQ[Double, Second](121)
+        (61d.withEpochTime[Second] + 1d.withUnit[Minute])
+            .assertDQ[Double, Second](121)
         // both different
-        (61L.withEpochTime[Second] + 1f.withUnit[Minute]).assertDQ[Float, Second](121)
+        (61L.withEpochTime[Second] + 1f.withUnit[Minute])
+            .assertDQ[Float, Second](121)
 
         // truncating
         assertCE("61.withEpochTime[Second] + 1.withUnit[Minute]")
-        (61f.withEpochTime[Second].tToValue[Int] + 1.withUnit[Minute].tToUnit[Second]).assertDQ[Int, Second](121)
+        (61f.withEpochTime[Second]
+            .tToValue[Int] + 1.withUnit[Minute].tToUnit[Second])
+            .assertDQ[Int, Second](121)
     }
 
     test("less-than strict") {
@@ -167,8 +199,14 @@ class TimeUnitsSuite extends CoulombSuite:
         assertCE("3f.withEpochTime[Week] < 4d.withEpochTime[Week]")
         assertCE("3f.withEpochTime[Day] < 3f.withEpochTime[Week]")
 
-        assertEquals(4f.withEpochTime[Week].toValue[Double] < 4d.withEpochTime[Week], false)
-        assertEquals(3f.withEpochTime[Day] < 3f.withEpochTime[Week].toUnit[Day], true)
+        assertEquals(
+            4f.withEpochTime[Week].toValue[Double] < 4d.withEpochTime[Week],
+            false
+        )
+        assertEquals(
+            3f.withEpochTime[Day] < 3f.withEpochTime[Week].toUnit[Day],
+            true
+        )
     }
 
     test("less-than standard") {
@@ -178,11 +216,14 @@ class TimeUnitsSuite extends CoulombSuite:
         assertEquals(3f.withEpochTime[Day] < 3f.withEpochTime[Week], true)
 
         assertCE("3L.withEpochTime[Day] < 3L.withEpochTime[Week]")
-        assertEquals(3L.withEpochTime[Day] < 3L.withEpochTime[Week].tToUnit[Day], true)
+        assertEquals(
+            3L.withEpochTime[Day] < 3L.withEpochTime[Week].tToUnit[Day],
+            true
+        )
     }
 
 class JavaTimeSuite extends CoulombSuite:
-    import java.time.{ Duration, Instant }
+    import java.time.{Duration, Instant}
     import coulomb.*
     import coulomb.syntax.*
     import coulomb.units.time.{*, given}
@@ -196,7 +237,7 @@ class JavaTimeSuite extends CoulombSuite:
 
         val dur = Duration.ofSeconds(70, 400000000)
         dur.toQuantity[Float, Minute].assertQD[Float, Minute](1.17333)
- 
+
         // truncation
         assertCE("dur.toQuantity[Int, Minute]")
         dur.tToQuantity[Int, Minute].assertQ[Int, Minute](1)
@@ -216,7 +257,7 @@ class JavaTimeSuite extends CoulombSuite:
 
         val ins = Instant.parse("1969-07-20T00:00:00Z")
         ins.toEpochTime[Double, Day].assertDQD[Double, Day](-165)
-        
+
         // truncation
         assertCE("ins.toEpochTime[Long, Day]")
         ins.tToEpochTime[Long, Day].assertDQ[Long, Day](-165)
@@ -225,14 +266,14 @@ class JavaTimeSuite extends CoulombSuite:
     test("toInstant") {
         import coulomb.units.javatime.conversions.explicit.given
 
-        val et = (-165L).withEpochTime[Day]       
+        val et = (-165L).withEpochTime[Day]
         assertEquals(et.toInstant.toString, "1969-07-20T00:00:00Z")
     }
 
     test("implicit Q -> D") {
         import scala.language.implicitConversions
         import coulomb.units.javatime.conversions.all.given
-        
+
         def f(d: Duration): (Long, Int) = (d.getSeconds(), d.getNano())
         val q = 1d.withUnit[Hour] + 777.1d.withUnit[Nano * Second]
         assertEquals(f(q), (3600L, 777))

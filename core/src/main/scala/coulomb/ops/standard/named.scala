@@ -27,4 +27,3 @@ object named:
     export deltasub.infra.DeltaSubNC
     export deltasubq.infra.DeltaSubQNC
     export deltaaddq.infra.DeltaAddQNC
-

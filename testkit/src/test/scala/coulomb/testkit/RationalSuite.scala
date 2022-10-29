@@ -24,18 +24,18 @@ import munit.DisciplineSuite
 import org.scalacheck.Prop.*
 
 class RationalSuite extends DisciplineSuite:
-  property("rational identity") {
-    forAll { (r: Rational) =>
-      r == Rational.const0 || (Rational.const1 / r) * r == Rational.const1
+    property("rational identity") {
+        forAll { (r: Rational) =>
+            r == Rational.const0 || (Rational.const1 / r) * r == Rational.const1
+        }
     }
-  }
 
-  property("functions of rationals are pure") {
-    forAll { (x: Rational, y: Rational, f: Rational => Rational) =>
-      x != y || f(x) == f(y)
+    property("functions of rationals are pure") {
+        forAll { (x: Rational, y: Rational, f: Rational => Rational) =>
+            x != y || f(x) == f(y)
+        }
     }
-  }
 
-  checkAll("Rational", RingLaws[Rational].field)
-  checkAll("Rational", OrderTests[Rational].order)
-  checkAll("Rational", HashTests[Rational].hash)
+    checkAll("Rational", RingLaws[Rational].field)
+    checkAll("Rational", OrderTests[Rational].order)
+    checkAll("Rational", HashTests[Rational].hash)

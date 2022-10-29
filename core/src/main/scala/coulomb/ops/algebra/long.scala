@@ -33,13 +33,18 @@ object long:
         def fquot(x: Long, y: Long): Long = ???
         def fmod(x: Long, y: Long): Long = ???
         def abs(a: Long): Long = ???
-        def additiveCommutativeMonoid: _root_.algebra.ring.AdditiveCommutativeMonoid[Long] = ???
+        def additiveCommutativeMonoid
+            : _root_.algebra.ring.AdditiveCommutativeMonoid[Long] = ???
         def order: _root_.cats.kernel.Order[Long] = ???
         def signum(a: Long): Int = ???
 
-    extension(vl: Long)
-        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using mul: Mul[Long, 1, VR, UR]): Quantity[mul.VO, mul.UO] =
+    extension (vl: Long)
+        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using
+            mul: Mul[Long, 1, VR, UR]
+        ): Quantity[mul.VO, mul.UO] =
             mul.eval(vl.withUnit[1], qr)
 
-        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using div: Div[Long, 1, VR, UR]): Quantity[div.VO, div.UO] =
+        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using
+            div: Div[Long, 1, VR, UR]
+        ): Quantity[div.VO, div.UO] =
             div.eval(vl.withUnit[1], qr)

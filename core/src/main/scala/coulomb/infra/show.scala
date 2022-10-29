@@ -42,7 +42,12 @@ object show:
         val str = showrender(TypeRepr.of[U], render)
         Expr(str)
 
-    def showrender(using Quotes)(u: quotes.reflect.TypeRepr, render: quotes.reflect.TypeRepr => String): String =
+    def showrender(using
+        Quotes
+    )(
+        u: quotes.reflect.TypeRepr,
+        render: quotes.reflect.TypeRepr => String
+    ): String =
         import quotes.reflect.*
         u match
             // named unit defs take highest priority
@@ -54,9 +59,11 @@ object show:
             // by the time my metaprogramming sees it.
             case typealias(_) => typestr(u)
             case unitconst(v) =>
-                if (v.d == 1) v.n.toString else s"${v.n.toString}/${v.d.toString}"
+                if (v.d == 1) v.n.toString
+                else s"${v.n.toString}/${v.d.toString}"
             case flatmul(t) => termstr(t, render)
-            case AppliedType(op, List(lu, unitconst1())) if (op =:= TypeRepr.of[/]) =>
+            case AppliedType(op, List(lu, unitconst1()))
+                if (op =:= TypeRepr.of[/]) =>
                 showrender(lu, render)
             case AppliedType(op, List(lu, ru)) if (op =:= TypeRepr.of[/]) =>
                 val (ls, rs) = (paren(lu, render), paren(ru, render))
@@ -68,7 +75,12 @@ object show:
             // with its name and abbv defined as its type-string
             case _ => typestr(u)
 
-    def termstr(using Quotes)(terms: List[quotes.reflect.TypeRepr], render: quotes.reflect.TypeRepr => String): String =
+    def termstr(using
+        Quotes
+    )(
+        terms: List[quotes.reflect.TypeRepr],
+        render: quotes.reflect.TypeRepr => String
+    ): String =
         import quotes.reflect.*
         // values for terms constructed from 'flatmul' should have >= 2 terms to start
         // so should terms should never be empty in this recursion
@@ -80,22 +92,24 @@ object show:
                 // tail should never be empty (see above)
                 term match
                     case namedPU(_) => s"${h}${t}"
-                    case _ => s"${h} ${t}"
+                    case _          => s"${h} ${t}"
             case _ =>
                 report.error(s"unrecognized termstr pattern $terms")
                 ""
 
     object flatmul:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[List[quotes.reflect.TypeRepr]] =
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[List[quotes.reflect.TypeRepr]] =
             import quotes.reflect.*
             u match
                 case AppliedType(op, List(lu, ru)) if (op =:= TypeRepr.of[*]) =>
                     val lflat = lu match
                         case flatmul(lf) => lf
-                        case _ => List(lu)
+                        case _           => List(lu)
                     val rflat = ru match
                         case flatmul(rf) => rf
-                        case _ => List(ru)
+                        case _           => List(ru)
                     Some(lflat ++ rflat)
                 case _ => None
 
@@ -103,11 +117,16 @@ object show:
         import quotes.reflect.*
         p match
             case bigintTE(v) if (v >= 0) => v.toString
-            case bigintTE(v) if (v < 0) => s"(${v.toString})"
-            case rationalTE(v) => s"(${v.n.toString}/${v.d.toString})"
-            case _ => "!!!"
+            case bigintTE(v) if (v < 0)  => s"(${v.toString})"
+            case rationalTE(v)           => s"(${v.n.toString}/${v.d.toString})"
+            case _                       => "!!!"
 
-    def paren(using Quotes)(u: quotes.reflect.TypeRepr, render: quotes.reflect.TypeRepr => String): String =
+    def paren(using
+        Quotes
+    )(
+        u: quotes.reflect.TypeRepr,
+        render: quotes.reflect.TypeRepr => String
+    ): String =
         val str = showrender(u, render)
         if (atomic(u)) str else s"(${str})"
 
@@ -116,45 +135,105 @@ object show:
         u match
             case namedunit(_) => true
             case unitconst(_) => true
-            case AppliedType(op, List(namedunit(_), _)) if (op =:= TypeRepr.of[^]) => true
-            case AppliedType(op, List(flatmul(namedPU(_) +: namedunit(_) +: Nil), _)) if (op =:= TypeRepr.of[^]) => true
+            case AppliedType(op, List(namedunit(_), _))
+                if (op =:= TypeRepr.of[^]) =>
+                true
+            case AppliedType(
+                    op,
+                    List(flatmul(namedPU(_) +: namedunit(_) +: Nil), _)
+                ) if (op =:= TypeRepr.of[^]) =>
+                true
             case flatmul(namedPU(_) +: namedunit(_) +: Nil) => true
-            case AppliedType(_, _) => false
-            case _ => true
+            case AppliedType(_, _)                          => false
+            case _                                          => true
 
     object namedunit:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
             u match
                 case namedSU(nu) => Some(nu)
                 case namedBU(nu) => Some(nu)
                 case namedDU(nu) => Some(nu)
-                case _ => None
+                case _           => None
 
     object namedSU:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
-            Implicits.search(TypeRepr.of[ShowUnitAlias].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))) match
-                case iss: ImplicitSearchSuccess => Some(iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol))
+            Implicits.search(
+                TypeRepr
+                    .of[ShowUnitAlias]
+                    .appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))
+            ) match
+                case iss: ImplicitSearchSuccess =>
+                    Some(
+                        iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol)
+                    )
                 case _ => None
 
     object namedPU:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
-            Implicits.search(TypeRepr.of[DerivedUnit].appliedTo(List(u, TypeRepr.of[1], TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
-                case iss: ImplicitSearchSuccess => Some(iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol))
+            Implicits.search(
+                TypeRepr
+                    .of[DerivedUnit]
+                    .appliedTo(
+                        List(
+                            u,
+                            TypeRepr.of[1],
+                            TypeBounds.empty,
+                            TypeBounds.empty,
+                            TypeBounds.empty
+                        )
+                    )
+            ) match
+                case iss: ImplicitSearchSuccess =>
+                    Some(
+                        iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol)
+                    )
                 case _ => None
 
     object namedBU:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
-            Implicits.search(TypeRepr.of[BaseUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))) match
-                case iss: ImplicitSearchSuccess => Some(iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol))
+            Implicits.search(
+                TypeRepr
+                    .of[BaseUnit]
+                    .appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))
+            ) match
+                case iss: ImplicitSearchSuccess =>
+                    Some(
+                        iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol)
+                    )
                 case _ => None
 
     object namedDU:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
-            Implicits.search(TypeRepr.of[DerivedUnit].appliedTo(List(u, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty, TypeBounds.empty))) match
-                case iss: ImplicitSearchSuccess => Some(iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol))
+            Implicits.search(
+                TypeRepr
+                    .of[DerivedUnit]
+                    .appliedTo(
+                        List(
+                            u,
+                            TypeBounds.empty,
+                            TypeBounds.empty,
+                            TypeBounds.empty,
+                            TypeBounds.empty
+                        )
+                    )
+            ) match
+                case iss: ImplicitSearchSuccess =>
+                    Some(
+                        iss.tree.tpe.baseType(TypeRepr.of[NamedUnit].typeSymbol)
+                    )
                 case _ => None
