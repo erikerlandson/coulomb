@@ -98,6 +98,13 @@
           <li class="level2"><a href="#examples">examples</a></li>
           <li class="level1"><a href="#packages-2">Packages</a></li>
           <li class="level1"><a href="#resources">Resources</a></li>
+          <li class="level1"><a href="#development">Development</a></li>
+          <li class="level2"><a href="#sbt-typelevel">sbt-typelevel</a></li>
+          <li class="level2"><a href="#testing-repl-environment">testing REPL environment</a></li>
+          <li class="level2"><a href="#scala-code-formatting">scala code formatting</a></li>
+          <li class="level2"><a href="#scaladoc-and-unidoc">scaladoc and unidoc</a></li>
+          <li class="level2"><a href="#editing-coulomb-site-documentation">editing coulomb site documentation</a></li>
+          <li class="level2"><a href="#editing-build-sbt">editing build.sbt</a></li>
           <li class="level1"><a href="#previous-versions">Previous versions</a></li>
           <li class="level1"><a href="#code-of-conduct">Code of Conduct</a></li>
         </ul>
@@ -226,6 +233,74 @@
           <li><a href="http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/">Algorithmic Unit Analysis</a></li>
           <li><a href="http://erikerlandson.github.io/blog/2020/05/06/unit-analysis-for-linear-regression/">A Unit Analysis of Linear Regression</a></li>
         </ul>
+        
+        <h2 id="development" class="section">Development<a class="anchor-link right" href="#development"><i class="icofont-laika">&#xef71;</i></a></h2>
+        
+        <h3 id="sbt-typelevel" class="section">sbt-typelevel<a class="anchor-link right" href="#sbt-typelevel"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p><code>coulomb</code> uses the
+        <a href="https://typelevel.org/sbt-typelevel/">sbt-typelevel</a>
+        project as its SBT build framework.
+        The following sections explain common <code>sbt</code> development commands that work with this framework.</p>
+        
+        <h3 id="testing-repl-environment" class="section">testing REPL environment<a class="anchor-link right" href="#testing-repl-environment"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>You can start up a Scala REPL that has all <code>coulomb</code> libraries provisioned,
+        using the command <code>sbt all/console</code></p>
+        <pre><code class="sh">$ sbt all/console
+[info] welcome to sbt 1.7.2 (Red Hat, Inc. Java 17.0.4.1)
+...
+Welcome to Scala 3.2.0 (17.0.4.1, Java OpenJDK 64-Bit Server VM).
+Type in expressions for evaluation. Or try :help.
+
+scala&gt; import coulomb.*
+     | import coulomb.syntax.*
+     |
+     | import algebra.instances.all.given
+     | import coulomb.ops.algebra.spire.all.given
+     |
+     | import coulomb.policy.spire.standard.given
+     | import coulomb.units.si.*
+     | import coulomb.units.si.given
+
+scala&gt; val x = 1d.withUnit[Meter]
+val x: coulomb.Quantity[Double, coulomb.units.si.Meter] = 1.0
+
+scala&gt;</code></pre>
+        
+        <h3 id="scala-code-formatting" class="section">scala code formatting<a class="anchor-link right" href="#scala-code-formatting"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p><code>coulomb</code> uses <code>scalafmt</code> for formatting code, and also checking its format during CI.
+        It is a good idea to run <code>scalafmt</code> before you check in new code to ensure it passes CI format checks:</p>
+        <pre class="keep-together pdf epub"><code class="sh"># run scalafmt on scala files:
+sbt scalafmtAll
+
+# run scalafmt on build.sbt
+sbt scalafmtSbt</code></pre>
+        
+        <h3 id="scaladoc-and-unidoc" class="section">scaladoc and unidoc<a class="anchor-link right" href="#scaladoc-and-unidoc"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>All <code>scaladoc</code> is built and published to <code>javadoc.io</code> via CI,
+        however you can build and view them locally:</p>
+        <pre class="keep-together pdf epub"><code class="sh"># generate scaladocs
+sbt unidocs/doc
+
+# serve docs via http locally:
+python3 -m http.server -d unidocs/target/scala-3.1.2/unidoc/</code></pre>
+        <p>You can also view directly at:
+        <code>file:///your/path/to/coulomb/unidocs/target/scala-3.1.2/unidoc/index.html</code></p>
+        
+        <h3 id="editing-coulomb-site-documentation" class="section">editing coulomb site documentation<a class="anchor-link right" href="#editing-coulomb-site-documentation"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>The <code>coulomb</code> site documentation resides in the <code>docs</code> subproject,
+        and uses the
+        <a href="https://typelevel.org/sbt-typelevel/site.html">sbt-typelevel-site</a>
+        framework, which is based on <code>mdoc</code> and <code>laika</code></p>
+        <p>If you make edits or contributions to the site documentation,
+        you can preview with this command:</p>
+        <pre class="keep-together pdf epub"><code class="sh">sbt docs/tlSitePreview
+
+# then view at http://localhost:4242</code></pre>
+        
+        <h3 id="editing-build-sbt" class="section">editing build.sbt<a class="anchor-link right" href="#editing-build-sbt"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>If you make changes to <code>build.sbt</code> remember to run the following:</p>
+        <pre class="keep-together pdf epub"><code class="sh">sbt githubWorkflowGenerate</code></pre>
+        <p>Make sure to check in any resulting changes to github workflow yaml.</p>
         
         <h2 id="previous-versions" class="section">Previous versions<a class="anchor-link right" href="#previous-versions"><i class="icofont-laika">&#xef71;</i></a></h2>
         <p>Versions of <code>coulomb</code> beginning with 0.6 require Scala 3,
