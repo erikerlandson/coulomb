@@ -4,7 +4,6 @@
     alt = coulomb splash
 }
 
-
 # Introduction to coulomb
 
 ## Quick Start
