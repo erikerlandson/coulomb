@@ -36,7 +36,8 @@ class QuantityBenchmark:
 
     import coulomb.policy.standard.given
 
-    var data: Vector[Quantity[Double, Meter]] = Vector.empty[Quantity[Double, Meter]]
+    var data: Vector[Quantity[Double, Meter]] =
+        Vector.empty[Quantity[Double, Meter]]
 
     @Setup(Level.Trial)
     def prepare: Unit =
