@@ -3,7 +3,7 @@
 // and check in the updates to github workflow yamls
 
 // base version for assessing MIMA
-ThisBuild / tlBaseVersion := "0.6"
+ThisBuild / tlBaseVersion := "0.7"
 
 // publish settings
 ThisBuild / developers += tlGitHubDev("erikerlandson", "Erik Erlandson")
