@@ -42,6 +42,14 @@ object unit:
             coefficientDenDouble[UF, UT]
         )
 
+    inline given ctx_DUC_Rational[B, UF, UT]
+        : DeltaUnitConversion[Rational, B, UF, UT] =
+        new infra.RationalDUC[B, UF, UT](
+            coefficientRational[UF, UT],
+            deltaOffsetRational[UF, B],
+            deltaOffsetRational[UT, B]
+        )
+
     inline given ctx_DUC_Double[B, UF, UT]
         : DeltaUnitConversion[Double, B, UF, UT] =
         new infra.DoubleDUC[B, UF, UT](
@@ -98,6 +106,10 @@ object unit:
         class IntTUC[UF, UT](nc: Double, dc: Double)
             extends TruncatingUnitConversion[Int, UF, UT]:
             def apply(v: Int): Int = ((nc * v) / dc).toInt
+
+        class RationalDUC[B, UF, UT](c: Rational, df: Rational, dt: Rational)
+            extends DeltaUnitConversion[Rational, B, UF, UT]:
+            def apply(v: Rational): Rational = ((v + df) * c) - dt
 
         class DoubleDUC[B, UF, UT](c: Double, df: Double, dt: Double)
             extends DeltaUnitConversion[Double, B, UF, UT]:
