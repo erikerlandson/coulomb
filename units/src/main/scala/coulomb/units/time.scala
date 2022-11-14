@@ -126,7 +126,8 @@ object javatime:
          */
         def toQuantity[V, U](using
             d2q: DurationQuantity[V, U]
-        ): Quantity[V, U] = d2q(duration)
+        ): Quantity[V, U] =
+            d2q(duration)
 
         /**
          * Convert a `Duration` to a coulomb `Quantity` using a truncating
@@ -146,9 +147,8 @@ object javatime:
          */
         def tToQuantity[V, U](using
             d2q: TruncatingDurationQuantity[V, U]
-        ): Quantity[V, U] = d2q(
-            duration
-        )
+        ): Quantity[V, U] =
+            d2q(duration)
 
     extension [V, U](quantity: Quantity[V, U])
         /**
@@ -162,9 +162,8 @@ object javatime:
          * q.toDuration
          *   }}}
          */
-        def toDuration(using q2d: QuantityDuration[V, U]): Duration = q2d(
-            quantity
-        )
+        def toDuration(using q2d: QuantityDuration[V, U]): Duration =
+            q2d(quantity)
 
     extension (instant: Instant)
         /**
@@ -183,13 +182,9 @@ object javatime:
          *   }}}
          */
         def toEpochTime[V, U](using
-            d2q: DurationQuantity[V, U]
+            i2e: InstantEpochTime[V, U]
         ): EpochTime[V, U] =
-            // this is cheating a bit, but it works because both Instant and Epochtime
-            // are based on 1970 epoch
-            val d =
-                Duration.ofSeconds(instant.getEpochSecond(), instant.getNano())
-            d2q(d).value.withEpochTime[U]
+            i2e(instant)
 
         /**
          * Convert a java.time Instant to an EpochTime value using a truncating
@@ -208,11 +203,8 @@ object javatime:
          *   }}}
          */
         def tToEpochTime[V, U](using
-            d2q: TruncatingDurationQuantity[V, U]
-        ): EpochTime[V, U] =
-            val d =
-                Duration.ofSeconds(instant.getEpochSecond(), instant.getNano())
-            d2q(d).value.withEpochTime[U]
+            i2e: TruncatingInstantEpochTime[V, U]
+        ): EpochTime[V, U] = i2e(instant)
 
     extension [V, U](epochTime: EpochTime[V, U])
         /**
@@ -307,17 +299,14 @@ object javatime:
                 (d: Duration) => d2q(d)
 
             given ctx_Conversion_EI[V, U](using
-                q2d: QuantityDuration[V, U]
+                e2i: EpochTimeInstant[V, U]
             ): Conversion[EpochTime[V, U], Instant] =
-                (e: EpochTime[V, U]) =>
-                    Instant.EPOCH.plus(q2d(e.value.withUnit[U]))
+                (e: EpochTime[V, U]) => e2i(e)
 
             given ctx_Conversion_IE[V, U](using
-                d2q: DurationQuantity[V, U]
+                i2e: InstantEpochTime[V, U]
             ): Conversion[Instant, EpochTime[V, U]] =
-                (i: Instant) =>
-                    val d = Duration.ofSeconds(i.getEpochSecond(), i.getNano())
-                    d2q(d).value.withEpochTime[U]
+                (i: Instant) => i2e(i)
 
         /**
          * defines typeclasses for explicit conversions
@@ -376,3 +365,39 @@ object javatime:
                     val nano: Int =
                         ((qsec - Rational(secs)) * Rational(1000000000)).toInt
                     Instant.EPOCH.plus(Duration.ofSeconds(secs, nano))
+
+            given ctx_InstantEpochTime[V, U](using
+                vc: ValueConversion[Rational, V],
+                uc: DeltaUnitConversion[
+                    Rational,
+                    coulomb.units.si.Second,
+                    coulomb.units.si.Second,
+                    U
+                ]
+            ): InstantEpochTime[V, U] =
+                (instant: Instant) =>
+                    val duration: Duration =
+                        Duration.between(Instant.EPOCH, instant)
+                    val seconds: Long = duration.getSeconds()
+                    val nano: Int = duration.getNano()
+                    val qsec: Rational =
+                        Rational(seconds) + Rational(nano, 1000000000)
+                    vc(uc(qsec)).withEpochTime[U]
+
+            given ctx_TruncatingInstantEpochTime[V, U](using
+                vc: TruncatingValueConversion[Rational, V],
+                uc: DeltaUnitConversion[
+                    Rational,
+                    coulomb.units.si.Second,
+                    coulomb.units.si.Second,
+                    U
+                ]
+            ): TruncatingInstantEpochTime[V, U] =
+                (instant: Instant) =>
+                    val duration: Duration =
+                        Duration.between(Instant.EPOCH, instant)
+                    val seconds: Long = duration.getSeconds()
+                    val nano: Int = duration.getNano()
+                    val qsec: Rational =
+                        Rational(seconds) + Rational(nano, 1000000000)
+                    vc(uc(qsec)).withEpochTime[U]

@@ -274,6 +274,19 @@ class JavaTimeSuite extends CoulombSuite:
         ins.tToEpochTime[Long, Day].assertDQ[Long, Day](-165)
     }
 
+    test("toEpochTime YearsBC") {
+        import coulomb.units.javatime.conversions.explicit.given
+
+        import bc.{*, given}
+
+        val ins = Instant.parse("-0099-05-18T00:00:00Z")
+        ins.toEpochTime[Double, YearsBC].assertDQD[Double, YearsBC](100)
+
+        // truncation
+        assertCE("ins.toEpochTime[Long, YearsBC]")
+        ins.tToEpochTime[Long, YearsBC].assertDQ[Long, YearsBC](100)
+    }
+
     test("toInstant") {
         import coulomb.units.javatime.conversions.explicit.given
 
