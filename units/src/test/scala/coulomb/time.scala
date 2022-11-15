@@ -232,6 +232,17 @@ class JavaTimeSuite extends CoulombSuite:
     import algebra.instances.all.given
     import coulomb.policy.standard.given
 
+    object bc:
+        import coulomb.define.*
+        final type YearsBC
+        given ctx_unit_YearsBC: define.DeltaUnit[
+            YearsBC,
+            -31536000 * Second,
+            1970,
+            "years BC",
+            "BC"
+        ] = define.DeltaUnit()
+
     test("toQuantity") {
         import coulomb.units.javatime.conversions.explicit.given
 
@@ -263,11 +274,33 @@ class JavaTimeSuite extends CoulombSuite:
         ins.tToEpochTime[Long, Day].assertDQ[Long, Day](-165)
     }
 
+    test("toEpochTime YearsBC") {
+        import coulomb.units.javatime.conversions.explicit.given
+
+        import bc.{*, given}
+
+        val ins = Instant.parse("-0099-05-18T00:00:00Z")
+        ins.toEpochTime[Double, YearsBC].assertDQD[Double, YearsBC](100)
+
+        // truncation
+        assertCE("ins.toEpochTime[Long, YearsBC]")
+        ins.tToEpochTime[Long, YearsBC].assertDQ[Long, YearsBC](100)
+    }
+
     test("toInstant") {
         import coulomb.units.javatime.conversions.explicit.given
 
         val et = (-165L).withEpochTime[Day]
         assertEquals(et.toInstant.toString, "1969-07-20T00:00:00Z")
+    }
+
+    test("toInstant YearsBC") {
+        import coulomb.units.javatime.conversions.explicit.given
+
+        import bc.{*, given}
+
+        val et = 100.withEpochTime[YearsBC]
+        assertEquals(et.toInstant.toString, "-0099-05-18T00:00:00Z")
     }
 
     test("implicit Q -> D") {
