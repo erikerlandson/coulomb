@@ -59,6 +59,14 @@ lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .settings(commonSettings: _*)
     .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
 
+lazy val refined = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("refined"))
+    .settings(name := "coulomb-refined")
+    .dependsOn(core % "compile->compile;test->test", units % Test)
+    .settings(commonSettings: _*)
+    .settings(libraryDependencies += "eu.timepit" %%% "refined" % "0.10.1")
+
 lazy val testkit = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("testkit"))
@@ -82,7 +90,8 @@ lazy val all = project
     .dependsOn(
         core.jvm,
         units.jvm,
-        spire.jvm
+        spire.jvm,
+        refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
     .settings(name := "coulomb-all")
     .enablePlugins(NoPublishPlugin) // don't publish
