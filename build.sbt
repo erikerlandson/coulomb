@@ -25,7 +25,7 @@ ThisBuild / crossScalaVersions := Seq("3.2.1")
 Test / parallelExecution := false
 
 def commonSettings = Seq(
-    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M6" % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M7" % Test
 )
 
 lazy val root = tlCrossRootProject
@@ -66,7 +66,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         name := "coulomb-testkit",
         libraryDependencies ++= Seq(
             "org.scalacheck" %%% "scalacheck" % "1.17.0",
-            "org.scalameta" %%% "munit-scalacheck" % "1.0.0-M6" % Test,
+            "org.scalameta" %%% "munit-scalacheck" % "1.0.0-M7" % Test,
             "org.typelevel" %%% "algebra-laws" % "2.9.0" % Test,
             "org.typelevel" %%% "discipline-munit" % "2.0.0-M3" % Test
         )
