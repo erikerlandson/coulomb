@@ -23,10 +23,20 @@ import eu.timepit.refined.api.*
 import eu.timepit.refined.numeric.*
 
 object all:
-    inline given ctx_AdditiveSemigroup_Refined[V](using
+    inline given ctx_AdditiveSemigroup_Refined_Positive[V](using
         alg: AdditiveSemigroup[V],
         vld: Validate[V, Positive]
     ): AdditiveSemigroup[Refined[V, Positive]] =
         new AdditiveSemigroup[Refined[V, Positive]]:
             def plus(x: Refined[V, Positive], y: Refined[V, Positive]): Refined[V, Positive] =
                 refineV[Positive].unsafeFrom(alg.plus(x.value, y.value))
+
+    inline given ctx_AdditiveSemigroup_Refined_NonNegative[V](using
+        alg: AdditiveSemigroup[V],
+        vld: Validate[V, NonNegative]
+    ): AdditiveSemigroup[Refined[V, NonNegative]] =
+        new AdditiveSemigroup[Refined[V, NonNegative]]:
+            def plus(x: Refined[V, NonNegative], y: Refined[V, NonNegative]): Refined[V, NonNegative] =
+                refineV[NonNegative].unsafeFrom(alg.plus(x.value, y.value))
+
+
