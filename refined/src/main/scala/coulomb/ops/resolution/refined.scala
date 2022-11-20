@@ -34,4 +34,3 @@ object refined:
         vres: ValueResolution[VL, VR]
     ): ValueResolution[Refined[VL, NonNegative], Refined[VR, NonNegative]] =
         new ValueResolution.NC[Refined[VL, NonNegative], Refined[VR, NonNegative], Refined[vres.VO, NonNegative]]
-        

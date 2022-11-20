@@ -38,5 +38,3 @@ object all:
         new AdditiveSemigroup[Refined[V, NonNegative]]:
             def plus(x: Refined[V, NonNegative], y: Refined[V, NonNegative]): Refined[V, NonNegative] =
                 refineV[NonNegative].unsafeFrom(alg.plus(x.value, y.value))
-
-
