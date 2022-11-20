@@ -68,6 +68,7 @@ class TimeUnitsSuite extends CoulombSuite:
         import coulomb.policy.standard.given
 
         36d.withEpochTime[Hour].toUnit[Day].assertDQD[Double, Day](1.5)
+        1.withUnit[Hour].toUnit[Second]
 
         // truncating
         assertCE("36.withEpochTime[Hour].toUnit[Day]")
