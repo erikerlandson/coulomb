@@ -35,7 +35,15 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
     import coulomb.testing.refined.*
 
     test("lift") {
+        1d.withRP[Positive].withUnit[Meter].assertQ[Refined[Double, Positive], Meter](1d.withRP[Positive])
+        1f.withRP[Positive].withUnit[Meter].assertQ[Refined[Float, Positive], Meter](1f.withRP[Positive])
+        1L.withRP[Positive].withUnit[Meter].assertQ[Refined[Long, Positive], Meter](1L.withRP[Positive])
         1.withRP[Positive].withUnit[Meter].assertQ[Refined[Int, Positive], Meter](1.withRP[Positive])
+
+        1d.withRP[NonNegative].withUnit[Meter].assertQ[Refined[Double, NonNegative], Meter](1d.withRP[NonNegative])
+        1f.withRP[NonNegative].withUnit[Meter].assertQ[Refined[Float, NonNegative], Meter](1f.withRP[NonNegative])
+        1L.withRP[NonNegative].withUnit[Meter].assertQ[Refined[Long, NonNegative], Meter](1L.withRP[NonNegative])
+        1.withRP[NonNegative].withUnit[Meter].assertQ[Refined[Int, NonNegative], Meter](1.withRP[NonNegative])
     }
 
     test("add strict") {
