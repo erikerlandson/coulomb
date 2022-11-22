@@ -35,8 +35,33 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
     import coulomb.testing.refined.*
 
     test("lift") {
+        1.withRP[Positive].withUnit[Meter].assertQ[Refined[Int, Positive], Meter](1.withRP[Positive])
+    }
+
+    test("add strict") {
         import coulomb.policy.strict.given
         import coulomb.policy.overlay.refined.algebraic.given
 
-        1.withRP[Positive].withUnit[Meter].assertQ[Refined[Int, Positive], Meter](1.withRP[Positive])
+        (1d.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter])
+            .assertQ[Refined[Double, Positive], Meter](3d.withRP[Positive])
+        (1f.withRP[Positive].withUnit[Meter] + 2f.withRP[Positive].withUnit[Meter])
+            .assertQ[Refined[Float, Positive], Meter](3f.withRP[Positive])
+        (1L.withRP[Positive].withUnit[Meter] + 2L.withRP[Positive].withUnit[Meter])
+            .assertQ[Refined[Long, Positive], Meter](3L.withRP[Positive])
+        (1.withRP[Positive].withUnit[Meter] + 2.withRP[Positive].withUnit[Meter])
+            .assertQ[Refined[Int, Positive], Meter](3.withRP[Positive])
+
+        (1d.withRP[NonNegative].withUnit[Meter] + 2d.withRP[NonNegative].withUnit[Meter])
+            .assertQ[Refined[Double, NonNegative], Meter](3d.withRP[NonNegative])
+        (1f.withRP[NonNegative].withUnit[Meter] + 2f.withRP[NonNegative].withUnit[Meter])
+            .assertQ[Refined[Float, NonNegative], Meter](3f.withRP[NonNegative])
+        (1L.withRP[NonNegative].withUnit[Meter] + 2L.withRP[NonNegative].withUnit[Meter])
+            .assertQ[Refined[Long, NonNegative], Meter](3L.withRP[NonNegative])
+        (1.withRP[NonNegative].withUnit[Meter] + 2.withRP[NonNegative].withUnit[Meter])
+            .assertQ[Refined[Int, NonNegative], Meter](3.withRP[NonNegative])
+
+        // differing value or unit types are not supported in strict policy
+        assertCE("1.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter]")
+        assertCE("1d.withRP[NonNegative].withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter]")
+        assertCE("1d.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Yard]")
     }
