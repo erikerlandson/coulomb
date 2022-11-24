@@ -374,7 +374,9 @@ object meta:
         // The policy goal here is that type aliases are never expanded.
         typestring(t, false)
 
-    def typestring(using Quotes)(t: quotes.reflect.TypeRepr, dealias: Boolean): String =
+    def typestring(using
+        Quotes
+    )(t: quotes.reflect.TypeRepr, dealias: Boolean): String =
         import quotes.reflect.*
         def work(trp: TypeRepr): String =
             val tr = if (dealias) trp.dealias else trp
