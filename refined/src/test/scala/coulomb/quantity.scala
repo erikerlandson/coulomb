@@ -134,3 +134,17 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         (1f.withRP[NonNegative].withUnit[Meter] + 1L.withRP[NonNegative].withUnit[Kilo * Meter])
             .assertQ[Refined[Float, NonNegative], Meter](1001f.withRP[NonNegative])
     }
+
+    test("multiply strict") {
+        import coulomb.policy.strict.given
+        import coulomb.policy.overlay.refined.algebraic.given
+
+        (2d.withRP[Positive].withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter])
+            .assertQ[Refined[Double, Positive], Meter ^ 2](6d.withRP[Positive])
+        (2.withRP[NonNegative].withUnit[Meter] * 3.withRP[NonNegative].withUnit[Meter])
+            .assertQ[Refined[Int, NonNegative], Meter ^ 2](6.withRP[NonNegative])
+
+        // differing value types are not supported in strict policy
+        assertCE("2.withRP[Positive].withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter]")
+        assertCE("2d.withRP[NonNegative].withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter]")
+    }

@@ -16,7 +16,7 @@
 
 package coulomb.ops.algebra.refined
 
-import algebra.ring.AdditiveSemigroup
+import algebra.ring.*
 
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
@@ -38,3 +38,19 @@ object all:
         new AdditiveSemigroup[Refined[V, NonNegative]]:
             def plus(x: Refined[V, NonNegative], y: Refined[V, NonNegative]): Refined[V, NonNegative] =
                 refineV[NonNegative].unsafeFrom(alg.plus(x.value, y.value))
+
+    inline given ctx_MultiplicativeSemigroup_Refined_Positive[V](using
+        alg: MultiplicativeSemigroup[V],
+        vld: Validate[V, Positive]
+    ): MultiplicativeSemigroup[Refined[V, Positive]] =
+        new MultiplicativeSemigroup[Refined[V, Positive]]:
+            def times(x: Refined[V, Positive], y: Refined[V, Positive]): Refined[V, Positive] =
+                refineV[Positive].unsafeFrom(alg.times(x.value, y.value))
+
+    inline given ctx_MultiplicativeSemigroup_Refined_NonNegative[V](using
+        alg: MultiplicativeSemigroup[V],
+        vld: Validate[V, NonNegative]
+    ): MultiplicativeSemigroup[Refined[V, NonNegative]] =
+        new MultiplicativeSemigroup[Refined[V, NonNegative]]:
+            def times(x: Refined[V, NonNegative], y: Refined[V, NonNegative]): Refined[V, NonNegative] =
+                refineV[NonNegative].unsafeFrom(alg.times(x.value, y.value))
