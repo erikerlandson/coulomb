@@ -116,6 +116,21 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         import coulomb.policy.standard.given
         import coulomb.policy.overlay.refined.algebraic.given
 
+        // same unit and value type
+        (1d.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter])
+            .assertQ[Refined[Double, Positive], Meter](3d.withRP[Positive])
+
+        // same unit, differing value types
+        (1L.withRP[NonNegative].withUnit[Meter] + 2f.withRP[NonNegative].withUnit[Meter])
+            .assertQ[Refined[Float, NonNegative], Meter](3f.withRP[NonNegative])
+
+        // same value, differing units
+        (1f.withRP[Positive].withUnit[Meter] + 1f.withRP[Positive].withUnit[Kilo * Meter])
+            .assertQ[Refined[Float, Positive], Meter](1001f.withRP[Positive])
+
+        // value and unit type are different
         (1.withRP[Positive].withUnit[Meter] + 1d.withRP[Positive].withUnit[Kilo * Meter])
             .assertQ[Refined[Double, Positive], Meter](1001d.withRP[Positive])
+        (1f.withRP[NonNegative].withUnit[Meter] + 1L.withRP[NonNegative].withUnit[Kilo * Meter])
+            .assertQ[Refined[Float, NonNegative], Meter](1001f.withRP[NonNegative])
     }
