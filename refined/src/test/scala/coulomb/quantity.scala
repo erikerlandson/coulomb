@@ -111,3 +111,11 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assertCE("1d.withRP[NonNegative].withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter]")
         assertCE("1d.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Yard]")
     }
+
+    test("add standard") {
+        import coulomb.policy.standard.given
+        import coulomb.policy.overlay.refined.algebraic.given
+
+        (1.withRP[Positive].withUnit[Meter] + 1d.withRP[Positive].withUnit[Kilo * Meter])
+            .assertQ[Refined[Double, Positive], Meter](1001d.withRP[Positive])
+    }
