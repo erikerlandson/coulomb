@@ -148,3 +148,53 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assertCE("2.withRP[Positive].withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter]")
         assertCE("2d.withRP[NonNegative].withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter]")
     }
+
+    test("multiply standard") {
+        import coulomb.policy.standard.given
+        import coulomb.policy.overlay.refined.algebraic.given
+
+        (2f.withRP[Positive].withUnit[Meter] * 3f.withRP[Positive].withUnit[Meter])
+            .assertQ[Refined[Float, Positive], Meter ^ 2](6f.withRP[Positive])
+        (2L.withRP[NonNegative].withUnit[Meter] * 3L.withRP[NonNegative].withUnit[Meter])
+            .assertQ[Refined[Long, NonNegative], Meter ^ 2](6L.withRP[NonNegative])
+
+        (2.withRP[Positive].withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter])
+            .assertQ[Refined[Double, Positive], Meter ^ 2](6d.withRP[Positive])
+        (2f.withRP[NonNegative].withUnit[Meter] * 3L.withRP[NonNegative].withUnit[Meter])
+            .assertQ[Refined[Float, NonNegative], Meter ^ 2](6f.withRP[NonNegative])
+    }
+
+    test("divide strict") {
+        import coulomb.policy.strict.given
+        import coulomb.policy.overlay.refined.algebraic.given
+
+        (12d.withRP[Positive].withUnit[Meter] / 3d.withRP[Positive].withUnit[Second])
+            .assertQ[Refined[Double, Positive], Meter / Second](4d.withRP[Positive])
+        (12f.withRP[Positive].withUnit[Meter] / 3f.withRP[Positive].withUnit[Second])
+            .assertQ[Refined[Float, Positive], Meter / Second](4f.withRP[Positive])
+
+        // differing values types not supported
+        assertCE("12d.withRP[Positive].withUnit[Meter] / 3f.withRP[Positive].withUnit[Second]")
+        // NonNegative is not multiplicative group
+        assertCE("12d.withRP[NonNegative].withUnit[Meter] / 3d.withRP[NonNegative].withUnit[Second]")
+        // Integrals are not a multiplicative group
+        assertCE("12.withRP[Positive].withUnit[Meter] / 3.withRP[Positive].withUnit[Second]")
+    }
+
+    test("divide standard") {
+        import coulomb.policy.standard.given
+        import coulomb.policy.overlay.refined.algebraic.given
+
+        (12d.withRP[Positive].withUnit[Meter] / 3d.withRP[Positive].withUnit[Second])
+            .assertQ[Refined[Double, Positive], Meter / Second](4d.withRP[Positive])
+
+        (12d.withRP[Positive].withUnit[Meter] / 3.withRP[Positive].withUnit[Second])
+            .assertQ[Refined[Double, Positive], Meter / Second](4d.withRP[Positive])
+        (12.withRP[Positive].withUnit[Meter] / 3f.withRP[Positive].withUnit[Second])
+            .assertQ[Refined[Float, Positive], Meter / Second](4f.withRP[Positive])
+ 
+        // NonNegative is not multiplicative group
+        assertCE("12d.withRP[NonNegative].withUnit[Meter] / 3d.withRP[NonNegative].withUnit[Second]")
+        // Integrals are not a multiplicative group
+        assertCE("12.withRP[Positive].withUnit[Meter] / 3.withRP[Positive].withUnit[Second]")
+    }
