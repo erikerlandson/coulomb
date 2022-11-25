@@ -22,6 +22,8 @@ import eu.timepit.refined.*
 import eu.timepit.refined.api.*
 import eu.timepit.refined.numeric.*
 
+import coulomb.ops.algebra.FractionalPower
+
 object all:
     given ctx_AdditiveSemigroup_Refined_Positive[V](using
         alg: AdditiveSemigroup[V],
@@ -41,17 +43,23 @@ object all:
     ): MultiplicativeGroup[Refined[V, Positive]] =
         new infra.MGR[V, Positive]
 
-    given ctx_MultiplicativeSemigroup_Refined_Positive[V](using
-        alg: MultiplicativeSemigroup[V],
+    given ctx_MultiplicativeMonoid_Refined_Positive[V](using
+        alg: MultiplicativeMonoid[V],
         vld: Validate[V, Positive]
-    ): MultiplicativeSemigroup[Refined[V, Positive]] =
-        new infra.MSGR[V, Positive]
+    ): MultiplicativeMonoid[Refined[V, Positive]] =
+        new infra.MMR[V, Positive]
 
-    given ctx_MultiplicativeSemigroup_Refined_NonNegative[V](using
-        alg: MultiplicativeSemigroup[V],
+    given ctx_MultiplicativeMonoid_Refined_NonNegative[V](using
+        alg: MultiplicativeMonoid[V],
         vld: Validate[V, NonNegative]
-    ): MultiplicativeSemigroup[Refined[V, NonNegative]] =
-        new infra.MSGR[V, NonNegative]
+    ): MultiplicativeMonoid[Refined[V, NonNegative]] =
+        new infra.MMR[V, NonNegative]
+
+    given ctx_FractionalPower_Refined_Positive[V](using
+        alg: FractionalPower[V],
+        vld: Validate[V, Positive]
+    ): FractionalPower[Refined[V, Positive]] =
+        new infra.FPR[V, Positive]
 
     object infra:
         class ASGR[V, P](using alg: AdditiveSemigroup[V], vld: Validate[V, P]) extends
@@ -64,8 +72,16 @@ object all:
             def times(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
                 refineV[P].unsafeFrom(alg.times(x.value, y.value))
 
+        class MMR[V, P](using alg: MultiplicativeMonoid[V], vld: Validate[V, P]) extends
+            MSGR[V, P] with MultiplicativeMonoid[Refined[V, P]]:
+            def one: Refined[V, P] = refineV[P].unsafeFrom(alg.one)
+
         class MGR[V, P](using alg: MultiplicativeGroup[V], vld: Validate[V, P]) extends
-            MSGR[V, P] with MultiplicativeGroup[Refined[V, P]]:
+            MMR[V, P] with MultiplicativeGroup[Refined[V, P]]:
             def div(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
                 refineV[P].unsafeFrom(alg.div(x.value, y.value))
-            def one: Refined[V, P] = refineV[P].unsafeFrom(alg.one)
+
+        class FPR[V, P](using alg: FractionalPower[V], vld: Validate[V, P]) extends
+            FractionalPower[Refined[V, P]]:
+            def pow(v: Refined[V, P], e: Double): Refined[V, P] =
+                refineV[P].unsafeFrom(alg.pow(v.value, e))

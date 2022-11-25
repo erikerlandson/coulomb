@@ -198,3 +198,25 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         // Integrals are not a multiplicative group
         assertCE("12.withRP[Positive].withUnit[Meter] / 3.withRP[Positive].withUnit[Second]")
     }
+
+    test("power") {
+        import coulomb.policy.strict.given
+        import coulomb.policy.overlay.refined.algebraic.given
+
+        // FractionalPower (algebras supporting rational exponents)
+        2d.withRP[Positive].withUnit[Meter].pow[0]
+            .assertQ[Refined[Double, Positive], 1](1d.withRP[Positive])
+        2d.withRP[Positive].withUnit[Meter].pow[2]
+            .assertQ[Refined[Double, Positive], Meter ^ 2](4d.withRP[Positive])
+        2d.withRP[Positive].withUnit[Meter].pow[-1]
+            .assertQ[Refined[Double, Positive], 1 / Meter](0.5d.withRP[Positive])
+        4d.withRP[Positive].withUnit[Meter].pow[1 / 2]
+            .assertQ[Refined[Double, Positive], Meter ^ (1 / 2)](2d.withRP[Positive])
+
+        // non-negative integer exponents allowed by multiplicative monoid
+        2.withRP[Positive].withUnit[Meter].pow[0]
+            .assertQ[Refined[Int, Positive], 1](1.withRP[Positive])
+        2.withRP[Positive].withUnit[Meter].pow[2]
+            .assertQ[Refined[Int, Positive], Meter ^ 2](4.withRP[Positive])
+        assertCE("2.withRP[Positive].withUnit[Meter].pow[-1]")
+    }
