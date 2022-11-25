@@ -23,34 +23,49 @@ import eu.timepit.refined.api.*
 import eu.timepit.refined.numeric.*
 
 object all:
-    inline given ctx_AdditiveSemigroup_Refined_Positive[V](using
+    given ctx_AdditiveSemigroup_Refined_Positive[V](using
         alg: AdditiveSemigroup[V],
         vld: Validate[V, Positive]
     ): AdditiveSemigroup[Refined[V, Positive]] =
-        new AdditiveSemigroup[Refined[V, Positive]]:
-            def plus(x: Refined[V, Positive], y: Refined[V, Positive]): Refined[V, Positive] =
-                refineV[Positive].unsafeFrom(alg.plus(x.value, y.value))
+        new infra.ASGR[V, Positive]
 
-    inline given ctx_AdditiveSemigroup_Refined_NonNegative[V](using
+    given ctx_AdditiveSemigroup_Refined_NonNegative[V](using
         alg: AdditiveSemigroup[V],
         vld: Validate[V, NonNegative]
     ): AdditiveSemigroup[Refined[V, NonNegative]] =
-        new AdditiveSemigroup[Refined[V, NonNegative]]:
-            def plus(x: Refined[V, NonNegative], y: Refined[V, NonNegative]): Refined[V, NonNegative] =
-                refineV[NonNegative].unsafeFrom(alg.plus(x.value, y.value))
+        new infra.ASGR[V, NonNegative]
 
-    inline given ctx_MultiplicativeSemigroup_Refined_Positive[V](using
+    given ctx_MultiplicativeGroup_Refined_Positive[V](using
+        alg: MultiplicativeGroup[V],
+        vld: Validate[V, Positive]
+    ): MultiplicativeGroup[Refined[V, Positive]] =
+        new infra.MGR[V, Positive]
+
+    given ctx_MultiplicativeSemigroup_Refined_Positive[V](using
         alg: MultiplicativeSemigroup[V],
         vld: Validate[V, Positive]
     ): MultiplicativeSemigroup[Refined[V, Positive]] =
-        new MultiplicativeSemigroup[Refined[V, Positive]]:
-            def times(x: Refined[V, Positive], y: Refined[V, Positive]): Refined[V, Positive] =
-                refineV[Positive].unsafeFrom(alg.times(x.value, y.value))
+        new infra.MSGR[V, Positive]
 
-    inline given ctx_MultiplicativeSemigroup_Refined_NonNegative[V](using
+    given ctx_MultiplicativeSemigroup_Refined_NonNegative[V](using
         alg: MultiplicativeSemigroup[V],
         vld: Validate[V, NonNegative]
     ): MultiplicativeSemigroup[Refined[V, NonNegative]] =
-        new MultiplicativeSemigroup[Refined[V, NonNegative]]:
-            def times(x: Refined[V, NonNegative], y: Refined[V, NonNegative]): Refined[V, NonNegative] =
-                refineV[NonNegative].unsafeFrom(alg.times(x.value, y.value))
+        new infra.MSGR[V, NonNegative]
+
+    object infra:
+        class ASGR[V, P](using alg: AdditiveSemigroup[V], vld: Validate[V, P]) extends
+            AdditiveSemigroup[Refined[V, P]]:
+            def plus(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
+                refineV[P].unsafeFrom(alg.plus(x.value, y.value))
+
+        class MSGR[V, P](using alg: MultiplicativeSemigroup[V], vld: Validate[V, P]) extends
+            MultiplicativeSemigroup[Refined[V, P]]:
+            def times(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
+                refineV[P].unsafeFrom(alg.times(x.value, y.value))
+
+        class MGR[V, P](using alg: MultiplicativeGroup[V], vld: Validate[V, P]) extends
+            MSGR[V, P] with MultiplicativeGroup[Refined[V, P]]:
+            def div(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
+                refineV[P].unsafeFrom(alg.div(x.value, y.value))
+            def one: Refined[V, P] = refineV[P].unsafeFrom(alg.one)
