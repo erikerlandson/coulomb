@@ -29,6 +29,11 @@ To import the standard coulomb policy with the refined overlay:
 import coulomb.*
 import coulomb.syntax.*
 
+// common refined definitions
+import eu.timepit.refined.*
+import eu.timepit.refined.api.*
+import eu.timepit.refined.numeric.*
+
 // algebraic definitions
 import algebra.instances.all.given
 import coulomb.ops.algebra.all.{*, given}
@@ -42,6 +47,46 @@ import coulomb.policy.overlay.refined.algebraic.given
 ```
 
 ### examples
+
+Examples in this section will use the following workaround as a replacement for
+[refineMV](https://github.com/fthomas/refined/issues/932)
+until it is ported forward to Scala 3.
+
+```scala mdoc
+// a workaround for refineMV not being available in scala3
+// https://github.com/fthomas/refined/issues/932
+object workaround:
+    extension [V](v: V)
+        def withRP[P](using Validate[V, P]): Refined[V, P] =
+            refineV[P].unsafeFrom(v)
+
+import workaround.*
+```
+
+The `coulomb-refined` package supports `refined` predicates that are algebraically well-behaved for applicable operations.
+Primarily this means the predicates `Positive` and `NonNegative`.
+For example, the positive doubles are an additive semigroup and multiplicative group,
+as the example below demonstrates.
+
+```scala mdoc
+import coulomb.units.si.{*, given}
+import coulomb.units.us.{*, given}
+
+val pos1 = 1d.withRP[Positive].withUnit[Meter]
+val pos2 = 2d.withRP[Positive].withUnit[Meter]
+val pos3 = 3d.withRP[Positive].withUnit[Second]
+
+// positive doubles are an additive semigroup
+pos1 + pos2
+
+// also a multiplicative semigroup
+pos1 * pos2
+pos2.pow[2]
+
+// also a multiplicative group
+pos2 / pos3
+pos2.pow[0]
+```
 
 ## Policies
 
