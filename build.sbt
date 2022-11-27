@@ -112,7 +112,7 @@ lazy val unidocs = project
 // http://localhost:4242
 lazy val docs = project
     .in(file("site"))
-    .dependsOn(core.jvm, units.jvm, spire.jvm)
+    .dependsOn(core.jvm, units.jvm, spire.jvm, refined.jvm)
     .enablePlugins(TypelevelSitePlugin)
 
 // https://github.com/sbt/sbt-jmh
