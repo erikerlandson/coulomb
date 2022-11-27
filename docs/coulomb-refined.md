@@ -8,12 +8,12 @@ typelevel libraries with `coulomb`.
 
 ### documentation
 
-You can browse the `coulomb-spire` policies
+You can browse the `coulomb-refined` policies
 [here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/policy/overlay/refined.html).
 
 ### packages
 
-Include `coulomb-spire` with your Scala project:
+Include `coulomb-refined` with your Scala project:
 
 ```scala
 libraryDependencies += "com.manyangled" %% "coulomb-core" % "@VERSION@"
@@ -66,7 +66,13 @@ import workaround.*
 The `coulomb-refined` package supports `refined` predicates that are algebraically well-behaved for applicable operations.
 Primarily this means the predicates `Positive` and `NonNegative`.
 For example, the positive doubles are an additive semigroup and multiplicative group,
-as the example below demonstrates.
+as the following code demonstrates.
+
+@:callout(info)
+The
+[table][algebraic-policy-table]
+below summarizes the full list of supported `refined` predicates and associated algebras.
+@:@
 
 ```scala mdoc
 import coulomb.units.si.{*, given}
@@ -90,6 +96,8 @@ pos2.pow[0]
 
 ## Policies
 
+### policy overlays
+
 The `coulomb-refined` package currently provides a single "overlay" policy.
 An overlay policy is designed to work with any other policies currently in scope,
 and lift them into another abstraction;
@@ -101,6 +109,28 @@ For example, given any algebra in scope for a type `V` that defines addition,
 the `coulomb-refined` overlay defines the corresponding `Refined[V, P]` addition
 like so:
 ```scala
-plus(x: Refined[V, P], y: Refined[V, P]) => // (x.value + y.value) refined by P
+plus(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
+// (x.value + y.value) refined by P
 ```
 
+@:callout(info)
+Because the refined algebraic policy is an overlay,
+you can use it with your choice of base policies,
+for example with
+[core policies](concepts.md#coulomb-policies)
+or
+[spire policies](coulomb-spire.md#policies).
+@:@
+
+### algebraic policy table
+
+The following table summarizes the "algebraic" overlay policy.
+Examples of Fractional value types include Double, Float, BigDecimal, spire Rational, etc.
+Integral value types include Int, Long, BigInt, etc.
+
+| Value Type | Predicate | Add Alg | Mult Alg | `+` | `*` | `/` | `pow` (exponent) |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Fractional | Positive | semigroup | group | Y | Y | Y | Y (rational) |
+| Fractional | NonNegative | semigroup | semigroup | Y | Y | N | Y (pos int) |
+| Integral | Positive | semigroup | semigroup | Y | Y | N | Y (pos int) |
+| Integral | NonNegative | semigroup | semigroup | Y | Y | N | Y (pos int) |
