@@ -16,6 +16,8 @@
 
 package coulomb.conversion.refined
 
+import scala.util.{Try, Success, Failure}
+
 import coulomb.conversion.* 
 
 import eu.timepit.refined.*
@@ -78,3 +80,11 @@ object unit:
     ): TruncatingDeltaUnitConversion[Refined[V, NonNegative], B, UF, UT] =
         (v: Refined[V, NonNegative]) =>
             refineV[NonNegative].unsafeFrom(uc(v.value))
+
+    given ctx_UC_Refined_Either[V, P, UF, UT](using
+        uc: UnitConversion[Refined[V, P], UF, UT]
+    ): UnitConversion[Either[String, Refined[V, P]], UF, UT] =
+        (v: Either[String, Refined[V, P]]) =>
+            Try(v.map(uc)) match
+                case Success(x) => x
+                case Failure(e) => Left(e.getMessage)

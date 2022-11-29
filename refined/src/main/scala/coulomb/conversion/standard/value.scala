@@ -16,6 +16,8 @@
 
 package coulomb.conversion.refined
 
+import scala.util.{Try, Success, Failure}
+
 import coulomb.conversion.* 
 
 import eu.timepit.refined.*
@@ -50,3 +52,12 @@ object value:
     ): TruncatingValueConversion[Refined[VF, NonNegative], Refined[VT, NonNegative]] =
         (v: Refined[VF, NonNegative]) =>
             refineV[NonNegative].unsafeFrom(vc(v.value))
+
+    given ctx_VC_Refined_Either[VF, VT, P](using
+        vc: ValueConversion[Refined[VF, P], Refined[VT, P]]
+    ): ValueConversion[Either[String, Refined[VF, P]], Either[String, Refined[VT, P]]] =
+        (v: Either[String, Refined[VF, P]]) =>
+            Try(v.map(vc)) match
+               case Success(x) => x
+               case Failure(e) => Left(e.getMessage)
+
