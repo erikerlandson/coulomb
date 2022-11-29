@@ -34,6 +34,8 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
 
     import coulomb.testing.refined.*
 
+    type RefinedE[V, P] = Either[String, Refined[V, P]]
+
     test("lift") {
         1d.withRP[Positive].withUnit[Meter].assertQ[Refined[Double, Positive], Meter](1d.withRP[Positive])
         1f.withRP[Positive].withUnit[Meter].assertQ[Refined[Float, Positive], Meter](1f.withRP[Positive])
@@ -44,6 +46,9 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         1f.withRP[NonNegative].withUnit[Meter].assertQ[Refined[Float, NonNegative], Meter](1f.withRP[NonNegative])
         1L.withRP[NonNegative].withUnit[Meter].assertQ[Refined[Long, NonNegative], Meter](1L.withRP[NonNegative])
         1.withRP[NonNegative].withUnit[Meter].assertQ[Refined[Int, NonNegative], Meter](1.withRP[NonNegative])
+
+        refineV[Positive](1d).withUnit[Meter]
+            .assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](1d))
     }
 
     test("value") {
