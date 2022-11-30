@@ -58,6 +58,8 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
 
     test("value") {
         1.withRP[Positive].withUnit[Meter].value.assertVT[Refined[Int, Positive]](1.withRP[Positive])
+
+        refineVU[Positive, Meter](1).value.assertVT[RefinedE[Int, Positive]](refineV[Positive](1))
     }
 
     test("show") {
