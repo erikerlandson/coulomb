@@ -23,6 +23,7 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
 
     import coulomb.*
     import coulomb.syntax.*
+    import coulomb.syntax.refined.*
 
     import algebra.instances.all.given
     import coulomb.ops.algebra.all.{*, given}
@@ -48,6 +49,10 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         1.withRP[NonNegative].withUnit[Meter].assertQ[Refined[Int, NonNegative], Meter](1.withRP[NonNegative])
 
         refineV[Positive](1d).withUnit[Meter]
+            .assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](1d))
+        refineVU[Positive, Meter](1d)
+            .assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](1d))
+        1d.withRefinedUnit[Positive, Meter]
             .assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](1d))
     }
 
