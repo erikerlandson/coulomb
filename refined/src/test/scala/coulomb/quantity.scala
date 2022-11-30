@@ -64,10 +64,12 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
 
     test("show") {
         assertEquals(1.withRP[Positive].withUnit[Meter].show, "1 m")
+        assertEquals(refineVU[Positive, Meter](1).show, "Right(1) m")
     }
 
     test("showFull") {
         assertEquals(1.withRP[NonNegative].withUnit[Second].showFull, "1 second")
+        assertEquals(refineVU[Positive, Meter](1).showFull, "Right(1) meter")
     }
 
     test("toValue") {
@@ -85,6 +87,11 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
             .assertQ[Refined[Int, Positive], Meter](1.withRP[Positive])
         1.5f.withRP[NonNegative].withUnit[Meter].tToValue[Refined[Int, NonNegative]]
             .assertQ[Refined[Int, NonNegative], Meter](1.withRP[NonNegative])
+
+        refineVU[Positive, Meter](1).toValue[RefinedE[Double, Positive]]
+            .assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](1d))
+        assert(refineVU[Positive, Meter](Double.MinPositiveValue)
+                   .toValue[RefinedE[Float, Positive]].value.isLeft)
     }
 
     test("toUnit") {
@@ -102,6 +109,11 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
             .assertQ[Refined[Int, Positive], Yard](1.withRP[Positive])
         1.withRP[NonNegative].withUnit[Meter].tToUnit[Yard]
             .assertQ[Refined[Int, NonNegative], Yard](1.withRP[NonNegative])
+
+        refineVU[Positive, Kilo * Meter](1d).toUnit[Meter]
+            .assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](1000d))
+        assert(refineVU[Positive, Meter](Double.MinPositiveValue)
+                   .toUnit[Kilo * Meter].value.isLeft)
     }
 
     test("add strict") {
