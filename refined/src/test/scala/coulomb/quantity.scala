@@ -134,6 +134,13 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assertCE("1.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter]")
         assertCE("1d.withRP[NonNegative].withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter]")
         assertCE("1d.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Yard]")
+
+        val x = refineVU[Positive, Meter](1d)
+        val y = refineVU[Positive, Meter](0d)
+        (x + x).assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](2d))
+        assert((x + y).value.isLeft)
+        assert((y + x).value.isLeft)
+        assert((y + y).value.isLeft)
     }
 
     test("add standard") {
@@ -157,6 +164,14 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
             .assertQ[Refined[Double, Positive], Meter](1001d.withRP[Positive])
         (1f.withRP[NonNegative].withUnit[Meter] + 1L.withRP[NonNegative].withUnit[Kilo * Meter])
             .assertQ[Refined[Float, NonNegative], Meter](1001f.withRP[NonNegative])
+
+        val x = refineVU[Positive, Meter](1d)
+        val y = refineVU[Positive, Kilo * Meter](1)
+        val z = refineVU[Positive, Kilo * Meter](0)
+        (x + y).assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](1001d))
+        assert((x + z).value.isLeft)
+        assert((z + x).value.isLeft)
+        assert((z + z).value.isLeft)
     }
 
     test("multiply strict") {
