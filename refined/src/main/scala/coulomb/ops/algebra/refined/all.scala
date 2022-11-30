@@ -16,6 +16,8 @@
 
 package coulomb.ops.algebra.refined
 
+import scala.util.{Try, Success, Failure}
+
 import algebra.ring.*
 
 import eu.timepit.refined.*
@@ -61,6 +63,11 @@ object all:
     ): FractionalPower[Refined[V, Positive]] =
         new infra.FPR[V, Positive]
 
+    given ctx_AdditiveSemigroup_Refined_Either[V, P](using
+        alg: AdditiveSemigroup[Refined[V, P]]
+    ): AdditiveSemigroup[Either[String, Refined[V, P]]] =
+        new infra.ASGRE[V, P]
+
     object infra:
         class ASGR[V, P](using alg: AdditiveSemigroup[V], vld: Validate[V, P]) extends
             AdditiveSemigroup[Refined[V, P]]:
@@ -85,3 +92,15 @@ object all:
             FractionalPower[Refined[V, P]]:
             def pow(v: Refined[V, P], e: Double): Refined[V, P] =
                 refineV[P].unsafeFrom(alg.pow(v.value, e))
+
+        class ASGRE[V, P](using alg: AdditiveSemigroup[Refined[V, P]]) extends
+            AdditiveSemigroup[Either[String, Refined[V, P]]]:
+            def plus(x: Either[String, Refined[V, P]], y: Either[String, Refined[V, P]]) =
+                (x, y) match
+                    case (Left(xe), Left(ye)) => Left(s"($xe)($ye)")
+                    case (Left(xe), Right(_)) => Left(xe)
+                    case (Right(_), Left(ye)) => Left(ye)
+                    case (Right(xv), Right(yv)) =>
+                        Try(alg.plus(xv, yv)) match
+                            case Success(z) => Right(z)
+                            case Failure(e) => Left(e.getMessage)
