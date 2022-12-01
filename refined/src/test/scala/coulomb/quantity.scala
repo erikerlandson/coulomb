@@ -136,11 +136,11 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assertCE("1d.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Yard]")
 
         val x = refineVU[Positive, Meter](1d)
-        val y = refineVU[Positive, Meter](0d)
+        val z = refineVU[Positive, Meter](0d)
         (x + x).assertQ[RefinedE[Double, Positive], Meter](refineV[Positive](2d))
-        assert((x + y).value.isLeft)
-        assert((y + x).value.isLeft)
-        assert((y + y).value.isLeft)
+        assert((x + z).value.isLeft)
+        assert((z + x).value.isLeft)
+        assert((z + z).value.isLeft)
     }
 
     test("add standard") {
@@ -186,6 +186,13 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         // differing value types are not supported in strict policy
         assertCE("2.withRP[Positive].withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter]")
         assertCE("2d.withRP[NonNegative].withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter]")
+
+        val x = refineVU[Positive, Meter](2d)
+        val z = refineVU[Positive, Meter](0d)
+        (x * x).assertQ[RefinedE[Double, Positive], Meter ^ 2](refineV[Positive](4d))
+        assert((x * z).value.isLeft)
+        assert((z * x).value.isLeft)
+        assert((z * z).value.isLeft)
     }
 
     test("multiply standard") {
@@ -201,6 +208,14 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
             .assertQ[Refined[Double, Positive], Meter ^ 2](6d.withRP[Positive])
         (2f.withRP[NonNegative].withUnit[Meter] * 3L.withRP[NonNegative].withUnit[Meter])
             .assertQ[Refined[Float, NonNegative], Meter ^ 2](6f.withRP[NonNegative])
+
+        val x = refineVU[Positive, Meter](2d)
+        val y = refineVU[Positive, Meter](2)
+        val z = refineVU[Positive, Meter](0)
+        (x * y).assertQ[RefinedE[Double, Positive], Meter ^ 2](refineV[Positive](4d))
+        assert((x * z).value.isLeft)
+        assert((z * x).value.isLeft)
+        assert((z * z).value.isLeft)
     }
 
     test("divide strict") {
