@@ -68,6 +68,16 @@ object all:
     ): AdditiveSemigroup[Either[String, Refined[V, P]]] =
         new infra.ASGRE[V, P]
 
+    given ctx_MultiplicativeGroup_Refined_Either[V, P](using
+        alg: MultiplicativeGroup[Refined[V, P]]
+    ): MultiplicativeGroup[Either[String, Refined[V, P]]] =
+        new infra.MGRE[V, P]
+
+    given ctx_MultiplicativeMonoid_Refined_Either[V, P](using
+        alg: MultiplicativeMonoid[Refined[V, P]]
+    ): MultiplicativeMonoid[Either[String, Refined[V, P]]] =
+        new infra.MMRE[V, P]
+
     object infra:
         class ASGR[V, P](using alg: AdditiveSemigroup[V], vld: Validate[V, P]) extends
             AdditiveSemigroup[Refined[V, P]]:
@@ -102,5 +112,36 @@ object all:
                     case (Right(_), Left(ye)) => Left(ye)
                     case (Right(xv), Right(yv)) =>
                         Try(alg.plus(xv, yv)) match
+                            case Success(z) => Right(z)
+                            case Failure(e) => Left(e.getMessage)
+
+        class MSGRE[V, P](using alg: MultiplicativeSemigroup[Refined[V, P]]) extends
+            MultiplicativeSemigroup[Either[String, Refined[V, P]]]:
+            def times(x: Either[String, Refined[V, P]], y: Either[String, Refined[V, P]]) =
+                (x, y) match
+                    case (Left(xe), Left(ye)) => Left(s"($xe)($ye)")
+                    case (Left(xe), Right(_)) => Left(xe)
+                    case (Right(_), Left(ye)) => Left(ye)
+                    case (Right(xv), Right(yv)) =>
+                        Try(alg.times(xv, yv)) match
+                            case Success(z) => Right(z)
+                            case Failure(e) => Left(e.getMessage)
+
+        class MMRE[V, P](using alg: MultiplicativeMonoid[Refined[V, P]]) extends
+            MSGRE[V, P] with MultiplicativeMonoid[Either[String, Refined[V, P]]]:
+            def one: Either[String, Refined[V, P]] =
+                Try(alg.one) match
+                    case Success(z) => Right(z)
+                    case Failure(e) => Left(e.getMessage)
+
+        class MGRE[V, P](using alg: MultiplicativeGroup[Refined[V, P]]) extends
+            MMRE[V, P] with MultiplicativeGroup[Either[String, Refined[V, P]]]:
+            def div(x: Either[String, Refined[V, P]], y: Either[String, Refined[V, P]]) =
+                (x, y) match
+                    case (Left(xe), Left(ye)) => Left(s"($xe)($ye)")
+                    case (Left(xe), Right(_)) => Left(xe)
+                    case (Right(_), Left(ye)) => Left(ye)
+                    case (Right(xv), Right(yv)) =>
+                        Try(alg.div(xv, yv)) match
                             case Success(z) => Right(z)
                             case Failure(e) => Left(e.getMessage)
