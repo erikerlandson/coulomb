@@ -141,6 +141,11 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assert((x + z).value.isLeft)
         assert((z + x).value.isLeft)
         assert((z + z).value.isLeft)
+
+        // args valid but final operation violates predicate
+        val v = refineVU[Positive, Meter](2000000000)
+        assert(v.value.isRight)
+        assert((v + v).value.isLeft)
     }
 
     test("add standard") {
@@ -193,6 +198,11 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assert((x * z).value.isLeft)
         assert((z * x).value.isLeft)
         assert((z * z).value.isLeft)
+
+        // args valid but final operation violates predicate
+        val v = refineVU[Positive, Meter](Double.MinPositiveValue)
+        assert(v.value.isRight)
+        assert((v * v).value.isLeft)
     }
 
     test("multiply standard") {
