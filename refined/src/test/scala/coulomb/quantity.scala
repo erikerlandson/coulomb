@@ -302,4 +302,14 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         2.withRP[Positive].withUnit[Meter].pow[2]
             .assertQ[Refined[Int, Positive], Meter ^ 2](4.withRP[Positive])
         assertCE("2.withRP[Positive].withUnit[Meter].pow[-1]")
+
+        val x = refineVU[Positive, Meter](2d)
+        val z = refineVU[Positive, Meter](0d)
+        x.pow[0].assertQ[RefinedE[Double, Positive], 1](refineV[Positive](1d))
+        x.pow[2].assertQ[RefinedE[Double, Positive], Meter ^ 2](refineV[Positive](4d))
+        assert(z.pow[2].value.isLeft)
+
+        val v = refineVU[Positive, Meter](Double.MinPositiveValue)
+        assert(v.value.isRight)
+        assert(v.pow[2].value.isLeft)
     }

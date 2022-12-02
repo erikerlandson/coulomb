@@ -145,3 +145,10 @@ object all:
                         Try(alg.div(xv, yv)) match
                             case Success(z) => Right(z)
                             case Failure(e) => Left(e.getMessage)
+
+        class FPRE[V, P](using alg: FractionalPower[Refined[V, P]]) extends
+            FractionalPower[Either[String, Refined[V, P]]]:
+            def pow(v: Either[String, Refined[V, P]], e: Double): Either[String, Refined[V, P]] =
+                Try(v.map(alg.pow(_, e))) match
+                    case Success(z) => z
+                    case Failure(e) => Left(e.getMessage)
