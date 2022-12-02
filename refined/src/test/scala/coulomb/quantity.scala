@@ -243,6 +243,17 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assertCE("12d.withRP[NonNegative].withUnit[Meter] / 3d.withRP[NonNegative].withUnit[Second]")
         // Integrals are not a multiplicative group
         assertCE("12.withRP[Positive].withUnit[Meter] / 3.withRP[Positive].withUnit[Second]")
+
+        val x = refineVU[Positive, Meter](2d)
+        val z = refineVU[Positive, Meter](0d)
+        (x / x).assertQ[RefinedE[Double, Positive], 1](refineV[Positive](1d))
+        assert((x / z).value.isLeft)
+        assert((z / x).value.isLeft)
+        assert((z / z).value.isLeft)
+
+        val v = refineVU[Positive, Meter](Double.MinPositiveValue)
+        assert(v.value.isRight)
+        assert((v / x).value.isLeft)
     }
 
     test("divide standard") {
@@ -261,6 +272,14 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assertCE("12d.withRP[NonNegative].withUnit[Meter] / 3d.withRP[NonNegative].withUnit[Second]")
         // Integrals are not a multiplicative group
         assertCE("12.withRP[Positive].withUnit[Meter] / 3.withRP[Positive].withUnit[Second]")
+
+        val x = refineVU[Positive, Meter](6d)
+        val y = refineVU[Positive, Meter](2)
+        val z = refineVU[Positive, Meter](0d)
+        (x / y).assertQ[RefinedE[Double, Positive], 1](refineV[Positive](3d))
+        assert((x / z).value.isLeft)
+        assert((z / x).value.isLeft)
+        assert((z / z).value.isLeft)
     }
 
     test("power") {
