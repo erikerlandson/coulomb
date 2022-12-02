@@ -68,6 +68,11 @@ class TimeUnitsSuite extends CoulombSuite:
         import coulomb.policy.standard.given
 
         36d.withEpochTime[Hour].toUnit[Day].assertDQD[Double, Day](1.5)
+        
+        //I think this ought to compile?
+        import coulomb.ops.algebra.int.ctx_Int_is_TruncatedDivision
+        val sixty: Quantity[Int, 1] = 1.withUnit[Minute].tquot(1.withUnit[Second])
+
 
         // truncating
         assertCE("36.withEpochTime[Hour].toUnit[Day]")
