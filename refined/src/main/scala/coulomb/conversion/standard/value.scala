@@ -61,3 +61,11 @@ object value:
                case Success(x) => x
                case Failure(e) => Left(e.getMessage)
 
+    given ctx_TVC_Refined_Either[VF, VT, P](using
+        vc: TruncatingValueConversion[Refined[VF, P], Refined[VT, P]]
+    ): TruncatingValueConversion[Either[String, Refined[VF, P]], Either[String, Refined[VT, P]]] =
+        (v: Either[String, Refined[VF, P]]) =>
+            Try(v.map(vc)) match
+               case Success(x) => x
+               case Failure(e) => Left(e.getMessage)
+
