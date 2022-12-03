@@ -88,3 +88,27 @@ object unit:
             Try(v.map(uc)) match
                 case Success(x) => x
                 case Failure(e) => Left(e.getMessage)
+
+    given ctx_TUC_Refined_Either[V, P, UF, UT](using
+        uc: TruncatingUnitConversion[Refined[V, P], UF, UT]
+    ): TruncatingUnitConversion[Either[String, Refined[V, P]], UF, UT] =
+        (v: Either[String, Refined[V, P]]) =>
+            Try(v.map(uc)) match
+                case Success(x) => x
+                case Failure(e) => Left(e.getMessage)
+
+    given ctx_DUC_Refined_Either[V, B, P, UF, UT](using
+        uc: DeltaUnitConversion[Refined[V, P], B, UF, UT]
+    ): DeltaUnitConversion[Either[String, Refined[V, P]], B, UF, UT] =
+        (v: Either[String, Refined[V, P]]) =>
+            Try(v.map(uc)) match
+                case Success(x) => x
+                case Failure(e) => Left(e.getMessage)
+
+    given ctx_TDUC_Refined_Either[V, B, P, UF, UT](using
+        uc: TruncatingDeltaUnitConversion[Refined[V, P], B, UF, UT]
+    ): TruncatingDeltaUnitConversion[Either[String, Refined[V, P]], B, UF, UT] =
+        (v: Either[String, Refined[V, P]]) =>
+            Try(v.map(uc)) match
+                case Success(x) => x
+                case Failure(e) => Left(e.getMessage)
