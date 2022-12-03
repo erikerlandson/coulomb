@@ -44,6 +44,9 @@ import scala.language.implicitConversions
 
 // overlay policy for refined integrations
 import coulomb.policy.overlay.refined.algebraic.given
+
+// coulomb syntax for refined integrations
+import coulomb.syntax.refined.*
 ```
 
 ### examples
@@ -94,6 +97,25 @@ pos2 / pos3
 pos2.pow[0]
 ```
 
+The standard `refined` function for refining values with run-time checking is `refineV`,
+which returns an `Either`.
+The `coulomb-refined` package supplies a similar variation `refinedVU`.
+These objects are also supported by algebras.
+
+```scala mdoc
+// This refinement succeeds, and returns a Right value
+val pe1 = refineVU[Positive, Meter](1)
+
+// This refinement fails, and returns a Left value
+val pe2 = refineVU[Positive, Meter](0)
+
+// positives are an additive semigroup
+pe1 + pe1
+
+// algebras operating on Left values result in a Left
+pe1 + pe2
+```
+
 ## Policies
 
 ### policy overlays
@@ -134,3 +156,8 @@ Integral value types include Int, Long, BigInt, etc.
 | Fractional | NonNegative | semigroup | semigroup | Y | Y | N | Y (pos int) |
 | Integral | Positive | semigroup | semigroup | Y | Y | N | Y (pos int) |
 | Integral | NonNegative | semigroup | semigroup | Y | Y | N | Y (pos int) |
+
+@:callout(info)
+The table above also applies to `Either` objects returned by `refineVU` as discussed
+in the examples section above.
+@:@
