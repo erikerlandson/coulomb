@@ -143,6 +143,9 @@ class TimeUnitsSuite extends CoulombSuite:
         // both different
         (61L.withEpochTime[Second] - 1f.withUnit[Minute])
             .assertDQ[Float, Second](1)
+        
+        (2000L.withEpochTime[coulomb.units.si.prefixes.Milli * Second] - 1L.withUnit[Second])
+
 
         // truncating
         assertCE("61.withEpochTime[Second] - 1.withUnit[Minute]")
