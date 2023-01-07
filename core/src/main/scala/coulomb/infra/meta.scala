@@ -371,24 +371,31 @@ object meta:
             case (u, e0) :: tail             => (u, e0 * e) :: unifyPow(e, tail)
 
     def typestr(using Quotes)(t: quotes.reflect.TypeRepr): String =
+        // The policy goal here is that type aliases are never expanded.
+        typestring(t, false)
+
+    def typestring(using
+        Quotes
+    )(t: quotes.reflect.TypeRepr, dealias: Boolean): String =
         import quotes.reflect.*
-        def work(tr: TypeRepr): String = tr match
-            // The policy goal here is that type aliases are never expanded.
-            case typealias(_) => tr.typeSymbol.name
-            case unitconst(v) => s"$v"
-            case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[*] =>
-                s"(${work(lhs)} * ${work(rhs)})"
-            case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[/] =>
-                s"(${work(lhs)} / ${work(rhs)})"
-            case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[^] =>
-                s"(${work(lhs)} ^ ${work(rhs)})"
-            case AppliedType(tc, ta) =>
-                val tcn = tc.typeSymbol.name
-                val as = ta.map(work)
-                if (as.length == 0) tcn
-                else
-                    tcn + "[" + as.mkString(",") + "]"
-            case t => t.typeSymbol.name
+        def work(trp: TypeRepr): String =
+            val tr = if (dealias) trp.dealias else trp
+            tr match
+                case typealias(_) => tr.typeSymbol.name
+                case unitconst(v) => s"$v"
+                case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[*] =>
+                    s"(${work(lhs)} * ${work(rhs)})"
+                case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[/] =>
+                    s"(${work(lhs)} / ${work(rhs)})"
+                case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[^] =>
+                    s"(${work(lhs)} ^ ${work(rhs)})"
+                case AppliedType(tc, ta) =>
+                    val tcn = tc.typeSymbol.name
+                    val as = ta.map(work)
+                    if (as.length == 0) tcn
+                    else
+                        tcn + "[" + as.mkString(",") + "]"
+                case t => t.typeSymbol.name
         work(t)
 
     object typealias:

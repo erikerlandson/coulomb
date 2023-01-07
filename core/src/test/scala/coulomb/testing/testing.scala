@@ -83,7 +83,7 @@ object types:
 
     private def tsmeta[T](using Type[T], Quotes): Expr[String] =
         import quotes.reflect.*
-        Expr(coulomb.infra.meta.typestr(TypeRepr.of[T]))
+        Expr(coulomb.infra.meta.typestring(TypeRepr.of[T], true))
 
     private def temeta[T1, T2](using
         Type[T1],
