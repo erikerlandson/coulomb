@@ -18,7 +18,7 @@ package coulomb.conversion.refined
 
 import scala.util.{Try, Success, Failure}
 
-import coulomb.conversion.* 
+import coulomb.conversion.*
 
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
@@ -29,8 +29,7 @@ object value:
         vc: ValueConversion[VF, VT],
         vld: Validate[VT, Positive]
     ): ValueConversion[Refined[VF, Positive], Refined[VT, Positive]] =
-        (v: Refined[VF, Positive]) =>
-            refineV[Positive].unsafeFrom(vc(v.value))
+        (v: Refined[VF, Positive]) => refineV[Positive].unsafeFrom(vc(v.value))
 
     given ctx_VC_Refined_NonNegative[VF, VT](using
         vc: ValueConversion[VF, VT],
@@ -43,29 +42,36 @@ object value:
         vc: TruncatingValueConversion[VF, VT],
         vld: Validate[VT, Positive]
     ): TruncatingValueConversion[Refined[VF, Positive], Refined[VT, Positive]] =
-        (v: Refined[VF, Positive]) =>
-            refineV[Positive].unsafeFrom(vc(v.value))
+        (v: Refined[VF, Positive]) => refineV[Positive].unsafeFrom(vc(v.value))
 
     given ctx_TVC_Refined_NonNegative[VF, VT](using
         vc: TruncatingValueConversion[VF, VT],
         vld: Validate[VT, NonNegative]
-    ): TruncatingValueConversion[Refined[VF, NonNegative], Refined[VT, NonNegative]] =
+    ): TruncatingValueConversion[Refined[VF, NonNegative], Refined[
+        VT,
+        NonNegative
+    ]] =
         (v: Refined[VF, NonNegative]) =>
             refineV[NonNegative].unsafeFrom(vc(v.value))
 
     given ctx_VC_Refined_Either[VF, VT, P](using
         vc: ValueConversion[Refined[VF, P], Refined[VT, P]]
-    ): ValueConversion[Either[String, Refined[VF, P]], Either[String, Refined[VT, P]]] =
+    ): ValueConversion[Either[String, Refined[VF, P]], Either[
+        String,
+        Refined[VT, P]
+    ]] =
         (v: Either[String, Refined[VF, P]]) =>
             Try(v.map(vc)) match
-               case Success(x) => x
-               case Failure(e) => Left(e.getMessage)
+                case Success(x) => x
+                case Failure(e) => Left(e.getMessage)
 
     given ctx_TVC_Refined_Either[VF, VT, P](using
         vc: TruncatingValueConversion[Refined[VF, P], Refined[VT, P]]
-    ): TruncatingValueConversion[Either[String, Refined[VF, P]], Either[String, Refined[VT, P]]] =
+    ): TruncatingValueConversion[Either[String, Refined[VF, P]], Either[
+        String,
+        Refined[VT, P]
+    ]] =
         (v: Either[String, Refined[VF, P]]) =>
             Try(v.map(vc)) match
-               case Success(x) => x
-               case Failure(e) => Left(e.getMessage)
-
+                case Success(x) => x
+                case Failure(e) => Left(e.getMessage)

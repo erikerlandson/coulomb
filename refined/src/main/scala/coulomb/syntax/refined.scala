@@ -44,7 +44,7 @@ extension [V](v: V)
         Validate[V, P]
     ): Quantity[Either[String, Refined[V, P]], U] =
         refineV[P](v).withUnit[U]
-        
+
 object infra:
     class ApplyRefineVU[P, U]:
         def apply[V](v: V)(using
