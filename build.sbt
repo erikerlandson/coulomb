@@ -29,7 +29,7 @@ def commonSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject
-    .aggregate(core, units, spire, testkit, unidocs)
+    .aggregate(core, units, spire, refined, testkit, unidocs)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
@@ -65,7 +65,10 @@ lazy val refined = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .settings(name := "coulomb-refined")
     .dependsOn(core % "compile->compile;test->test", units % Test)
     .settings(commonSettings: _*)
-    .settings(libraryDependencies += "eu.timepit" %%% "refined" % "0.10.1")
+    .settings(
+        libraryDependencies += "eu.timepit" %%% "refined" % "0.10.1",
+        tlVersionIntroduced := Map("3" -> "0.7.2")
+    )
 
 lazy val testkit = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
