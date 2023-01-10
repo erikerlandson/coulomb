@@ -25,17 +25,33 @@ import coulomb.ops.ValueResolution
 import coulomb.policy.priority.*
 
 object refined:
-    transparent inline given ctx_VR_Refined_Positive[VL, VR, Positive](using Prio0)(using
+    transparent inline given ctx_VR_Refined_Positive[VL, VR, Positive](using
+        Prio0
+    )(using
         vres: ValueResolution[VL, VR]
     ): ValueResolution[Refined[VL, Positive], Refined[VR, Positive]] =
-        new ValueResolution.NC[Refined[VL, Positive], Refined[VR, Positive], Refined[vres.VO, Positive]]
+        new ValueResolution.NC[Refined[VL, Positive], Refined[
+            VR,
+            Positive
+        ], Refined[vres.VO, Positive]]
 
-    transparent inline given ctx_VR_Refined_NonNegative[VL, VR, NonNegative](using Prio1)(using
+    transparent inline given ctx_VR_Refined_NonNegative[VL, VR, NonNegative](
+        using Prio1
+    )(using
         vres: ValueResolution[VL, VR]
     ): ValueResolution[Refined[VL, NonNegative], Refined[VR, NonNegative]] =
-        new ValueResolution.NC[Refined[VL, NonNegative], Refined[VR, NonNegative], Refined[vres.VO, NonNegative]]
+        new ValueResolution.NC[Refined[VL, NonNegative], Refined[
+            VR,
+            NonNegative
+        ], Refined[vres.VO, NonNegative]]
 
     transparent inline given ctx_VR_Refined_Either[VL, VR, P](using
         vres: ValueResolution[Refined[VL, P], Refined[VR, P]]
-    ): ValueResolution[Either[String, Refined[VL, P]], Either[String, Refined[VR, P]]] =
-        new ValueResolution.NC[Either[String, Refined[VL, P]], Either[String, Refined[VR, P]], Either[String, vres.VO]]
+    ): ValueResolution[Either[String, Refined[VL, P]], Either[
+        String,
+        Refined[VR, P]
+    ]] =
+        new ValueResolution.NC[Either[String, Refined[VL, P]], Either[
+            String,
+            Refined[VR, P]
+        ], Either[String, vres.VO]]

@@ -18,7 +18,7 @@ package coulomb.conversion.refined
 
 import scala.util.{Try, Success, Failure}
 
-import coulomb.conversion.* 
+import coulomb.conversion.*
 
 import eu.timepit.refined.*
 import eu.timepit.refined.api.*
@@ -29,8 +29,7 @@ object unit:
         uc: UnitConversion[V, UF, UT],
         vld: Validate[V, Positive]
     ): UnitConversion[Refined[V, Positive], UF, UT] =
-        (v: Refined[V, Positive]) =>
-            refineV[Positive].unsafeFrom(uc(v.value))
+        (v: Refined[V, Positive]) => refineV[Positive].unsafeFrom(uc(v.value))
 
     given ctx_UC_Refined_NonNegative[V, UF, UT](using
         uc: UnitConversion[V, UF, UT],
@@ -43,8 +42,7 @@ object unit:
         uc: TruncatingUnitConversion[V, UF, UT],
         vld: Validate[V, Positive]
     ): TruncatingUnitConversion[Refined[V, Positive], UF, UT] =
-        (v: Refined[V, Positive]) =>
-            refineV[Positive].unsafeFrom(uc(v.value))
+        (v: Refined[V, Positive]) => refineV[Positive].unsafeFrom(uc(v.value))
 
     given ctx_TUC_Refined_NonNegative[V, UF, UT](using
         uc: TruncatingUnitConversion[V, UF, UT],
@@ -57,8 +55,7 @@ object unit:
         uc: DeltaUnitConversion[V, B, UF, UT],
         vld: Validate[V, Positive]
     ): DeltaUnitConversion[Refined[V, Positive], B, UF, UT] =
-        (v: Refined[V, Positive]) =>
-            refineV[Positive].unsafeFrom(uc(v.value))
+        (v: Refined[V, Positive]) => refineV[Positive].unsafeFrom(uc(v.value))
 
     given ctx_DUC_Refined_NonNegative[V, B, UF, UT](using
         uc: DeltaUnitConversion[V, B, UF, UT],
@@ -71,8 +68,7 @@ object unit:
         uc: TruncatingDeltaUnitConversion[V, B, UF, UT],
         vld: Validate[V, Positive]
     ): TruncatingDeltaUnitConversion[Refined[V, Positive], B, UF, UT] =
-        (v: Refined[V, Positive]) =>
-            refineV[Positive].unsafeFrom(uc(v.value))
+        (v: Refined[V, Positive]) => refineV[Positive].unsafeFrom(uc(v.value))
 
     given ctx_TDUC_Refined_NonNegative[V, B, UF, UT](using
         uc: TruncatingDeltaUnitConversion[V, B, UF, UT],

@@ -79,33 +79,40 @@ object all:
         new infra.MMRE[V, P]
 
     object infra:
-        class ASGR[V, P](using alg: AdditiveSemigroup[V], vld: Validate[V, P]) extends
-            AdditiveSemigroup[Refined[V, P]]:
+        class ASGR[V, P](using alg: AdditiveSemigroup[V], vld: Validate[V, P])
+            extends AdditiveSemigroup[Refined[V, P]]:
             def plus(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
                 refineV[P].unsafeFrom(alg.plus(x.value, y.value))
 
-        class MSGR[V, P](using alg: MultiplicativeSemigroup[V], vld: Validate[V, P]) extends
-            MultiplicativeSemigroup[Refined[V, P]]:
+        class MSGR[V, P](using
+            alg: MultiplicativeSemigroup[V],
+            vld: Validate[V, P]
+        ) extends MultiplicativeSemigroup[Refined[V, P]]:
             def times(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
                 refineV[P].unsafeFrom(alg.times(x.value, y.value))
 
-        class MMR[V, P](using alg: MultiplicativeMonoid[V], vld: Validate[V, P]) extends
-            MSGR[V, P] with MultiplicativeMonoid[Refined[V, P]]:
+        class MMR[V, P](using alg: MultiplicativeMonoid[V], vld: Validate[V, P])
+            extends MSGR[V, P]
+            with MultiplicativeMonoid[Refined[V, P]]:
             def one: Refined[V, P] = refineV[P].unsafeFrom(alg.one)
 
-        class MGR[V, P](using alg: MultiplicativeGroup[V], vld: Validate[V, P]) extends
-            MMR[V, P] with MultiplicativeGroup[Refined[V, P]]:
+        class MGR[V, P](using alg: MultiplicativeGroup[V], vld: Validate[V, P])
+            extends MMR[V, P]
+            with MultiplicativeGroup[Refined[V, P]]:
             def div(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
                 refineV[P].unsafeFrom(alg.div(x.value, y.value))
 
-        class FPR[V, P](using alg: FractionalPower[V], vld: Validate[V, P]) extends
-            FractionalPower[Refined[V, P]]:
+        class FPR[V, P](using alg: FractionalPower[V], vld: Validate[V, P])
+            extends FractionalPower[Refined[V, P]]:
             def pow(v: Refined[V, P], e: Double): Refined[V, P] =
                 refineV[P].unsafeFrom(alg.pow(v.value, e))
 
-        class ASGRE[V, P](using alg: AdditiveSemigroup[Refined[V, P]]) extends
-            AdditiveSemigroup[Either[String, Refined[V, P]]]:
-            def plus(x: Either[String, Refined[V, P]], y: Either[String, Refined[V, P]]) =
+        class ASGRE[V, P](using alg: AdditiveSemigroup[Refined[V, P]])
+            extends AdditiveSemigroup[Either[String, Refined[V, P]]]:
+            def plus(
+                x: Either[String, Refined[V, P]],
+                y: Either[String, Refined[V, P]]
+            ) =
                 (x, y) match
                     case (Left(xe), Left(ye)) => Left(s"($xe)($ye)")
                     case (Left(xe), Right(_)) => Left(xe)
@@ -115,9 +122,12 @@ object all:
                             case Success(z) => Right(z)
                             case Failure(e) => Left(e.getMessage)
 
-        class MSGRE[V, P](using alg: MultiplicativeSemigroup[Refined[V, P]]) extends
-            MultiplicativeSemigroup[Either[String, Refined[V, P]]]:
-            def times(x: Either[String, Refined[V, P]], y: Either[String, Refined[V, P]]) =
+        class MSGRE[V, P](using alg: MultiplicativeSemigroup[Refined[V, P]])
+            extends MultiplicativeSemigroup[Either[String, Refined[V, P]]]:
+            def times(
+                x: Either[String, Refined[V, P]],
+                y: Either[String, Refined[V, P]]
+            ) =
                 (x, y) match
                     case (Left(xe), Left(ye)) => Left(s"($xe)($ye)")
                     case (Left(xe), Right(_)) => Left(xe)
@@ -127,16 +137,21 @@ object all:
                             case Success(z) => Right(z)
                             case Failure(e) => Left(e.getMessage)
 
-        class MMRE[V, P](using alg: MultiplicativeMonoid[Refined[V, P]]) extends
-            MSGRE[V, P] with MultiplicativeMonoid[Either[String, Refined[V, P]]]:
+        class MMRE[V, P](using alg: MultiplicativeMonoid[Refined[V, P]])
+            extends MSGRE[V, P]
+            with MultiplicativeMonoid[Either[String, Refined[V, P]]]:
             def one: Either[String, Refined[V, P]] =
                 Try(alg.one) match
                     case Success(z) => Right(z)
                     case Failure(e) => Left(e.getMessage)
 
-        class MGRE[V, P](using alg: MultiplicativeGroup[Refined[V, P]]) extends
-            MMRE[V, P] with MultiplicativeGroup[Either[String, Refined[V, P]]]:
-            def div(x: Either[String, Refined[V, P]], y: Either[String, Refined[V, P]]) =
+        class MGRE[V, P](using alg: MultiplicativeGroup[Refined[V, P]])
+            extends MMRE[V, P]
+            with MultiplicativeGroup[Either[String, Refined[V, P]]]:
+            def div(
+                x: Either[String, Refined[V, P]],
+                y: Either[String, Refined[V, P]]
+            ) =
                 (x, y) match
                     case (Left(xe), Left(ye)) => Left(s"($xe)($ye)")
                     case (Left(xe), Right(_)) => Left(xe)
@@ -146,9 +161,12 @@ object all:
                             case Success(z) => Right(z)
                             case Failure(e) => Left(e.getMessage)
 
-        class FPRE[V, P](using alg: FractionalPower[Refined[V, P]]) extends
-            FractionalPower[Either[String, Refined[V, P]]]:
-            def pow(v: Either[String, Refined[V, P]], e: Double): Either[String, Refined[V, P]] =
+        class FPRE[V, P](using alg: FractionalPower[Refined[V, P]])
+            extends FractionalPower[Either[String, Refined[V, P]]]:
+            def pow(
+                v: Either[String, Refined[V, P]],
+                e: Double
+            ): Either[String, Refined[V, P]] =
                 Try(v.map(alg.pow(_, e))) match
                     case Success(z) => z
                     case Failure(e) => Left(e.getMessage)
