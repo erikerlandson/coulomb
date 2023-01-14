@@ -18,3 +18,12 @@ package coulomb.parser
 
 object test:
     val stub = 0
+
+    inline def f[T]: String = ${ meta.f[T] }
+
+    object meta:
+        import scala.quoted.*
+        import scala.language.implicitConversions
+        
+        def f[T](using Quotes, Type[T]): Expr[String] =
+            Expr("foo!")
