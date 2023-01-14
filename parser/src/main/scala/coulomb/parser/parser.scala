@@ -21,9 +21,15 @@ object test:
 
     inline def f[T]: String = ${ meta.f[T] }
 
+    inline def m[T]: Map[String, String] = ${ meta.m[T] }
+
     object meta:
         import scala.quoted.*
         import scala.language.implicitConversions
 
         def f[T](using Quotes, Type[T]): Expr[String] =
             Expr("foo!")
+
+        def m[T](using Quotes, Type[T]): Expr[Map[String, String]] =
+            val mm = Map("a" -> "b")
+            Expr(mm)
