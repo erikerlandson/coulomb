@@ -29,7 +29,7 @@ def commonSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject
-    .aggregate(core, units, spire, refined, testkit, unidocs)
+    .aggregate(core, units, parser, spire, refined, testkit, unidocs)
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
@@ -50,6 +50,15 @@ lazy val units = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .platformsSettings(JSPlatform, NativePlatform)(
         libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.5.0" % Test
     )
+
+// see also: https://github.com/lampepfl/dotty/issues/7647
+lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("parser"))
+    .settings(name := "coulomb-parser")
+    .dependsOn(core % "compile->compile;test->test")
+    .settings(commonSettings: _*)
+    .settings(libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value)
 
 lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
@@ -93,6 +102,7 @@ lazy val all = project
     .dependsOn(
         core.jvm,
         units.jvm,
+        parser.jvm,
         spire.jvm,
         refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
