@@ -58,7 +58,9 @@ lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .settings(name := "coulomb-parser")
     .dependsOn(core % "compile->compile;test->test")
     .settings(commonSettings: _*)
-    .settings(libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value)
+    .settings(
+        libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value
+    )
 
 lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
