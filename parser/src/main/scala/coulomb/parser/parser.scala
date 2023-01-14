@@ -24,6 +24,6 @@ object test:
     object meta:
         import scala.quoted.*
         import scala.language.implicitConversions
-        
+
         def f[T](using Quotes, Type[T]): Expr[String] =
             Expr("foo!")
