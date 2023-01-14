@@ -59,6 +59,7 @@ lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .dependsOn(core % "compile->compile;test->test")
     .settings(commonSettings: _*)
     .settings(
+        tlVersionIntroduced := Map("3" -> "0.7.3"),
         libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value
     )
 
