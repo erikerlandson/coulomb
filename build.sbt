@@ -65,7 +65,7 @@ lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("parser"))
     .settings(name := "coulomb-parser")
-    .dependsOn(core % "compile->compile;test->test")
+    .dependsOn(core % "compile->compile;test->test", units) // make units "% Test"
     .settings(commonSettings: _*)
     .settings(
         tlVersionIntroduced := Map("3" -> "0.7.3"),

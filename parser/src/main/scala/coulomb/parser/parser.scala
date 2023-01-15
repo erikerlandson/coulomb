@@ -16,19 +16,62 @@
 
 package coulomb.parser
 
+import scala.quoted.*
+
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.units.si.*
+import coulomb.conversion.*
+
 object test:
     val stub = 0
 
-    inline def f[T]: String = ${ meta.f[T] }
+    // fully qualified type name
+    inline def fqtn[T]: String = ${ meta.fqtn[T] }
 
     inline def m[T]: Map[String, String] = ${ meta.m[T] }
 
+    // this "almost" works but it won't bind 'Quotes' if you try to invoke it
+    def q(v: Double, u: String)(using
+        Quotes,
+        staging.Compiler
+    ): Quantity[Double, Meter] = staging.run {
+        import quotes.reflect.*
+
+        // this eventually builds arbitrary unit expr via parsing
+        val t = u match
+            case "meter"  => TypeRepr.of[Meter]
+            case "second" => TypeRepr.of[Second]
+            case _        => TypeRepr.of[1]
+
+        val ttt = t.asType match
+            case '[t] => Expr.summon[UnitConversion[Double, t, Meter]]
+        val cnv = ttt match
+            case Some(x) => x
+            case _       => null
+
+        val f = t.asType match
+            case '[t] =>
+                '{ (v: Double) =>
+                    v.withUnit[t]
+                        .toUnit[Meter](using
+                            ${
+                                cnv.asTerm
+                                    .asExprOf[UnitConversion[Double, t, Meter]]
+                            }
+                        )
+                }
+
+        '{ (${ f })(${ Expr(v) }) }
+    }
+
     object meta:
-        import scala.quoted.*
         import scala.language.implicitConversions
 
-        def f[T](using Quotes, Type[T]): Expr[String] =
-            Expr("foo!")
+        def fqtn[T](using Quotes, Type[T]): Expr[String] =
+            import quotes.reflect.*
+            val tr = TypeRepr.of[T]
+            Expr(tr.dealias.typeSymbol.fullName)
 
         def m[T](using Quotes, Type[T]): Expr[Map[String, String]] =
             val mm = Map("a" -> "b")
