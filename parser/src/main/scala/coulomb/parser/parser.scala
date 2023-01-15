@@ -31,42 +31,74 @@ object test:
 
     inline def m[T]: Map[String, String] = ${ meta.m[T] }
 
-    // this "almost" works but it won't bind 'Quotes' if you try to invoke it
+    // this compiles and "runs" but run-time fails trying to find
+    // coulomb implicits - so the staging compiler
+    // currently doesn't work for finding imported implicits
+    // unsure if this is due to bad class loader or something else
     def q(v: Double, u: String)(using
-        Quotes,
         staging.Compiler
     ): Quantity[Double, Meter] = staging.run {
-        import quotes.reflect.*
+        // inside this scope Quotes is defined
 
-        // this eventually builds arbitrary unit expr via parsing
-        val t = u match
-            case "meter"  => TypeRepr.of[Meter]
-            case "second" => TypeRepr.of[Second]
-            case _        => TypeRepr.of[1]
+        println(s"get f...")
+        val f = meta.qqq(u)
 
-        val ttt = t.asType match
-            case '[t] => Expr.summon[UnitConversion[Double, t, Meter]]
-        val cnv = ttt match
-            case Some(x) => x
-            case _       => null
-
-        val f = t.asType match
-            case '[t] =>
-                '{ (v: Double) =>
-                    v.withUnit[t]
-                        .toUnit[Meter](using
-                            ${
-                                cnv.asTerm
-                                    .asExprOf[UnitConversion[Double, t, Meter]]
-                            }
-                        )
-                }
-
+        println(s"apply f...")
         '{ (${ f })(${ Expr(v) }) }
     }
 
+    // invoke qqq without staging compiler
+    // this works because it is bypassing the staging compiler
+    inline def qq(u: String): (Double => Quantity[Double, Meter]) =
+        ${ meta.qq('u) }
+
     object meta:
         import scala.language.implicitConversions
+
+        def qq(u: Expr[String])(using
+            Quotes
+        ): Expr[Double => Quantity[Double, Meter]] =
+            qqq(u.valueOrAbort)
+
+        def qqq(u: String)(using
+            Quotes
+        ): Expr[Double => Quantity[Double, Meter]] =
+            import quotes.reflect.*
+
+            // this eventually builds arbitrary unit expr via parsing
+            val t = u match
+                case "meter"  => TypeRepr.of[Meter]
+                case "second" => TypeRepr.of[Second]
+                case _        => TypeRepr.of[1]
+
+            println(s"t= $t")
+
+            val ttt = t.asType match
+                case '[t] => Expr.summon[UnitConversion[Double, t, Meter]]
+            val cnv = ttt match
+                case Some(x) =>
+                    println(s"found ${x}")
+                    x
+                case _ =>
+                    println(s"not found!")
+                    null
+
+            val f = t.asType match
+                case '[t] =>
+                    '{ (v: Double) =>
+                        v.withUnit[t]
+                            .toUnit[Meter](using
+                                ${
+                                    cnv.asTerm
+                                        .asExprOf[UnitConversion[
+                                            Double,
+                                            t,
+                                            Meter
+                                        ]]
+                                }
+                            )
+                    }
+            f
 
         def fqtn[T](using Quotes, Type[T]): Expr[String] =
             import quotes.reflect.*
