@@ -73,30 +73,13 @@ object test:
 
             println(s"t= $t")
 
-            val ttt = t.asType match
-                case '[t] => Expr.summon[UnitConversion[Double, t, Meter]]
-            val cnv = ttt match
-                case Some(x) =>
-                    println(s"found ${x}")
-                    x
-                case _ =>
-                    println(s"not found!")
-                    null
-
             val f = t.asType match
                 case '[t] =>
-                    '{ (v: Double) =>
-                        v.withUnit[t]
-                            .toUnit[Meter](using
-                                ${
-                                    cnv.asTerm
-                                        .asExprOf[UnitConversion[
-                                            Double,
-                                            t,
-                                            Meter
-                                        ]]
-                                }
-                            )
+                    '{
+                        // hard-coding imports works
+                        // so question is how to allow library users to inject these from above
+                        import coulomb.policy.standard.given
+                        (v: Double) => v.withUnit[t].toUnit[Meter]
                     }
             f
 
