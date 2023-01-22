@@ -79,23 +79,8 @@ object test:
 
             println(s"t= $t")
 
-            val root = defn.RootPackage
-            println(s"root= $root")
-            println(s"root.DF= ${root.declaredFields}")
-            val clmb = root.declaredFields.filter(_.name == "coulomb").head
-            println(s"clmb= $clmb")
-            val units = clmb.declaredFields.filter(_.name == "units").head
-            val si = units.declaredFields.filter(_.name == "si").head
-            println(s"si= $si")
-            println(s"si.tree= ${si.tree}")
-            println(s"si.types= ${si.typeMembers}")
-            val meter = si.typeMembers.filter(_.name == "Meter").head
-            println(s"meter= $meter")
-            println(s"typeRef= ${meter.typeRef}")
-
-            val tt = meter.typeRef
-            val iseq = (tt =:= t)
-            println(s"iseq= $iseq")
+            val ttt = fqTypeRepr("coulomb.units.si.Meter")
+            assert(ttt =:= TypeRepr.of[coulomb.units.si.Meter])
 
             val f = t.asType match
                 case '[t] =>
@@ -106,6 +91,49 @@ object test:
                         (v: Double) => v.withUnit[t].toUnit[Meter]
                     }
             f
+
+        def fqTypeRepr(using Quotes)(
+            path: Seq[String]
+        ): quotes.reflect.TypeRepr =
+            import quotes.reflect.*
+            if (path.isEmpty)
+                report.errorAndAbort("fqTypeRepr: empty path")
+                TypeRepr.of[Unit]
+            else
+                val q = fqFieldSymbol(path.dropRight(1))
+                val qt = q.typeMembers.filter(_.name == path.last)
+                if (qt.length == 1) qt.head.typeRef
+                else
+                    report.errorAndAbort(
+                        s"""fqTypeRepr: bad path ${path.mkString(".")}"""
+                    )
+                    TypeRepr.of[Unit]
+
+        def fqTypeRepr(using Quotes)(path: String): quotes.reflect.TypeRepr =
+            fqTypeRepr(path.split('.').toIndexedSeq)
+
+        def fqFieldSymbol(using Quotes)(
+            path: Seq[String]
+        ): quotes.reflect.Symbol =
+            import quotes.reflect.*
+            def work(q: Symbol, tail: Seq[String]): Symbol =
+                if (tail.isEmpty) q
+                else
+                    val qt = q.declaredFields.filter(_.name == tail.head)
+                    if (qt.length == 1) work(qt.head, tail.tail)
+                    else
+                        report.errorAndAbort(
+                            s"""fqFieldSymbol: bad path ${path.mkString(".")}"""
+                        )
+                        defn.RootPackage
+            path match
+                case _ if path.isEmpty => defn.RootPackage
+                case _ if path.head == "_root_" =>
+                    work(defn.RootPackage, path.tail)
+                case _ => work(defn.RootPackage, path)
+
+        def fqFieldSymbol(using Quotes)(path: String): quotes.reflect.Symbol =
+            fqFieldSymbol(path.split('.').toIndexedSeq)
 
         def fqtn[T](using Quotes, Type[T]): Expr[String] =
             import quotes.reflect.*
