@@ -24,8 +24,6 @@ import coulomb.units.si.*
 import coulomb.conversion.*
 
 object test:
-    val stub = 0
-
     // fully qualified type name
     inline def fqtn[T]: String = ${ meta.fqtn[T] }
 
@@ -52,8 +50,16 @@ object test:
     inline def qq(u: String): (Double => Quantity[Double, Meter]) =
         ${ meta.qq('u) }
 
+    inline def z(inline b: Int): Int = ${ meta.z('b) }
+
     object meta:
+        import scala.unchecked
         import scala.language.implicitConversions
+
+        def z(b: Expr[Int])(using Quotes): Expr[Int] =
+            import quotes.reflect.*
+            println(s"${b.asTerm}")
+            b
 
         def qq(u: Expr[String])(using
             Quotes
@@ -72,6 +78,24 @@ object test:
                 case _        => TypeRepr.of[1]
 
             println(s"t= $t")
+
+            val root = defn.RootPackage
+            println(s"root= $root")
+            println(s"root.DF= ${root.declaredFields}")
+            val clmb = root.declaredFields.filter(_.name == "coulomb").head
+            println(s"clmb= $clmb")
+            val units = clmb.declaredFields.filter(_.name == "units").head
+            val si = units.declaredFields.filter(_.name == "si").head
+            println(s"si= $si")
+            println(s"si.tree= ${si.tree}")
+            println(s"si.types= ${si.typeMembers}")
+            val meter = si.typeMembers.filter(_.name == "Meter").head
+            println(s"meter= $meter")
+            println(s"typeRef= ${meter.typeRef}")
+
+            val tt = meter.typeRef
+            val iseq = (tt =:= t)
+            println(s"iseq= $iseq")
 
             val f = t.asType match
                 case '[t] =>
