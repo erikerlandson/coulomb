@@ -48,7 +48,7 @@ object value:
         (v: VF) => ct.fromType(v)
 
     given ctx_ConvertableToCoulombRational: ConvertableTo[CoulombRational]
-        with {
+    with {
         import java.math.MathContext
         val bigint1 = BigInt(java.math.BigInteger.ONE)
         def fromByte(a: Byte): CoulombRational =
@@ -83,7 +83,7 @@ object value:
     }
 
     given ctx_ConvertableFromCoulombRational: ConvertableFrom[CoulombRational]
-        with {
+    with {
         import java.math.MathContext
         def toByte(a: CoulombRational): Byte = toBigInt(a).toByte
         def toShort(a: CoulombRational): Short = toBigInt(a).toShort
