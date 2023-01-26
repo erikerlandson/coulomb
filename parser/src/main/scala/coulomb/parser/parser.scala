@@ -23,6 +23,16 @@ import coulomb.syntax.*
 import coulomb.units.si.*
 import coulomb.conversion.*
 
+import coulomb.rational.Rational
+
+object ast:
+    sealed abstract class UnitAST
+    object UnitAST:
+        case class Unit(name: String) extends UnitAST
+        case class Mul(lhs: UnitAST, rhs: UnitAST) extends UnitAST
+        case class Div(num: UnitAST, den: UnitAST) extends UnitAST
+        case class Pow(b: UnitAST, e: Rational) extends UnitAST
+
 object test:
     // fully qualified type name
     inline def fqtn[T]: String = ${ meta.fqtn[T] }
@@ -50,16 +60,9 @@ object test:
     inline def qq(u: String): (Double => Quantity[Double, Meter]) =
         ${ meta.qq('u) }
 
-    inline def z(inline b: Int): Int = ${ meta.z('b) }
-
     object meta:
         import scala.unchecked
         import scala.language.implicitConversions
-
-        def z(b: Expr[Int])(using Quotes): Expr[Int] =
-            import quotes.reflect.*
-            println(s"${b.asTerm}")
-            b
 
         def qq(u: Expr[String])(using
             Quotes
@@ -73,14 +76,21 @@ object test:
 
             // this eventually builds arbitrary unit expr via parsing
             val t = u match
-                case "meter"  => TypeRepr.of[Meter]
-                case "second" => TypeRepr.of[Second]
-                case _        => TypeRepr.of[1]
+                case "meter"  => fqTypeRepr("coulomb.units.si.Meter")
+                case "second" => fqTypeRepr("coulomb.units.si.Second")
+                case _        => TypeRepr.of[Unit]
 
-            println(s"t= $t")
+            // val ttt = fqTypeRepr("coulomb.units.si.Meter")
+            // assert(ttt =:= TypeRepr.of[coulomb.units.si.Meter])
 
-            val ttt = fqTypeRepr("coulomb.units.si.Meter")
-            assert(ttt =:= TypeRepr.of[coulomb.units.si.Meter])
+            val s = fqFieldSymbol("coulomb.units.info.ctx_unit_Bit")
+            println(s"s= ${symbolValueType(s).show}")
+            println(s"s= ${symbolValueType(s).isSingleton}")
+            println(s"s= ${s.flags.show}")
+            val ss = fqFieldSymbol("coulomb.units.info")
+            println(s"ss= ${symbolValueType(ss).show}")
+            println(s"ss= ${symbolValueType(ss).isSingleton}")
+            println(s"ss= ${ss.flags.show}")
 
             val f = t.asType match
                 case '[t] =>
@@ -91,6 +101,13 @@ object test:
                         (v: Double) => v.withUnit[t].toUnit[Meter]
                     }
             f
+
+        def symbolValueType(using Quotes)(
+            sym: quotes.reflect.Symbol
+        ): quotes.reflect.TypeRepr =
+            import quotes.reflect.*
+            val TermRef(tr, _) = sym.termRef: @unchecked
+            tr.memberType(sym)
 
         def fqTypeRepr(using Quotes)(
             path: Seq[String]
@@ -126,11 +143,12 @@ object test:
                             s"""fqFieldSymbol: bad path ${path.mkString(".")}"""
                         )
                         defn.RootPackage
-            path match
-                case _ if path.isEmpty => defn.RootPackage
-                case _ if path.head == "_root_" =>
-                    work(defn.RootPackage, path.tail)
-                case _ => work(defn.RootPackage, path)
+            if (path.isEmpty)
+                defn.RootPackage
+            else if (path.head == "_root_")
+                work(defn.RootPackage, path.tail)
+            else
+                work(defn.RootPackage, path)
 
         def fqFieldSymbol(using Quotes)(path: String): quotes.reflect.Symbol =
             fqFieldSymbol(path.split('.').toIndexedSeq)
