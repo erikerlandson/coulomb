@@ -25,13 +25,34 @@ import coulomb.conversion.*
 
 import coulomb.rational.Rational
 
-object ast:
-    sealed abstract class UnitAST
-    object UnitAST:
-        case class Unit(name: String) extends UnitAST
-        case class Mul(lhs: UnitAST, rhs: UnitAST) extends UnitAST
-        case class Div(num: UnitAST, den: UnitAST) extends UnitAST
-        case class Pow(b: UnitAST, e: Rational) extends UnitAST
+final class RuntimeContext[UnitDefs]
+object RuntimeContext:
+    final type &:[H, T]
+    final type TNil
+
+    def apply[D](): RuntimeContext[D] = new RuntimeContext[D]
+
+object runtime:
+    import coulomb.define.*
+    import RuntimeContext.{&:, TNil}
+    import coulomb.units.si.*
+    import coulomb.units.si.prefixes.*
+    given given_context: RuntimeContext[
+        BaseUnit[Meter, "meter", "m"] &:
+            DerivedUnit[Kilo, 10 ^ 3, "kilo", "k"] &: TNil
+    ] = RuntimeContext()
+
+sealed abstract class UnitAST:
+    def *(rhs: UnitAST): UnitAST.Mul = UnitAST.Mul(this, rhs)
+    def /(den: UnitAST): UnitAST.Div = UnitAST.Div(this, den)
+    def ^(e: Rational): UnitAST.Pow = UnitAST.Pow(this, e)
+
+object UnitAST:
+    case class UnitType(path: String) extends UnitAST
+    case class Mul(lhs: UnitAST, rhs: UnitAST) extends UnitAST
+    case class Div(num: UnitAST, den: UnitAST) extends UnitAST
+    case class Pow(b: UnitAST, e: Rational) extends UnitAST
+    inline def of[U]: UnitType = ${ meta.astunit[U] }
 
 object test:
     // fully qualified type name
@@ -60,104 +81,145 @@ object test:
     inline def qq(u: String): (Double => Quantity[Double, Meter]) =
         ${ meta.qq('u) }
 
-    object meta:
-        import scala.unchecked
-        import scala.language.implicitConversions
+    inline def bu: Unit =
+        ${ meta.bu }
 
-        def qq(u: Expr[String])(using
-            Quotes
-        ): Expr[Double => Quantity[Double, Meter]] =
-            qqq(u.valueOrAbort)
+object meta:
+    import scala.unchecked
+    import scala.language.implicitConversions
 
-        def qqq(u: String)(using
-            Quotes
-        ): Expr[Double => Quantity[Double, Meter]] =
-            import quotes.reflect.*
+    def bu(using Quotes): Expr[Unit] =
+        import quotes.reflect.*
+        val m = baseunittree(fqTypeRepr("coulomb.units.si.Meter"))
+        println(s"m= $m")
+        println(s"m= ${m.symbol.fullName}")
+        val Ident(s) = m: @unchecked
+        println(s"s= $s")
+        val t = symbolValueType(fqFieldSymbol(m.symbol.fullName))
+        println(s"t= $t")
+        '{ () }
 
-            // this eventually builds arbitrary unit expr via parsing
-            val t = u match
-                case "meter"  => fqTypeRepr("coulomb.units.si.Meter")
-                case "second" => fqTypeRepr("coulomb.units.si.Second")
-                case _        => TypeRepr.of[Unit]
+    def baseunittree(using Quotes)(
+        u: quotes.reflect.TypeRepr
+    ): quotes.reflect.Tree =
+        import quotes.reflect.*
+        Implicits.search(
+            TypeRepr
+                .of[coulomb.define.BaseUnit]
+                .appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))
+        ) match
+            case iss: ImplicitSearchSuccess => iss.tree
+            case _                          => Literal(UnitConstant())
 
-            // val ttt = fqTypeRepr("coulomb.units.si.Meter")
-            // assert(ttt =:= TypeRepr.of[coulomb.units.si.Meter])
+    def qq(u: Expr[String])(using
+        Quotes
+    ): Expr[Double => Quantity[Double, Meter]] =
+        qqq(u.valueOrAbort)
 
-            val s = fqFieldSymbol("coulomb.units.info.ctx_unit_Bit")
-            println(s"s= ${symbolValueType(s).show}")
-            println(s"s= ${symbolValueType(s).isSingleton}")
-            println(s"s= ${s.flags.show}")
-            val ss = fqFieldSymbol("coulomb.units.info")
-            println(s"ss= ${symbolValueType(ss).show}")
-            println(s"ss= ${symbolValueType(ss).isSingleton}")
-            println(s"ss= ${ss.flags.show}")
+    def qqq(u: String)(using
+        Quotes
+    ): Expr[Double => Quantity[Double, Meter]] =
+        import quotes.reflect.*
 
-            val f = t.asType match
-                case '[t] =>
-                    '{
-                        // hard-coding imports works
-                        // so question is how to allow library users to inject these from above
-                        import coulomb.policy.standard.given
-                        (v: Double) => v.withUnit[t].toUnit[Meter]
-                    }
-            f
+        // this eventually builds arbitrary unit expr via parsing
+        val t = u match
+            case "meter"  => fqTypeRepr("coulomb.units.si.Meter")
+            case "second" => fqTypeRepr("coulomb.units.si.Second")
+            case _        => TypeRepr.of[Unit]
 
-        def symbolValueType(using Quotes)(
-            sym: quotes.reflect.Symbol
-        ): quotes.reflect.TypeRepr =
-            import quotes.reflect.*
-            val TermRef(tr, _) = sym.termRef: @unchecked
-            tr.memberType(sym)
+        // val ttt = fqTypeRepr("coulomb.units.si.Meter")
+        // assert(ttt =:= TypeRepr.of[coulomb.units.si.Meter])
 
-        def fqTypeRepr(using Quotes)(
-            path: Seq[String]
-        ): quotes.reflect.TypeRepr =
-            import quotes.reflect.*
-            if (path.isEmpty)
-                report.errorAndAbort("fqTypeRepr: empty path")
-                TypeRepr.of[Unit]
+        val s = fqFieldSymbol("coulomb.units.info.ctx_unit_Bit")
+        println(s"s= ${symbolValueType(s).show}")
+        println(s"s= ${symbolValueType(s).isSingleton}")
+        println(s"s= ${s.flags.show}")
+        val ss = fqFieldSymbol("coulomb.units.info")
+        println(s"ss= ${symbolValueType(ss).show}")
+        println(s"ss= ${symbolValueType(ss).isSingleton}")
+        println(s"ss= ${ss.flags.show}")
+
+        val g = '{ given given_test: String = "foooooo" }
+        println(s"g= ${g.show}")
+
+        val f = t.asType match
+            case '[t] =>
+                '{
+                    // hard-coding imports works
+                    // so question is how to allow library users to inject these from above
+                    import coulomb.policy.standard.given
+                    (v: Double) => v.withUnit[t].toUnit[Meter]
+                }
+        f
+
+    def symbolValueType(using Quotes)(
+        sym: quotes.reflect.Symbol
+    ): quotes.reflect.TypeRepr =
+        import quotes.reflect.*
+        val TermRef(tr, _) = sym.termRef: @unchecked
+        tr.memberType(sym)
+
+    def fqTypeRepr(using Quotes)(
+        path: Seq[String]
+    ): quotes.reflect.TypeRepr =
+        import quotes.reflect.*
+        if (path.isEmpty)
+            report.errorAndAbort("fqTypeRepr: empty path")
+            TypeRepr.of[Unit]
+        else
+            val q = fqFieldSymbol(path.dropRight(1))
+            val qt = q.typeMembers.filter(_.name == path.last)
+            if (qt.length == 1) qt.head.typeRef
             else
-                val q = fqFieldSymbol(path.dropRight(1))
-                val qt = q.typeMembers.filter(_.name == path.last)
-                if (qt.length == 1) qt.head.typeRef
+                report.errorAndAbort(
+                    s"""fqTypeRepr: bad path ${path.mkString(
+                            "."
+                        )} at ${path.last}"""
+                )
+                TypeRepr.of[Unit]
+
+    def fqTypeRepr(using Quotes)(path: String): quotes.reflect.TypeRepr =
+        fqTypeRepr(path.split('.').toIndexedSeq)
+
+    def fqFieldSymbol(using Quotes)(
+        path: Seq[String]
+    ): quotes.reflect.Symbol =
+        import quotes.reflect.*
+        def work(q: Symbol, tail: Seq[String]): Symbol =
+            if (tail.isEmpty) q
+            else
+                val qt = q.declaredFields.filter(_.name == tail.head)
+                if (qt.length == 1) work(qt.head, tail.tail)
                 else
                     report.errorAndAbort(
-                        s"""fqTypeRepr: bad path ${path.mkString(".")}"""
+                        s"""fqFieldSymbol: bad path ${path.mkString(
+                                "."
+                            )} at ${tail.head}"""
                     )
-                    TypeRepr.of[Unit]
+                    defn.RootPackage
+        if (path.isEmpty)
+            defn.RootPackage
+        else if (path.head == "_root_")
+            work(defn.RootPackage, path.tail)
+        else
+            work(defn.RootPackage, path)
 
-        def fqTypeRepr(using Quotes)(path: String): quotes.reflect.TypeRepr =
-            fqTypeRepr(path.split('.').toIndexedSeq)
+    def fqFieldSymbol(using Quotes)(path: String): quotes.reflect.Symbol =
+        fqFieldSymbol(path.split('.').toIndexedSeq)
 
-        def fqFieldSymbol(using Quotes)(
-            path: Seq[String]
-        ): quotes.reflect.Symbol =
-            import quotes.reflect.*
-            def work(q: Symbol, tail: Seq[String]): Symbol =
-                if (tail.isEmpty) q
-                else
-                    val qt = q.declaredFields.filter(_.name == tail.head)
-                    if (qt.length == 1) work(qt.head, tail.tail)
-                    else
-                        report.errorAndAbort(
-                            s"""fqFieldSymbol: bad path ${path.mkString(".")}"""
-                        )
-                        defn.RootPackage
-            if (path.isEmpty)
-                defn.RootPackage
-            else if (path.head == "_root_")
-                work(defn.RootPackage, path.tail)
-            else
-                work(defn.RootPackage, path)
+    def astunit[T](using Quotes, Type[T]): Expr[UnitAST.UnitType] =
+        import quotes.reflect.*
+        val tr = TypeRepr.of[T]
+        // filtering is a hack - these dollar sign variant symbols do not
+        // show up in my fqTypRepr navigation
+        val path = tr.dealias.typeSymbol.fullName.filter(_ != '$')
+        '{ UnitAST.UnitType(${ Expr(path) }) }
 
-        def fqFieldSymbol(using Quotes)(path: String): quotes.reflect.Symbol =
-            fqFieldSymbol(path.split('.').toIndexedSeq)
+    def fqtn[T](using Quotes, Type[T]): Expr[String] =
+        import quotes.reflect.*
+        val tr = TypeRepr.of[T]
+        Expr(tr.dealias.typeSymbol.fullName)
 
-        def fqtn[T](using Quotes, Type[T]): Expr[String] =
-            import quotes.reflect.*
-            val tr = TypeRepr.of[T]
-            Expr(tr.dealias.typeSymbol.fullName)
-
-        def m[T](using Quotes, Type[T]): Expr[Map[String, String]] =
-            val mm = Map("a" -> "b")
-            Expr(mm)
+    def m[T](using Quotes, Type[T]): Expr[Map[String, String]] =
+        val mm = Map("a" -> "b")
+        Expr(mm)
