@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package coulomb.parser
+package coulomb.runtime
 
 import scala.quoted.*
 
@@ -33,6 +33,10 @@ object UnitAST:
     case class Div(num: UnitAST, den: UnitAST) extends UnitAST
     case class Pow(b: UnitAST, e: Rational) extends UnitAST
     inline def of[U]: UnitAST = ${ meta.unitAST[U] }
+
+object test:
+    inline def tk[U](v: Rational, u: UnitAST): Quantity[Rational, U] =
+        ${ meta.tk[U]('v, 'u) }
 
 object meta:
     import scala.unchecked
@@ -53,6 +57,21 @@ object meta:
                 case UnitAST.Pow(b, e) =>
                     '{ UnitAST.Pow(${ Expr(b) }, ${ Expr(e) }) }
 
+    def tk[U](v: Expr[Rational], u: Expr[UnitAST])(using
+        Quotes,
+        Type[U]
+    ): Expr[Quantity[Rational, U]] =
+        import quotes.reflect.*
+        val cmp = stagingCompiler
+        println(s"cmp= ${cmp.asTerm}")
+        val astU = typeReprAST(TypeRepr.of[U])
+        println(s"astU= $astU")
+        val expr = '{
+            kernel($v, $u, ${ Expr(astU) })(using $cmp).withUnit[U]
+        }
+        println(s"expr= ${expr.asTerm.show}")
+        expr
+
     def kernel(v: Rational, astF: UnitAST, astT: UnitAST)(using
         staging.Compiler
     ): Rational =
@@ -62,6 +81,15 @@ object meta:
                 case ('[uf], '[ut]) =>
                     '{ ${ Expr(v) } * coefficientRational[uf, ut] }
         }
+
+    def stagingCompiler(using Quotes): Expr[staging.Compiler] =
+        import quotes.reflect.*
+        Implicits.search(TypeRepr.of[staging.Compiler]) match
+            case iss: ImplicitSearchSuccess =>
+                iss.tree.asExprOf[staging.Compiler]
+            case _ =>
+                report.errorAndAbort("no.")
+                null.asInstanceOf[Expr[staging.Compiler]]
 
     def baseunittree(using Quotes)(
         u: quotes.reflect.TypeRepr
