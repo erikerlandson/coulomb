@@ -93,10 +93,32 @@ object meta:
         val m = baseunittree(fqTypeRepr("coulomb.units.si.Meter"))
         println(s"m= $m")
         println(s"m= ${m.symbol.fullName}")
-        val Ident(s) = m: @unchecked
-        println(s"s= $s")
         val t = symbolValueType(fqFieldSymbol(m.symbol.fullName))
-        println(s"t= $t")
+        println(s"t= ${t.show}")
+        /*
+        val s2 = fqFieldSymbol("coulomb.units.si.ctx_unit_Meter")
+        val s3 = fqFieldSymbol("coulomb.units.us.ctx_unit_Meter")
+        println(s"${s2.tree.show}")
+        println(s"${s3.tree.show}")
+        println(s"${s2.typeRef}")
+        println(s"${s3.typeRef}")
+        println(s"${s2.termRef}")
+        println(s"${s3.termRef}")
+        val r2 = Ref.term(s2.termRef)
+        println(s"$r2")
+        val r3 = Ref.term(s3.termRef)
+        println(s"$r3")
+        val u2 = r2.underlying
+        println(s"${u2.show}")
+        val u3 = r3.underlying
+        println(s"${u3.show}")
+        val t2 = symbolValueType(fqFieldSymbol("coulomb.units.si$.ctx_unit_Meter"))
+        println(s"${t2.show}")
+        println(s"${t2.widen.show}")
+        val t3 = symbolValueType(fqFieldSymbol("coulomb.units.us$.ctx_unit_Meter"))
+        println(s"${t3.show}")
+        println(s"${t3.widen.show}")
+         */
         '{ () }
 
     def baseunittree(using Quotes)(
@@ -157,7 +179,7 @@ object meta:
     ): quotes.reflect.TypeRepr =
         import quotes.reflect.*
         val TermRef(tr, _) = sym.termRef: @unchecked
-        tr.memberType(sym)
+        tr.memberType(sym).widen
 
     def fqTypeRepr(using Quotes)(
         path: Seq[String]
@@ -188,15 +210,32 @@ object meta:
         def work(q: Symbol, tail: Seq[String]): Symbol =
             if (tail.isEmpty) q
             else
-                val qt = q.declaredFields.filter(_.name == tail.head)
-                if (qt.length == 1) work(qt.head, tail.tail)
+                // println(s"\nsymbol $q")
+                // look for modules first
+                // this includes packages and objects
+                val qt = q.declarations.filter { x =>
+                    (x.name == tail.head) && x.flags.is(Flags.Module)
+                }
+                // println(s"${qt.map{x => (x, x.flags.show)}}")
+                val tt = q.declaredFields.filter(_.name == tail.head)
+                // println(s"${tt.map{x => (x, x.flags.show)}}")
+                // there are sometimes two symbols representing a module
+                // is the difference important to this function?
+                if (qt.length > 0) work(qt.head, tail.tail)
                 else
-                    report.errorAndAbort(
-                        s"""fqFieldSymbol: bad path ${path.mkString(
-                                "."
-                            )} at ${tail.head}"""
-                    )
-                    defn.RootPackage
+                    // if no module exists, look for declared symbol
+                    val f = q.declarations.filter { x => x.name == tail.head }
+                    // println(s"${f.map{x => (x, x.flags.show)}}")
+                    // expect a unique field declaration in this case
+                    if ((f.length == 1) && (tail.length == 1)) f.head
+                    else
+                        // if we cannot find a field here, it is a failure
+                        report.errorAndAbort(
+                            s"""fqFieldSymbol: bad path ${path.mkString(
+                                    "."
+                                )} at ${tail.head}"""
+                        )
+                        defn.RootPackage
         if (path.isEmpty)
             defn.RootPackage
         else if (path.head == "_root_")
