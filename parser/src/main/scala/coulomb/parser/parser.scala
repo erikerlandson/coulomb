@@ -21,6 +21,7 @@ import scala.quoted.*
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.*
+import coulomb.units.us.*
 import coulomb.conversion.*
 
 import coulomb.rational.Rational
@@ -59,6 +60,24 @@ object test:
     inline def fqtn[T]: String = ${ meta.fqtn[T] }
 
     inline def m[T]: Map[String, String] = ${ meta.m[T] }
+
+    def s(astf: UnitAST, astt: UnitAST)(using staging.Compiler): Double =
+        staging.run {
+            import quotes.reflect.*
+
+            val tf = meta.astTypeRepr(astf)
+            val tt = meta.astTypeRepr(astt)
+
+            println(s"tf= ${tf.show}")
+            println(s"tt= ${tt.show}")
+
+            val r = (tf.asType, tt.asType) match
+                case ('[f], '[t]) =>
+                    '{ coulomb.conversion.coefficients.coefficientDouble[f, t] }
+
+            println("hi")
+            r
+        }
 
     // this compiles and "runs" but run-time fails trying to find
     // coulomb implicits - so the staging compiler
@@ -173,6 +192,22 @@ object meta:
                     (v: Double) => v.withUnit[t].toUnit[Meter]
                 }
         f
+
+    def astTypeRepr(using Quotes)(
+        ast: UnitAST
+    ): quotes.reflect.TypeRepr =
+        import quotes.reflect.*
+        ast match
+            case UnitAST.UnitType(path) => fqTypeRepr(path)
+            case UnitAST.Mul(l, r) =>
+                val ltr = astTypeRepr(l)
+                val rtr = astTypeRepr(r)
+                TypeRepr.of[coulomb.`*`].appliedTo(List(ltr, rtr))
+            case UnitAST.Div(n, d) =>
+                val ntr = astTypeRepr(n)
+                val dtr = astTypeRepr(d)
+                TypeRepr.of[coulomb.`/`].appliedTo(List(ntr, dtr))
+            case UnitAST.Pow(b, e) => astTypeRepr(b)
 
     def symbolValueType(using Quotes)(
         sym: quotes.reflect.Symbol
