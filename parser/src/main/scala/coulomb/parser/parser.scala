@@ -20,28 +20,7 @@ import scala.quoted.*
 
 import coulomb.*
 import coulomb.syntax.*
-import coulomb.units.si.*
-import coulomb.units.us.*
-import coulomb.conversion.*
-
 import coulomb.rational.Rational
-
-final class RuntimeContext[UnitDefs]
-object RuntimeContext:
-    final type &:[H, T]
-    final type TNil
-
-    def apply[D](): RuntimeContext[D] = new RuntimeContext[D]
-
-object runtime:
-    import coulomb.define.*
-    import RuntimeContext.{&:, TNil}
-    import coulomb.units.si.*
-    import coulomb.units.si.prefixes.*
-    given given_context: RuntimeContext[
-        BaseUnit[Meter, "meter", "m"] &:
-            DerivedUnit[Kilo, 10 ^ 3, "kilo", "k"] &: TNil
-    ] = RuntimeContext()
 
 sealed abstract class UnitAST:
     def *(rhs: UnitAST): UnitAST.Mul = UnitAST.Mul(this, rhs)
@@ -53,92 +32,36 @@ object UnitAST:
     case class Mul(lhs: UnitAST, rhs: UnitAST) extends UnitAST
     case class Div(num: UnitAST, den: UnitAST) extends UnitAST
     case class Pow(b: UnitAST, e: Rational) extends UnitAST
-    inline def of[U]: UnitType = ${ meta.astunit[U] }
-
-object test:
-    // fully qualified type name
-    inline def fqtn[T]: String = ${ meta.fqtn[T] }
-
-    inline def m[T]: Map[String, String] = ${ meta.m[T] }
-
-    def s(astf: UnitAST, astt: UnitAST)(using staging.Compiler): Double =
-        staging.run {
-            import quotes.reflect.*
-
-            val tf = meta.astTypeRepr(astf)
-            val tt = meta.astTypeRepr(astt)
-
-            println(s"tf= ${tf.show}")
-            println(s"tt= ${tt.show}")
-
-            val r = (tf.asType, tt.asType) match
-                case ('[f], '[t]) =>
-                    '{ coulomb.conversion.coefficients.coefficientDouble[f, t] }
-
-            println("hi")
-            r
-        }
-
-    // this compiles and "runs" but run-time fails trying to find
-    // coulomb implicits - so the staging compiler
-    // currently doesn't work for finding imported implicits
-    // unsure if this is due to bad class loader or something else
-    def q(v: Double, u: String)(using
-        staging.Compiler
-    ): Quantity[Double, Meter] = staging.run {
-        // inside this scope Quotes is defined
-
-        println(s"get f...")
-        val f = meta.qqq(u)
-
-        println(s"apply f...")
-        '{ (${ f })(${ Expr(v) }) }
-    }
-
-    // invoke qqq without staging compiler
-    // this works because it is bypassing the staging compiler
-    inline def qq(u: String): (Double => Quantity[Double, Meter]) =
-        ${ meta.qq('u) }
-
-    inline def bu: Unit =
-        ${ meta.bu }
+    inline def of[U]: UnitAST = ${ meta.unitAST[U] }
 
 object meta:
     import scala.unchecked
     import scala.language.implicitConversions
 
-    def bu(using Quotes): Expr[Unit] =
-        import quotes.reflect.*
-        val m = baseunittree(fqTypeRepr("coulomb.units.si.Meter"))
-        println(s"m= $m")
-        println(s"m= ${m.symbol.fullName}")
-        val t = symbolValueType(fqFieldSymbol(m.symbol.fullName))
-        println(s"t= ${t.show}")
-        /*
-        val s2 = fqFieldSymbol("coulomb.units.si.ctx_unit_Meter")
-        val s3 = fqFieldSymbol("coulomb.units.us.ctx_unit_Meter")
-        println(s"${s2.tree.show}")
-        println(s"${s3.tree.show}")
-        println(s"${s2.typeRef}")
-        println(s"${s3.typeRef}")
-        println(s"${s2.termRef}")
-        println(s"${s3.termRef}")
-        val r2 = Ref.term(s2.termRef)
-        println(s"$r2")
-        val r3 = Ref.term(s3.termRef)
-        println(s"$r3")
-        val u2 = r2.underlying
-        println(s"${u2.show}")
-        val u3 = r3.underlying
-        println(s"${u3.show}")
-        val t2 = symbolValueType(fqFieldSymbol("coulomb.units.si$.ctx_unit_Meter"))
-        println(s"${t2.show}")
-        println(s"${t2.widen.show}")
-        val t3 = symbolValueType(fqFieldSymbol("coulomb.units.us$.ctx_unit_Meter"))
-        println(s"${t3.show}")
-        println(s"${t3.widen.show}")
-         */
-        '{ () }
+    import coulomb.conversion.coefficients.{meta => _, *}
+    import coulomb.infra.meta.{*, given}
+
+    given ctx_UnitASTToExpr: ToExpr[UnitAST] with
+        def apply(ast: UnitAST)(using Quotes): Expr[UnitAST] =
+            ast match
+                case UnitAST.UnitType(path) =>
+                    '{ UnitAST.UnitType(${ Expr(path) }) }
+                case UnitAST.Mul(l, r) =>
+                    '{ UnitAST.Mul(${ Expr(l) }, ${ Expr(r) }) }
+                case UnitAST.Div(n, d) =>
+                    '{ UnitAST.Div(${ Expr(n) }, ${ Expr(d) }) }
+                case UnitAST.Pow(b, e) =>
+                    '{ UnitAST.Pow(${ Expr(b) }, ${ Expr(e) }) }
+
+    def kernel(v: Rational, astF: UnitAST, astT: UnitAST)(using
+        staging.Compiler
+    ): Rational =
+        staging.run {
+            import quotes.reflect.*
+            (astTypeRepr(astF).asType, astTypeRepr(astT).asType) match
+                case ('[uf], '[ut]) =>
+                    '{ ${ Expr(v) } * coefficientRational[uf, ut] }
+        }
 
     def baseunittree(using Quotes)(
         u: quotes.reflect.TypeRepr
@@ -152,46 +75,9 @@ object meta:
             case iss: ImplicitSearchSuccess => iss.tree
             case _                          => Literal(UnitConstant())
 
-    def qq(u: Expr[String])(using
-        Quotes
-    ): Expr[Double => Quantity[Double, Meter]] =
-        qqq(u.valueOrAbort)
-
-    def qqq(u: String)(using
-        Quotes
-    ): Expr[Double => Quantity[Double, Meter]] =
+    def unitAST[U](using Quotes, Type[U]): Expr[UnitAST] =
         import quotes.reflect.*
-
-        // this eventually builds arbitrary unit expr via parsing
-        val t = u match
-            case "meter"  => fqTypeRepr("coulomb.units.si.Meter")
-            case "second" => fqTypeRepr("coulomb.units.si.Second")
-            case _        => TypeRepr.of[Unit]
-
-        // val ttt = fqTypeRepr("coulomb.units.si.Meter")
-        // assert(ttt =:= TypeRepr.of[coulomb.units.si.Meter])
-
-        val s = fqFieldSymbol("coulomb.units.info.ctx_unit_Bit")
-        println(s"s= ${symbolValueType(s).show}")
-        println(s"s= ${symbolValueType(s).isSingleton}")
-        println(s"s= ${s.flags.show}")
-        val ss = fqFieldSymbol("coulomb.units.info")
-        println(s"ss= ${symbolValueType(ss).show}")
-        println(s"ss= ${symbolValueType(ss).isSingleton}")
-        println(s"ss= ${ss.flags.show}")
-
-        val g = '{ given given_test: String = "foooooo" }
-        println(s"g= ${g.show}")
-
-        val f = t.asType match
-            case '[t] =>
-                '{
-                    // hard-coding imports works
-                    // so question is how to allow library users to inject these from above
-                    import coulomb.policy.standard.given
-                    (v: Double) => v.withUnit[t].toUnit[Meter]
-                }
-        f
+        Expr(typeReprAST(TypeRepr.of[U]))
 
     def astTypeRepr(using Quotes)(
         ast: UnitAST
@@ -207,7 +93,31 @@ object meta:
                 val ntr = astTypeRepr(n)
                 val dtr = astTypeRepr(d)
                 TypeRepr.of[coulomb.`/`].appliedTo(List(ntr, dtr))
-            case UnitAST.Pow(b, e) => astTypeRepr(b)
+            case UnitAST.Pow(b, e) =>
+                val btr = astTypeRepr(b)
+                val etr = rationalTE(e)
+                TypeRepr.of[coulomb.`^`].appliedTo(List(btr, etr))
+
+    def typeReprAST(using Quotes)(
+        tr: quotes.reflect.TypeRepr
+    ): UnitAST =
+        import quotes.reflect.*
+        tr match
+            case AppliedType(op, List(lu, ru))
+                if (op =:= TypeRepr.of[coulomb.`*`]) =>
+                UnitAST.Mul(typeReprAST(lu), typeReprAST(ru))
+            case AppliedType(op, List(lu, ru))
+                if (op =:= TypeRepr.of[coulomb.`/`]) =>
+                UnitAST.Div(typeReprAST(lu), typeReprAST(ru))
+            case AppliedType(op, List(b, e))
+                if (op =:= TypeRepr.of[coulomb.`^`]) =>
+                val rationalTE(ev) = e: @unchecked
+                UnitAST.Pow(typeReprAST(b), ev)
+            case t =>
+                // should add checking for types with type-args here
+                // possibly an explicit non dealiasting policy here would allow
+                // parameterized types to be handled via typedef aliases?
+                UnitAST.UnitType(t.typeSymbol.fullName)
 
     def symbolValueType(using Quotes)(
         sym: quotes.reflect.Symbol
@@ -280,20 +190,3 @@ object meta:
 
     def fqFieldSymbol(using Quotes)(path: String): quotes.reflect.Symbol =
         fqFieldSymbol(path.split('.').toIndexedSeq)
-
-    def astunit[T](using Quotes, Type[T]): Expr[UnitAST.UnitType] =
-        import quotes.reflect.*
-        val tr = TypeRepr.of[T]
-        // filtering is a hack - these dollar sign variant symbols do not
-        // show up in my fqTypRepr navigation
-        val path = tr.dealias.typeSymbol.fullName.filter(_ != '$')
-        '{ UnitAST.UnitType(${ Expr(path) }) }
-
-    def fqtn[T](using Quotes, Type[T]): Expr[String] =
-        import quotes.reflect.*
-        val tr = TypeRepr.of[T]
-        Expr(tr.dealias.typeSymbol.fullName)
-
-    def m[T](using Quotes, Type[T]): Expr[Map[String, String]] =
-        val mm = Map("a" -> "b")
-        Expr(mm)
