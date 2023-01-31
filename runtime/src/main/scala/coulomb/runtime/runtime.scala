@@ -34,9 +34,16 @@ object UnitAST:
     case class Pow(b: UnitAST, e: Rational) extends UnitAST
     inline def of[U]: UnitAST = ${ meta.unitAST[U] }
 
-object test:
-    inline def tk[U](v: Rational, u: UnitAST): Quantity[Rational, U] =
-        ${ meta.tk[U]('v, 'u) }
+package syntax {
+    import coulomb.conversion.*
+
+    extension [V](v: V)
+        inline def withUnitRuntime[U](u: UnitAST)(using
+            vi: ValueConversion[V, Rational],
+            vo: ValueConversion[Rational, V]
+        ): Quantity[V, U] =
+            vo(meta.kernelExpr[U](vi(v), u)).withUnit[U]
+}
 
 object meta:
     import scala.unchecked
@@ -57,22 +64,19 @@ object meta:
                 case UnitAST.Pow(b, e) =>
                     '{ UnitAST.Pow(${ Expr(b) }, ${ Expr(e) }) }
 
-    def tk[U](v: Expr[Rational], u: Expr[UnitAST])(using
+    inline def kernelExpr[U](v: Rational, u: UnitAST): Rational =
+        ${ kernelExprMeta[U]('v, 'u) }
+
+    def kernelExprMeta[U](v: Expr[Rational], u: Expr[UnitAST])(using
         Quotes,
         Type[U]
-    ): Expr[Quantity[Rational, U]] =
+    ): Expr[Rational] =
         import quotes.reflect.*
         val cmp = stagingCompiler
-        println(s"cmp= ${cmp.asTerm}")
         val astU = typeReprAST(TypeRepr.of[U])
-        println(s"astU= $astU")
-        val expr = '{
-            kernel($v, $u, ${ Expr(astU) })(using $cmp).withUnit[U]
-        }
-        println(s"expr= ${expr.asTerm.show}")
-        expr
+        '{ kernelRuntime($v, $u, ${ Expr(astU) })(using $cmp) }
 
-    def kernel(v: Rational, astF: UnitAST, astT: UnitAST)(using
+    def kernelRuntime(v: Rational, astF: UnitAST, astT: UnitAST)(using
         staging.Compiler
     ): Rational =
         staging.run {
@@ -88,20 +92,9 @@ object meta:
             case iss: ImplicitSearchSuccess =>
                 iss.tree.asExprOf[staging.Compiler]
             case _ =>
-                report.errorAndAbort("no.")
+                report.errorAndAbort("no 'given' staging.Compiler is in scope")
+                // I'm not even sorry.
                 null.asInstanceOf[Expr[staging.Compiler]]
-
-    def baseunittree(using Quotes)(
-        u: quotes.reflect.TypeRepr
-    ): quotes.reflect.Tree =
-        import quotes.reflect.*
-        Implicits.search(
-            TypeRepr
-                .of[coulomb.define.BaseUnit]
-                .appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))
-        ) match
-            case iss: ImplicitSearchSuccess => iss.tree
-            case _                          => Literal(UnitConstant())
 
     def unitAST[U](using Quotes, Type[U]): Expr[UnitAST] =
         import quotes.reflect.*
@@ -147,12 +140,11 @@ object meta:
                 // parameterized types to be handled via typedef aliases?
                 UnitAST.UnitType(t.typeSymbol.fullName)
 
-    def symbolValueType(using Quotes)(
-        sym: quotes.reflect.Symbol
-    ): quotes.reflect.TypeRepr =
-        import quotes.reflect.*
-        val TermRef(tr, _) = sym.termRef: @unchecked
-        tr.memberType(sym).widen
+    def fqTypeRepr(using Quotes)(path: String): quotes.reflect.TypeRepr =
+        fqTypeRepr(path.split('.').toIndexedSeq)
+
+    def fqFieldSymbol(using Quotes)(path: String): quotes.reflect.Symbol =
+        fqFieldSymbol(path.split('.').toIndexedSeq)
 
     def fqTypeRepr(using Quotes)(
         path: Seq[String]
@@ -173,9 +165,6 @@ object meta:
                 )
                 TypeRepr.of[Unit]
 
-    def fqTypeRepr(using Quotes)(path: String): quotes.reflect.TypeRepr =
-        fqTypeRepr(path.split('.').toIndexedSeq)
-
     def fqFieldSymbol(using Quotes)(
         path: Seq[String]
     ): quotes.reflect.Symbol =
@@ -183,22 +172,17 @@ object meta:
         def work(q: Symbol, tail: Seq[String]): Symbol =
             if (tail.isEmpty) q
             else
-                // println(s"\nsymbol $q")
                 // look for modules first
                 // this includes packages and objects
                 val qt = q.declarations.filter { x =>
                     (x.name == tail.head) && x.flags.is(Flags.Module)
                 }
-                // println(s"${qt.map{x => (x, x.flags.show)}}")
-                val tt = q.declaredFields.filter(_.name == tail.head)
-                // println(s"${tt.map{x => (x, x.flags.show)}}")
                 // there are sometimes two symbols representing a module
                 // is the difference important to this function?
                 if (qt.length > 0) work(qt.head, tail.tail)
                 else
                     // if no module exists, look for declared symbol
                     val f = q.declarations.filter { x => x.name == tail.head }
-                    // println(s"${f.map{x => (x, x.flags.show)}}")
                     // expect a unique field declaration in this case
                     if ((f.length == 1) && (tail.length == 1)) f.head
                     else
@@ -215,6 +199,3 @@ object meta:
             work(defn.RootPackage, path.tail)
         else
             work(defn.RootPackage, path)
-
-    def fqFieldSymbol(using Quotes)(path: String): quotes.reflect.Symbol =
-        fqFieldSymbol(path.split('.').toIndexedSeq)
