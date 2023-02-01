@@ -80,6 +80,8 @@ object meta:
         val rtuU = typeReprRTU(TypeRepr.of[U])
         '{ kernelRuntime($v, $u, ${ Expr(rtuU) })(using $cmp) }
 
+    // maybe this should return Either[String, Rational]
+    // this is the core of a hypothetical RuntimeUnitConversion type
     def kernelRuntime(v: Rational, rtuF: RuntimeUnit, rtuT: RuntimeUnit)(using
         staging.Compiler
     ): Rational =
