@@ -22,27 +22,31 @@ import coulomb.*
 import coulomb.syntax.*
 import coulomb.rational.Rational
 
-sealed abstract class UnitAST:
-    def *(rhs: UnitAST): UnitAST.Mul = UnitAST.Mul(this, rhs)
-    def /(den: UnitAST): UnitAST.Div = UnitAST.Div(this, den)
-    def ^(e: Rational): UnitAST.Pow = UnitAST.Pow(this, e)
+sealed abstract class RuntimeUnit:
+    def *(rhs: RuntimeUnit): RuntimeUnit.Mul = RuntimeUnit.Mul(this, rhs)
+    def /(den: RuntimeUnit): RuntimeUnit.Div = RuntimeUnit.Div(this, den)
+    def ^(e: Rational): RuntimeUnit.Pow = RuntimeUnit.Pow(this, e)
 
-object UnitAST:
-    case class UnitType(path: String) extends UnitAST
-    case class Mul(lhs: UnitAST, rhs: UnitAST) extends UnitAST
-    case class Div(num: UnitAST, den: UnitAST) extends UnitAST
-    case class Pow(b: UnitAST, e: Rational) extends UnitAST
-    inline def of[U]: UnitAST = ${ meta.unitAST[U] }
+object RuntimeUnit:
+    case class UnitType(path: String) extends RuntimeUnit
+    case class Mul(lhs: RuntimeUnit, rhs: RuntimeUnit) extends RuntimeUnit
+    case class Div(num: RuntimeUnit, den: RuntimeUnit) extends RuntimeUnit
+    case class Pow(b: RuntimeUnit, e: Rational) extends RuntimeUnit
+    inline def of[U]: RuntimeUnit = ${ meta.unitRTU[U] }
 
 package syntax {
+    import scala.util.{Try, Success, Failure}
     import coulomb.conversion.*
 
-    extension [V](v: V)
-        inline def withUnitRuntime[U](u: UnitAST)(using
+    extension [V](vu: (V, RuntimeUnit))
+        inline def toQuantity[U](using
             vi: ValueConversion[V, Rational],
             vo: ValueConversion[Rational, V]
-        ): Quantity[V, U] =
-            vo(meta.kernelExpr[U](vi(v), u)).withUnit[U]
+        ): Either[String, Quantity[V, U]] =
+            val (v, u) = vu
+            Try(vo(meta.kernelExpr[U](vi(v), u)).withUnit[U]) match
+                case Success(q) => Right(q)
+                case Failure(e) => Left(e.getMessage)
 }
 
 object meta:
@@ -52,36 +56,36 @@ object meta:
     import coulomb.conversion.coefficients.{meta => _, *}
     import coulomb.infra.meta.{*, given}
 
-    given ctx_UnitASTToExpr: ToExpr[UnitAST] with
-        def apply(ast: UnitAST)(using Quotes): Expr[UnitAST] =
-            ast match
-                case UnitAST.UnitType(path) =>
-                    '{ UnitAST.UnitType(${ Expr(path) }) }
-                case UnitAST.Mul(l, r) =>
-                    '{ UnitAST.Mul(${ Expr(l) }, ${ Expr(r) }) }
-                case UnitAST.Div(n, d) =>
-                    '{ UnitAST.Div(${ Expr(n) }, ${ Expr(d) }) }
-                case UnitAST.Pow(b, e) =>
-                    '{ UnitAST.Pow(${ Expr(b) }, ${ Expr(e) }) }
+    given ctx_RuntimeUnitToExpr: ToExpr[RuntimeUnit] with
+        def apply(rtu: RuntimeUnit)(using Quotes): Expr[RuntimeUnit] =
+            rtu match
+                case RuntimeUnit.UnitType(path) =>
+                    '{ RuntimeUnit.UnitType(${ Expr(path) }) }
+                case RuntimeUnit.Mul(l, r) =>
+                    '{ RuntimeUnit.Mul(${ Expr(l) }, ${ Expr(r) }) }
+                case RuntimeUnit.Div(n, d) =>
+                    '{ RuntimeUnit.Div(${ Expr(n) }, ${ Expr(d) }) }
+                case RuntimeUnit.Pow(b, e) =>
+                    '{ RuntimeUnit.Pow(${ Expr(b) }, ${ Expr(e) }) }
 
-    inline def kernelExpr[U](v: Rational, u: UnitAST): Rational =
+    inline def kernelExpr[U](v: Rational, u: RuntimeUnit): Rational =
         ${ kernelExprMeta[U]('v, 'u) }
 
-    def kernelExprMeta[U](v: Expr[Rational], u: Expr[UnitAST])(using
+    def kernelExprMeta[U](v: Expr[Rational], u: Expr[RuntimeUnit])(using
         Quotes,
         Type[U]
     ): Expr[Rational] =
         import quotes.reflect.*
         val cmp = stagingCompiler
-        val astU = typeReprAST(TypeRepr.of[U])
-        '{ kernelRuntime($v, $u, ${ Expr(astU) })(using $cmp) }
+        val rtuU = typeReprRTU(TypeRepr.of[U])
+        '{ kernelRuntime($v, $u, ${ Expr(rtuU) })(using $cmp) }
 
-    def kernelRuntime(v: Rational, astF: UnitAST, astT: UnitAST)(using
+    def kernelRuntime(v: Rational, rtuF: RuntimeUnit, rtuT: RuntimeUnit)(using
         staging.Compiler
     ): Rational =
         staging.run {
             import quotes.reflect.*
-            (astTypeRepr(astF).asType, astTypeRepr(astT).asType) match
+            (rtuTypeRepr(rtuF).asType, rtuTypeRepr(rtuT).asType) match
                 case ('[uf], '[ut]) =>
                     '{ ${ Expr(v) } * coefficientRational[uf, ut] }
         }
@@ -96,49 +100,49 @@ object meta:
                 // I'm not even sorry.
                 null.asInstanceOf[Expr[staging.Compiler]]
 
-    def unitAST[U](using Quotes, Type[U]): Expr[UnitAST] =
+    def unitRTU[U](using Quotes, Type[U]): Expr[RuntimeUnit] =
         import quotes.reflect.*
-        Expr(typeReprAST(TypeRepr.of[U]))
+        Expr(typeReprRTU(TypeRepr.of[U]))
 
-    def astTypeRepr(using Quotes)(
-        ast: UnitAST
+    def rtuTypeRepr(using Quotes)(
+        rtu: RuntimeUnit
     ): quotes.reflect.TypeRepr =
         import quotes.reflect.*
-        ast match
-            case UnitAST.UnitType(path) => fqTypeRepr(path)
-            case UnitAST.Mul(l, r) =>
-                val ltr = astTypeRepr(l)
-                val rtr = astTypeRepr(r)
+        rtu match
+            case RuntimeUnit.UnitType(path) => fqTypeRepr(path)
+            case RuntimeUnit.Mul(l, r) =>
+                val ltr = rtuTypeRepr(l)
+                val rtr = rtuTypeRepr(r)
                 TypeRepr.of[coulomb.`*`].appliedTo(List(ltr, rtr))
-            case UnitAST.Div(n, d) =>
-                val ntr = astTypeRepr(n)
-                val dtr = astTypeRepr(d)
+            case RuntimeUnit.Div(n, d) =>
+                val ntr = rtuTypeRepr(n)
+                val dtr = rtuTypeRepr(d)
                 TypeRepr.of[coulomb.`/`].appliedTo(List(ntr, dtr))
-            case UnitAST.Pow(b, e) =>
-                val btr = astTypeRepr(b)
+            case RuntimeUnit.Pow(b, e) =>
+                val btr = rtuTypeRepr(b)
                 val etr = rationalTE(e)
                 TypeRepr.of[coulomb.`^`].appliedTo(List(btr, etr))
 
-    def typeReprAST(using Quotes)(
+    def typeReprRTU(using Quotes)(
         tr: quotes.reflect.TypeRepr
-    ): UnitAST =
+    ): RuntimeUnit =
         import quotes.reflect.*
         tr match
             case AppliedType(op, List(lu, ru))
                 if (op =:= TypeRepr.of[coulomb.`*`]) =>
-                UnitAST.Mul(typeReprAST(lu), typeReprAST(ru))
+                RuntimeUnit.Mul(typeReprRTU(lu), typeReprRTU(ru))
             case AppliedType(op, List(lu, ru))
                 if (op =:= TypeRepr.of[coulomb.`/`]) =>
-                UnitAST.Div(typeReprAST(lu), typeReprAST(ru))
+                RuntimeUnit.Div(typeReprRTU(lu), typeReprRTU(ru))
             case AppliedType(op, List(b, e))
                 if (op =:= TypeRepr.of[coulomb.`^`]) =>
                 val rationalTE(ev) = e: @unchecked
-                UnitAST.Pow(typeReprAST(b), ev)
+                RuntimeUnit.Pow(typeReprRTU(b), ev)
             case t =>
                 // should add checking for types with type-args here
-                // possibly an explicit non dealiasting policy here would allow
+                // possibly an explicit non dealirtuing policy here would allow
                 // parameterized types to be handled via typedef aliases?
-                UnitAST.UnitType(t.typeSymbol.fullName)
+                RuntimeUnit.UnitType(t.typeSymbol.fullName)
 
     def fqTypeRepr(using Quotes)(path: String): quotes.reflect.TypeRepr =
         fqTypeRepr(path.split('.').toIndexedSeq)
