@@ -34,6 +34,12 @@ object RuntimeUnit:
     case class Pow(b: RuntimeUnit, e: Rational) extends RuntimeUnit
     inline def of[U]: RuntimeUnit = ${ meta.unitRTU[U] }
 
+case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
+
+object RuntimeQuantity:
+    inline def apply[V, U](q: Quantity[V, U]): RuntimeQuantity[V] =
+        RuntimeQuantity(q.value, RuntimeUnit.of[U])
+
 package syntax {
     import scala.util.{Try, Success, Failure}
     import coulomb.conversion.*
