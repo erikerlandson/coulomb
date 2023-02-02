@@ -71,7 +71,7 @@ lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     ) // make units "% Test"
     .settings(commonSettings: _*)
     .settings(
-        tlVersionIntroduced := Map("3" -> "0.7.3"),
+        tlVersionIntroduced := Map("3" -> "0.7.4"),
         libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value
     )
 
