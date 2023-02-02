@@ -120,29 +120,13 @@ object meta:
         Quotes
     )(u: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
-        given sigmode: SigMode = SigMode.Simplify
+        // given sigmode: SigMode = SigMode.Simplify
         u match
-            case deltaunit(offset, db) =>
-                if (matchingdelta(db, b)) offset
-                else
-                    report.error(s"bad DeltaUnit in offset: ${typestr(u)}")
-                    Rational.const0
-            case baseunit() if convertible(u, b)        => Rational.const0
-            case derivedunit(_, _) if convertible(u, b) => Rational.const0
-            case _ => {
-                report.error(
-                    s"unknown unit expression in offset: ${typestr(u)}"
-                ); Rational.const0
-            }
-
-    def matchingdelta(using
-        Quotes
-    )(db: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Boolean =
-        import quotes.reflect.*
-        // units of db and b should cancel, and leave only a constant behind
-        simplify(TypeRepr.of[/].appliedTo(List(db, b))) match
-            case rationalTE(_) => true
-            case _             => false
+            case deltaunit(offset, d) if convertible(d, b) => offset
+            case _ if convertible(u, b)                    => Rational.const0
+            case _ =>
+                report.error(s"bad DeltaUnit in offset: ${typestr(u)}")
+                Rational.const0
 
     def convertible(using
         Quotes
@@ -151,6 +135,12 @@ object meta:
         given sigmode: SigMode = SigMode.Canonical
         val (_, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
         rsig == Nil
+
+    @deprecated("unused, keeping this to satisfy MIMA")
+    def matchingdelta(using
+        Quotes
+    )(db: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Boolean =
+        false
 
     // returns tuple: (expr-for-coef, type-of-Res)
     def cansig(using qq: Quotes, mode: SigMode)(
@@ -331,12 +321,12 @@ object meta:
                     )
             ) match
                 case iss: ImplicitSearchSuccess =>
-                    val AppliedType(_, List(_, b, o, _, _)) =
+                    val AppliedType(_, List(_, d, o, _, _)) =
                         iss.tree.tpe.baseType(
                             TypeRepr.of[DeltaUnit].typeSymbol
                         ): @unchecked
                     val rationalTE(offset) = o: @unchecked
-                    Some((offset, b))
+                    Some((offset, d))
                 case _ => None
 
     def unifyOp(using Quotes)(

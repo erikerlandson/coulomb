@@ -294,11 +294,20 @@ class JavaTimeSuite extends CoulombSuite:
         assertEquals(et.toInstant.toString, "1969-07-20T00:00:00Z")
     }
 
+    test("toInstant Milli * Seconds") {
+        import coulomb.units.javatime.conversions.explicit.given
+
+        // verify it handles arbitrary unit types that are compatible
+        val et = (1000L).withEpochTime[Milli * Second]
+        assertEquals(et.toInstant.toString, "1970-01-01T00:00:01Z")
+    }
+
     test("toInstant YearsBC") {
         import coulomb.units.javatime.conversions.explicit.given
 
         import bc.{*, given}
 
+        // verify it handles negative directionality
         val et = 100.withEpochTime[YearsBC]
         assertEquals(et.toInstant.toString, "-0099-05-18T00:00:00Z")
     }
