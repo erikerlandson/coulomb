@@ -120,7 +120,7 @@ object meta:
         Quotes
     )(u: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
-        given sigmode: SigMode = SigMode.Simplify
+        // given sigmode: SigMode = SigMode.Simplify
         u match
             case deltaunit(offset, d) if convertible(d, b) => offset
             case _ if convertible(u, b)                    => Rational.const0
@@ -135,6 +135,12 @@ object meta:
         given sigmode: SigMode = SigMode.Canonical
         val (_, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
         rsig == Nil
+
+    @deprecated("unused, keeping this to satisfy MIMA")
+    def matchingdelta(using
+        Quotes
+    )(db: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Boolean =
+        false
 
     // returns tuple: (expr-for-coef, type-of-Res)
     def cansig(using qq: Quotes, mode: SigMode)(
