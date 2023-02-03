@@ -58,8 +58,8 @@ lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .settings(name := "coulomb-runtime")
     .dependsOn(
         core % "compile->compile;test->test",
-        units
-    ) // make units "% Test"
+        units % Test
+    )
     .settings(commonSettings: _*)
     .settings(
         tlVersionIntroduced := Map("3" -> "0.7.4"),
