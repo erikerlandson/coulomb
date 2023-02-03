@@ -33,10 +33,14 @@ sealed abstract class RuntimeUnit:
             if (tl) s else s"($s)"
         def work(u: RuntimeUnit, tl: Boolean = false): String =
             u match
-                case RuntimeUnit.UnitType(path) => path.split('.').last
-                case RuntimeUnit.Mul(l, r) => paren(s"${work(l)}*${work(r)}", tl)
-                case RuntimeUnit.Div(n, d) => paren(s"${work(n)}/${work(d)}", tl)
-                case RuntimeUnit.Pow(b, e) => paren(s"${work(b)}^$e", tl)
+                case RuntimeUnit.UnitType(path) =>
+                    path.split('.').last
+                case RuntimeUnit.Mul(l, r) =>
+                    paren(s"${work(l)}*${work(r)}", tl)
+                case RuntimeUnit.Div(n, d) =>
+                    paren(s"${work(n)}/${work(d)}", tl)
+                case RuntimeUnit.Pow(b, e) =>
+                    paren(s"${work(b)}^$e", tl)
         work(this, tl = true)
 
 object RuntimeUnit:
