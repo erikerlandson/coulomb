@@ -17,10 +17,12 @@
 package coulomb.runtime
 
 import scala.quoted.*
+import scala.util.{Try, Success, Failure}
 
-import coulomb.*
+import coulomb.{infra => _, *}
 import coulomb.syntax.*
 import coulomb.rational.Rational
+import coulomb.conversion.*
 
 sealed abstract class RuntimeUnit:
     def *(rhs: RuntimeUnit): RuntimeUnit.Mul = RuntimeUnit.Mul(this, rhs)
@@ -32,7 +34,14 @@ object RuntimeUnit:
     case class Mul(lhs: RuntimeUnit, rhs: RuntimeUnit) extends RuntimeUnit
     case class Div(num: RuntimeUnit, den: RuntimeUnit) extends RuntimeUnit
     case class Pow(b: RuntimeUnit, e: Rational) extends RuntimeUnit
-    inline def of[U]: RuntimeUnit = ${ meta.unitRTU[U] }
+    inline def of[U]: RuntimeUnit = ${ infra.meta.unitRTU[U] }
+
+def coefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
+    scmp: staging.Compiler,
+    vc: ValueConversion[Rational, V]
+): Either[String, V] =
+    import coulomb.runtime.conversion.coefficients.coefficientRational
+    coefficientRational(uf, ut).map(vc)
 
 case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
 
@@ -40,26 +49,60 @@ object RuntimeQuantity:
     inline def apply[V, U](q: Quantity[V, U]): RuntimeQuantity[V] =
         RuntimeQuantity(q.value, RuntimeUnit.of[U])
 
-package syntax {
-    import scala.util.{Try, Success, Failure}
-    import coulomb.conversion.*
+extension [VL](ql: RuntimeQuantity[VL])
+    inline def toQuantity[VR, UR](using
+        vi: ValueConversion[VL, Rational],
+        vo: ValueConversion[Rational, VR]
+    ): Either[String, Quantity[VR, UR]] =
+        infra.meta.coefExpr[UR](ql.unit).map { coef =>
+            vo(coef * vi(ql.value)).withUnit[UR]
+        }
 
-    extension [V](vu: (V, RuntimeUnit))
-        inline def toQuantity[U](using
-            vi: ValueConversion[V, Rational],
-            vo: ValueConversion[Rational, V]
-        ): Either[String, Quantity[V, U]] =
-            val (v, u) = vu
-            Try(vo(meta.kernelExpr[U](vi(v), u)).withUnit[U]) match
-                case Success(q) => Right(q)
-                case Failure(e) => Left(e.getMessage)
+package syntax {
+    extension [V](v: V)
+        inline def withRuntimeUnit(u: RuntimeUnit): RuntimeQuantity[V] =
+            RuntimeQuantity(v, u)
 }
+
+package conversion {
+abstract class RuntimeUnitConversion[V] extends (V => V)
+object RuntimeUnitConversion:
+    def apply[V](rtuF: RuntimeUnit, rtuT: RuntimeUnit)(using
+        scmp: staging.Compiler,
+        vi: ValueConversion[V, Rational],
+        vo: ValueConversion[Rational, V]
+    ): Either[String, RuntimeUnitConversion[V]] =
+        coefficients.coefficientRational(rtuF, rtuT).map { coef =>
+            new RuntimeUnitConversion[V] {
+                def apply(v: V): V = vo(coef * vi(v))
+            }
+        }
+
+object coefficients:
+    import coulomb.runtime.infra.meta.*
+    import coulomb.conversion.coefficients.{coefficientRational => staticCR}
+
+    def coefficientRational(uf: RuntimeUnit, ut: RuntimeUnit)(using
+        staging.Compiler
+    ): Either[String, Rational] =
+        Try {
+            staging.run {
+                import quotes.reflect.*
+                (rtuTypeRepr(uf).asType, rtuTypeRepr(ut).asType) match
+                    case ('[f], '[t]) =>
+                        '{ staticCR[f, t] }
+            }
+        } match
+            case Success(coef) => Right(coef)
+            case Failure(e) => Left(e.getMessage)
+}
+
+package infra {
 
 object meta:
     import scala.unchecked
     import scala.language.implicitConversions
 
-    import coulomb.conversion.coefficients.{meta => _, *}
     import coulomb.infra.meta.{*, given}
 
     given ctx_RuntimeUnitToExpr: ToExpr[RuntimeUnit] with
@@ -74,29 +117,18 @@ object meta:
                 case RuntimeUnit.Pow(b, e) =>
                     '{ RuntimeUnit.Pow(${ Expr(b) }, ${ Expr(e) }) }
 
-    inline def kernelExpr[U](v: Rational, u: RuntimeUnit): Rational =
-        ${ kernelExprMeta[U]('v, 'u) }
+    inline def coefExpr[UT](uf: RuntimeUnit): Either[String, Rational] =
+        ${ coefExprMeta[UT]('uf) }
 
-    def kernelExprMeta[U](v: Expr[Rational], u: Expr[RuntimeUnit])(using
+    def coefExprMeta[UT](uf: Expr[RuntimeUnit])(using
         Quotes,
-        Type[U]
-    ): Expr[Rational] =
+        Type[UT]
+    ): Expr[Either[String, Rational]] =
         import quotes.reflect.*
+        import coulomb.runtime.conversion.coefficients.coefficientRational
         val cmp = stagingCompiler
-        val rtuU = typeReprRTU(TypeRepr.of[U])
-        '{ kernelRuntime($v, $u, ${ Expr(rtuU) })(using $cmp) }
-
-    // maybe this should return Either[String, Rational]
-    // this is the core of a hypothetical RuntimeUnitConversion type
-    def kernelRuntime(v: Rational, rtuF: RuntimeUnit, rtuT: RuntimeUnit)(using
-        staging.Compiler
-    ): Rational =
-        staging.run {
-            import quotes.reflect.*
-            (rtuTypeRepr(rtuF).asType, rtuTypeRepr(rtuT).asType) match
-                case ('[uf], '[ut]) =>
-                    '{ ${ Expr(v) } * coefficientRational[uf, ut] }
-        }
+        val ut = typeReprRTU(TypeRepr.of[UT])
+        '{ coefficientRational($uf, ${ Expr(ut) })(using $cmp) }
 
     def stagingCompiler(using Quotes): Expr[staging.Compiler] =
         import quotes.reflect.*
@@ -211,3 +243,4 @@ object meta:
             work(defn.RootPackage, path.tail)
         else
             work(defn.RootPackage, path)
+}
