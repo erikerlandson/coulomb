@@ -28,6 +28,16 @@ sealed abstract class RuntimeUnit:
     def *(rhs: RuntimeUnit): RuntimeUnit.Mul = RuntimeUnit.Mul(this, rhs)
     def /(den: RuntimeUnit): RuntimeUnit.Div = RuntimeUnit.Div(this, den)
     def ^(e: Rational): RuntimeUnit.Pow = RuntimeUnit.Pow(this, e)
+    override def toString: String =
+        def paren(s: String, tl: Boolean): String =
+            if (tl) s else s"($s)"
+        def work(u: RuntimeUnit, tl: Boolean = false): String =
+            u match
+                case RuntimeUnit.UnitType(path) => path.split('.').last
+                case RuntimeUnit.Mul(l, r) => paren(s"${work(l)}*${work(r)}", tl)
+                case RuntimeUnit.Div(n, d) => paren(s"${work(n)}/${work(d)}", tl)
+                case RuntimeUnit.Pow(b, e) => paren(s"${work(b)}^$e", tl)
+        work(this, tl = true)
 
 object RuntimeUnit:
     case class UnitType(path: String) extends RuntimeUnit
