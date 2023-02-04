@@ -61,7 +61,7 @@ lazy val units = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
 
 // see also: https://github.com/lampepfl/dotty/issues/7647
-lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+lazy val runtime = crossProject(JVMPlatform /*, JSPlatform, NativePlatform */)
     .crossType(CrossType.Pure)
     .in(file("runtime"))
     .settings(name := "coulomb-runtime")
