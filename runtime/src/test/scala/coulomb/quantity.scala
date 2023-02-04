@@ -30,10 +30,14 @@ class RuntimeQuantitySuite extends CoulombSuite:
     import coulomb.units.si.prefixes.{*, given}
     import coulomb.units.us.{*, given}
 
-    given staging.Compiler = staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
+    given staging.Compiler =
+        staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
 
     test("coefficient") {
         import coulomb.policy.strict.given
-        val coef = runtime.coefficient[Double](RuntimeUnit.of[Kilo * Meter], RuntimeUnit.of[Meter])
+        val coef = runtime.coefficient[Double](
+            RuntimeUnit.of[Kilo * Meter],
+            RuntimeUnit.of[Meter]
+        )
         assert(coef.contains(1000d))
     }
