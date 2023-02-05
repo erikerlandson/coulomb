@@ -50,13 +50,6 @@ object RuntimeUnit:
     case class Pow(b: RuntimeUnit, e: Rational) extends RuntimeUnit
     inline def of[U]: RuntimeUnit = ${ infra.meta.unitRTU[U] }
 
-def coefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
-    scmp: staging.Compiler,
-    vc: ValueConversion[Rational, V]
-): Either[String, V] =
-    import coulomb.runtime.conversion.coefficients.coefficientRational
-    coefficientRational(uf, ut).map(vc)
-
 case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
 
 object RuntimeQuantity:
@@ -65,11 +58,11 @@ object RuntimeQuantity:
 
 extension [VL](ql: RuntimeQuantity[VL])
     inline def toQuantity[VR, UR](using
-        scmp: staging.Compiler,
+        crt: CoefficientRuntime,
         vi: ValueConversion[VL, Rational],
         vo: ValueConversion[Rational, VR]
     ): Either[String, Quantity[VR, UR]] =
-        infra.meta.coefExpr[UR](ql.unit).map { coef =>
+        crt.coefficientRational[UR](ql.unit).map { coef =>
             vo(coef * vi(ql.value)).withUnit[UR]
         }
 
@@ -79,45 +72,63 @@ package syntax {
             RuntimeQuantity(v, u)
 }
 
+def runtimeCoefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
+    crt: CoefficientRuntime,
+    vc: ValueConversion[Rational, V]
+): Either[String, V] =
+    crt.coefficient[V](uf, ut)
+
+abstract class CoefficientRuntime:
+    def coefficientRational(
+        uf: RuntimeUnit,
+        ut: RuntimeUnit
+    ): Either[String, Rational]
+
+    final inline def coefficientRational[UT](
+        uf: RuntimeUnit
+    ): Either[String, Rational] =
+        infra.meta.crExpr[UT](this, uf)
+
+    final def coefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
+        vc: ValueConversion[Rational, V]
+    ): Either[String, V] =
+        this.coefficientRational(uf, ut).map(vc)
+
+object CoefficientRuntime:
+    // a CoefficientRuntime that leverages a staging compiler to do runtime magic
+    // it will be possible to define other flavors of CoefficientRuntime that
+    // do not require staging compiler and so can work with JS and Native
+    def staging(using scmp: scala.quoted.staging.Compiler): CoefficientRuntime =
+        new CoefficientRuntime:
+            def coefficientRational(
+                uf: RuntimeUnit,
+                ut: RuntimeUnit
+            ): Either[String, Rational] =
+                infra.meta.coefStaging(uf, ut)(using scmp)
+
 package conversion {
     abstract class RuntimeUnitConversion[V] extends (V => V)
+
     object RuntimeUnitConversion:
         def apply[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
-            scmp: staging.Compiler,
+            crt: CoefficientRuntime,
             vi: ValueConversion[V, Rational],
             vo: ValueConversion[Rational, V]
         ): Either[String, RuntimeUnitConversion[V]] =
-            coefficients.coefficientRational(uf, ut).map { coef =>
+            crt.coefficientRational(uf, ut).map { coef =>
                 new RuntimeUnitConversion[V] {
                     def apply(v: V): V = vo(coef * vi(v))
                 }
             }
-
-    object coefficients:
-        import coulomb.runtime.infra.meta.*
-        import coulomb.conversion.coefficients.{coefficientRational => staticCR}
-
-        def coefficientRational(uf: RuntimeUnit, ut: RuntimeUnit)(using
-            staging.Compiler
-        ): Either[String, Rational] =
-            Try {
-                staging.run {
-                    import quotes.reflect.*
-                    (rtuTypeRepr(uf).asType, rtuTypeRepr(ut).asType) match
-                        case ('[f], '[t]) => '{ staticCR[f, t] }
-                }
-            } match
-                case Success(coef) => Right(coef)
-                case Failure(e)    => Left(e.getMessage)
 }
 
 package infra {
-
     object meta:
         import scala.unchecked
         import scala.language.implicitConversions
 
         import coulomb.infra.meta.{*, given}
+        import coulomb.conversion.coefficients.coefficientRational
 
         given ctx_RuntimeUnitToExpr: ToExpr[RuntimeUnit] with
             def apply(rtu: RuntimeUnit)(using Quotes): Expr[RuntimeUnit] =
@@ -131,22 +142,33 @@ package infra {
                     case RuntimeUnit.Pow(b, e) =>
                         '{ RuntimeUnit.Pow(${ Expr(b) }, ${ Expr(e) }) }
 
-        inline def coefExpr[UT](uf: RuntimeUnit)(using
-            scmp: staging.Compiler
+        def coefStaging(uf: RuntimeUnit, ut: RuntimeUnit)(using
+            staging.Compiler
         ): Either[String, Rational] =
-            ${ coefExprMeta[UT]('uf, 'scmp) }
+            Try {
+                staging.run {
+                    import quotes.reflect.*
+                    (rtuTypeRepr(uf).asType, rtuTypeRepr(ut).asType) match
+                        case ('[f], '[t]) => '{ coefficientRational[f, t] }
+                }
+            } match
+                case Success(coef) => Right(coef)
+                case Failure(e)    => Left(e.getMessage)
 
-        def coefExprMeta[UT](
-            uf: Expr[RuntimeUnit],
-            scmp: Expr[staging.Compiler]
-        )(using
+        inline def crExpr[UT](
+            cr: CoefficientRuntime,
+            uf: RuntimeUnit
+        ): Either[String, Rational] =
+            ${ crExprMeta[UT]('cr, 'uf) }
+
+        def crExprMeta[UT](cr: Expr[CoefficientRuntime], uf: Expr[RuntimeUnit])(
+            using
             Quotes,
             Type[UT]
         ): Expr[Either[String, Rational]] =
             import quotes.reflect.*
-            import coulomb.runtime.conversion.coefficients.coefficientRational
             val ut = typeReprRTU(TypeRepr.of[UT])
-            '{ coefficientRational($uf, ${ Expr(ut) })(using $scmp) }
+            '{ ${ cr }.coefficientRational($uf, ${ Expr(ut) }) }
 
         def unitRTU[U](using Quotes, Type[U]): Expr[RuntimeUnit] =
             import quotes.reflect.*

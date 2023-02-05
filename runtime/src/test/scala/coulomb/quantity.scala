@@ -33,9 +33,11 @@ class RuntimeQuantitySuite extends CoulombSuite:
     given staging.Compiler =
         staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
 
-    test("coefficient") {
+    given CoefficientRuntime = CoefficientRuntime.staging
+
+    test("runtimeCoefficient") {
         import coulomb.policy.strict.given
-        val coef = runtime.coefficient[Double](
+        val coef = runtimeCoefficient[Double](
             RuntimeUnit.of[Kilo * Meter],
             RuntimeUnit.of[Meter]
         )
