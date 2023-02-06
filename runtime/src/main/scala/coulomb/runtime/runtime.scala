@@ -94,18 +94,6 @@ abstract class CoefficientRuntime:
     ): Either[String, V] =
         this.coefficientRational(uf, ut).map(vc)
 
-object CoefficientRuntime:
-    // a CoefficientRuntime that leverages a staging compiler to do runtime magic
-    // it will be possible to define other flavors of CoefficientRuntime that
-    // do not require staging compiler and so can work with JS and Native
-    def staging(using scmp: scala.quoted.staging.Compiler): CoefficientRuntime =
-        new CoefficientRuntime:
-            def coefficientRational(
-                uf: RuntimeUnit,
-                ut: RuntimeUnit
-            ): Either[String, Rational] =
-                infra.meta.coefStaging(uf, ut)(using scmp)
-
 package conversion {
     abstract class RuntimeUnitConversion[V] extends (V => V)
 
@@ -120,6 +108,29 @@ package conversion {
                     def apply(v: V): V = vo(coef * vi(v))
                 }
             }
+}
+
+package conversion.runtimes {
+    import scala.quoted.staging
+    import coulomb.runtime.infra.meta
+
+    // a CoefficientRuntime that leverages a staging compiler to do runtime magic
+    // it will be possible to define other flavors of CoefficientRuntime that
+    // do not require staging compiler and so can work with JS and Native
+    class StagingCoefficientRuntime(using
+        scmp: staging.Compiler
+    ) extends CoefficientRuntime:
+        def coefficientRational(
+            uf: RuntimeUnit,
+            ut: RuntimeUnit
+        ): Either[String, Rational] =
+            meta.coefStaging(uf, ut)(using scmp)
+
+    object StagingCoefficientRuntime:
+        def apply()(using
+            scmp: staging.Compiler
+        ): StagingCoefficientRuntime =
+            new StagingCoefficientRuntime(using scmp)
 }
 
 package infra {
