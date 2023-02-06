@@ -133,6 +133,18 @@ package conversion.runtimes {
             new StagingCoefficientRuntime(using scmp)
 }
 
+package conversion.runtimes {
+    class MappingCoefficientRuntime(
+        baseUnits: Set[RuntimeUnit.UnitType],
+        derivedUnits: Map[RuntimeUnit.UnitType, RuntimeUnit]
+    ) extends CoefficientRuntime:
+        def coefficientRational(
+            uf: RuntimeUnit,
+            ut: RuntimeUnit
+        ): Either[String, Rational] =
+            Left("No.")
+}
+
 package infra {
     object meta:
         import scala.unchecked
