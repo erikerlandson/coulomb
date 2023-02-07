@@ -33,6 +33,8 @@ sealed abstract class RuntimeUnit:
             if (tl) s else s"($s)"
         def work(u: RuntimeUnit, tl: Boolean = false): String =
             u match
+                case RuntimeUnit.UnitConst(value) =>
+                    s"$value"
                 case RuntimeUnit.UnitType(path) =>
                     path.split('.').last
                 case RuntimeUnit.Mul(l, r) =>
@@ -44,6 +46,7 @@ sealed abstract class RuntimeUnit:
         work(this, tl = true)
 
 object RuntimeUnit:
+    case class UnitConst(value: Rational) extends RuntimeUnit
     case class UnitType(path: String) extends RuntimeUnit
     case class Mul(lhs: RuntimeUnit, rhs: RuntimeUnit) extends RuntimeUnit
     case class Div(num: RuntimeUnit, den: RuntimeUnit) extends RuntimeUnit
@@ -153,11 +156,23 @@ package infra {
         import coulomb.infra.meta.{*, given}
         import coulomb.conversion.coefficients.coefficientRational
 
+        given ctx_RuntimeUnitConstToExpr: ToExpr[RuntimeUnit.UnitConst] with
+            def apply(uc: RuntimeUnit.UnitConst)(using
+                Quotes
+            ): Expr[RuntimeUnit.UnitConst] =
+                '{ RuntimeUnit.UnitConst(${ Expr(uc.value) }) }
+
+        given ctx_RuntimeUnitTypeToExpr: ToExpr[RuntimeUnit.UnitType] with
+            def apply(ut: RuntimeUnit.UnitType)(using
+                Quotes
+            ): Expr[RuntimeUnit.UnitType] =
+                '{ RuntimeUnit.UnitType(${ Expr(ut.path) }) }
+
         given ctx_RuntimeUnitToExpr: ToExpr[RuntimeUnit] with
             def apply(rtu: RuntimeUnit)(using Quotes): Expr[RuntimeUnit] =
                 rtu match
-                    case RuntimeUnit.UnitType(path) =>
-                        '{ RuntimeUnit.UnitType(${ Expr(path) }) }
+                    case uc: RuntimeUnit.UnitConst => Expr(uc)
+                    case ut: RuntimeUnit.UnitType  => Expr(ut)
                     case RuntimeUnit.Mul(l, r) =>
                         '{ RuntimeUnit.Mul(${ Expr(l) }, ${ Expr(r) }) }
                     case RuntimeUnit.Div(n, d) =>
@@ -202,7 +217,8 @@ package infra {
         ): quotes.reflect.TypeRepr =
             import quotes.reflect.*
             rtu match
-                case RuntimeUnit.UnitType(path) => fqTypeRepr(path)
+                case RuntimeUnit.UnitConst(value) => rationalTE(value)
+                case RuntimeUnit.UnitType(path)   => fqTypeRepr(path)
                 case RuntimeUnit.Mul(l, r) =>
                     val ltr = rtuTypeRepr(l)
                     val rtr = rtuTypeRepr(r)
@@ -231,6 +247,8 @@ package infra {
                     if (op =:= TypeRepr.of[coulomb.`^`]) =>
                     val rationalTE(ev) = e: @unchecked
                     RuntimeUnit.Pow(typeReprRTU(b), ev)
+                case rationalTE(v) =>
+                    RuntimeUnit.UnitConst(v)
                 case t =>
                     // should add checking for types with type-args here
                     // possibly an explicit non dealirtuing policy here would allow
