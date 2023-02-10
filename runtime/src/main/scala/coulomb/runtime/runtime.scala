@@ -160,29 +160,6 @@ package conversion {
 }
 
 package conversion.runtimes {
-    import scala.quoted.staging
-    import coulomb.runtime.infra.meta
-
-    // a CoefficientRuntime that leverages a staging compiler to do runtime magic
-    // it will be possible to define other flavors of CoefficientRuntime that
-    // do not require staging compiler and so can work with JS and Native
-    class StagingCoefficientRuntime(using
-        scmp: staging.Compiler
-    ) extends CoefficientRuntime:
-        def coefficientRational(
-            uf: RuntimeUnit,
-            ut: RuntimeUnit
-        ): Either[String, Rational] =
-            meta.coefStaging(uf, ut)(using scmp)
-
-    object StagingCoefficientRuntime:
-        def apply()(using
-            scmp: staging.Compiler
-        ): StagingCoefficientRuntime =
-            new StagingCoefficientRuntime(using scmp)
-}
-
-package conversion.runtimes {
     class MappingCoefficientRuntime(
         baseUnits: Set[RuntimeUnit.UnitType],
         derivedUnits: Map[RuntimeUnit.UnitType, RuntimeUnit]
