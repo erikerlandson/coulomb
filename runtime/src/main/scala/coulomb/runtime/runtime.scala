@@ -19,6 +19,8 @@ package coulomb.runtime
 import scala.quoted.*
 import scala.util.{Try, Success, Failure}
 
+import scala.collection.immutable.HashMap
+
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
 import coulomb.rational.Rational
@@ -52,6 +54,50 @@ object RuntimeUnit:
     case class Div(num: RuntimeUnit, den: RuntimeUnit) extends RuntimeUnit
     case class Pow(b: RuntimeUnit, e: Rational) extends RuntimeUnit
     inline def of[U]: RuntimeUnit = ${ infra.meta.unitRTU[U] }
+
+case class Canonical(coef: Rational, sig: Map[RuntimeUnit.UnitType, Rational]):
+    def *(that: Canonical): Canonical =
+        val Canonical(rcoef, rsig) = that
+        val s = Canonical
+            .merge(sig, rsig)(_ + _)
+            .filter { case (_, e) => e != Rational.const0 }
+        Canonical(coef * rcoef, s)
+
+    def /(that: Canonical): Canonical =
+        val Canonical(rcoef, rsig) = that
+        val rneg = rsig.map { case (u, e) => (u, -e) }
+        val s = Canonical
+            .merge(sig, rneg)(_ + _)
+            .filter { case (_, e) => e != Rational.const0 }
+        Canonical(coef / rcoef, s)
+
+    def pow(e: Rational): Canonical =
+        if (e == Rational.const0) Canonical.one
+        else if (e == Rational.const1) this
+        else
+            val s = sig.map { case (u, ue) => (u, ue * e) }
+            Canonical(coef.pow(e), s)
+
+object Canonical:
+    def merge[K, V](m1: Map[K, V], m2: Map[K, V])(f: (V, V) => V): Map[K, V] =
+        val ki = m1.keySet & m2.keySet
+        val r1 = m1.filter { case (k, _) => !ki.contains(k) }
+        val r2 = m2.filter { case (k, _) => !ki.contains(k) }
+        val ri = ki.map { k => (k, f(m1(k), m2(k))) }
+        r1.concat(r2).concat(ri)
+
+    private val s1 = HashMap.empty[RuntimeUnit.UnitType, Rational]
+    private val r1 = Rational.const1
+
+    val one: Canonical = Canonical(r1, s1)
+
+    def apply(u: RuntimeUnit): Canonical =
+        u match
+            case RuntimeUnit.Mul(l, r)    => Canonical(l) * Canonical(r)
+            case RuntimeUnit.Div(n, d)    => Canonical(n) / Canonical(d)
+            case RuntimeUnit.Pow(b, e)    => Canonical(b).pow(e)
+            case RuntimeUnit.UnitConst(c) => Canonical(c, s1)
+            case u: RuntimeUnit.UnitType  => Canonical(r1, HashMap(u -> r1))
 
 case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
 
