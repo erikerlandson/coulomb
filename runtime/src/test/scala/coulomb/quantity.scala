@@ -30,7 +30,7 @@ class RuntimeQuantitySuite extends CoulombSuite:
     import coulomb.units.si.prefixes.{*, given}
     import coulomb.units.us.{*, given}
 
-    import coulomb.runtime.conversion.runtimes.StagingCoefficientRuntime
+    import coulomb.runtime.conversion.runtimes.staging.StagingCoefficientRuntime
 
     given staging.Compiler =
         staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
