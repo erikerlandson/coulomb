@@ -16,7 +16,7 @@
 
 import coulomb.testing.CoulombSuite
 
-class RuntimeQuantitySuite extends CoulombSuite:
+class StagingRuntimeQuantitySuite extends CoulombSuite:
     import scala.quoted.staging
 
     import coulomb.*
