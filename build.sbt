@@ -52,7 +52,7 @@ lazy val units = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
 
 // see also: https://github.com/lampepfl/dotty/issues/7647
-lazy val runtime = crossProject(JVMPlatform /*, JSPlatform, NativePlatform */ )
+lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("runtime"))
     .settings(name := "coulomb-runtime")
@@ -60,10 +60,18 @@ lazy val runtime = crossProject(JVMPlatform /*, JSPlatform, NativePlatform */ )
         core % "compile->compile;test->test",
         units % Test
     )
+    .settings(
+        tlVersionIntroduced := Map("3" -> "0.7.4")
+    )
     .settings(commonSettings: _*)
     .settings(
-        tlVersionIntroduced := Map("3" -> "0.7.4"),
+        // staging compiler is only supported on JVM
+        // but is also used to satisfy builds on JS and Native
         libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value
+    )
+    .platformsSettings(JSPlatform, NativePlatform)(
+        // any unit tests using staging must be excluded from JS and Native
+        Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*stagingquantity.scala"
     )
 
 lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
