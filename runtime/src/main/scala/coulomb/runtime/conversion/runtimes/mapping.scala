@@ -106,7 +106,47 @@ object meta:
     import coulomb.infra.meta.{*, given}
     import coulomb.runtime.infra.meta.{*, given}
 
+    import MappingCoefficientRuntime.{TNil, &:}
+
     def ofUTL[UTL](using Quotes, Type[UTL]): Expr[MappingCoefficientRuntime] =
-        val bu = Set.empty[RuntimeUnit.UnitType]
-        val du = Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
+        import quotes.reflect.*
+        val (bu, du) = utlClosure(TypeRepr.of[UTL])
         '{ new MappingCoefficientRuntime(${ Expr(bu) }, ${ Expr(du) }) }
+
+    def utlClosure(using Quotes)(
+        utl: quotes.reflect.TypeRepr
+    ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
+        import quotes.reflect.*
+        utl match
+            case tnil if (tnil =:= TypeRepr.of[TNil]) =>
+                (
+                    Set.empty[RuntimeUnit.UnitType],
+                    Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
+                )
+            case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[&:]) =>
+                val (bu, du) = utlClosure(tail)
+                head match
+                    case baseunit() =>
+                        (bu + typeReprUT(head), du)
+                    case derivedunitTR(dtr) =>
+                        val AppliedType(_, List(_, d, _, _)) = dtr: @unchecked
+                        val (dbu, ddu) = utClosure(d)
+                        (
+                            bu ++ dbu,
+                            (du ++ ddu) + (typeReprUT(head) -> typeReprRTU(d))
+                        )
+                    case _ =>
+                        val (hbu, hdu) = utClosure(head)
+                        (bu ++ hbu, du ++ hdu)
+            case _ =>
+                report.errorAndAbort("no")
+                null.asInstanceOf[Nothing]
+
+    def utClosure(using Quotes)(
+        utl: quotes.reflect.TypeRepr
+    ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
+        import quotes.reflect.*
+        (
+            Set.empty[RuntimeUnit.UnitType],
+            Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
+        )
