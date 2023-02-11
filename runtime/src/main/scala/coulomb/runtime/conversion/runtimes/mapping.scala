@@ -29,17 +29,31 @@ class MappingCoefficientRuntime(
         uf: RuntimeUnit,
         ut: RuntimeUnit
     ): Either[String, Rational] =
-        val Canonical(coef, sig) = canonical(ut / uf)
-        if (sig.isEmpty) Right(coef) else Left("No.")
+        canonical(ut / uf).flatMap { qcan =>
+            val Canonical(coef, sig) = qcan
+            if (sig.isEmpty) Right(coef) else Left("No.")
+        }
 
-    def canonical(u: RuntimeUnit): Canonical =
+    def canonical(u: RuntimeUnit): Either[String, Canonical] =
         u match
-            case RuntimeUnit.Mul(l, r)    => canonical(l) * canonical(r)
-            case RuntimeUnit.Div(n, d)    => canonical(n) / canonical(d)
-            case RuntimeUnit.Pow(b, e)    => canonical(b).pow(e)
-            case RuntimeUnit.UnitConst(c) => Canonical(c, Canonical.one.sig)
-            case u: RuntimeUnit.UnitType =>
-                Canonical(Rational.const1, HashMap(u -> Rational.const1))
+            case RuntimeUnit.Mul(l, r) => canonical(l) * canonical(r)
+            case RuntimeUnit.Div(n, d) => canonical(n) / canonical(d)
+            case RuntimeUnit.Pow(b, e) => canonical(b).pow(e)
+            case RuntimeUnit.UnitConst(c) =>
+                Right(Canonical(c, Canonical.one.sig))
+            case u: RuntimeUnit.UnitType if (baseUnits.contains(u)) =>
+                Right(Canonical(Rational.const1, HashMap(u -> Rational.const1)))
+            case u: RuntimeUnit.UnitType if (derivedUnits.contains(u)) =>
+                canonical(derivedUnits(u))
+            case _ => Left(s"canonical: unrecognized unit $u")
+
+extension (lhs: Either[String, Canonical])
+    def *(rhs: Either[String, Canonical]): Either[String, Canonical] =
+        for { l <- lhs; r <- rhs } yield l * r
+    def /(rhs: Either[String, Canonical]): Either[String, Canonical] =
+        for { l <- lhs; r <- rhs } yield l / r
+    def pow(e: Rational): Either[String, Canonical] =
+        lhs.map { l => l.pow(e) }
 
 object MappingCoefficientRuntime:
     final type &:[H, T]
