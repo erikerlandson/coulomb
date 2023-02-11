@@ -277,28 +277,15 @@ object meta:
             u: quotes.reflect.TypeRepr
         ): Option[(Rational, List[(quotes.reflect.TypeRepr, Rational)])] =
             import quotes.reflect.*
-            Implicits.search(
-                TypeRepr
-                    .of[DerivedUnit]
-                    .appliedTo(
-                        List(
-                            u,
-                            TypeBounds.empty,
-                            TypeBounds.empty,
-                            TypeBounds.empty
-                        )
-                    )
-            ) match
-                case iss: ImplicitSearchSuccess =>
+            u match
+                case derivedunitTR(dtr) =>
                     mode match
                         case SigMode.Simplify =>
                             // don't expand the signature definition in simplify mode
                             Some((Rational.const1, (u, Rational.const1) :: Nil))
                         case _ =>
                             val AppliedType(_, List(_, d, _, _)) =
-                                iss.tree.tpe.baseType(
-                                    TypeRepr.of[DerivedUnit].typeSymbol
-                                ): @unchecked
+                                dtr: @unchecked
                             Some(cansig(d))
                 case _ => None
 
