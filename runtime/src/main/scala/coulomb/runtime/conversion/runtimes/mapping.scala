@@ -31,7 +31,8 @@ class MappingCoefficientRuntime(
     ): Either[String, Rational] =
         canonical(ut / uf).flatMap { qcan =>
             val Canonical(coef, sig) = qcan
-            if (sig.isEmpty) Right(coef) else Left("No.")
+            if (sig.isEmpty) Right(coef)
+            else Left(s"non-convertible units: $uf, $ut")
         }
 
     def canonical(u: RuntimeUnit): Either[String, Canonical] =
@@ -118,35 +119,59 @@ object meta:
     ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
         import quotes.reflect.*
         utl match
-            case tnil if (tnil =:= TypeRepr.of[TNil]) =>
-                (
-                    Set.empty[RuntimeUnit.UnitType],
-                    Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
-                )
+            case tnil if (tnil =:= TypeRepr.of[TNil]) => emptyClosure
             case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[&:]) =>
-                val (bu, du) = utlClosure(tail)
-                head match
+                val (tbu, tdu) = utlClosure(tail)
+                val (hbu, hdu) = utClosure(head)
+                (hbu ++ tbu, hdu ++ tdu)
+            case _ =>
+                report.errorAndAbort(
+                    s"utlClosure: bad unit type list ${utl.show}"
+                )
+                null.asInstanceOf[Nothing]
+
+    def utClosure(using Quotes)(
+        tr: quotes.reflect.TypeRepr
+    ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
+        import quotes.reflect.*
+        tr match
+            case AppliedType(op, List(lu, ru))
+                if (op =:= TypeRepr.of[coulomb.`*`]) =>
+                val (lbu, ldu) = utClosure(lu)
+                val (rbu, rdu) = utClosure(ru)
+                (lbu ++ rbu, ldu ++ rdu)
+            case AppliedType(op, List(lu, ru))
+                if (op =:= TypeRepr.of[coulomb.`/`]) =>
+                val (lbu, ldu) = utClosure(lu)
+                val (rbu, rdu) = utClosure(ru)
+                (lbu ++ rbu, ldu ++ rdu)
+            case AppliedType(op, List(b, _))
+                if (op =:= TypeRepr.of[coulomb.`^`]) =>
+                utClosure(b)
+            case rationalTE(v) =>
+                emptyClosure
+            case ut =>
+                ut match
                     case baseunit() =>
-                        (bu + typeReprUT(head), du)
+                        (Set(typeReprUT(ut)), emptyMap)
                     case derivedunitTR(dtr) =>
                         val AppliedType(_, List(_, d, _, _)) = dtr: @unchecked
                         val (dbu, ddu) = utClosure(d)
                         (
-                            bu ++ dbu,
-                            (du ++ ddu) + (typeReprUT(head) -> typeReprRTU(d))
+                            dbu,
+                            ddu + (typeReprUT(ut) -> typeReprRTU(d))
                         )
                     case _ =>
-                        val (hbu, hdu) = utClosure(head)
-                        (bu ++ hbu, du ++ hdu)
-            case _ =>
-                report.errorAndAbort("no")
-                null.asInstanceOf[Nothing]
+                        report.errorAndAbort(
+                            s"closureUT: bad unit type ${ut.show}"
+                        )
+                        null.asInstanceOf[Nothing]
 
-    def utClosure(using Quotes)(
-        utl: quotes.reflect.TypeRepr
-    ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
-        import quotes.reflect.*
+    private val emptyMap =
+        Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
+
+    private val emptyClosure =
         (
             Set.empty[RuntimeUnit.UnitType],
-            Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
+            emptyMap
         )
