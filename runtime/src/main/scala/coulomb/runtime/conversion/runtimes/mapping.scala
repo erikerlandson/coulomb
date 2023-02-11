@@ -19,7 +19,6 @@ package coulomb.runtime.conversion.runtimes.mapping
 import scala.collection.immutable.HashMap
 
 import coulomb.runtime.*
-import coulomb.runtime.infra.meta
 import coulomb.rational.Rational
 
 class MappingCoefficientRuntime(
@@ -30,7 +29,23 @@ class MappingCoefficientRuntime(
         uf: RuntimeUnit,
         ut: RuntimeUnit
     ): Either[String, Rational] =
-        Left("No.")
+        val Canonical(coef, sig) = canonical(ut / uf)
+        if (sig.isEmpty) Right(coef) else Left("No.")
+
+    def canonical(u: RuntimeUnit): Canonical =
+        u match
+            case RuntimeUnit.Mul(l, r)    => canonical(l) * canonical(r)
+            case RuntimeUnit.Div(n, d)    => canonical(n) / canonical(d)
+            case RuntimeUnit.Pow(b, e)    => canonical(b).pow(e)
+            case RuntimeUnit.UnitConst(c) => Canonical(c, Canonical.one.sig)
+            case u: RuntimeUnit.UnitType =>
+                Canonical(Rational.const1, HashMap(u -> Rational.const1))
+
+object MappingCoefficientRuntime:
+    final type &:[H, T]
+    final type TNil
+
+    inline def of[UTL]: MappingCoefficientRuntime = ${ meta.ofUTL[UTL] }
 
 case class Canonical(coef: Rational, sig: Map[RuntimeUnit.UnitType, Rational]):
     def *(that: Canonical): Canonical =
@@ -63,15 +78,21 @@ object Canonical:
         val ri = ki.map { k => (k, f(m1(k), m2(k))) }
         r1.concat(r2).concat(ri)
 
-    private val s1 = HashMap.empty[RuntimeUnit.UnitType, Rational]
-    private val r1 = Rational.const1
+    val one: Canonical = Canonical(
+        Rational.const1,
+        HashMap.empty[RuntimeUnit.UnitType, Rational]
+    )
 
-    val one: Canonical = Canonical(r1, s1)
+object meta:
+    import scala.quoted.*
+    import scala.util.{Try, Success, Failure}
+    import scala.unchecked
+    import scala.language.implicitConversions
 
-    def apply(u: RuntimeUnit): Canonical =
-        u match
-            case RuntimeUnit.Mul(l, r)    => Canonical(l) * Canonical(r)
-            case RuntimeUnit.Div(n, d)    => Canonical(n) / Canonical(d)
-            case RuntimeUnit.Pow(b, e)    => Canonical(b).pow(e)
-            case RuntimeUnit.UnitConst(c) => Canonical(c, s1)
-            case u: RuntimeUnit.UnitType  => Canonical(r1, HashMap(u -> r1))
+    import coulomb.infra.meta.{*, given}
+    import coulomb.runtime.infra.meta.{*, given}
+
+    def ofUTL[UTL](using Quotes, Type[UTL]): Expr[MappingCoefficientRuntime] =
+        val bu = Set.empty[RuntimeUnit.UnitType]
+        val du = Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
+        '{ new MappingCoefficientRuntime(${ Expr(bu) }, ${ Expr(du) }) }
