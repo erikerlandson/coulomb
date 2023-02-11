@@ -302,6 +302,31 @@ object meta:
                             Some(cansig(d))
                 case _ => None
 
+    object derivedunitTR:
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[quotes.reflect.TypeRepr] =
+            import quotes.reflect.*
+            Implicits.search(
+                TypeRepr
+                    .of[DerivedUnit]
+                    .appliedTo(
+                        List(
+                            u,
+                            TypeBounds.empty,
+                            TypeBounds.empty,
+                            TypeBounds.empty
+                        )
+                    )
+            ) match
+                case iss: ImplicitSearchSuccess =>
+                    Some(
+                        iss.tree.tpe.baseType(
+                            TypeRepr.of[DerivedUnit].typeSymbol
+                        )
+                    )
+                case _ => None
+
     object deltaunit:
         def unapply(using Quotes)(
             u: quotes.reflect.TypeRepr

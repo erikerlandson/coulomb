@@ -122,11 +122,16 @@ object meta:
                 RuntimeUnit.Pow(typeReprRTU(b), ev)
             case rationalTE(v) =>
                 RuntimeUnit.UnitConst(v)
-            case t =>
-                // should add checking for types with type-args here
-                // possibly an explicit non dealirtuing policy here would allow
-                // parameterized types to be handled via typedef aliases?
-                RuntimeUnit.UnitType(t.typeSymbol.fullName)
+            case ut => typeReprUT(ut)
+
+    def typeReprUT(using Quotes)(
+        tr: quotes.reflect.TypeRepr
+    ): RuntimeUnit.UnitType =
+        import quotes.reflect.*
+        // should add checking for types with type-args here
+        // possibly an explicit non dealiasing policy here would allow
+        // parameterized types to be handled via typedef aliases?
+        RuntimeUnit.UnitType(tr.typeSymbol.fullName)
 
     def fqTypeRepr(using Quotes)(path: String): quotes.reflect.TypeRepr =
         fqTypeRepr(path.split('.').toIndexedSeq)
