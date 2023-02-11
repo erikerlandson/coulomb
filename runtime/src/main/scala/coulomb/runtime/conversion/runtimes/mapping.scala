@@ -29,7 +29,7 @@ class MappingCoefficientRuntime(
         uf: RuntimeUnit,
         ut: RuntimeUnit
     ): Either[String, Rational] =
-        canonical(ut / uf).flatMap { qcan =>
+        canonical(uf / ut).flatMap { qcan =>
             val Canonical(coef, sig) = qcan
             if (sig.isEmpty) Right(coef)
             else Left(s"non-convertible units: $uf, $ut")
