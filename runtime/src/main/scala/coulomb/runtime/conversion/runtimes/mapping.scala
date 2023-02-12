@@ -111,30 +111,27 @@ object meta:
 
     def ofUTL[UTL](using Quotes, Type[UTL]): Expr[MappingCoefficientRuntime] =
         import quotes.reflect.*
-        val (bu, du) = utlClosure(TypeRepr.of[UTL])
+        val (bu, du) = utlClosure(typeReprList(TypeRepr.of[UTL]))
         '{ new MappingCoefficientRuntime(${ Expr(bu) }, ${ Expr(du) }) }
 
     def utlClosure(using Quotes)(
-        utl: quotes.reflect.TypeRepr
+        utl: List[quotes.reflect.TypeRepr]
     ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
         import quotes.reflect.*
         utl match
-            case tnil if (tnil =:= TypeRepr.of[TNil]) => emptyClosure
-            case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[&:]) =>
+            case Nil => emptyClosure
+            case head :: tail =>
                 val (tbu, tdu) = utlClosure(tail)
                 val (hbu, hdu) = utClosure(head)
                 (hbu ++ tbu, hdu ++ tdu)
-            case _ =>
-                report.errorAndAbort(
-                    s"utlClosure: bad unit type list ${utl.show}"
-                )
-                null.asInstanceOf[Nothing]
 
     def utClosure(using Quotes)(
         tr: quotes.reflect.TypeRepr
     ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
         import quotes.reflect.*
         tr match
+            case ConstantType(StringConstant(mname)) =>
+                utlClosure(moduleUnits(mname))
             case AppliedType(op, List(lu, ru))
                 if (op =:= TypeRepr.of[coulomb.`*`]) =>
                 val (lbu, ldu) = utClosure(lu)
@@ -166,6 +163,36 @@ object meta:
                             s"closureUT: bad unit type ${ut.show}"
                         )
                         null.asInstanceOf[Nothing]
+
+    def moduleUnits(using Quotes)(
+        mname: String
+    ): List[quotes.reflect.TypeRepr] =
+        import quotes.reflect.*
+        val msym = fqFieldSymbol(mname)
+        if (!msym.flags.is(Flags.Module))
+            report.errorAndAbort(s"$mname is not a module")
+        val usyms = msym.typeMembers.filter(isUnitSym)
+        usyms.map(_.typeRef)
+
+    def isUnitSym(using Quotes)(sym: quotes.reflect.Symbol): Boolean =
+        sym.typeRef match
+            case baseunit()       => true
+            case derivedunitTR(_) => true
+            case _                => false
+
+    def typeReprList(using Quotes)(
+        tlist: quotes.reflect.TypeRepr
+    ): List[quotes.reflect.TypeRepr] =
+        import quotes.reflect.*
+        tlist match
+            case tnil if (tnil =:= TypeRepr.of[TNil]) => Nil
+            case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[&:]) =>
+                head :: typeReprList(tail)
+            case _ =>
+                report.errorAndAbort(
+                    s"utlClosure: bad type list ${tlist.show}"
+                )
+                null.asInstanceOf[Nothing]
 
     private val emptyMap =
         Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
