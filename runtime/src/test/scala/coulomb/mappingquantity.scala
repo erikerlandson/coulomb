@@ -32,7 +32,8 @@ class MappingRuntimeQuantitySuite extends CoulombSuite:
 
     import MappingCoefficientRuntime.{TNil, &:}
     given CoefficientRuntime =
-        MappingCoefficientRuntime.of[Kilo &: Meter &: TNil]
+        MappingCoefficientRuntime
+            .of["coulomb.units.si" &: "coulomb.units.si.prefixes" &: TNil]
 
     test("runtimeCoefficient") {
         import coulomb.policy.strict.given
