@@ -37,9 +37,24 @@ class MappingRuntimeQuantitySuite extends CoulombSuite:
 
     test("runtimeCoefficient") {
         import coulomb.policy.strict.given
-        val coef = runtimeCoefficient[Double](
+        runtimeCoefficient[Double](
             RuntimeUnit.of[Kilo * Meter],
             RuntimeUnit.of[Meter]
-        )
-        assert(coef.contains(1000d))
+        ).assertRVT[Double](1000d)
+
+        runtimeCoefficient[Double](
+            RuntimeUnit.of[Kilo * Meter],
+            RuntimeUnit.of[Second]
+        ).assertL
+    }
+
+    test("toQuantity") {
+        import coulomb.policy.strict.given
+        RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])
+            .toQuantity[Float, Meter]
+            .assertRQ[Float, Meter](1000f)
+
+        RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])
+            .toQuantity[Float, Second]
+            .assertL
     }

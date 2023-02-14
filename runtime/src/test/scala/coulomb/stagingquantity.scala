@@ -43,5 +43,5 @@ class StagingRuntimeQuantitySuite extends CoulombSuite:
             RuntimeUnit.of[Kilo * Meter],
             RuntimeUnit.of[Meter]
         )
-        assert(coef.contains(1000d))
+        coef.assertRVT[Double](1000d)
     }
