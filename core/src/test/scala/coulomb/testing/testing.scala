@@ -22,6 +22,11 @@ import coulomb.conversion.ValueConversion
 abstract class CoulombSuite extends munit.FunSuite:
     import coulomb.testing.types.*
 
+    extension [L, V, U](q: Either[L, Quantity[V, U]])
+        inline def assertRQ[VT, UT](vt: VT): Unit =
+            assert(q.isRight)
+            q.toSeq.head.assertQ[VT, UT](vt)
+
     extension [V, U](q: Quantity[V, U])
         inline def assertQ[VT, UT](vt: VT): Unit =
             // checking types first
@@ -57,6 +62,18 @@ abstract class CoulombSuite extends munit.FunSuite:
             // epsilon governed by V, but scale by |vt|
             val e = math.abs(vt) * eps.getOrElse(typeEps[V])
             assertEqualsDouble(vc(q.value), vt, e)
+
+    extension [L, V](v: Either[L, V])
+        inline def assertL: Unit =
+            assert(v.isLeft)
+
+        inline def assertR(vt: V): Unit =
+            assert(v.isRight)
+            assertEquals(v.toSeq.head, vt)
+
+        inline def assertRVT[VT](vt: VT): Unit =
+            assert(v.isRight)
+            v.toSeq.head.assertVT[VT](vt)
 
     extension [V](v: V)
         inline def assertVT[VT](vt: VT): Unit =
