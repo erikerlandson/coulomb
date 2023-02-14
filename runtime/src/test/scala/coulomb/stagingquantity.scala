@@ -16,32 +16,14 @@
 
 import coulomb.testing.CoulombSuite
 
-class StagingRuntimeQuantitySuite extends CoulombSuite:
-    import scala.quoted.staging
+import scala.quoted.staging
+import coulomb.runtime.conversion.runtimes.staging.StagingCoefficientRuntime
 
-    import coulomb.*
-    import coulomb.syntax.*
-    import coulomb.runtime.*
+import coulomb.runtime.CoefficientRuntime
 
-    import algebra.instances.all.given
-    import coulomb.ops.algebra.all.{*, given}
+val compiler: staging.Compiler =
+    staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
 
-    import coulomb.units.si.{*, given}
-    import coulomb.units.si.prefixes.{*, given}
-    import coulomb.units.us.{*, given}
+val stagingRT: CoefficientRuntime = StagingCoefficientRuntime()(using compiler)
 
-    import coulomb.runtime.conversion.runtimes.staging.StagingCoefficientRuntime
-
-    given staging.Compiler =
-        staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
-
-    given CoefficientRuntime = StagingCoefficientRuntime()
-
-    test("runtimeCoefficient") {
-        import coulomb.policy.strict.given
-        val coef = runtimeCoefficient[Double](
-            RuntimeUnit.of[Kilo * Meter],
-            RuntimeUnit.of[Meter]
-        )
-        coef.assertRVT[Double](1000d)
-    }
+class StagingRuntimeQuantitySuite extends RuntimeQuantitySuite(using stagingRT)

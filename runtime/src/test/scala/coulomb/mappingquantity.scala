@@ -16,45 +16,17 @@
 
 import coulomb.testing.CoulombSuite
 
-class MappingRuntimeQuantitySuite extends CoulombSuite:
-    import coulomb.*
-    import coulomb.syntax.*
-    import coulomb.runtime.*
+import coulomb.units.si.{*, given}
+import coulomb.units.si.prefixes.{*, given}
+import coulomb.units.us.{*, given}
 
-    import algebra.instances.all.given
-    import coulomb.ops.algebra.all.{*, given}
+import coulomb.runtime.CoefficientRuntime
+import coulomb.runtime.conversion.runtimes.mapping.MappingCoefficientRuntime
 
-    import coulomb.units.si.{*, given}
-    import coulomb.units.si.prefixes.{*, given}
-    import coulomb.units.us.{*, given}
+import MappingCoefficientRuntime.{TNil, &:}
 
-    import coulomb.runtime.conversion.runtimes.mapping.MappingCoefficientRuntime
+val mappingRT: CoefficientRuntime =
+    MappingCoefficientRuntime
+        .of["coulomb.units.si" &: "coulomb.units.si.prefixes" &: TNil]
 
-    import MappingCoefficientRuntime.{TNil, &:}
-    given CoefficientRuntime =
-        MappingCoefficientRuntime
-            .of["coulomb.units.si" &: "coulomb.units.si.prefixes" &: TNil]
-
-    test("runtimeCoefficient") {
-        import coulomb.policy.strict.given
-        runtimeCoefficient[Double](
-            RuntimeUnit.of[Kilo * Meter],
-            RuntimeUnit.of[Meter]
-        ).assertRVT[Double](1000d)
-
-        runtimeCoefficient[Double](
-            RuntimeUnit.of[Kilo * Meter],
-            RuntimeUnit.of[Second]
-        ).assertL
-    }
-
-    test("toQuantity") {
-        import coulomb.policy.strict.given
-        RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])
-            .toQuantity[Float, Meter]
-            .assertRQ[Float, Meter](1000f)
-
-        RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])
-            .toQuantity[Float, Second]
-            .assertL
-    }
+class MappingRuntimeQuantitySuite extends RuntimeQuantitySuite(using mappingRT)
