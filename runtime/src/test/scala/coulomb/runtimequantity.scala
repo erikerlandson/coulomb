@@ -17,7 +17,8 @@
 import coulomb.testing.CoulombSuite
 import coulomb.runtime.CoefficientRuntime
 
-abstract class RuntimeQuantitySuite(using CoefficientRuntime) extends CoulombSuite:
+abstract class RuntimeQuantitySuite(using CoefficientRuntime)
+    extends CoulombSuite:
     import coulomb.*
     import coulomb.syntax.*
     import coulomb.runtime.*
