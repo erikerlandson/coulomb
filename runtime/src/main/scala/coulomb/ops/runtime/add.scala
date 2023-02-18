@@ -27,7 +27,7 @@ object add:
     import coulomb.syntax.withRuntimeUnit
     import coulomb.ops.{RuntimeAdd, ValueResolution}
     import coulomb.conversion.ValueConversion
-    
+
     transparent inline given ctx_runtime_add_1V[VL, VR](using
         eqv: VR =:= VL,
         crt: CoefficientRuntime,
@@ -35,16 +35,18 @@ object add:
         alg: AdditiveSemigroup[VL],
         mul: MultiplicativeSemigroup[VL]
     ): RuntimeAdd[VL, VR] =
-        new infra.RTAddNC(
-            (ql: RuntimeQuantity[VL], qr: RuntimeQuantity[VR]) =>
-                crt.coefficient[VL](qr.unit, ql.unit).map { coef =>
-                    alg.plus(ql.value, mul.times(coef, eqv(qr.value))).withRuntimeUnit(ql.unit)
-                }
+        new infra.RTAddNC((ql: RuntimeQuantity[VL], qr: RuntimeQuantity[VR]) =>
+            crt.coefficient[VL](qr.unit, ql.unit).map { coef =>
+                alg.plus(ql.value, mul.times(coef, eqv(qr.value)))
+                    .withRuntimeUnit(ql.unit)
+            }
         )
 
     object infra:
         class RTAddNC[VL, VR, VOp](
-            val eval: (RuntimeQuantity[VL], RuntimeQuantity[VR]) => Either[String, RuntimeQuantity[VOp]]
+            val eval: (
+                RuntimeQuantity[VL],
+                RuntimeQuantity[VR]
+            ) => Either[String, RuntimeQuantity[VOp]]
         ) extends RuntimeAdd[VL, VR]:
             type VO = VOp
-        
