@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package coulomb.runtime
+package coulomb
 
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
@@ -48,7 +48,7 @@ object RuntimeUnit:
     case class Mul(lhs: RuntimeUnit, rhs: RuntimeUnit) extends RuntimeUnit
     case class Div(num: RuntimeUnit, den: RuntimeUnit) extends RuntimeUnit
     case class Pow(b: RuntimeUnit, e: Rational) extends RuntimeUnit
-    inline def of[U]: RuntimeUnit = ${ infra.meta.unitRTU[U] }
+    inline def of[U]: RuntimeUnit = ${ infra.runtime.meta.unitRTU[U] }
 
 case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
 
@@ -87,25 +87,9 @@ abstract class CoefficientRuntime:
     final inline def coefficientRational[UT](
         uf: RuntimeUnit
     ): Either[String, Rational] =
-        infra.meta.crExpr[UT](this, uf)
+        infra.runtime.meta.crExpr[UT](this, uf)
 
     final def coefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
         vc: ValueConversion[Rational, V]
     ): Either[String, V] =
         this.coefficientRational(uf, ut).map(vc)
-
-package conversion {
-    abstract class RuntimeUnitConversion[V] extends (V => V)
-
-    object RuntimeUnitConversion:
-        def apply[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
-            crt: CoefficientRuntime,
-            vi: ValueConversion[V, Rational],
-            vo: ValueConversion[Rational, V]
-        ): Either[String, RuntimeUnitConversion[V]] =
-            crt.coefficientRational(uf, ut).map { coef =>
-                new RuntimeUnitConversion[V] {
-                    def apply(v: V): V = vo(coef * vi(v))
-                }
-            }
-}

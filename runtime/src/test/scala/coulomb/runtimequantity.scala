@@ -15,13 +15,12 @@
  */
 
 import coulomb.testing.CoulombSuite
-import coulomb.runtime.CoefficientRuntime
+import coulomb.CoefficientRuntime
 
 abstract class RuntimeQuantitySuite(using CoefficientRuntime)
     extends CoulombSuite:
     import coulomb.*
     import coulomb.syntax.*
-    import coulomb.runtime.*
 
     import algebra.instances.all.given
     import coulomb.ops.algebra.all.{*, given}

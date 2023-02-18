@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-import coulomb.testing.CoulombSuite
+package coulomb.conversion.runtime
 
-import scala.quoted.staging
-import coulomb.conversion.runtimes.staging.StagingCoefficientRuntime
+object scala:
+    import _root_.scala.Conversion
+    import coulomb.conversion.*
+    import coulomb.*
+    import coulomb.syntax.*
 
-import coulomb.CoefficientRuntime
-
-val compiler: staging.Compiler =
-    staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
-
-val stagingRT: CoefficientRuntime = StagingCoefficientRuntime()(using compiler)
-
-class StagingRuntimeQuantitySuite extends RuntimeQuantitySuite(using stagingRT)
+    val stub = 0 

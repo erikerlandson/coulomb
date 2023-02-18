@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package coulomb.runtime.conversion.runtimes.mapping
+package coulomb.conversion.runtimes.mapping
 
 import scala.collection.immutable.HashMap
 
-import coulomb.runtime.*
+import coulomb.*
 import coulomb.rational.Rational
 
 class MappingCoefficientRuntime(
@@ -105,7 +105,7 @@ object meta:
     import scala.language.implicitConversions
 
     import coulomb.infra.meta.{*, given}
-    import coulomb.runtime.infra.meta.{*, given}
+    import coulomb.infra.runtime.meta.{*, given}
 
     import MappingCoefficientRuntime.{TNil, &:}
 

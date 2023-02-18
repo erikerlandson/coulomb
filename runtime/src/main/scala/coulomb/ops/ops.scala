@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-import coulomb.testing.CoulombSuite
+package coulomb.ops
 
-import scala.quoted.staging
-import coulomb.conversion.runtimes.staging.StagingCoefficientRuntime
+import scala.annotation.implicitNotFound
 
-import coulomb.CoefficientRuntime
+import coulomb.*
 
-val compiler: staging.Compiler =
-    staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
-
-val stagingRT: CoefficientRuntime = StagingCoefficientRuntime()(using compiler)
-
-class StagingRuntimeQuantitySuite extends RuntimeQuantitySuite(using stagingRT)
+@implicitNotFound(
+    "Addition not defined in scope for RuntimeQuantity[${VL}] and RuntimeQuantity[${VR}]"
+)
+abstract class RuntimeAdd[VL, VR]:
+    type VO
+    val eval: (RuntimeQuantity[VL], RuntimeQuantity[VR]) => Either[String, RuntimeQuantity[VO]]
