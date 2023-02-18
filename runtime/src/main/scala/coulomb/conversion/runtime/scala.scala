@@ -22,4 +22,4 @@ object scala:
     import coulomb.*
     import coulomb.syntax.*
 
-    val stub = 0 
+    val stub = 0

@@ -25,4 +25,7 @@ import coulomb.*
 )
 abstract class RuntimeAdd[VL, VR]:
     type VO
-    val eval: (RuntimeQuantity[VL], RuntimeQuantity[VR]) => Either[String, RuntimeQuantity[VO]]
+    val eval: (
+        RuntimeQuantity[VL],
+        RuntimeQuantity[VR]
+    ) => Either[String, RuntimeQuantity[VO]]
