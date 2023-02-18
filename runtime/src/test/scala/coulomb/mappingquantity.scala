@@ -20,8 +20,8 @@ import coulomb.units.si.{*, given}
 import coulomb.units.si.prefixes.{*, given}
 import coulomb.units.us.{*, given}
 
-import coulomb.runtime.CoefficientRuntime
-import coulomb.runtime.conversion.runtimes.mapping.MappingCoefficientRuntime
+import coulomb.CoefficientRuntime
+import coulomb.conversion.runtimes.mapping.MappingCoefficientRuntime
 
 import MappingCoefficientRuntime.{TNil, &:}
 

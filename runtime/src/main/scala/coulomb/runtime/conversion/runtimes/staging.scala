@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package coulomb.runtime.conversion.runtimes.staging
+package coulomb.conversion.runtimes.staging
 
 import scala.quoted.staging
 
-import coulomb.runtime.*
-import coulomb.runtime.infra.meta
+import coulomb.*
+import coulomb.infra.runtime.meta
 import coulomb.rational.Rational
 
 // a CoefficientRuntime that leverages a staging compiler to do runtime magic

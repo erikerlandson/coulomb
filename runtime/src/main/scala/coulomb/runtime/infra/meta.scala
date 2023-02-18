@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package coulomb.runtime.infra
+package coulomb.infra.runtime
 
 import scala.quoted.*
 import scala.util.{Try, Success, Failure}
 
-import coulomb.runtime.*
+import coulomb.*
 import coulomb.rational.Rational
 
 object meta:
