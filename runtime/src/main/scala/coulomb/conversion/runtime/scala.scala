@@ -22,4 +22,11 @@ object scala:
     import coulomb.*
     import coulomb.syntax.*
 
-    val stub = 0
+    given ctx_RuntimeQuantity_Conversion_1V[V]
+        : Conversion[RuntimeQuantity[V], RuntimeQuantity[V]] =
+        (q: RuntimeQuantity[V]) => q
+
+    given ctx_RuntimeQuantity_Conversion_2V[VF, VT](using
+        vc: ValueConversion[VF, VT]
+    ): Conversion[RuntimeQuantity[VF], RuntimeQuantity[VT]] =
+        (q: RuntimeQuantity[VF]) => RuntimeQuantity(vc(q.value), q.unit)
