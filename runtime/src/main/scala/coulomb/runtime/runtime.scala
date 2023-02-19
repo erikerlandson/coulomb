@@ -53,18 +53,24 @@ object RuntimeUnit:
 case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
 
 object RuntimeQuantity:
+    import coulomb.ops.*
+
     inline def apply[V, U](q: Quantity[V, U]): RuntimeQuantity[V] =
         RuntimeQuantity(q.value, RuntimeUnit.of[U])
 
-extension [VL](ql: RuntimeQuantity[VL])
-    inline def toQuantity[VR, UR](using
-        crt: CoefficientRuntime,
-        vi: ValueConversion[VL, Rational],
-        vo: ValueConversion[Rational, VR]
-    ): Either[String, Quantity[VR, UR]] =
-        crt.coefficientRational[UR](ql.unit).map { coef =>
-            vo(coef * vi(ql.value)).withUnit[UR]
-        }
+    extension [VL](ql: RuntimeQuantity[VL])
+        inline def toQuantity[VR, UR](using
+            crt: CoefficientRuntime,
+            vi: ValueConversion[VL, Rational],
+            vo: ValueConversion[Rational, VR]
+        ): Either[String, Quantity[VR, UR]] =
+            crt.coefficientRational[UR](ql.unit).map { coef =>
+                vo(coef * vi(ql.value)).withUnit[UR]
+            }
+
+        transparent inline def +[VR](qr: RuntimeQuantity[VR])(using
+            add: RuntimeAdd[VL, VR]
+        ): Either[String, RuntimeQuantity[add.VO]] = add.eval(ql, qr)
 
 package syntax {
     extension [V](v: V)

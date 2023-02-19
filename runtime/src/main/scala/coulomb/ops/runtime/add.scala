@@ -31,7 +31,7 @@ object add:
     transparent inline given ctx_runtime_add_1V[VL, VR](using
         eqv: VR =:= VL,
         crt: CoefficientRuntime,
-        vc: ValueConversion[Rational, VL],
+        vcr: ValueConversion[Rational, VL],
         alg: AdditiveSemigroup[VL],
         mul: MultiplicativeSemigroup[VL]
     ): RuntimeAdd[VL, VR] =
@@ -39,6 +39,25 @@ object add:
             crt.coefficient[VL](qr.unit, ql.unit).map { coef =>
                 alg.plus(ql.value, mul.times(coef, eqv(qr.value)))
                     .withRuntimeUnit(ql.unit)
+            }
+        )
+
+    transparent inline given ctx_runtime_add_2V[VL, VR](using
+        nev: NotGiven[VR =:= VL],
+        crt: CoefficientRuntime,
+        vres: ValueResolution[VL, VR],
+        icl: Conversion[RuntimeQuantity[VL], RuntimeQuantity[vres.VO]],
+        icr: Conversion[RuntimeQuantity[VR], RuntimeQuantity[vres.VO]],
+        vcr: ValueConversion[Rational, vres.VO],
+        alg: AdditiveSemigroup[vres.VO],
+        mul: MultiplicativeSemigroup[vres.VO]
+    ): RuntimeAdd[VL, VR] =
+        new infra.RTAddNC((ql: RuntimeQuantity[VL], qr: RuntimeQuantity[VR]) =>
+            val qlo = icl(ql)
+            val qro = icr(qr)
+            crt.coefficient[vres.VO](qro.unit, qlo.unit).map { coef =>
+                alg.plus(qlo.value, mul.times(coef, qro.value))
+                    .withRuntimeUnit(qlo.unit)
             }
         )
 

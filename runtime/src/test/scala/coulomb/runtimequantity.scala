@@ -52,3 +52,12 @@ abstract class RuntimeQuantitySuite(using CoefficientRuntime)
             .toQuantity[Float, Second]
             .assertL
     }
+
+    test("addition") {
+        import coulomb.policy.strict.given
+        import coulomb.ops.runtime.add.given
+
+        (RuntimeQuantity(1d, RuntimeUnit.of[Meter])
+            + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter]))
+            .assertR(RuntimeQuantity(1001d, RuntimeUnit.of[Meter]))
+    }
