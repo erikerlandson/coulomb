@@ -60,4 +60,24 @@ abstract class RuntimeQuantitySuite(using CoefficientRuntime)
         (RuntimeQuantity(1d, RuntimeUnit.of[Meter])
             + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter]))
             .assertR(RuntimeQuantity(1001d, RuntimeUnit.of[Meter]))
+
+        (RuntimeQuantity(1d, RuntimeUnit.of[Second])
+            + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])).assertL
+
+        assertCE("""
+            (RuntimeQuantity(1, RuntimeUnit.of[Meter])
+                + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter]))
+        """)
+    }
+
+    test("addition standard") {
+        import coulomb.policy.standard.given
+        import coulomb.policy.overlay.runtime.standard.given
+
+        (RuntimeQuantity(1, RuntimeUnit.of[Meter])
+            + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter]))
+            .assertR(RuntimeQuantity(1001d, RuntimeUnit.of[Meter]))
+
+        (RuntimeQuantity(1, RuntimeUnit.of[Second])
+            + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])).assertL
     }
