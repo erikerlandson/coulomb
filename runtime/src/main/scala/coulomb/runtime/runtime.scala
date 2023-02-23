@@ -50,6 +50,21 @@ object RuntimeUnit:
     case class Pow(b: RuntimeUnit, e: Rational) extends RuntimeUnit
     inline def of[U]: RuntimeUnit = ${ infra.runtime.meta.unitRTU[U] }
 
+def runtimeCoefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
+    crt: CoefficientRuntime,
+    vc: ValueConversion[Rational, V]
+): Either[String, V] =
+    crt.coefficient[V](uf, ut)
+
+package syntax {
+    extension [V](v: V)
+        inline def withRuntimeUnit(u: RuntimeUnit): RuntimeQuantity[V] =
+            RuntimeQuantity(v, u)
+
+        inline def withRuntimeUnit[U]: RuntimeQuantity[V] =
+            RuntimeQuantity(v, RuntimeUnit.of[U])
+}
+
 case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
 
 object RuntimeQuantity:
@@ -57,6 +72,14 @@ object RuntimeQuantity:
 
     inline def apply[V, U](q: Quantity[V, U]): RuntimeQuantity[V] =
         RuntimeQuantity(q.value, RuntimeUnit.of[U])
+
+    inline def apply[U](using a: Applier[U]) = a
+
+    class Applier[U]:
+        inline def apply[V](v: V): RuntimeQuantity[V] =
+            RuntimeQuantity(v, RuntimeUnit.of[U])
+    object Applier:
+        given ctx_Applier[U]: Applier[U] = new Applier[U]
 
     extension [VL](ql: RuntimeQuantity[VL])
         inline def toQuantity[VR, UR](using
@@ -71,18 +94,6 @@ object RuntimeQuantity:
         transparent inline def +[VR](qr: RuntimeQuantity[VR])(using
             add: RuntimeAdd[VL, VR]
         ): Either[String, RuntimeQuantity[add.VO]] = add.eval(ql, qr)
-
-package syntax {
-    extension [V](v: V)
-        inline def withRuntimeUnit(u: RuntimeUnit): RuntimeQuantity[V] =
-            RuntimeQuantity(v, u)
-}
-
-def runtimeCoefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
-    crt: CoefficientRuntime,
-    vc: ValueConversion[Rational, V]
-): Either[String, V] =
-    crt.coefficient[V](uf, ut)
 
 abstract class CoefficientRuntime:
     def coefficientRational(
