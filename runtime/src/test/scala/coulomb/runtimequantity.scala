@@ -57,16 +57,13 @@ abstract class RuntimeQuantitySuite(using CoefficientRuntime)
         import coulomb.policy.strict.given
         import coulomb.policy.overlay.runtime.strict.given
 
-        (RuntimeQuantity(1d, RuntimeUnit.of[Meter])
-            + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter]))
-            .assertR(RuntimeQuantity(1001d, RuntimeUnit.of[Meter]))
+        (1d.withRuntimeUnit[Meter] + 1d.withRuntimeUnit[Kilo * Meter])
+            .assertR(RuntimeQuantity[Meter](1001d))
 
-        (RuntimeQuantity(1d, RuntimeUnit.of[Second])
-            + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])).assertL
+        (1d.withRuntimeUnit[Second] + 1d.withRuntimeUnit[Kilo * Meter]).assertL
 
         assertCE("""
-            (RuntimeQuantity(1, RuntimeUnit.of[Meter])
-                + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter]))
+            (1.withRuntimeUnit[Meter] + 1d.withRuntimeUnit[Kilo * Meter])
         """)
     }
 
@@ -74,10 +71,8 @@ abstract class RuntimeQuantitySuite(using CoefficientRuntime)
         import coulomb.policy.standard.given
         import coulomb.policy.overlay.runtime.standard.given
 
-        (RuntimeQuantity(1, RuntimeUnit.of[Meter])
-            + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter]))
-            .assertR(RuntimeQuantity(1001d, RuntimeUnit.of[Meter]))
+        (1.withRuntimeUnit[Meter] + 1d.withRuntimeUnit[Kilo * Meter])
+            .assertR(RuntimeQuantity[Meter](1001d))
 
-        (RuntimeQuantity(1, RuntimeUnit.of[Second])
-            + RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])).assertL
+        (1.withRuntimeUnit[Second] + 1d.withRuntimeUnit[Kilo * Meter]).assertL
     }
