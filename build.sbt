@@ -74,6 +74,23 @@ lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*stagingquantity.scala"
     )
 
+lazy val pureconfig = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("pureconfig"))
+    .settings(name := "coulomb-pureconfig")
+    .dependsOn(
+        core % "compile->compile;test->test",
+        runtime,
+        units % Test
+    )
+    .settings(
+        tlVersionIntroduced := Map("3" -> "0.7.4")
+    )
+    .settings(commonSettings: _*)
+    .settings(
+        libraryDependencies += "com.github.pureconfig" %% "pureconfig-core" % "0.17.2"
+    )
+
 lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("spire"))
@@ -117,6 +134,7 @@ lazy val all = project
         core.jvm,
         units.jvm,
         runtime.jvm,
+        pureconfig.jvm,
         spire.jvm,
         refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
