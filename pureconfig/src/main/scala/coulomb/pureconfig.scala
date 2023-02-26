@@ -29,32 +29,63 @@ object pureconfig:
             Rational(n, d)
         }
 
+    given rationalWriter: ConfigWriter[Rational] =
+        ConfigWriter.forProduct2("n", "d") { (r: Rational) =>
+            (r.n, r.d)
+        }
+
     given runtimeUnitReader: ConfigReader[RuntimeUnit] =
-        ConfigReader.fromCursor { cur =>
+        ConfigReader.fromCursor { xcur =>
             for {
-                objcur <- cur.asObjectCursor
-                typecur <- objcur.atKey("type")
+                cur <- xcur.asObjectCursor
+                typecur <- cur.atKey("type")
                 typestr <- typecur.asString
-                u <- infra.readByType(typestr, objcur)
+                u <- infra.readByType(typestr, cur)
             } yield u
         }
+
+    given runtimeUnitWriter: ConfigWriter[RuntimeUnit] =
+         ConfigWriter.fromFunction { (x: RuntimeUnit) =>
+             x match
+                 case u: RuntimeUnit.UnitConst => infra.constWriter.to(u)
+                 case u: RuntimeUnit.UnitType => infra.typeWriter.to(u)
+                 case u: RuntimeUnit.Mul => infra.mulWriter.to(u)
+                 case u: RuntimeUnit.Div => infra.divWriter.to(u)
+                 case u: RuntimeUnit.Pow => infra.powWriter.to(u)
+         }
 
     object infra:
         import _root_.pureconfig.error.CannotConvert
 
         def readByType(typ: String, cur: ConfigObjectCursor): ConfigReader.Result[RuntimeUnit] =
             typ match
-                case "const" => unitConstReader.from(cur)
-                case "type" => unitTypeReader.from(cur)
+                case "const" => constReader.from(cur)
+                case "type" => typeReader.from(cur)
                 case "mul" => mulReader.from(cur)
                 case "div" => divReader.from(cur)
                 case "pow" => powReader.from(cur)
                 case t =>
                     cur.failed(CannotConvert(cur.objValue.toString, "RuntimeUnit", s"unknown type $t"))
 
-        val unitConstReader = ConfigReader.forProduct1("value")(RuntimeUnit.UnitConst(_))
-        val unitTypeReader = ConfigReader.forProduct1("path")(RuntimeUnit.UnitType(_))
+        val constReader = ConfigReader.forProduct1("value")(RuntimeUnit.UnitConst(_))
+        val typeReader = ConfigReader.forProduct1("path")(RuntimeUnit.UnitType(_))
         val mulReader = ConfigReader.forProduct2("lhs", "rhs")(RuntimeUnit.Mul(_, _))
         val divReader = ConfigReader.forProduct2("num", "den")(RuntimeUnit.Div(_, _))
         val powReader = ConfigReader.forProduct2("b", "e")(RuntimeUnit.Pow(_, _))
+
+        val constWriter = ConfigWriter.forProduct2("type", "value") {
+            (u: RuntimeUnit.UnitConst) => ("const", u.value)
+        }
+        val typeWriter = ConfigWriter.forProduct2("type", "path") {
+            (u: RuntimeUnit.UnitType) => ("type", u.path)
+        }
+        val mulWriter = ConfigWriter.forProduct3("type", "lhs", "rhs") {
+            (u: RuntimeUnit.Mul) => ("mul", u.lhs, u.rhs)
+        }
+        val divWriter = ConfigWriter.forProduct3("type", "num", "den") {
+            (u: RuntimeUnit.Div) => ("div", u.num, u.den)
+        }
+        val powWriter = ConfigWriter.forProduct3("type", "b", "e") {
+            (u: RuntimeUnit.Pow) => ("pow", u.b, u.e)
+        }
 
