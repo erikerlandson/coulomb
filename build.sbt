@@ -74,6 +74,23 @@ lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*stagingquantity.scala"
     )
 
+lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("parser"))
+    .settings(name := "coulomb-parser")
+    .dependsOn(
+        core % "compile->compile;test->test",
+        runtime,
+        units % Test
+    )
+    .settings(
+        tlVersionIntroduced := Map("3" -> "0.7.4")
+    )
+    .settings(commonSettings: _*)
+    .settings(
+        libraryDependencies += "org.typelevel" %% "cats-parse" % "0.3.7"
+    )
+
 lazy val pureconfig = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("pureconfig"))
@@ -81,6 +98,7 @@ lazy val pureconfig = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .dependsOn(
         core % "compile->compile;test->test",
         runtime,
+        parser,
         units % Test
     )
     .settings(
@@ -134,6 +152,7 @@ lazy val all = project
         core.jvm,
         units.jvm,
         runtime.jvm,
+        parser.jvm,
         pureconfig.jvm,
         spire.jvm,
         refined.jvm
@@ -157,7 +176,15 @@ lazy val unidocs = project
 // http://localhost:4242
 lazy val docs = project
     .in(file("site"))
-    .dependsOn(core.jvm, units.jvm, spire.jvm, refined.jvm)
+    .dependsOn(
+        core.jvm,
+        units.jvm,
+        runtime.jvm,
+        parser.jvm,
+        pureconfig.jvm,
+        spire.jvm,
+        refined.jvm
+    )
     .enablePlugins(TypelevelSitePlugin)
 
 // https://github.com/sbt/sbt-jmh

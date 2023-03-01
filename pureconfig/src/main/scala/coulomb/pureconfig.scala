@@ -22,6 +22,9 @@ import coulomb.{infra => _, *}
 import coulomb.rational.Rational
 
 object pureconfig:
+    val stub = 0
+
+object pureconfig_save:
     // it would be nice to handle polymorphic inputs
     // https://github.com/pureconfig/pureconfig/issues/1472
     given rationalReader: ConfigReader[Rational] =
