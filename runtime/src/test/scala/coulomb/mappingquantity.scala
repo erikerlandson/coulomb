@@ -23,7 +23,7 @@ import coulomb.units.us.{*, given}
 import coulomb.CoefficientRuntime
 import coulomb.conversion.runtimes.mapping.MappingCoefficientRuntime
 
-import MappingCoefficientRuntime.{TNil, &:}
+import coulomb.syntax.typelist.{TNil, &:}
 
 val mappingRT: CoefficientRuntime =
     MappingCoefficientRuntime
