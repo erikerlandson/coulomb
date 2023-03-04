@@ -182,20 +182,6 @@ object meta:
             case derivedunitTR(_) => true
             case _                => false
 
-    def typeReprList(using Quotes)(
-        tlist: quotes.reflect.TypeRepr
-    ): List[quotes.reflect.TypeRepr] =
-        import quotes.reflect.*
-        tlist match
-            case tnil if (tnil =:= TypeRepr.of[TNil]) => Nil
-            case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[&:]) =>
-                head :: typeReprList(tail)
-            case _ =>
-                report.errorAndAbort(
-                    s"utlClosure: bad type list ${tlist.show}"
-                )
-                null.asInstanceOf[Nothing]
-
     private val emptyMap =
         Map.empty[RuntimeUnit.UnitType, RuntimeUnit]
 
