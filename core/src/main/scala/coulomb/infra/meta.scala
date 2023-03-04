@@ -25,6 +25,8 @@ object meta:
     import scala.quoted.*
     import scala.language.implicitConversions
 
+    import coulomb.syntax.typelist.{TNil, &:}
+
     given ctx_RationalToExpr: ToExpr[Rational] with
         def apply(r: Rational)(using Quotes): Expr[Rational] = r match
             // Rational(1) is a useful special case to have predefined
@@ -371,6 +373,20 @@ object meta:
             case _ if (e == Rational.const0) => Nil
             case Nil                         => Nil
             case (u, e0) :: tail             => (u, e0 * e) :: unifyPow(e, tail)
+
+    def typeReprList(using Quotes)(
+        tlist: quotes.reflect.TypeRepr
+    ): List[quotes.reflect.TypeRepr] =
+        import quotes.reflect.*
+        tlist match
+            case tnil if (tnil =:= TypeRepr.of[TNil]) => Nil
+            case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[&:]) =>
+                head :: typeReprList(tail)
+            case _ =>
+                report.errorAndAbort(
+                    s"utlClosure: bad type list ${tlist.show}"
+                )
+                null.asInstanceOf[Nothing]
 
     def typestr(using Quotes)(t: quotes.reflect.TypeRepr): String =
         // The policy goal here is that type aliases are never expanded.

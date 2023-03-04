@@ -44,6 +44,8 @@ package parser {
 
         import coulomb.parser.standard.RuntimeUnitExprParser
 
+        import coulomb.syntax.typelist.{TNil, &:}
+
         def ofUTL[UTL](using Quotes, Type[UTL]): Expr[RuntimeUnitExprParser] =
             val un = Map.empty[String, String]
             val pn = Set.empty[String]
