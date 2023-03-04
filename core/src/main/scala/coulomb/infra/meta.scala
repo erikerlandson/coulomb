@@ -265,14 +265,9 @@ object meta:
 
     object baseunit:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
-            import quotes.reflect.*
-            Implicits.search(
-                TypeRepr
-                    .of[BaseUnit]
-                    .appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))
-            ) match
-                case iss: ImplicitSearchSuccess => true
-                case _                          => false
+            u match
+                case baseunitTR(_) => true
+                case _ => false
 
     object derivedunit:
         def unapply(using qq: Quotes, mode: SigMode)(
@@ -289,6 +284,22 @@ object meta:
                             val AppliedType(_, List(_, d, _, _)) =
                                 dtr: @unchecked
                             Some(cansig(d))
+                case _ => None
+
+    object baseunitTR:
+        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+            import quotes.reflect.*
+            Implicits.search(
+                TypeRepr
+                    .of[BaseUnit]
+                    .appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))
+            ) match
+                case iss: ImplicitSearchSuccess =>
+                    Some(
+                        iss.tree.tpe.baseType(
+                            TypeRepr.of[BaseUnit].typeSymbol
+                        )
+                    )
                 case _ => None
 
     object derivedunitTR:
