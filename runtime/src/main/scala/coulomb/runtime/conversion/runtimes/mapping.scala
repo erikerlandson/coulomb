@@ -21,10 +21,11 @@ import scala.collection.immutable.HashMap
 import coulomb.*
 import coulomb.rational.Rational
 
-class MappingCoefficientRuntime(
-    baseUnits: Set[RuntimeUnit.UnitType],
-    derivedUnits: Map[RuntimeUnit.UnitType, RuntimeUnit]
-) extends CoefficientRuntime:
+sealed abstract class MappingCoefficientRuntime extends CoefficientRuntime:
+    // can protected members change and preserve binary compatibility?
+    protected def base: Set[RuntimeUnit.UnitType]
+    protected def derived: Map[RuntimeUnit.UnitType, RuntimeUnit]
+
     def coefficientRational(
         uf: RuntimeUnit,
         ut: RuntimeUnit
@@ -42,10 +43,10 @@ class MappingCoefficientRuntime(
             case RuntimeUnit.Pow(b, e) => canonical(b).pow(e)
             case RuntimeUnit.UnitConst(c) =>
                 Right(Canonical(c, Canonical.one.sig))
-            case u: RuntimeUnit.UnitType if (baseUnits.contains(u)) =>
+            case u: RuntimeUnit.UnitType if (base.contains(u)) =>
                 Right(Canonical(Rational.const1, HashMap(u -> Rational.const1)))
-            case u: RuntimeUnit.UnitType if (derivedUnits.contains(u)) =>
-                canonical(derivedUnits(u))
+            case u: RuntimeUnit.UnitType if (derived.contains(u)) =>
+                canonical(derived(u))
             case _ => Left(s"canonical: unrecognized unit $u")
 
 extension (lhs: Either[String, Canonical])
@@ -57,9 +58,6 @@ extension (lhs: Either[String, Canonical])
         lhs.map { l => l.pow(e) }
 
 object MappingCoefficientRuntime:
-    final type &:[H, T]
-    final type TNil
-
     inline def of[UTL]: MappingCoefficientRuntime = ${ meta.ofUTL[UTL] }
 
 case class Canonical(coef: Rational, sig: Map[RuntimeUnit.UnitType, Rational]):
@@ -107,12 +105,16 @@ object meta:
     import coulomb.infra.meta.{*, given}
     import coulomb.infra.runtime.meta.{*, given}
 
-    import MappingCoefficientRuntime.{TNil, &:}
+    import coulomb.syntax.typelist.{TNil, &:}
 
     def ofUTL[UTL](using Quotes, Type[UTL]): Expr[MappingCoefficientRuntime] =
         import quotes.reflect.*
         val (bu, du) = utlClosure(typeReprList(TypeRepr.of[UTL]))
-        '{ new MappingCoefficientRuntime(${ Expr(bu) }, ${ Expr(du) }) }
+        '{
+            new MappingCoefficientRuntime:
+                protected val base = ${ Expr(bu) }
+                protected val derived = ${ Expr(du) }
+        }
 
     def utlClosure(using Quotes)(
         utl: List[quotes.reflect.TypeRepr]

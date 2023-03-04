@@ -170,8 +170,7 @@ object ValuePromotion:
 
     import coulomb.infra.meta.typestr
 
-    final type &:[H, T]
-    final type TNil
+    import coulomb.syntax.typelist.{TNil, &:}
 
     transparent inline given ctx_VP_Path[VF, VT]: ValuePromotion[VF, VT] = ${
         vpPath[VF, VT]

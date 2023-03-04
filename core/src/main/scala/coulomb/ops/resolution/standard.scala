@@ -18,7 +18,7 @@ package coulomb.ops.resolution
 
 object standard:
     import coulomb.ops.ValuePromotionPolicy
-    import coulomb.ops.ValuePromotion.{&:, TNil}
+    import coulomb.syntax.typelist.{&:, TNil}
 
     // ValuePromotion infers the transitive closure of all promotions
     given ctx_vpp_standard: ValuePromotionPolicy[

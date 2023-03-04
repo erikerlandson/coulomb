@@ -16,5 +16,40 @@
 
 package coulomb
 
-object parser:
-    val stub = 0
+import coulomb.RuntimeUnit
+
+package parser {
+    abstract class RuntimeUnitParser:
+        def parse(expr: String): RuntimeUnit
+        def render(u: RuntimeUnit): String
+
+    object standard:
+        sealed abstract class RuntimeUnitExprParser extends RuntimeUnitParser:
+            protected def unames: Map[String, String]
+            protected def pnames: Set[String]
+            def parse(expr: String): RuntimeUnit = ???
+            def render(u: RuntimeUnit): String = ???
+
+        object RuntimeUnitExprParser:
+            inline def of[UTL]: RuntimeUnitExprParser = ${ meta.ofUTL[UTL] }
+
+    object meta:
+        import scala.quoted.*
+        import scala.util.{Try, Success, Failure}
+        import scala.unchecked
+        import scala.language.implicitConversions
+
+        import coulomb.infra.meta.{*, given}
+        import coulomb.infra.runtime.meta.{*, given}
+
+        import coulomb.parser.standard.RuntimeUnitExprParser
+
+        def ofUTL[UTL](using Quotes, Type[UTL]): Expr[RuntimeUnitExprParser] =
+            val un = Map.empty[String, String]
+            val pn = Set.empty[String]
+            '{
+                new RuntimeUnitExprParser:
+                    protected val unames = ${ Expr(un) }
+                    protected val pnames = ${ Expr(pn) }
+            }
+}
