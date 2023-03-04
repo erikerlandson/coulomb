@@ -267,7 +267,7 @@ object meta:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
             u match
                 case baseunitTR(_) => true
-                case _ => false
+                case _             => false
 
     object derivedunit:
         def unapply(using qq: Quotes, mode: SigMode)(
@@ -287,7 +287,9 @@ object meta:
                 case _ => None
 
     object baseunitTR:
-        def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Option[quotes.reflect.TypeRepr] =
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
             Implicits.search(
                 TypeRepr
