@@ -117,6 +117,11 @@ package syntax {
          *   }}}
          */
         inline def withUnit[U]: Quantity[V, U] = Quantity[U](v)
+
+    package typelist {
+        final type &:[Head, Tail]
+        final type TNil
+    }
 }
 
 /**
