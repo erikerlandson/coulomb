@@ -19,15 +19,15 @@ package coulomb.parser
 import coulomb.RuntimeUnit
 
 abstract class RuntimeUnitParser:
-    def parse(expr: String): RuntimeUnit
+    def parse(expr: String): Either[String, RuntimeUnit]
     def render(u: RuntimeUnit): String
 
 object standard:
     sealed abstract class RuntimeUnitExprParser extends RuntimeUnitParser:
         protected def unames: Map[String, String]
         protected def pnames: Set[String]
-        def parse(expr: String): RuntimeUnit =
-            RuntimeUnit.UnitType("no")
+        def parse(expr: String): Either[String, RuntimeUnit] =
+            Left("no")
         def render(u: RuntimeUnit): String =
             "no"
 
