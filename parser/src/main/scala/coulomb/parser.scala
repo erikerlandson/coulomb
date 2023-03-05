@@ -50,7 +50,7 @@ object infra:
             else
                 (Parser.char(c) ~ strsetvoid(tail)).void
         }
-        val p = po.drop(1).fold(po.head) { case (p, q) =>
+        val p = po.drop(1).foldLeft(po.head) { case (p, q) =>
             (p | q).void
         }
         p
