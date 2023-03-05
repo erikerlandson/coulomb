@@ -66,7 +66,7 @@ object infra:
     // this is guaranteed by construction at compile time
     private def strsetvoid(ss: Set[String]): Parser[Unit] =
         // construct a parser "branch" for each starting character
-        val hp = ss.map(_.head).map { h =>
+        val hp = ss.map(_.head).toList.map { h =>
             // set of string tails starting with char h
             val tails = ss.filter(_.head == h).map(_.drop(1)).filter(_.length > 0)
             if (tails.isEmpty)
@@ -77,9 +77,7 @@ object infra:
                 (Parser.char(h) ~ strsetvoid(tails)).void
         }
         // final parser is just "or" of branches: hp(0) | hp(1) | hp(2) ...
-        hp.drop(1).foldLeft(hp.head) { case (p, q) =>
-            (p | q).void
-        }
+        Parser.oneOf(hp)
 
 object meta:
     import scala.quoted.*
