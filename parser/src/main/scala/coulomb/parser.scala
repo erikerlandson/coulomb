@@ -37,18 +37,21 @@ object standard:
 object infra:
     import _root_.cats.parse.*
     def strset(ss: Set[String]): Parser[String] =
+        strsetvoid(ss).string
+
+    private def strsetvoid(ss: Set[String]): Parser[Unit] =
         // assumes ss is not empty and all members are length > 0
         // this is guaranteed by construction at compile time
         val head = ss.map(_.head)
         val po = head.map { c =>
             val tail = ss.filter(_.head == c).map(_.drop(1)).filter(_.length > 0)
             if (tail.isEmpty)
-                Parser.string(Parser.char(c))
+                Parser.char(c)
             else
-                Parser.string(Parser.char(c) ~ strset(tail))
+                (Parser.char(c) ~ strsetvoid(tail)).void
         }
         val p = po.drop(1).fold(po.head) { case (p, q) =>
-            Parser.string(p | q)
+            (p | q).void
         }
         p
 
