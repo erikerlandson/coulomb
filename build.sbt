@@ -66,7 +66,7 @@ lazy val refined = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .dependsOn(core % "compile->compile;test->test", units % Test)
     .settings(commonSettings: _*)
     .settings(
-        libraryDependencies += "eu.timepit" %%% "refined" % "0.10.1",
+        libraryDependencies += "eu.timepit" %%% "refined" % "0.10.2",
         tlVersionIntroduced := Map("3" -> "0.7.2")
     )
 
