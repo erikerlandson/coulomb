@@ -37,6 +37,19 @@ object standard:
 object infra:
     import _root_.cats.parse.*
 
+    val ws: Parser[Unit] = Parser.charIn(" \t\r\n").void
+    val ws0: Parser0[Unit] = ws.rep0.void
+
+    def unit(named: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
+        Parser.recursive[RuntimeUnit] { recurse =>
+            val sub: Parser[RuntimeUnit] = recurse.between(Parser.char('(') <* ws0, ws0 *> Parser.char(')'))
+            val mul: Parser[RuntimeUnit] =
+                ((recurse <* Parser.char('*').soft.surroundedBy(ws0)).soft ~ recurse).map { case (lhs, rhs) =>
+                    RuntimeUnit.Mul(lhs, rhs)
+                }
+            Parser.oneOf(named :: sub :: mul :: Nil)
+        }
+
     def named(unames: Map[String, String], pnames: Set[String]): Parser[RuntimeUnit] =
         // unames is never empty by construction
         val unit = strset(unames.keySet).map { name =>
