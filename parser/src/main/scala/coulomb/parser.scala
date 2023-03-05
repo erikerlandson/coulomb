@@ -36,24 +36,50 @@ object standard:
 
 object infra:
     import _root_.cats.parse.*
+
+    def named(unames: Map[String, String], pnames: Set[String]): Parser[RuntimeUnit] =
+        // unames is never empty by construction
+        val unit = strset(unames.keySet).map { name =>
+            // map will always succeed because only names in unames can parse
+            RuntimeUnit.UnitType(unames(name))
+        }
+        if (pnames.isEmpty)
+            // if there are no prefix units, just parse units
+            unit
+        else
+            val prefix = strset(pnames).map { name =>
+                // prefixes are also defined in unames
+                RuntimeUnit.UnitType(unames(name))
+            }
+            val pfu = (prefix ~ unit).map { case (lhs, rhs) =>
+                // <prefix><unit> => prefix * unit
+                RuntimeUnit.Mul(lhs, rhs)
+            }
+            // parse either <prefix><unit> or <unit>
+            // test pfu first
+            pfu | unit
+
     def strset(ss: Set[String]): Parser[String] =
         strsetvoid(ss).string
 
+    // assumes ss is not empty and all members are length > 0
+    // this is guaranteed by construction at compile time
     private def strsetvoid(ss: Set[String]): Parser[Unit] =
-        // assumes ss is not empty and all members are length > 0
-        // this is guaranteed by construction at compile time
-        val head = ss.map(_.head)
-        val po = head.map { c =>
-            val tail = ss.filter(_.head == c).map(_.drop(1)).filter(_.length > 0)
-            if (tail.isEmpty)
-                Parser.char(c)
+        // construct a parser "branch" for each starting character
+        val hp = ss.map(_.head).map { h =>
+            // set of string tails starting with char h
+            val tails = ss.filter(_.head == h).map(_.drop(1)).filter(_.length > 0)
+            if (tails.isEmpty)
+                // no remaining string tails, just parse char h
+                Parser.char(h)
             else
-                (Parser.char(c) ~ strsetvoid(tail)).void
+                // parse h followed by parser for tails
+                (Parser.char(h) ~ strsetvoid(tails)).void
         }
-        val p = po.drop(1).foldLeft(po.head) { case (p, q) =>
+        // final parser is just "or" of branches: hp(0) | hp(1) | hp(2) ...
+        hp.drop(1).foldLeft(hp.head) { case (p, q) =>
             (p | q).void
         }
-        p
 
 object meta:
     import scala.quoted.*
@@ -72,11 +98,13 @@ object meta:
     def ofUTL[UTL](using Quotes, Type[UTL]): Expr[RuntimeUnitExprParser] =
         import quotes.reflect.*
         val (un, pn) = collect(typeReprList(TypeRepr.of[UTL]))
+        // remove any unit names that are empty strings
         val pn1 = pn.filter(_.length > 0)
         val un1 = un.filter { case (k, _) =>
             k.length > 0
         }
         if (un1.isEmpty)
+            // unit map must be non-empty
             report.errorAndAbort(s"ofUTL: no defined unit names")
         '{
             new RuntimeUnitExprParser:
@@ -96,11 +124,15 @@ object meta:
                     case baseunitTR(tr) =>
                         val AppliedType(_, List(_, n, _)) = tr: @unchecked
                         val ConstantType(StringConstant(name)) = n: @unchecked
+                        // base units are never prefix units because prefix units are
+                        // derived from '1' (unitless)
                         (un + (name -> head.typeSymbol.fullName), pn)
                     case derivedunitTR(tr) =>
                         val AppliedType(_, List(_, _, n, _)) = tr: @unchecked
                         val ConstantType(StringConstant(name)) = n: @unchecked
+                        // always add to unit types
                         val unr = un + (name -> head.typeSymbol.fullName)
+                        // if it is derived from unitless, also add it to prefix unit set
                         val pnr = if (convertible(head, TypeRepr.of[1])) pn + name else pn
                         (unr, pnr)
                     case _ =>
