@@ -40,15 +40,61 @@ object infra:
     val ws: Parser[Unit] = Parser.charIn(" \t\r\n").void
     val ws0: Parser0[Unit] = ws.rep0.void
 
-    def unit(named: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
+    def unit_nope(named: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
         Parser.recursive[RuntimeUnit] { recurse =>
-            val sub: Parser[RuntimeUnit] = recurse.between(Parser.char('(') <* ws0, ws0 *> Parser.char(')'))
+            // ( <expr> )
+            val sub: Parser[RuntimeUnit] =
+                recurse.between(Parser.char('(') <* ws0, Parser.char(')') <* ws0)
+
+            // <expr> * <expr> 
             val mul: Parser[RuntimeUnit] =
-                ((recurse <* Parser.char('*').soft.surroundedBy(ws0)).soft ~ recurse).map { case (lhs, rhs) =>
-                    RuntimeUnit.Mul(lhs, rhs)
-                }
-            Parser.oneOf(named :: sub :: mul :: Nil)
+                chainl1(recurse, (Parser.char('*') <* ws0).as(RuntimeUnit.Mul(_, _)))
+
+             ws0.with1 *> Parser.oneOf((named <* ws0) :: sub :: mul :: Nil) <* Parser.end
         }
+
+    def unit(named: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
+        lazy val expr: Parser[RuntimeUnit] = Parser.defer {
+            lazy val mul: Parser[RuntimeUnit] =
+                chainl1(term, (Parser.char('*') <* ws0).as(RuntimeUnit.Mul(_, _)))
+            lazy val term: Parser[RuntimeUnit] =
+                paren | (named <* ws0)
+            lazy val paren: Parser[RuntimeUnit] =
+                expr.between(Parser.char('(') <* ws0, Parser.char(')') <* ws0)
+            mul
+        }
+        ws0.with1 *> expr <* Parser.end
+
+    def chainl1[X](p: Parser[X], op: Parser[(X, X) => X]): Parser[X] =
+        lazy val rest: Parser0[X => X] = Parser.defer0 {
+          val some: Parser0[X => X] = (op, p, rest).mapN {
+                // found an <op><rhs>, with possibly more
+                (f, y, next) => ((x: X) => next(f(x, y)))
+            }
+            // none consumes no input
+            val none: Parser0[X => X] = Parser.pure(identity[X])
+            some | none
+        }
+        // this feels wrong but .with1 returns With1, not Parser
+        rapp(p, rest).asInstanceOf[Parser[X]]
+
+    // parsley <*>
+    def app[X, Z](f: Parser0[X => Z], x: Parser0[X]): Parser0[Z] =
+        (f ~ x).map { case (f, x) => f(x) }
+
+    // parsley <**>
+    def rapp[X, Z](x: Parser0[X], f: Parser0[X => Z]): Parser0[Z] =
+        (x ~ f).map { case (x, f) => f(x) }
+
+    // parsley zipped
+    // can scala 3 '*:' clean this up?
+    extension [X1, X2](p: (Parser0[X1], Parser0[X2]))
+        def mapN[Z](f: (X1, X2) => Z): Parser0[Z] =
+            (p._1 ~ p._2).map { case (x1, x2) => f(x1, x2) }
+
+    extension [X1, X2, X3](p: (Parser0[X1], Parser0[X2], Parser0[X3]))
+        def mapN[Z](f: (X1, X2, X3) => Z): Parser0[Z] =
+            ((p._1 ~ p._2) ~ p._3).map { case ((x1, x2), x3) => f(x1, x2, x3) }
 
     def named(unames: Map[String, String], pnames: Set[String]): Parser[RuntimeUnit] =
         // unames is never empty by construction
