@@ -40,28 +40,18 @@ object infra:
     val ws: Parser[Unit] = Parser.charIn(" \t\r\n").void
     val ws0: Parser0[Unit] = ws.rep0.void
 
-    def unit_nope(named: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
-        Parser.recursive[RuntimeUnit] { recurse =>
-            // ( <expr> )
-            val sub: Parser[RuntimeUnit] =
-                recurse.between(Parser.char('(') <* ws0, Parser.char(')') <* ws0)
-
-            // <expr> * <expr> 
-            val mul: Parser[RuntimeUnit] =
-                chainl1(recurse, (Parser.char('*') <* ws0).as(RuntimeUnit.Mul(_, _)))
-
-             ws0.with1 *> Parser.oneOf((named <* ws0) :: sub :: mul :: Nil) <* Parser.end
-        }
-
     def unit(named: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
         lazy val expr: Parser[RuntimeUnit] = Parser.defer {
-            lazy val mul: Parser[RuntimeUnit] =
-                chainl1(term, (Parser.char('*') <* ws0).as(RuntimeUnit.Mul(_, _)))
+            val termops: Parser[(RuntimeUnit, RuntimeUnit) => RuntimeUnit] =
+                (Parser.char('*') <* ws0).as(RuntimeUnit.Mul(_, _)) |
+                (Parser.char('/') <* ws0).as(RuntimeUnit.Div(_, _))
             lazy val term: Parser[RuntimeUnit] =
+                chainl1(atom, termops)
+            lazy val atom: Parser[RuntimeUnit] =
                 paren | (named <* ws0)
             lazy val paren: Parser[RuntimeUnit] =
                 expr.between(Parser.char('(') <* ws0, Parser.char(')') <* ws0)
-            mul
+            term
         }
         ws0.with1 *> expr <* Parser.end
 
@@ -96,27 +86,30 @@ object infra:
         def mapN[Z](f: (X1, X2, X3) => Z): Parser0[Z] =
             ((p._1 ~ p._2) ~ p._3).map { case ((x1, x2), x3) => f(x1, x2, x3) }
 
+    def unitname: Parser[String] =
+        // this might be extended but not until I have a reason and a principle
+        // one possible extension would be "any printable char not in { '(', ')', '*', etc }"
+        // however I'm not sure if there is an efficient way to express that
+        // (starting char can also not be digit, + or -)
+        Parser.charIn('a' to 'z').rep.string
+
     def named(unames: Map[String, String], pnames: Set[String]): Parser[RuntimeUnit] =
-        // unames is never empty by construction
-        val unit = strset(unames.keySet).map { name =>
-            // map will always succeed because only names in unames can parse
-            RuntimeUnit.UnitType(unames(name))
+        val prefixunit = (strset(pnames) ~ strset(unames.keySet `diff` pnames)) <* Parser.end
+        unitname.flatMap { name =>
+            if (unames.contains(name))
+                // name is a defined unit, return its type
+                Parser.pure(RuntimeUnit.UnitType(unames(name)))
+            else
+                // otherwise see if it can be parsed as <prefix><unit>
+                prefixunit.parse(name) match
+                    case Right((_, (pn, un))) =>
+                        // <prefix><unit> => <prefix> * <unit>
+                        val p = RuntimeUnit.UnitType(unames(pn))
+                        val u = RuntimeUnit.UnitType(unames(un))
+                        Parser.pure(RuntimeUnit.Mul(p, u))
+                    case Left(_) =>
+                        Parser.failWith[RuntimeUnit](s"unrecognized unit '$name'")
         }
-        if (pnames.isEmpty)
-            // if there are no prefix units, just parse units
-            unit
-        else
-            val prefix = strset(pnames).map { name =>
-                // prefixes are also defined in unames
-                RuntimeUnit.UnitType(unames(name))
-            }
-            val pfu = (prefix ~ unit).map { case (lhs, rhs) =>
-                // <prefix><unit> => prefix * unit
-                RuntimeUnit.Mul(lhs, rhs)
-            }
-            // parse either <prefix><unit> or <unit>
-            // test pfu first
-            pfu | unit
 
     def strset(ss: Set[String]): Parser[String] =
         strsetvoid(ss).string
@@ -136,6 +129,8 @@ object infra:
                 (Parser.char(h) ~ strsetvoid(tails)).void
         }
         // final parser is just "or" of branches: hp(0) | hp(1) | hp(2) ...
+        // these are safe to "or" because by construction they share
+        // no common left factor
         Parser.oneOf(hp)
 
 object meta:
