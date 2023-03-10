@@ -25,8 +25,6 @@ object meta:
     import scala.quoted.*
     import scala.language.implicitConversions
 
-    import coulomb.syntax.typelist.{TNil, &:}
-
     given ctx_RationalToExpr: ToExpr[Rational] with
         def apply(r: Rational)(using Quotes): Expr[Rational] = r match
             // Rational(1) is a useful special case to have predefined
@@ -392,12 +390,12 @@ object meta:
     ): List[quotes.reflect.TypeRepr] =
         import quotes.reflect.*
         tlist match
-            case tnil if (tnil =:= TypeRepr.of[TNil]) => Nil
-            case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[&:]) =>
+            case tnil if (tnil =:= TypeRepr.of[EmptyTuple]) => Nil
+            case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[*:]) =>
                 head :: typeReprList(tail)
             case _ =>
                 report.errorAndAbort(
-                    s"utlClosure: bad type list ${tlist.show}"
+                    s"typeReprList: bad type list ${tlist.show}"
                 )
                 null.asInstanceOf[Nothing]
 
