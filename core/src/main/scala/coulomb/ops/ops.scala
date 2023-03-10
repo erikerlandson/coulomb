@@ -170,8 +170,6 @@ object ValuePromotion:
 
     import coulomb.infra.meta.*
 
-    import coulomb.syntax.typelist.{TNil, &:}
-
     transparent inline given ctx_VP_Path[VF, VT]: ValuePromotion[VF, VT] = ${
         vpPath[VF, VT]
     }
@@ -255,9 +253,9 @@ object ValuePromotion:
                 done = true
         haspath
 
-final class ValuePromotionPolicy[Pairs]
+final class ValuePromotionPolicy[Pairs <: Tuple]
 object ValuePromotionPolicy:
-    def apply[P](): ValuePromotionPolicy[P] = new ValuePromotionPolicy[P]
+    def apply[P <: Tuple](): ValuePromotionPolicy[P] = new ValuePromotionPolicy[P]
 
 final case class ShowUnit[U](value: String)
 object ShowUnit:

@@ -23,10 +23,8 @@ import coulomb.units.us.{*, given}
 import coulomb.CoefficientRuntime
 import coulomb.conversion.runtimes.mapping.MappingCoefficientRuntime
 
-import coulomb.syntax.typelist.{TNil, &:}
-
 val mappingRT: CoefficientRuntime =
     MappingCoefficientRuntime
-        .of["coulomb.units.si" &: "coulomb.units.si.prefixes" &: TNil]
+        .of["coulomb.units.si" *: "coulomb.units.si.prefixes" *: EmptyTuple]
 
 class MappingRuntimeQuantitySuite extends RuntimeQuantitySuite(using mappingRT)

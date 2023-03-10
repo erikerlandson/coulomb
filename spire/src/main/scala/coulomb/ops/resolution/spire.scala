@@ -20,12 +20,11 @@ object spire:
     import _root_.spire.math.*
 
     import coulomb.ops.ValuePromotionPolicy
-    import coulomb.syntax.typelist.{&:, TNil}
 
     // ValuePromotion infers the transitive closure of all promotions
     given ctx_vpp_spire: ValuePromotionPolicy[
-        (Int, Long) &: (Long, Float) &: (Float, Double) &:
-            (Double, BigDecimal) &: (BigDecimal, Rational) &: (Long, BigInt) &:
-            (BigInt, Float) &: (Rational, Algebraic) &: (Algebraic, Real) &:
-            TNil
+        (Int, Long) *: (Long, Float) *: (Float, Double) *:
+            (Double, BigDecimal) *: (BigDecimal, Rational) *: (Long, BigInt) *:
+            (BigInt, Float) *: (Rational, Algebraic) *: (Algebraic, Real) *:
+            EmptyTuple
     ] = ValuePromotionPolicy()

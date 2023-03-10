@@ -27,15 +27,16 @@ abstract class RuntimeUnitParser:
 
 object standard:
     sealed abstract class RuntimeUnitExprParser extends RuntimeUnitParser:
-        protected def unames: Map[String, String]
-        protected def pnames: Set[String]
+        def unames: Map[String, String]
+        def pnames: Set[String]
         def parse(expr: String): Either[String, RuntimeUnit] =
             Left("no")
         def render(u: RuntimeUnit): String =
             "no"
 
     object RuntimeUnitExprParser:
-        inline def of[UTL]: RuntimeUnitExprParser = ${ meta.ofUTL[UTL] }
+        inline def of[UTL <: Tuple]: RuntimeUnitExprParser =
+            ${ coulomb.parser.meta.ofUTL[UTL] }
 
 object infra:
     import _root_.cats.parse.*
@@ -138,7 +139,11 @@ object infra:
     // these lists are intended to be constructed at compile-time via scala metaprogramming
     // to reduce errors
     def named(unames: Map[String, String], pnames: Set[String]): Parser[RuntimeUnit] =
-        val prefixunit = (strset(pnames) ~ strset(unames.keySet `diff` pnames)) <* Parser.end
+        val prefixunit: Parser[(String, String)] =
+            if (pnames.isEmpty || unames.isEmpty)
+                Parser.fail
+            else
+                (strset(pnames) ~ strset(unames.keySet `diff` pnames)) <* Parser.end
         unitlit.flatMap { name =>
             if (unames.contains(name))
                 // name is a defined unit, return its type
@@ -261,11 +266,9 @@ object meta:
 
     import coulomb.infra.meta.{*, given}
     import coulomb.infra.runtime.meta.{*, given}
-    import coulomb.conversion.runtimes.mapping.meta.{*, given}
+    import coulomb.conversion.runtimes.mapping.meta.moduleUnits
 
     import coulomb.parser.standard.RuntimeUnitExprParser
-
-    import coulomb.syntax.typelist.{TNil, &:}
 
     def ofUTL[UTL](using Quotes, Type[UTL]): Expr[RuntimeUnitExprParser] =
         import quotes.reflect.*
@@ -275,13 +278,10 @@ object meta:
         val un1 = un.filter { case (k, _) =>
             k.length > 0
         }
-        if (un1.isEmpty)
-            // unit map must be non-empty
-            report.errorAndAbort(s"ofUTL: no defined unit names")
         '{
             new RuntimeUnitExprParser:
-                protected val unames = ${ Expr(un1) }
-                protected val pnames = ${ Expr(pn1) }
+                val unames = ${ Expr(un1) }
+                val pnames = ${ Expr(pn1) }
         }
 
     private def collect(using Quotes)(tl: List[quotes.reflect.TypeRepr]): (Map[String, String], Set[String]) =
@@ -292,7 +292,8 @@ object meta:
                 val (un, pn) = collect(tail)
                 head match
                     case ConstantType(StringConstant(mname)) =>
-                        collect(moduleUnits(mname))
+                        val (mu, mp) = collect(moduleUnits(mname))
+                        (un ++ mu, pn ++ mp)
                     case baseunitTR(tr) =>
                         val AppliedType(_, List(_, n, _)) = tr: @unchecked
                         val ConstantType(StringConstant(name)) = n: @unchecked

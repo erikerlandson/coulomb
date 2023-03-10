@@ -58,7 +58,7 @@ extension (lhs: Either[String, Canonical])
         lhs.map { l => l.pow(e) }
 
 object MappingCoefficientRuntime:
-    inline def of[UTL]: MappingCoefficientRuntime = ${ meta.ofUTL[UTL] }
+    inline def of[UTL <: Tuple]: MappingCoefficientRuntime = ${ meta.ofUTL[UTL] }
 
 case class Canonical(coef: Rational, sig: Map[RuntimeUnit.UnitType, Rational]):
     def *(that: Canonical): Canonical =
@@ -104,8 +104,6 @@ object meta:
 
     import coulomb.infra.meta.{*, given}
     import coulomb.infra.runtime.meta.{*, given}
-
-    import coulomb.syntax.typelist.{TNil, &:}
 
     def ofUTL[UTL](using Quotes, Type[UTL]): Expr[MappingCoefficientRuntime] =
         import quotes.reflect.*
