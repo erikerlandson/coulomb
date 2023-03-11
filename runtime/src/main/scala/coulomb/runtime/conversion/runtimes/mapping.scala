@@ -58,7 +58,9 @@ extension (lhs: Either[String, Canonical])
         lhs.map { l => l.pow(e) }
 
 object MappingCoefficientRuntime:
-    inline def of[UTL <: Tuple]: MappingCoefficientRuntime = ${ meta.ofUTL[UTL] }
+    inline def of[UTL <: Tuple]: MappingCoefficientRuntime = ${
+        meta.ofUTL[UTL]
+    }
 
 case class Canonical(coef: Rational, sig: Map[RuntimeUnit.UnitType, Rational]):
     def *(that: Canonical): Canonical =
