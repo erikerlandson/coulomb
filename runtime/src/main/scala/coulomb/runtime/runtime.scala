@@ -25,6 +25,7 @@ sealed abstract class RuntimeUnit:
     def *(rhs: RuntimeUnit): RuntimeUnit.Mul = RuntimeUnit.Mul(this, rhs)
     def /(den: RuntimeUnit): RuntimeUnit.Div = RuntimeUnit.Div(this, den)
     def ^(e: Rational): RuntimeUnit.Pow = RuntimeUnit.Pow(this, e)
+
     override def toString: String =
         def paren(s: String, tl: Boolean): String =
             if (tl) s else s"($s)"
@@ -41,6 +42,33 @@ sealed abstract class RuntimeUnit:
                 case RuntimeUnit.Pow(b, e) =>
                     paren(s"${work(b)}^$e", tl)
         work(this, tl = true)
+
+    // evaluate a RuntimeUnit expression whose leaves are
+    // all UnitConst into a Rational value
+    def toRational: Either[String, Rational] =
+        this match
+            case RuntimeUnit.UnitConst(v) => Right(v)
+            case RuntimeUnit.Mul(lhs, rhs) =>
+                for {
+                    lv <- lhs.toRational
+                    rv <- rhs.toRational
+                } yield (lv * rv)
+            case RuntimeUnit.Div(num, den) =>
+                den.toRational match
+                    case Left(e) => Left(e)
+                    case Right(dv) =>
+                        if (dv == Rational.const0)
+                            Left("toRational: div by zero")
+                        else
+                            for {
+                                nv <- num.toRational
+                            } yield (nv / dv)
+            case RuntimeUnit.Pow(b, e) =>
+                for {
+                    bv <- b.toRational
+                } yield bv.pow(e)
+            case _ =>
+                Left(s"toRational: bad rational expression: $this")
 
 object RuntimeUnit:
     case class UnitConst(value: Rational) extends RuntimeUnit

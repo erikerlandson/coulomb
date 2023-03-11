@@ -26,13 +26,22 @@ abstract class RuntimeUnitParser:
     def render(u: RuntimeUnit): String
 
 object standard:
+    import _root_.cats.parse.*
+
     sealed abstract class RuntimeUnitExprParser extends RuntimeUnitParser:
         def unames: Map[String, String]
         def pnames: Set[String]
+
+        private lazy val parser: Parser[RuntimeUnit] =
+            infra.unit(infra.named(unames, pnames))
+
         def parse(expr: String): Either[String, RuntimeUnit] =
-            Left("no")
+            parser.parse(expr) match
+                case Right((_, u)) => Right(u)
+                case Left(e) => Left(s"$e")
+
         def render(u: RuntimeUnit): String =
-            "no"
+            s"${u.toString}"
 
     object RuntimeUnitExprParser:
         inline def of[UTL <: Tuple]: RuntimeUnitExprParser =
@@ -85,9 +94,9 @@ object infra:
     // used for left-factoring the parsing of "^" (power)
     val powop: Parser[(RuntimeUnit, RuntimeUnit) => RuntimeUnit] =
         (Parser.char('^') <* ws0).as { (b: RuntimeUnit, e: RuntimeUnit) =>
-            // we do not have to check for Left value of 'evalnum' here
+            // we do not have to check for Left value here
             // because it is verified during parsing
-            RuntimeUnit.Pow(b, e.evalnum.toSeq.head)
+            RuntimeUnit.Pow(b, e.toRational.toSeq.head)
         }
 
     def unit(named: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
@@ -119,7 +128,7 @@ object infra:
             // used to enforce that exponent of powers is a valid numeric value
             lazy val numeric: Parser[RuntimeUnit] =
                 atom.flatMap { u =>
-                    u.evalnum match
+                    u.toRational match
                        case Right(v) =>
                            Parser.pure(RuntimeUnit.UnitConst(v))
                        case Left(e) =>
@@ -181,36 +190,6 @@ object infra:
         // these are safe to "or" because by construction they share
         // no common left factor
         Parser.oneOf(hp)
-
-    extension (u: RuntimeUnit)
-        // attempt to evaluate a RuntimeUnit into a valid
-        // numeric constant value. This is used to constrain
-        // specialized parsing of RuntimeUnit expressions that 
-        // are required to represent numeric constants
-        def evalnum: Either[String, Rational] =
-            u match
-                case RuntimeUnit.UnitConst(v) => Right(v)
-                case RuntimeUnit.Mul(lhs, rhs) =>
-                    for {
-                        lv <- lhs.evalnum
-                        rv <- rhs.evalnum
-                    } yield (lv * rv)
-                case RuntimeUnit.Div(num, den) =>
-                    den.evalnum match
-                        case Left(e) => Left(e)
-                        case Right(dv) =>
-                            if (dv == Rational.const0)
-                                Left("div by zero")
-                            else
-                                for {
-                                    nv <- num.evalnum
-                                } yield (nv / dv)
-                case RuntimeUnit.Pow(b, e) =>
-                    for {
-                        bv <- b.evalnum
-                    } yield bv.pow(e)
-                case _ =>
-                    Left(s"bad numeric expression: $u")
 
     // the following are combinators for factoring left-recursive grammars
     // they are taken from this paper:
