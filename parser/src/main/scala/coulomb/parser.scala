@@ -35,13 +35,39 @@ object standard:
         private lazy val parser: Parser[RuntimeUnit] =
             infra.unit(infra.named(unames, pnames))
 
+        private lazy val unamesinv: Map[String, String] = {
+            val inv = unames.map { (k, v) => (v, k) }
+            // check this at compile-time in ofUTL ?
+            assert(inv.size == unames.size)
+            inv
+        }
+
         def parse(expr: String): Either[String, RuntimeUnit] =
             parser.parse(expr) match
                 case Right((_, u)) => Right(u)
                 case Left(e) => Left(s"$e")
 
         def render(u: RuntimeUnit): String =
-            s"${u.toString}"
+            def paren(s: String, tl: Boolean): String =
+                if (tl) s else s"($s)"
+            def rparen(r: Rational, tl: Boolean): String =
+                if (r.d == 1)
+                    s"${r.n}"
+                else
+                    paren(s"${r.n}/${r.d}", tl)
+            def work(u: RuntimeUnit, tl: Boolean = false): String =
+                u match
+                    case RuntimeUnit.UnitConst(value) =>
+                        rparen(value, tl)
+                    case RuntimeUnit.UnitType(path) =>
+                        unamesinv(path)
+                    case RuntimeUnit.Mul(l, r) =>
+                        paren(s"${work(l)}*${work(r)}", tl)
+                    case RuntimeUnit.Div(n, d) =>
+                        paren(s"${work(n)}/${work(d)}", tl)
+                    case RuntimeUnit.Pow(b, e) =>
+                        paren(s"${work(b)}^${rparen(e, false)}", tl)
+            work(u, tl = true)
 
     object RuntimeUnitExprParser:
         inline def of[UTL <: Tuple]: RuntimeUnitExprParser =
