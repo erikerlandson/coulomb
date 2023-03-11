@@ -255,7 +255,8 @@ object ValuePromotion:
 
 final class ValuePromotionPolicy[Pairs <: Tuple]
 object ValuePromotionPolicy:
-    def apply[P <: Tuple](): ValuePromotionPolicy[P] = new ValuePromotionPolicy[P]
+    def apply[P <: Tuple](): ValuePromotionPolicy[P] =
+        new ValuePromotionPolicy[P]
 
 final case class ShowUnit[U](value: String)
 object ShowUnit:
