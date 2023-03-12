@@ -22,8 +22,8 @@ import coulomb.RuntimeUnit
 import coulomb.rational.Rational
 
 object parsing:
-    def parser(unames: Map[String, String], pnames: Set[String]): (String => Either[String, RuntimeUnit]) =
-        val p = catsparse.unit(catsparse.named(unames, pnames))
+    def parser(unames: Map[String, String], pnames: Set[String], unamesinv: Map[String, String]): (String => Either[String, RuntimeUnit]) =
+        val p = catsparse.unit(catsparse.named(unames, pnames), catsparse.typed(unamesinv))
         (expr: String) => p.parse(expr) match
             case Right((_, u)) => Right(u)
             case Left(e) => Left(s"$e")
@@ -33,7 +33,7 @@ object parsing:
         import _root_.cats.parse.*
 
         // for consuming whitespace
-        val ws: Parser[Unit] = Parser.charIn(" \t\r\n").void
+        val ws: Parser[Unit] = Parser.charIn(" \t").void
         val ws0: Parser0[Unit] = ws.rep0.void
 
         // numeric literals parse into UnitConst objects
@@ -66,7 +66,16 @@ object parsing:
             // one possible extension would be "any printable char not in { '(', ')', '*', etc }"
             // however I'm not sure if there is an efficient way to express that
             // (starting char can also not be digit, + or -)
-            Parser.charIn('a' to 'z').rep.string
+            Rfc5234.alpha.rep.string
+
+        // scala identifier
+        val idlit: Parser[String] =
+            (Rfc5234.alpha ~ (Rfc5234.alpha | Rfc5234.digit | Parser.char('$')).rep0).string
+
+        // fully qualified scala module path for a UnitType
+        val typelit: Parser[String] =
+            // I expect at least one '.' in the type path
+            Parser.char('@') *> (idlit ~ (Parser.char('.') ~ idlit).rep).string
 
         // used for left-factoring the parsing for sequences of mul and div
         val muldivop: Parser[(RuntimeUnit, RuntimeUnit) => RuntimeUnit] =
@@ -81,7 +90,7 @@ object parsing:
                 RuntimeUnit.Pow(b, e.toRational.toSeq.head)
             }
 
-        def unit(named: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
+        def unit(named: Parser[RuntimeUnit], typed: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
             lazy val unitexpr: Parser[RuntimeUnit] = Parser.defer {
                 // sequence of mul and div operators
                 // these have lowest precedence and form the top of the parse tree
@@ -97,7 +106,7 @@ object parsing:
 
                 // numeric literal, named unit, or sub-expr in parens
                 lazy val atom: Parser[RuntimeUnit] =
-                    paren | (numlit <* ws0) | (named <* ws0)
+                    paren | (numlit <* ws0) | (typed <* ws0) | (named <* ws0)
 
                 // any unit subexpression inside of parens: (<expr>)
                 lazy val paren: Parser[RuntimeUnit] =
@@ -124,6 +133,15 @@ object parsing:
             // and requiring parsing reach end of input
             // (trailing whitespace is consumed inside unitexpr)
             ws0.with1 *> unitexpr <* Parser.end
+
+        def typed(unamesinv: Map[String, String]): Parser[RuntimeUnit] =
+            typelit.flatMap { path =>
+                if (unamesinv.contains(path))
+                    // type paths are ok if they are in the map
+                    Parser.pure(RuntimeUnit.UnitType(path))
+                else
+                    Parser.failWith[RuntimeUnit](s"unrecognized unit type '$path'")
+            }
 
         // parses "raw" unit literals - only succeeds if the literal is
         // in the list of defined units (or unit prefixes)

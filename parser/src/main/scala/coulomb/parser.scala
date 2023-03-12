@@ -23,23 +23,23 @@ import coulomb.rational.Rational
 
 abstract class RuntimeUnitParser:
     def parse(expr: String): Either[String, RuntimeUnit]
-    def render(u: RuntimeUnit): Either[String, String]
+    def render(u: RuntimeUnit): String
 
 object standard:
     abstract class RuntimeUnitExprParser extends RuntimeUnitParser:
         def unames: Map[String, String]
         def pnames: Set[String]
 
-        private lazy val parser: (String => Either[String, RuntimeUnit]) =
-            infra.parsing.parser(unames, pnames)
-
-        private lazy val unamesinv: Map[String, String] =
+        lazy val unamesinv: Map[String, String] =
             unames.map { (k, v) => (v, k) }
 
-        def parse(expr: String): Either[String, RuntimeUnit] =
+        private lazy val parser: (String => Either[String, RuntimeUnit]) =
+            infra.parsing.parser(unames, pnames, unamesinv)
+
+        final def parse(expr: String): Either[String, RuntimeUnit] =
             parser(expr)
 
-        def render(u: RuntimeUnit): Either[String, String] =
+        final def render(u: RuntimeUnit): String =
             def paren(s: String, tl: Boolean): String =
                 if (tl) s else s"($s)"
             def rparen(r: Rational, tl: Boolean): String =
@@ -52,17 +52,19 @@ object standard:
                     case RuntimeUnit.UnitConst(value) =>
                         rparen(value, tl)
                     case RuntimeUnit.UnitType(path) =>
-                        // this can error out if map isn't defined
-                        unamesinv(path)
+                        if (unamesinv.contains(path))
+                            // if it is in the inverse mapping write the name
+                            unamesinv(path)
+                        else
+                            // otherwise write the fully qualified type name
+                            s"@$path"
                     case RuntimeUnit.Mul(l, r) =>
                         paren(s"${work(l)}*${work(r)}", tl)
                     case RuntimeUnit.Div(n, d) =>
                         paren(s"${work(n)}/${work(d)}", tl)
                     case RuntimeUnit.Pow(b, e) =>
                         paren(s"${work(b)}^${rparen(e, false)}", tl)
-            Try { work(u, tl = true) } match
-                case Success(s) => Right(s)
-                case Failure(e) => Left(s"$e")
+            work(u, tl = true)
 
     object RuntimeUnitExprParser:
         inline def of[UTL <: Tuple]: RuntimeUnitExprParser =

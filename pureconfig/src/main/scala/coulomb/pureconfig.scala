@@ -31,6 +31,16 @@ object pureconfig:
     import _root_.pureconfig.error.CannotConvert
 
     import coulomb.parser.RuntimeUnitParser
+    
+    import com.typesafe.config.ConfigValue
+
+    // probably useful for unit testing, will keep them here for now
+    extension [V, U](q: Quantity[V, U])
+        inline def toCV(using ConfigWriter[Quantity[V, U]]): ConfigValue =
+            ConfigWriter[Quantity[V, U]].to(q)
+    extension (conf: ConfigValue)
+        inline def toQuantity[V, U](using ConfigReader[Quantity[V, U]]): Quantity[V, U] =
+            ConfigReader[Quantity[V, U]].from(conf).toSeq.head
 
     object intlit:
         def unapply(lit: String): Option[BigInt] =
@@ -70,6 +80,13 @@ object pureconfig:
             }
         }
 
+    given ctx_RuntimeUnit_Writer(using
+        parser: RuntimeUnitParser
+    ): ConfigWriter[RuntimeUnit] =
+        ConfigWriter[String].contramap[RuntimeUnit] { u =>
+            parser.render(u)
+        }
+
     given ctx_RuntimeQuantity_Reader[V](using
         ConfigReader[V],
         ConfigReader[RuntimeUnit]
@@ -78,9 +95,16 @@ object pureconfig:
             RuntimeQuantity(v, u)
         }
 
+    given ctx_RuntimeQuantity_Writer[V](using
+        ConfigWriter[V],
+        ConfigWriter[RuntimeUnit]
+    ): ConfigWriter[RuntimeQuantity[V]] =
+        ConfigWriter.forProduct2("value", "unit") { (q: RuntimeQuantity[V]) =>
+            (q.value, q.unit)
+        }
+
     inline given ctx_Quantity_Reader[V, U](using
-        crv: ConfigReader[V],
-        cru: ConfigReader[RuntimeUnit],
+        crq: ConfigReader[RuntimeQuantity[V]],
         crt: CoefficientRuntime,
         vcr: ValueConversion[Rational, V],
         mul: MultiplicativeSemigroup[V]
@@ -90,3 +114,10 @@ object pureconfig:
                 case Right(coef) => Right(mul.times(coef, rq.value).withUnit[U])
                 case Left(e) => Left(CannotConvert(s"$rq", "Quantity", e))
         }
+
+    inline given ctx_Quantity_Writer[V, U](using
+        ConfigWriter[RuntimeQuantity[V]]
+    ): ConfigWriter[Quantity[V, U]] =
+      ConfigWriter[RuntimeQuantity[V]].contramap[Quantity[V, U]] { q =>
+          RuntimeQuantity(q.value, RuntimeUnit.of[U])
+      }
