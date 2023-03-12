@@ -96,6 +96,7 @@ package syntax {
 case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
 
 object RuntimeQuantity:
+    import algebra.ring.MultiplicativeSemigroup
     import coulomb.ops.*
 
     inline def apply[V, U](q: Quantity[V, U]): RuntimeQuantity[V] =
@@ -112,11 +113,12 @@ object RuntimeQuantity:
     extension [VL](ql: RuntimeQuantity[VL])
         inline def toQuantity[VR, UR](using
             crt: CoefficientRuntime,
-            vi: ValueConversion[VL, Rational],
-            vo: ValueConversion[Rational, VR]
+            vc: ValueConversion[VL, VR],
+            vcr: ValueConversion[Rational, VR],
+            mul: MultiplicativeSemigroup[VR]
         ): Either[String, Quantity[VR, UR]] =
-            crt.coefficientRational[UR](ql.unit).map { coef =>
-                vo(coef * vi(ql.value)).withUnit[UR]
+            crt.coefficient[VR](ql.unit, RuntimeUnit.of[UR]).map { coef =>
+                mul.times(coef, vc(ql.value)).withUnit[UR]
             }
 
         transparent inline def +[VR](qr: RuntimeQuantity[VR])(using
