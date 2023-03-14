@@ -16,6 +16,7 @@
 
 package coulomb
 
+import scala.jdk.CollectionConverters.*
 import _root_.pureconfig.*
 
 import algebra.ring.MultiplicativeSemigroup
@@ -32,7 +33,7 @@ object pureconfig:
 
     import coulomb.parser.RuntimeUnitParser
     
-    import com.typesafe.config.ConfigValue
+    import com.typesafe.config.{ConfigValue, ConfigValueFactory}
 
     // probably useful for unit testing, will keep them here for now
     extension [V, U](q: Quantity[V, U])
@@ -42,31 +43,32 @@ object pureconfig:
         inline def toQuantity[V, U](using ConfigReader[Quantity[V, U]]): Quantity[V, U] =
             ConfigReader[Quantity[V, U]].from(conf).toSeq.head
 
-    object intlit:
-        def unapply(lit: String): Option[BigInt] =
-            Try { BigInt(lit) }.toOption
+    given ctx_RationalReader: ConfigReader[Rational] =
+        ConfigReader[BigInt].map(Rational(_, 1)) `orElse`
+        ConfigReader[Double].map(Rational(_)) `orElse`
+        ConfigReader.forProduct2("n", "d") { (n: BigInt, d: BigInt) =>
+            Rational(n, d)
+        }
 
-    object fplit:
-        def unapply(lit: String): Option[Double] =
-            Try { lit.toDouble }.toOption
+    extension (v: BigInt)
+        def toCV(using
+            ConfigWriter[Int],
+            ConfigWriter[BigInt]
+        ): ConfigValue =
+            if (v.isValidInt) ConfigWriter[Int].to(v.toInt)
+            else ConfigWriter[BigInt].to(v)
 
-    object ratlit:
-        def unapply(lit: String): Option[Rational] =
-            Try {
-                val x = lit.filter(_ != ' ').split('/')
-                assert(x.length == 2)
-                Rational(BigInt(x(0)), BigInt(x(1)))
-            }.toOption
-
-    given ctx_Rational_Reader: ConfigReader[Rational] =
-        ConfigReader.fromCursor[Rational] { cur =>
-            cur.asString.flatMap { lit =>
-                lit match
-                    case intlit(v) => Right(Rational(v, 1))
-                    case fplit(v) => Right(Rational(v))
-                    case ratlit(v) => Right(v)
-                    case _ => cur.failed(CannotConvert(lit, "Rational", s"bad rational literal"))
-            }
+    given ctx_RationalWriter(using
+        ConfigWriter[Int],
+        ConfigWriter[BigInt]
+    ): ConfigWriter[Rational] =
+        ConfigWriter.fromFunction[Rational] { r =>
+            if (r.d == 1)
+                ConfigValueFactory.fromAnyRef(r.n.toCV)
+            else
+                ConfigValueFactory.fromAnyRef(
+                    Map("n" -> r.n.toCV, "d" -> r.d.toCV).asJava
+                )
         }
 
     given ctx_RuntimeUnit_Reader(using
