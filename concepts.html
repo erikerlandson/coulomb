@@ -368,17 +368,16 @@
         <p>Although value and unit types are arbitrary for a <code>Quantity</code>, there is no free lunch.
         Operations on quantity objects will only work if they are defined.
         The following example will not compile because we have not defined what it means to add <code>Wrapper</code> objects:</p>
-        <pre><code class="nohighlight"><span class="comment">// addition has not been defined for Wrapper types
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// addition has not been defined for Wrapper types
 </span><span class="keyword">val</span><span> </span><span class="identifier">wsum</span><span> = </span><span class="identifier">w</span><span> + </span><span class="identifier">w</span><span>
 </span><span class="comment">// error: 
 // Addition not defined in scope for Quantity[Wrapper[Float], coulomb.units.si.Meter] and Quantity[Wrapper[Float], coulomb.units.si.Meter].
 // I found:
 // 
-//     coulomb.policy.standard.ctx_add_1V1U[Wrapper[Float], coulomb.units.si.Meter, 
-//       Wrapper[Float]
-//     , coulomb.units.si.Meter](&lt;:&lt;.refl[Wrapper[Float]], 
-//       &lt;:&lt;.refl[coulomb.units.si.Meter]
-//     , /* missing */summon[algebra.ring.AdditiveSemigroup[Wrapper[Float]]])
+//     coulomb.policy.standard.ctx_add_1V1U[Wrapper[Float], coulomb.units.si.Meter,
+//       Wrapper[Float], coulomb.units.si.Meter](&lt;:&lt;.refl[Wrapper[Float]],
+//       &lt;:&lt;.refl[coulomb.units.si.Meter],
+//       /* missing */summon[algebra.ring.AdditiveSemigroup[Wrapper[Float]]])
 // 
 // But no implicit values were found that match type algebra.ring.AdditiveSemigroup[Wrapper[Float]].</span></code></pre>
         <p>The compiler error above indicates that it was unable to find an algebra that tells coulomb&#39;s
@@ -476,8 +475,7 @@
 // I found:
 // 
 //     coulomb.policy.standard.ctx_div_2V2U[Int, coulomb.units.si.Meter, Int, (1 : Int)
-//       ]
-//     (/* missing */summon[util.NotGiven[Int =:= Int]], ???, ???, ???, ???, ???)
+//       ](/* missing */summon[util.NotGiven[Int =:= Int]], ???, ???, ???, ???, ???)
 // 
 // But no implicit values were found that match type util.NotGiven[Int =:= Int].</span></code></pre>
         
@@ -652,33 +650,32 @@
 // Addition not defined in scope for DeltaQuantity[Double, coulomb.units.temperature.Celsius] and Quantity[coulomb.units.temperature.Temperature[Double, coulomb.units.temperature.Celsius], (1 : Int)].
 // I found:
 // 
-//     coulomb.policy.standard.ctx_deltaaddq_2V2U[coulomb.units.si.Kelvin, Double, 
-//       coulomb.units.temperature.Celsius
-//     , 
-//       coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius, 
-//         coulomb.units.temperature.Kelvin
-//       ]
-//     , (1 : Int)](scala.util.NotGiven.value, scala.util.NotGiven.value, 
-//       coulomb.ops.ValueResolution.ctx_VR_LpR[Double, 
-//         coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius, 
-//           coulomb.units.temperature.Kelvin
-//         ]
+//     coulomb.policy.standard.ctx_deltaaddq_2V2U[coulomb.units.si.Kelvin, Double,
+//       coulomb.units.temperature.Celsius,
+//       coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
+//         coulomb.units.temperature.Kelvin²],
+//     (1 : Int)](scala.util.NotGiven.value, scala.util.NotGiven.value,
+//       coulomb.ops.ValueResolution.ctx_VR_LpR[Double,
+//         coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
+//           coulomb.units.temperature.Kelvin²]
 //       ](
-//         new 
-//           coulomb.ops.ValuePromotion[Double, 
-//             coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius, 
-//               coulomb.units.temperature.Kelvin
-//             ]
+//         new
+//           coulomb.ops.ValuePromotion[Double,
+//             coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
+//               coulomb.units.temperature.Kelvin²]
 //           ]
 //         ()
-//       )
-//     , ???, ???, ???)
+//       ),
+//     ???, ???, ???)
 // 
-// But given instance ctx_VP_Path in object ValuePromotion does not match type coulomb.ops.ValuePromotion[Double, 
-//   coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius, 
-//     coulomb.units.temperature.Kelvin
-//   ]
-// ].</span></code></pre>
+// But given instance ctx_VP_Path in object ValuePromotion does not match type coulomb.ops.ValuePromotion[Double,
+//   coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
+//     coulomb.units.temperature.Kelvin²]
+// ]
+// 
+// where:    Kelvin  is a type in object si with bounds 
+//           Kelvin² is a type in object temperature which is an alias of coulomb.units.si.Kelvin
+// .</span></code></pre>
         <p>We can see that <code>coulomb</code> time units support an algebra that behaves the same as temperatures above:</p>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">time</span><span>.{*, </span><span class="keyword">given</span><span>}
 
@@ -703,32 +700,27 @@
 // Addition not defined in scope for DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day] and Quantity[coulomb.units.time.EpochTime[Double, (365 : Int) * coulomb.units.time.Day], (1 : Int)].
 // I found:
 // 
-//     coulomb.policy.standard.ctx_deltaaddq_2V2U[coulomb.units.si.Second, Double, 
-//       ((365 : Int) * coulomb.units.time.Day)
-//     , 
-//       coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day, 
-//         coulomb.units.si.Second
-//       ]
-//     , (1 : Int)](scala.util.NotGiven.value, scala.util.NotGiven.value, 
-//       coulomb.ops.ValueResolution.ctx_VR_LpR[Double, 
-//         coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day, 
-//           coulomb.units.si.Second
-//         ]
+//     coulomb.policy.standard.ctx_deltaaddq_2V2U[coulomb.units.si.Second, Double,
+//       (365 : Int) * coulomb.units.time.Day,
+//       coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day,
+//         coulomb.units.si.Second],
+//     (1 : Int)](scala.util.NotGiven.value, scala.util.NotGiven.value,
+//       coulomb.ops.ValueResolution.ctx_VR_LpR[Double,
+//         coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day,
+//           coulomb.units.si.Second]
 //       ](
-//         new 
-//           coulomb.ops.ValuePromotion[Double, 
-//             coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day, 
-//               coulomb.units.si.Second
-//             ]
+//         new
+//           coulomb.ops.ValuePromotion[Double,
+//             coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day,
+//               coulomb.units.si.Second]
 //           ]
 //         ()
-//       )
-//     , ???, ???, ???)
+//       ),
+//     ???, ???, ???)
 // 
-// But given instance ctx_VP_Path in object ValuePromotion does not match type coulomb.ops.ValuePromotion[Double, 
-//   coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day, 
-//     coulomb.units.si.Second
-//   ]
+// But given instance ctx_VP_Path in object ValuePromotion does not match type coulomb.ops.ValuePromotion[Double,
+//   coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day,
+//     coulomb.units.si.Second]
 // ].</span></code></pre>
         
         <h3 id="delta-units" class="section">Delta Units<a class="anchor-link right" href="#delta-units"><i class="icofont-laika">&#xef71;</i></a></h3>
@@ -805,16 +797,15 @@ DeltaUnit - Quantity =&gt; DeltaUnit</code></pre>
 </span><span class="comment">// strict policy does not allow implicit value or unit conversions
 </span><span class="identifier">q1</span><span> + </span><span class="identifier">q3</span><span>
 </span><span class="comment">// error:
-// Addition not defined in scope for Quantity[Double, coulomb.units.accepted.Liter] and Quantity[Int, (coulomb.units.si.Meter ^ (3 : Int))].
+// Addition not defined in scope for Quantity[Double, coulomb.units.accepted.Liter] and Quantity[Int, coulomb.units.si.Meter ^ (3 : Int)].
 // I found:
 // 
-//     coulomb.policy.strict.ctx_add_2V2U[Double, coulomb.units.accepted.Liter, Int, 
-//       (coulomb.units.si.Meter ^ (3 : Int))
-//     ](scala.util.NotGiven.value, scala.util.NotGiven.value, 
+//     coulomb.policy.strict.ctx_add_2V2U[Double, coulomb.units.accepted.Liter, Int,
+//       coulomb.units.si.Meter ^ (3 : Int)](scala.util.NotGiven.value,
+//       scala.util.NotGiven.value,
 //       coulomb.ops.ValueResolution.ctx_VR_LpR[Double, Int](
-//         new coulomb.ops.ValuePromotion[Double, Int]()
-//       )
-//     , ???, ???, ???)
+//         new coulomb.ops.ValuePromotion[Double, Int]()),
+//     ???, ???, ???)
 // 
 // But given instance ctx_VP_Path in object ValuePromotion does not match type coulomb.ops.ValuePromotion[Double, Int].
 // q1 + q3

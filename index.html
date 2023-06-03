@@ -180,26 +180,21 @@
 // Addition not defined in scope for Quantity[Int, coulomb.units.si.Second] and Quantity[Int, coulomb.units.si.Meter].
 // I found:
 // 
-//     coulomb.policy.standard.ctx_add_1V2U[Int, coulomb.units.si.Second, Int, 
-//       coulomb.units.si.Meter
-//     ](&lt;:&lt;.refl[Int], scala.util.NotGiven.value, 
-//       coulomb.policy.standard.ctx_Quantity_Conversion_2V2U[Int, 
-//         coulomb.units.si.Meter
-//       , Int, coulomb.units.si.Second](
-//         coulomb.policy.standard.ctx_VC_Int[Int](scala.math.Numeric.IntIsIntegral)
-//       , 
+//     coulomb.policy.standard.ctx_add_1V2U[Int, coulomb.units.si.Second, Int,
+//       coulomb.units.si.Meter](&lt;:&lt;.refl[Int], scala.util.NotGiven.value,
+//       coulomb.policy.standard.ctx_Quantity_Conversion_2V2U[Int,
+//         coulomb.units.si.Meter, Int, coulomb.units.si.Second](
+//         coulomb.policy.standard.ctx_VC_Int[Int](scala.math.Numeric.IntIsIntegral),
 //         /* missing */
 //           summon[
-//             coulomb.conversion.UnitConversion[Int, coulomb.units.si.Meter, 
-//               coulomb.units.si.Second
-//             ]
+//             coulomb.conversion.UnitConversion[Int, coulomb.units.si.Meter,
+//               coulomb.units.si.Second]
 //           ]
-//       )
-//     , ???)
+//       ),
+//     ???)
 // 
-// But no implicit values were found that match type coulomb.conversion.UnitConversion[Int, coulomb.units.si.Meter, 
-//   coulomb.units.si.Second
-// ].
+// But no implicit values were found that match type coulomb.conversion.UnitConversion[Int, coulomb.units.si.Meter,
+//   coulomb.units.si.Second].
 // val fail = time + dist
 //                   ^^^^</span></code></pre>
         
