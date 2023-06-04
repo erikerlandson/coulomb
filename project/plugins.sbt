@@ -15,3 +15,6 @@ addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.4")
 // snapshot to pick up bug fix
 // https://github.com/scalameta/mdoc/pull/664
 addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.3.7")
+
+// enable bloop
+addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "1.5.6")
