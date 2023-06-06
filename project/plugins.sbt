@@ -10,7 +10,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.13.1")
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.4.12")
 addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.1")
 
-addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.4")
+addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.5")
 
 // snapshot to pick up bug fix
 // https://github.com/scalameta/mdoc/pull/664
