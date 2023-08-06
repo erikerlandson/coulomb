@@ -31,9 +31,9 @@ object meta:
     import coulomb.infra.runtime.meta.{*, given}
     import coulomb.conversion.runtimes.mapping.meta.moduleUnits
 
-    import coulomb.parser.standard.RuntimeUnitExprParser
+    import coulomb.parser.standard.RuntimeUnitDslParser
 
-    def ofUTL[UTL](using Quotes, Type[UTL]): Expr[RuntimeUnitExprParser] =
+    def ofUTL[UTL](using Quotes, Type[UTL]): Expr[RuntimeUnitDslParser] =
         import quotes.reflect.*
         val (un, pn) = collect(typeReprList(TypeRepr.of[UTL]))
         // remove any unit names that are empty strings
@@ -42,7 +42,7 @@ object meta:
             k.length > 0
         }
         '{
-            new RuntimeUnitExprParser:
+            new RuntimeUnitDslParser:
                 val unames = ${ Expr(un1) }
                 val pnames = ${ Expr(pn1) }
         }

@@ -26,7 +26,7 @@ abstract class RuntimeUnitParser:
     def render(u: RuntimeUnit): String
 
 object standard:
-    abstract class RuntimeUnitExprParser extends RuntimeUnitParser:
+    abstract class RuntimeUnitDslParser extends RuntimeUnitParser:
         def unames: Map[String, String]
         def pnames: Set[String]
 
@@ -66,6 +66,6 @@ object standard:
                         paren(s"${work(b)}^${rparen(e, false)}", tl)
             work(u, tl = true)
 
-    object RuntimeUnitExprParser:
-        inline def of[UTL <: Tuple]: RuntimeUnitExprParser =
+    object RuntimeUnitDslParser:
+        inline def of[UTL <: Tuple]: RuntimeUnitDslParser =
             ${ infra.meta.ofUTL[UTL] }
