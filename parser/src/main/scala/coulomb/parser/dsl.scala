@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package coulomb.parser.infra
+package coulomb.parser
 
 import scala.util.{Try, Success, Failure}
 
 import coulomb.RuntimeUnit
 import coulomb.rational.Rational
 
-object parsing:
+object dsl:
     def parser(unames: Map[String, String], pnames: Set[String], unamesinv: Map[String, String]): (String => Either[String, RuntimeUnit]) =
         val p = catsparse.unit(catsparse.named(unames, pnames), catsparse.typed(unamesinv))
         (expr: String) => p.parse(expr) match
@@ -29,6 +29,7 @@ object parsing:
             case Left(e) => Left(s"$e")
 
     // parsing library is implementation detail
+    // note this is private and so could be swapped out without breaking binary compat
     private object catsparse:
         import _root_.cats.parse.*
 
