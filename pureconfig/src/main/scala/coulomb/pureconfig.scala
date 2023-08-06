@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package coulomb
+package coulomb.pureconfig
 
 import scala.jdk.CollectionConverters.*
 import _root_.pureconfig.*
@@ -26,15 +26,21 @@ import coulomb.syntax.*
 import coulomb.rational.Rational
 import coulomb.conversion.ValueConversion
 
-object pureconfig:
-    import scala.util.{Try, Success, Failure}
+import scala.util.{Try, Success, Failure}
 
-    import _root_.pureconfig.error.CannotConvert
+import _root_.pureconfig.error.CannotConvert
 
-    import coulomb.parser.RuntimeUnitParser
-    
-    import com.typesafe.config.{ConfigValue, ConfigValueFactory}
+import coulomb.parser.RuntimeUnitParser
 
+import com.typesafe.config.{ConfigValue, ConfigValueFactory}
+
+object policy:
+    object DSL:
+        export _root_.coulomb.pureconfig.rational.given
+        export _root_.coulomb.pureconfig.ruDSL.given
+        export _root_.coulomb.pureconfig.quantity.given
+
+object testing:
     // probably useful for unit testing, will keep them here for now
     extension [V, U](q: Quantity[V, U])
         inline def toCV(using ConfigWriter[Quantity[V, U]]): ConfigValue =
@@ -43,6 +49,7 @@ object pureconfig:
         inline def toQuantity[V, U](using ConfigReader[Quantity[V, U]]): Quantity[V, U] =
             ConfigReader[Quantity[V, U]].from(conf).toSeq.head
 
+object rational:
     given ctx_RationalReader: ConfigReader[Rational] =
         ConfigReader[BigInt].map(Rational(_, 1)) `orElse`
         ConfigReader[Double].map(Rational(_)) `orElse`
@@ -71,6 +78,7 @@ object pureconfig:
                 )
         }
 
+object ruDSL:
     given ctx_RuntimeUnit_Reader(using
         parser: RuntimeUnitParser
     ): ConfigReader[RuntimeUnit] =
@@ -89,6 +97,7 @@ object pureconfig:
             parser.render(u)
         }
 
+object quantity:
     given ctx_RuntimeQuantity_Reader[V](using
         ConfigReader[V],
         ConfigReader[RuntimeUnit]
