@@ -70,7 +70,7 @@ lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         units % Test
     )
     .settings(
-        tlVersionIntroduced := Map("3" -> "0.7.4")
+        tlVersionIntroduced := Map("3" -> "0.8.0")
     )
     .settings(commonSettings: _*)
     .settings(
@@ -93,7 +93,7 @@ lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         units % Test
     )
     .settings(
-        tlVersionIntroduced := Map("3" -> "0.7.4")
+        tlVersionIntroduced := Map("3" -> "0.8.0")
     )
     .settings(commonSettings: _*)
     .settings(
@@ -111,7 +111,7 @@ lazy val pureconfig = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         units % Test
     )
     .settings(
-        tlVersionIntroduced := Map("3" -> "0.7.4")
+        tlVersionIntroduced := Map("3" -> "0.8.0")
     )
     .settings(commonSettings: _*)
     .settings(
