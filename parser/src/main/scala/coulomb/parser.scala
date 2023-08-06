@@ -34,7 +34,7 @@ object standard:
             unames.map { (k, v) => (v, k) }
 
         private lazy val parser: (String => Either[String, RuntimeUnit]) =
-            infra.parsing.parser(unames, pnames, unamesinv)
+            dsl.parser(unames, pnames, unamesinv)
 
         final def parse(expr: String): Either[String, RuntimeUnit] =
             parser(expr)
