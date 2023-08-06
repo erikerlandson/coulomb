@@ -132,3 +132,27 @@ object quantity:
       ConfigWriter[RuntimeQuantity[V]].contramap[Quantity[V, U]] { q =>
           RuntimeQuantity(q.value, RuntimeUnit.of[U])
       }
+
+class PureconfigRuntime(cr: CoefficientRuntime, rup: RuntimeUnitParser)
+    extends CoefficientRuntime
+    with RuntimeUnitParser:
+    
+    def parse(expr: String): Either[String, RuntimeUnit] =
+        rup.parse(expr)
+    def render(u: RuntimeUnit): String =
+        rup.render(u)
+
+    def coefficientRational(
+        uf: RuntimeUnit,
+        ut: RuntimeUnit
+    ): Either[String, Rational] =
+        cr.coefficientRational(uf, ut)
+
+object PureconfigRuntime:
+    import coulomb.conversion.runtimes.mapping.MappingCoefficientRuntime
+    import coulomb.parser.standard.RuntimeUnitDslParser
+
+    inline def of[UTL <: Tuple]: PureconfigRuntime =
+        val r = MappingCoefficientRuntime.of[UTL]
+        val p = RuntimeUnitDslParser.of[UTL]
+        new PureconfigRuntime(r, p)

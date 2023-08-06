@@ -125,7 +125,7 @@ object RuntimeQuantity:
             add: RuntimeAdd[VL, VR]
         ): Either[String, RuntimeQuantity[add.VO]] = add.eval(ql, qr)
 
-abstract class CoefficientRuntime:
+trait CoefficientRuntime:
     def coefficientRational(
         uf: RuntimeUnit,
         ut: RuntimeUnit

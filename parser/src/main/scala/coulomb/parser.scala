@@ -21,7 +21,7 @@ import scala.util.{Try, Success, Failure}
 import coulomb.RuntimeUnit
 import coulomb.rational.Rational
 
-abstract class RuntimeUnitParser:
+trait RuntimeUnitParser:
     def parse(expr: String): Either[String, RuntimeUnit]
     def render(u: RuntimeUnit): String
 
