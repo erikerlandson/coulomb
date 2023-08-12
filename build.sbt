@@ -93,7 +93,8 @@ lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*stagingquantity.scala"
     )
 
-lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+// cats-parse doesn't seem to build for JS or Native
+lazy val parser = crossProject(JVMPlatform /*, JSPlatform, NativePlatform */)
     .crossType(CrossType.Pure)
     .in(file("parser"))
     .settings(name := "coulomb-parser")
@@ -110,7 +111,8 @@ lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         libraryDependencies += "org.typelevel" %% "cats-parse" % "0.3.7"
     )
 
-lazy val pureconfig = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+// pureconfig doesn't seem to build for JS or Native
+lazy val pureconfig = crossProject(JVMPlatform /*, JSPlatform, NativePlatform */)
     .crossType(CrossType.Pure)
     .in(file("pureconfig"))
     .settings(name := "coulomb-pureconfig")
