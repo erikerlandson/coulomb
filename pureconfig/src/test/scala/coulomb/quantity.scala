@@ -34,18 +34,17 @@ class QuantityDSLSuite extends CoulombSuite:
 
     given given_pureconfig: PureconfigRuntime =
         PureconfigRuntime.of[
-            "coulomb.units.si" *:
-            "coulomb.units.si.prefixes" *:
-            EmptyTuple
+            "coulomb.units.si" *: "coulomb.units.si.prefixes" *: EmptyTuple
         ]
 
     test("smoke test") {
-        ConfigSource.string("""{ value: 3, unit: kilometer}""")
+        ConfigSource
+            .string("""{ value: 3, unit: kilometer}""")
             .load[Quantity[Float, Meter]]
             .assertRQ[Float, Meter](3000f)
 
-        ConfigSource.string("""{ value: 3, unit: kilometer}""")
+        ConfigSource
+            .string("""{ value: 3, unit: kilometer}""")
             .load[Quantity[Float, Second]]
             .assertL
     }
-

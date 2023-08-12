@@ -26,7 +26,7 @@ import coulomb.parser.RuntimeUnitParser
 class PureconfigRuntime(cr: CoefficientRuntime, rup: RuntimeUnitParser)
     extends CoefficientRuntime
     with RuntimeUnitParser:
-    
+
     def parse(expr: String): Either[String, RuntimeUnit] =
         rup.parse(expr)
     def render(u: RuntimeUnit): String =

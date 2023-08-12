@@ -40,16 +40,18 @@ object testing:
         inline def toCV(using ConfigWriter[Quantity[V, U]]): ConfigValue =
             ConfigWriter[Quantity[V, U]].to(q)
     extension (conf: ConfigValue)
-        inline def toQuantity[V, U](using ConfigReader[Quantity[V, U]]): Quantity[V, U] =
+        inline def toQuantity[V, U](using
+            ConfigReader[Quantity[V, U]]
+        ): Quantity[V, U] =
             ConfigReader[Quantity[V, U]].from(conf).toSeq.head
 
 object rational:
     given ctx_RationalReader: ConfigReader[Rational] =
         ConfigReader[BigInt].map(Rational(_, 1)) `orElse`
-        ConfigReader[Double].map(Rational(_)) `orElse`
-        ConfigReader.forProduct2("n", "d") { (n: BigInt, d: BigInt) =>
-            Rational(n, d)
-        }
+            ConfigReader[Double].map(Rational(_)) `orElse`
+            ConfigReader.forProduct2("n", "d") { (n: BigInt, d: BigInt) =>
+                Rational(n, d)
+            }
 
     extension (v: BigInt)
         def toCV(using
@@ -80,7 +82,8 @@ object ruDSL:
             cur.asString.flatMap { expr =>
                 parser.parse(expr) match
                     case Right(u) => Right(u)
-                    case Left(e) => cur.failed(CannotConvert(expr, "RuntimeUnit", e))
+                    case Left(e) =>
+                        cur.failed(CannotConvert(expr, "RuntimeUnit", e))
             }
         }
 
@@ -117,12 +120,12 @@ object quantity:
         ConfigReader[RuntimeQuantity[V]].emap { rq =>
             crt.coefficient[V](rq.unit, RuntimeUnit.of[U]) match
                 case Right(coef) => Right(mul.times(coef, rq.value).withUnit[U])
-                case Left(e) => Left(CannotConvert(s"$rq", "Quantity", e))
+                case Left(e)     => Left(CannotConvert(s"$rq", "Quantity", e))
         }
 
     inline given ctx_Quantity_Writer[V, U](using
         ConfigWriter[RuntimeQuantity[V]]
     ): ConfigWriter[Quantity[V, U]] =
-      ConfigWriter[RuntimeQuantity[V]].contramap[Quantity[V, U]] { q =>
-          RuntimeQuantity(q.value, RuntimeUnit.of[U])
-      }
+        ConfigWriter[RuntimeQuantity[V]].contramap[Quantity[V, U]] { q =>
+            RuntimeQuantity(q.value, RuntimeUnit.of[U])
+        }

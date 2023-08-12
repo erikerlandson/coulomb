@@ -47,7 +47,9 @@ object meta:
                 val pnames = ${ Expr(pn1) }
         }
 
-    private def collect(using Quotes)(tl: List[quotes.reflect.TypeRepr]): (Map[String, String], Set[String]) =
+    private def collect(using Quotes)(
+        tl: List[quotes.reflect.TypeRepr]
+    ): (Map[String, String], Set[String]) =
         import quotes.reflect.*
         tl match
             case Nil => (Map.empty[String, String], Set.empty[String])
@@ -69,7 +71,9 @@ object meta:
                         // always add to unit types
                         val unr = un + (name -> head.typeSymbol.fullName)
                         // if it is derived from unitless, also add it to prefix unit set
-                        val pnr = if (convertible(head, TypeRepr.of[1])) pn + name else pn
+                        val pnr =
+                            if (convertible(head, TypeRepr.of[1])) pn + name
+                            else pn
                         (unr, pnr)
                     case _ =>
                         report.errorAndAbort(s"collect: bad type ${head.show}")

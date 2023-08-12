@@ -22,11 +22,19 @@ import coulomb.RuntimeUnit
 import coulomb.rational.Rational
 
 object dsl:
-    def parser(unames: Map[String, String], pnames: Set[String], unamesinv: Map[String, String]): (String => Either[String, RuntimeUnit]) =
-        val p = catsparse.unit(catsparse.named(unames, pnames), catsparse.typed(unamesinv))
-        (expr: String) => p.parse(expr) match
-            case Right((_, u)) => Right(u)
-            case Left(e) => Left(s"$e")
+    def parser(
+        unames: Map[String, String],
+        pnames: Set[String],
+        unamesinv: Map[String, String]
+    ): (String => Either[String, RuntimeUnit]) =
+        val p = catsparse.unit(
+            catsparse.named(unames, pnames),
+            catsparse.typed(unamesinv)
+        )
+        (expr: String) =>
+            p.parse(expr) match
+                case Right((_, u)) => Right(u)
+                case Left(e)       => Left(s"$e")
 
     // parsing library is implementation detail
     // note this is private and so could be swapped out without breaking binary compat
@@ -46,7 +54,9 @@ object dsl:
                     case fplit(v) =>
                         Parser.pure(RuntimeUnit.UnitConst(Rational(v)))
                     case _ =>
-                        Parser.failWith[RuntimeUnit](s"bad numeric literal '$lit'")
+                        Parser.failWith[RuntimeUnit](
+                            s"bad numeric literal '$lit'"
+                        )
             }
 
         object intlit:
@@ -71,7 +81,9 @@ object dsl:
 
         // scala identifier
         val idlit: Parser[String] =
-            (Rfc5234.alpha ~ (Rfc5234.alpha | Rfc5234.digit | Parser.char('$')).rep0).string
+            (Rfc5234.alpha ~ (Rfc5234.alpha | Rfc5234.digit | Parser.char(
+                '$'
+            )).rep0).string
 
         // fully qualified scala module path for a UnitType
         val typelit: Parser[String] =
@@ -81,7 +93,7 @@ object dsl:
         // used for left-factoring the parsing for sequences of mul and div
         val muldivop: Parser[(RuntimeUnit, RuntimeUnit) => RuntimeUnit] =
             (Parser.char('*') <* ws0).as(RuntimeUnit.Mul(_, _)) |
-            (Parser.char('/') <* ws0).as(RuntimeUnit.Div(_, _))
+                (Parser.char('/') <* ws0).as(RuntimeUnit.Div(_, _))
 
         // used for left-factoring the parsing of "^" (power)
         val powop: Parser[(RuntimeUnit, RuntimeUnit) => RuntimeUnit] =
@@ -91,19 +103,22 @@ object dsl:
                 RuntimeUnit.Pow(b, e.toRational.toSeq.head)
             }
 
-        def unit(named: Parser[RuntimeUnit], typed: Parser[RuntimeUnit]): Parser[RuntimeUnit] =
+        def unit(
+            named: Parser[RuntimeUnit],
+            typed: Parser[RuntimeUnit]
+        ): Parser[RuntimeUnit] =
             lazy val unitexpr: Parser[RuntimeUnit] = Parser.defer {
                 // sequence of mul and div operators
                 // these have lowest precedence and form the top of the parse tree
                 // example: <expr> * <expr> / <expr> * ...
                 lazy val muldiv: Parser[RuntimeUnit] =
                     chainl1(pow, muldivop)
-     
+
                 // powers of form <b> ^ <e>, where:
                 // <b> may be any unit expression and
                 // <e> is an expression that must evaluate to a valid numeric constant
                 lazy val pow: Parser[RuntimeUnit] =
-                    binaryl1(atom, numeric, powop) 
+                    binaryl1(atom, numeric, powop)
 
                 // numeric literal, named unit, or sub-expr in parens
                 lazy val atom: Parser[RuntimeUnit] =
@@ -111,7 +126,10 @@ object dsl:
 
                 // any unit subexpression inside of parens: (<expr>)
                 lazy val paren: Parser[RuntimeUnit] =
-                    unitexpr.between(Parser.char('(') <* ws0, Parser.char(')') <* ws0)
+                    unitexpr.between(
+                        Parser.char('(') <* ws0,
+                        Parser.char(')') <* ws0
+                    )
 
                 // parses a RuntimeUnit expression, but only succeeds
                 // if it evaluates to a constant numeric value
@@ -121,10 +139,10 @@ object dsl:
                 lazy val numeric: Parser[RuntimeUnit] =
                     atom.flatMap { u =>
                         u.toRational match
-                           case Right(v) =>
-                               Parser.pure(RuntimeUnit.UnitConst(v))
-                           case Left(e) =>
-                               Parser.failWith[RuntimeUnit](e)
+                            case Right(v) =>
+                                Parser.pure(RuntimeUnit.UnitConst(v))
+                            case Left(e) =>
+                                Parser.failWith[RuntimeUnit](e)
                     }
 
                 // return the top of the parse tree
@@ -141,19 +159,26 @@ object dsl:
                     // type paths are ok if they are in the map
                     Parser.pure(RuntimeUnit.UnitType(path))
                 else
-                    Parser.failWith[RuntimeUnit](s"unrecognized unit type '$path'")
+                    Parser.failWith[RuntimeUnit](
+                        s"unrecognized unit type '$path'"
+                    )
             }
 
         // parses "raw" unit literals - only succeeds if the literal is
         // in the list of defined units (or unit prefixes)
         // these lists are intended to be constructed at compile-time via scala metaprogramming
         // to reduce errors
-        def named(unames: Map[String, String], pnames: Set[String]): Parser[RuntimeUnit] =
+        def named(
+            unames: Map[String, String],
+            pnames: Set[String]
+        ): Parser[RuntimeUnit] =
             val prefixunit: Parser[(String, String)] =
                 if (pnames.isEmpty || unames.isEmpty)
                     Parser.fail
                 else
-                    (strset(pnames) ~ strset(unames.keySet `diff` pnames)) <* Parser.end
+                    (strset(pnames) ~ strset(
+                        unames.keySet `diff` pnames
+                    )) <* Parser.end
             unitlit.flatMap { name =>
                 if (unames.contains(name))
                     // name is a defined unit, return its type
@@ -167,7 +192,9 @@ object dsl:
                             val u = RuntimeUnit.UnitType(unames(un))
                             Parser.pure(RuntimeUnit.Mul(p, u))
                         case Left(_) =>
-                            Parser.failWith[RuntimeUnit](s"unrecognized unit '$name'")
+                            Parser.failWith[RuntimeUnit](
+                                s"unrecognized unit '$name'"
+                            )
             }
 
         def strset(ss: Set[String]): Parser[String] =
@@ -179,7 +206,8 @@ object dsl:
             // construct a parser "branch" for each starting character
             val hp = ss.map(_.head).toList.map { h =>
                 // set of string tails starting with char h
-                val tails = ss.filter(_.head == h).map(_.drop(1)).filter(_.length > 0)
+                val tails =
+                    ss.filter(_.head == h).map(_.drop(1)).filter(_.length > 0)
                 if (tails.isEmpty)
                     // no remaining string tails, just parse char h
                     Parser.char(h)
@@ -197,7 +225,7 @@ object dsl:
         // https://github.com/j-mie6/design-patterns-for-parser-combinators#readme
         def chainl1[X](p: Parser[X], op: Parser[(X, X) => X]): Parser[X] =
             lazy val rest: Parser0[X => X] = Parser.defer0 {
-              val some: Parser0[X => X] = (op, p, rest).mapN {
+                val some: Parser0[X => X] = (op, p, rest).mapN {
                     // found an <op><rhs>, with possibly more
                     (f, y, next) => ((x: X) => next(f(x, y)))
                 }
@@ -212,10 +240,14 @@ object dsl:
 
         // like chainl1 but specifically a single left-factored binary expr
         // <left> [<op> <right>]
-        def binaryl1[X](pl: Parser[X], pr: Parser[X], op: Parser[(X, X) => X]): Parser[X] =
+        def binaryl1[X](
+            pl: Parser[X],
+            pr: Parser[X],
+            op: Parser[(X, X) => X]
+        ): Parser[X] =
             val some: Parser0[X => X] = (op, pr).mapN {
                 // found an <op><rhs>
-                (f, y) => ((x: X) => f(x, y)) 
+                (f, y) => ((x: X) => f(x, y))
             }
             val none: Parser0[X => X] = Parser.pure(identity[X])
             rapp(pl, some | none).asInstanceOf[Parser[X]]
@@ -236,5 +268,6 @@ object dsl:
 
         extension [X1, X2, X3](p: (Parser0[X1], Parser0[X2], Parser0[X3]))
             def mapN[Z](f: (X1, X2, X3) => Z): Parser0[Z] =
-                ((p._1 ~ p._2) ~ p._3).map { case ((x1, x2), x3) => f(x1, x2, x3) }
-
+                ((p._1 ~ p._2) ~ p._3).map { case ((x1, x2), x3) =>
+                    f(x1, x2, x3)
+                }
