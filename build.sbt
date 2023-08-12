@@ -94,7 +94,7 @@ lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
 
 // cats-parse doesn't seem to build for JS or Native
-lazy val parser = crossProject(JVMPlatform /*, JSPlatform, NativePlatform */ )
+lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("parser"))
     .settings(name := "coulomb-parser")
@@ -108,10 +108,11 @@ lazy val parser = crossProject(JVMPlatform /*, JSPlatform, NativePlatform */ )
     )
     .settings(commonSettings: _*)
     .settings(
-        libraryDependencies += "org.typelevel" %% "cats-parse" % "0.3.7"
+        libraryDependencies += "org.typelevel" %%% "cats-parse" % "0.3.10"
     )
 
-// pureconfig doesn't seem to build for JS or Native
+// pureconfig doesn't currently build for JS or Native
+// https://github.com/pureconfig/pureconfig/issues/1307
 lazy val pureconfig = crossProject(
     JVMPlatform /*, JSPlatform, NativePlatform */
 )
@@ -129,7 +130,7 @@ lazy val pureconfig = crossProject(
     )
     .settings(commonSettings: _*)
     .settings(
-        libraryDependencies += "com.github.pureconfig" %% "pureconfig-core" % "0.17.2"
+        libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.4"
     )
 
 lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
