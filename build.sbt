@@ -38,7 +38,17 @@ def commonSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject
-    .aggregate(core, units, runtime, spire, refined, testkit, unidocs)
+    .aggregate(
+        core,
+        units,
+        runtime,
+        parser,
+        pureconfig,
+        spire,
+        refined,
+        testkit,
+        unidocs
+    )
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
