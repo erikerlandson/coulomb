@@ -39,12 +39,40 @@ class QuantityDSLSuite extends CoulombSuite:
 
     test("smoke test") {
         ConfigSource
-            .string("""{ value: 3, unit: kilometer}""")
+            .string("""{value: 3, unit: kilometer}""")
             .load[Quantity[Float, Meter]]
             .assertRQ[Float, Meter](3000f)
 
         ConfigSource
-            .string("""{ value: 3, unit: kilometer}""")
+            .string("""{value: 3, unit: kilometer}""")
             .load[Quantity[Float, Second]]
             .assertL
+    }
+
+class QuantityJSONSuite extends CoulombSuite:
+    import pureconfig.{*, given}
+
+    import coulomb.*
+    import coulomb.syntax.*
+
+    import coulomb.policy.standard.given
+    import algebra.instances.all.given
+    import coulomb.ops.algebra.all.given
+
+    import coulomb.pureconfig.*
+    import coulomb.pureconfig.policy.JSON.given
+
+    import coulomb.units.si.{*, given}
+    import coulomb.units.si.prefixes.{*, given}
+
+    given given_pureconfig: PureconfigRuntime =
+        PureconfigRuntime.of[
+            "coulomb.units.si" *: "coulomb.units.si.prefixes" *: EmptyTuple
+        ]
+
+    test("smoke test") {
+        ConfigSource
+            .string("""{value: 3, unit: {lhs: kilo, op: "*", rhs: meter}}""")
+            .load[Quantity[Float, Meter]]
+            .assertRQ[Float, Meter](3000f)
     }

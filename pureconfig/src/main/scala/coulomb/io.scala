@@ -46,21 +46,20 @@ object testing:
             ConfigReader[Quantity[V, U]].from(conf).toSeq.head
 
 object rational:
-    import _root_.pureconfig.{*, given}
-
     extension (v: BigInt)
         def toCV: ConfigValue =
             if (v.isValidInt) ConfigWriter[Int].to(v.toInt)
             else ConfigWriter[BigInt].to(v)
 
-    val reader: ConfigReader[Rational] =
-        ConfigReader[BigInt].map(Rational(_, 1)) `orElse`
-            ConfigReader[Double].map(Rational(_)) `orElse`
-            ConfigReader.forProduct2("n", "d") { (n: BigInt, d: BigInt) =>
-                Rational(n, d)
+    given ctx_RationalReader: ConfigReader[Rational] =
+        ConfigReader[BigInt].map(Rational(_, 1))
+            `orElse` ConfigReader[Double].map(Rational(_))
+            `orElse` ConfigReader.forProduct2("n", "d") {
+                (n: BigInt, d: BigInt) =>
+                    Rational(n, d)
             }
 
-    val writer: ConfigWriter[Rational] =
+    given ctx_RationalWriter: ConfigWriter[Rational] =
         ConfigWriter.fromFunction[Rational] { r =>
             if (r.d == 1)
                 ConfigValueFactory.fromAnyRef(r.n.toCV)
@@ -69,12 +68,6 @@ object rational:
                     Map("n" -> r.n.toCV, "d" -> r.d.toCV).asJava
                 )
         }
-
-    given ctx_RationalReader: ConfigReader[Rational] =
-        reader
-
-    given ctx_RationalWriter: ConfigWriter[Rational] =
-        writer
 
 object ruDSL:
     given ctx_RuntimeUnit_DSL_Reader(using
@@ -107,8 +100,14 @@ object ruJSON:
             `orElse` ConfigReader[String].emap { id =>
                 upm.path(id) match
                     case Right(path) => Right(RuntimeUnit.UnitType(path))
-                    case Left(e) =>
-                        Left(CannotConvert(s"$id", "RuntimeUnit", e))
+                    case Left(_) =>
+                        Left(
+                            CannotConvert(
+                                s"$id",
+                                "RuntimeUnit",
+                                s"id has no mapping: '$id'"
+                            )
+                        )
             }
             `orElse` ConfigReader
                 .forProduct3("lhs", "op", "rhs") {
