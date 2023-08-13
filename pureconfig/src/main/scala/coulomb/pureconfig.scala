@@ -23,9 +23,16 @@ import coulomb.rational.Rational
 
 import coulomb.parser.RuntimeUnitParser
 
-class PureconfigRuntime(cr: CoefficientRuntime, rup: RuntimeUnitParser)
-    extends CoefficientRuntime
-    with RuntimeUnitParser:
+trait UnitPathMapper:
+    def path(expr: String): Either[String, String]
+
+class PureconfigRuntime(
+    cr: CoefficientRuntime,
+    rup: RuntimeUnitParser,
+    upm: String => Either[String, String]
+) extends CoefficientRuntime
+    with RuntimeUnitParser
+    with UnitPathMapper:
 
     def parse(expr: String): Either[String, RuntimeUnit] =
         rup.parse(expr)
@@ -38,6 +45,9 @@ class PureconfigRuntime(cr: CoefficientRuntime, rup: RuntimeUnitParser)
     ): Either[String, Rational] =
         cr.coefficientRational(uf, ut)
 
+    def path(expr: String): Either[String, String] =
+        upm(expr)
+
 object PureconfigRuntime:
     import coulomb.conversion.runtimes.mapping.MappingCoefficientRuntime
     import coulomb.parser.standard.RuntimeUnitDslParser
@@ -45,4 +55,10 @@ object PureconfigRuntime:
     inline def of[UTL <: Tuple]: PureconfigRuntime =
         val r = MappingCoefficientRuntime.of[UTL]
         val p = RuntimeUnitDslParser.of[UTL]
-        new PureconfigRuntime(r, p)
+        val u: (String => Either[String, String]) = (expr: String) => {
+            if (expr.isEmpty) Left(expr)
+            else if (expr.head == '@') Right(expr.tail)
+            else if (p.unames.contains(expr)) Right(p.unames(expr))
+            else Left(expr)
+        }
+        new PureconfigRuntime(r, p, u)

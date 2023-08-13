@@ -16,8 +16,14 @@
 
 package coulomb.pureconfig.io
 
+import scala.util.{Try, Success, Failure}
+
 import scala.jdk.CollectionConverters.*
+
+import com.typesafe.config.{ConfigValue, ConfigValueFactory}
+
 import _root_.pureconfig.*
+import _root_.pureconfig.error.CannotConvert
 
 import algebra.ring.MultiplicativeSemigroup
 
@@ -26,13 +32,7 @@ import coulomb.syntax.*
 import coulomb.rational.Rational
 import coulomb.conversion.ValueConversion
 
-import scala.util.{Try, Success, Failure}
-
-import _root_.pureconfig.error.CannotConvert
-
 import coulomb.parser.RuntimeUnitParser
-
-import com.typesafe.config.{ConfigValue, ConfigValueFactory}
 
 object testing:
     // probably useful for unit testing, will keep them here for now
@@ -46,25 +46,21 @@ object testing:
             ConfigReader[Quantity[V, U]].from(conf).toSeq.head
 
 object rational:
-    given ctx_RationalReader: ConfigReader[Rational] =
+    import _root_.pureconfig.{*, given}
+
+    extension (v: BigInt)
+        def toCV: ConfigValue =
+            if (v.isValidInt) ConfigWriter[Int].to(v.toInt)
+            else ConfigWriter[BigInt].to(v)
+
+    val reader: ConfigReader[Rational] =
         ConfigReader[BigInt].map(Rational(_, 1)) `orElse`
             ConfigReader[Double].map(Rational(_)) `orElse`
             ConfigReader.forProduct2("n", "d") { (n: BigInt, d: BigInt) =>
                 Rational(n, d)
             }
 
-    extension (v: BigInt)
-        def toCV(using
-            ConfigWriter[Int],
-            ConfigWriter[BigInt]
-        ): ConfigValue =
-            if (v.isValidInt) ConfigWriter[Int].to(v.toInt)
-            else ConfigWriter[BigInt].to(v)
-
-    given ctx_RationalWriter(using
-        ConfigWriter[Int],
-        ConfigWriter[BigInt]
-    ): ConfigWriter[Rational] =
+    val writer: ConfigWriter[Rational] =
         ConfigWriter.fromFunction[Rational] { r =>
             if (r.d == 1)
                 ConfigValueFactory.fromAnyRef(r.n.toCV)
@@ -74,8 +70,14 @@ object rational:
                 )
         }
 
+    given ctx_RationalReader: ConfigReader[Rational] =
+        reader
+
+    given ctx_RationalWriter: ConfigWriter[Rational] =
+        writer
+
 object ruDSL:
-    given ctx_RuntimeUnit_Reader(using
+    given ctx_RuntimeUnit_DSL_Reader(using
         parser: RuntimeUnitParser
     ): ConfigReader[RuntimeUnit] =
         ConfigReader.fromCursor[RuntimeUnit] { cur =>
@@ -87,12 +89,45 @@ object ruDSL:
             }
         }
 
-    given ctx_RuntimeUnit_Writer(using
+    given ctx_RuntimeUnit_DSL_Writer(using
         parser: RuntimeUnitParser
     ): ConfigWriter[RuntimeUnit] =
         ConfigWriter[String].contramap[RuntimeUnit] { u =>
             parser.render(u)
         }
+
+object ruJSON:
+    import coulomb.pureconfig.UnitPathMapper
+
+    given ctx_RuntimeUnit_JSON_Reader(using
+        rr: ConfigReader[Rational],
+        upm: UnitPathMapper
+    ): ConfigReader[RuntimeUnit] =
+        ConfigReader[Rational].map(RuntimeUnit.UnitConst(_))
+            `orElse` ConfigReader[String].emap { id =>
+                upm.path(id) match
+                    case Right(path) => Right(RuntimeUnit.UnitType(path))
+                    case Left(e) =>
+                        Left(CannotConvert(s"$id", "RuntimeUnit", e))
+            }
+            `orElse` ConfigReader
+                .forProduct3("lhs", "op", "rhs") {
+                    (lhs: RuntimeUnit, op: String, rhs: RuntimeUnit) =>
+                        (lhs, op, rhs)
+                }
+                .emap { (lhs, op, rhs) =>
+                    op match
+                        case "*" => Right(RuntimeUnit.Mul(lhs, rhs))
+                        case "/" => Right(RuntimeUnit.Div(lhs, rhs))
+                        case _ =>
+                            Left(
+                                CannotConvert(
+                                    s"${(lhs, op, rhs)}",
+                                    "RuntimeUnit",
+                                    s"unrecognized operator: '$op'"
+                                )
+                            )
+                }
 
 object quantity:
     given ctx_RuntimeQuantity_Reader[V](using
