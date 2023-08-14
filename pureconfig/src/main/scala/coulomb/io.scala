@@ -118,6 +118,17 @@ object ruJSON:
                     op match
                         case "*" => Right(RuntimeUnit.Mul(lhs, rhs))
                         case "/" => Right(RuntimeUnit.Div(lhs, rhs))
+                        case "^" =>
+                            rhs.toRational match
+                                case Right(e) => Right(RuntimeUnit.Pow(lhs, e))
+                                case Left(_) =>
+                                    Left(
+                                        CannotConvert(
+                                            s"${(lhs, op, rhs)}",
+                                            "RuntimeUnit",
+                                            s"bad exponent '$rhs'"
+                                        )
+                                    )
                         case _ =>
                             Left(
                                 CannotConvert(
