@@ -90,7 +90,7 @@ object ruDSL:
         }
 
 object ruJSON:
-    import coulomb.pureconfig.UnitPathMapper
+    import coulomb.pureconfig.{UnitPathMapper, PathUnitMapper}
 
     given ctx_RuntimeUnit_JSON_Reader(using
         rr: ConfigReader[Rational],
@@ -138,6 +138,44 @@ object ruJSON:
                                 )
                             )
                 }
+
+    given ctx_RuntimeUnit_JSON_Writer(using
+        cwr: ConfigWriter[Rational],
+        pum: PathUnitMapper
+    ): ConfigWriter[RuntimeUnit] =
+        def u2cv(u: RuntimeUnit): ConfigValue =
+            u match
+                case RuntimeUnit.UnitConst(v) =>
+                    ConfigValueFactory.fromAnyRef(ConfigWriter[Rational].to(v))
+                case RuntimeUnit.UnitType(path) =>
+                    ConfigValueFactory.fromAnyRef(
+                        ConfigWriter[String].to(pum.unit(path))
+                    )
+                case RuntimeUnit.Mul(lhs, rhs) =>
+                    ConfigValueFactory.fromAnyRef(
+                        Map(
+                            "lhs" -> u2cv(lhs),
+                            "rhs" -> u2cv(rhs),
+                            "op" -> ConfigWriter[String].to("*")
+                        ).asJava
+                    )
+                case RuntimeUnit.Div(num, den) =>
+                    ConfigValueFactory.fromAnyRef(
+                        Map(
+                            "lhs" -> u2cv(num),
+                            "rhs" -> u2cv(den),
+                            "op" -> ConfigWriter[String].to("/")
+                        ).asJava
+                    )
+                case RuntimeUnit.Pow(b, e) =>
+                    ConfigValueFactory.fromAnyRef(
+                        Map(
+                            "lhs" -> u2cv(b),
+                            "rhs" -> ConfigWriter[Rational].to(e),
+                            "op" -> ConfigWriter[String].to("^")
+                        ).asJava
+                    )
+        ConfigWriter.fromFunction[RuntimeUnit](u2cv)
 
 object quantity:
     given ctx_RuntimeQuantity_Reader[V](using

@@ -24,15 +24,20 @@ import coulomb.rational.Rational
 import coulomb.parser.RuntimeUnitParser
 
 trait UnitPathMapper:
-    def path(expr: String): Either[String, String]
+    def path(unit: String): Either[String, String]
+
+trait PathUnitMapper:
+    def unit(path: String): String
 
 class PureconfigRuntime(
     cr: CoefficientRuntime,
     rup: RuntimeUnitParser,
-    upm: String => Either[String, String]
+    upm: String => Either[String, String],
+    pum: String => String
 ) extends CoefficientRuntime
     with RuntimeUnitParser
-    with UnitPathMapper:
+    with UnitPathMapper
+    with PathUnitMapper:
 
     def parse(expr: String): Either[String, RuntimeUnit] =
         rup.parse(expr)
@@ -45,8 +50,10 @@ class PureconfigRuntime(
     ): Either[String, Rational] =
         cr.coefficientRational(uf, ut)
 
-    def path(expr: String): Either[String, String] =
-        upm(expr)
+    def path(unit: String): Either[String, String] =
+        upm(unit)
+    def unit(path: String): String =
+        pum(path)
 
 object PureconfigRuntime:
     import coulomb.conversion.runtimes.mapping.MappingCoefficientRuntime
@@ -55,10 +62,15 @@ object PureconfigRuntime:
     inline def of[UTL <: Tuple]: PureconfigRuntime =
         val r = MappingCoefficientRuntime.of[UTL]
         val p = RuntimeUnitDslParser.of[UTL]
-        val u: (String => Either[String, String]) = (expr: String) => {
-            if (expr.isEmpty) Left(expr)
-            else if (expr.head == '@') Right(expr.tail)
-            else if (p.unames.contains(expr)) Right(p.unames(expr))
-            else Left(expr)
+        val upm: (String => Either[String, String]) = (unit: String) => {
+            if (unit.isEmpty) Left(unit)
+            else if (unit.head == '@') Right(unit.tail)
+            else if (p.unames.contains(unit)) Right(p.unames(unit))
+            else Left(unit)
         }
-        new PureconfigRuntime(r, p, u)
+        val pum: (String => String) = (path: String) => {
+            if (path.isEmpty) throw new Exception("empty path string")
+            else if (p.unamesinv.contains(path)) p.unamesinv(path)
+            else s"@${path}"
+        }
+        new PureconfigRuntime(r, p, upm, pum)
