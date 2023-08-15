@@ -36,7 +36,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .in(file("core"))
     .settings(name := "coulomb-core")
     .settings(commonSettings: _*)
-    .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.9.0")
+    .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.10.0")
     .platformsSettings(JSPlatform, NativePlatform)(
         Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*serde.scala"
     )
@@ -78,7 +78,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         libraryDependencies ++= Seq(
             "org.scalacheck" %%% "scalacheck" % "1.17.0",
             "org.scalameta" %%% "munit-scalacheck" % "1.0.0-M8" % Test,
-            "org.typelevel" %%% "algebra-laws" % "2.9.0" % Test,
+            "org.typelevel" %%% "algebra-laws" % "2.10.0" % Test,
             "org.typelevel" %%% "discipline-munit" % "2.0.0-M3" % Test
         )
     )
