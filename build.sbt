@@ -181,8 +181,8 @@ def coulombPureConfigDeps = Seq(
 )
 
 def coulombCatsDeps = Def.setting(Seq(
-  "org.typelevel" %%% "cats-core" % "2.9.0" % Provided,
-  "org.typelevel" %%% "cats-testkit" % "2.9.0" % Provided,
+  "org.typelevel" %%% "cats-core" % "2.10.0" % Provided,
+  "org.typelevel" %%% "cats-testkit" % "2.10.0" % Provided,
   "org.scalacheck" %%% "scalacheck" % "1.17.0" % Provided
     // "org.typelevel" %%% "discipline-core" % "1.1.2" % Test
 ))
