@@ -17,6 +17,7 @@
 package coulomb.pureconfig.io
 
 import scala.util.{Try, Success, Failure}
+import scala.util.NotGiven
 
 import scala.jdk.CollectionConverters.*
 
@@ -178,6 +179,16 @@ object ruJSON:
         ConfigWriter.fromFunction[RuntimeUnit](u2cv)
 
 object quantity:
+    // https://github.com/lampepfl/dotty/discussions/18415
+    case class GivenAll[T <: Tuple](t: T)
+
+    given given_GivenAll_Tuple[H, T <: Tuple](using
+        h: H,
+        t: GivenAll[T]
+    ): GivenAll[H *: T] =
+        GivenAll(h *: t.t)
+    given given_GivenAll_Empty: GivenAll[EmptyTuple] = GivenAll(EmptyTuple)
+
     given ctx_RuntimeQuantity_Reader[V](using
         ConfigReader[V],
         ConfigReader[RuntimeUnit]
@@ -194,16 +205,48 @@ object quantity:
             (q.value, q.unit)
         }
 
-    inline given ctx_Quantity_Reader[V, U](using
-        crq: ConfigReader[RuntimeQuantity[V]],
-        crt: CoefficientRuntime,
+    // if we have a conversion from Rational to V, that is happy path
+    // since we can safely convert units (basically, fractional values).
+    inline given ctx_Quantity_Reader_VC[V, U](using
         vcr: ValueConversion[Rational, V],
-        mul: MultiplicativeSemigroup[V]
+        mul: MultiplicativeSemigroup[V],
+        crq: ConfigReader[RuntimeQuantity[V]],
+        crt: CoefficientRuntime
     ): ConfigReader[Quantity[V, U]] =
         ConfigReader[RuntimeQuantity[V]].emap { rq =>
             crt.coefficient[V](rq.unit, RuntimeUnit.of[U]) match
                 case Right(coef) => Right(mul.times(coef, rq.value).withUnit[U])
                 case Left(e)     => Left(CannotConvert(s"$rq", "Quantity", e))
+        }
+
+    // if there is no conversion from Rational to V in context, then
+    // we can still try to safely load, as long as U is identical
+    // (or equivalent) to the unit we are loading from
+    inline given ctx_Quantity_Reader_NoVC[V, U](using
+        nocv: NotGiven[
+            GivenAll[(ValueConversion[Rational, V], MultiplicativeSemigroup[V])]
+        ],
+        crq: ConfigReader[RuntimeQuantity[V]],
+        crt: CoefficientRuntime
+    ): ConfigReader[Quantity[V, U]] =
+        ConfigReader[RuntimeQuantity[V]].emap { rq =>
+            val ufrom = rq.unit
+            val uto = RuntimeUnit.of[U]
+            crt.coefficientRational(ufrom, uto) match
+                case Right(coef) =>
+                    if (coef == Rational.const1)
+                        // units are same or equivalent (conversion coefficient is 1)
+                        // so it is valid to load directly without applying conversion coefficient
+                        Right(rq.value.withUnit[U])
+                    else
+                        Left(
+                            CannotConvert(
+                                s"$rq",
+                                "Quantity",
+                                s"no safe conversion from $ufrom to $uto"
+                            )
+                        )
+                case Left(e) => Left(CannotConvert(s"$rq", "Quantity", e))
         }
 
     inline given ctx_Quantity_Writer[V, U](using
