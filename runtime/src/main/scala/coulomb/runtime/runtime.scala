@@ -121,10 +121,6 @@ object RuntimeQuantity:
                 mul.times(coef, vc(ql.value)).withUnit[UR]
             }
 
-        transparent inline def +[VR](qr: RuntimeQuantity[VR])(using
-            add: RuntimeAdd[VL, VR]
-        ): Either[String, RuntimeQuantity[add.VO]] = add.eval(ql, qr)
-
 trait CoefficientRuntime:
     def coefficientRational(
         uf: RuntimeUnit,
