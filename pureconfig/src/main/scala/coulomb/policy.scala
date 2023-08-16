@@ -19,9 +19,11 @@ package coulomb.pureconfig.policy
 object DSL:
     export coulomb.pureconfig.io.rational.given
     export coulomb.pureconfig.io.ruDSL.given
+    export coulomb.pureconfig.io.runtimeq.given
     export coulomb.pureconfig.io.quantity.given
 
 object JSON:
     export coulomb.pureconfig.io.rational.given
     export coulomb.pureconfig.io.ruJSON.given
+    export coulomb.pureconfig.io.runtimeq.given
     export coulomb.pureconfig.io.quantity.given

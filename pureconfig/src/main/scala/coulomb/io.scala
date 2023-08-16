@@ -178,17 +178,7 @@ object ruJSON:
                     )
         ConfigWriter.fromFunction[RuntimeUnit](u2cv)
 
-object quantity:
-    // https://github.com/lampepfl/dotty/discussions/18415
-    case class GivenAll[T <: Tuple](t: T)
-
-    given given_GivenAll_Tuple[H, T <: Tuple](using
-        h: H,
-        t: GivenAll[T]
-    ): GivenAll[H *: T] =
-        GivenAll(h *: t.t)
-    given given_GivenAll_Empty: GivenAll[EmptyTuple] = GivenAll(EmptyTuple)
-
+object runtimeq:
     given ctx_RuntimeQuantity_Reader[V](using
         ConfigReader[V],
         ConfigReader[RuntimeUnit]
@@ -204,6 +194,9 @@ object quantity:
         ConfigWriter.forProduct2("value", "unit") { (q: RuntimeQuantity[V]) =>
             (q.value, q.unit)
         }
+
+object quantity:
+    import givenall.{*, given}
 
     // if we have a conversion from Rational to V, that is happy path
     // since we can safely convert units (basically, fractional values).
@@ -255,3 +248,15 @@ object quantity:
         ConfigWriter[RuntimeQuantity[V]].contramap[Quantity[V, U]] { q =>
             RuntimeQuantity(q.value, RuntimeUnit.of[U])
         }
+
+    private object givenall:
+        // https://github.com/lampepfl/dotty/discussions/18415
+        case class GivenAll[T <: Tuple](t: T)
+
+        given given_GivenAll_Tuple[H, T <: Tuple](using
+            h: H,
+            t: GivenAll[T]
+        ): GivenAll[H *: T] =
+            GivenAll(h *: t.t)
+
+        given given_GivenAll_Empty: GivenAll[EmptyTuple] = GivenAll(EmptyTuple)
