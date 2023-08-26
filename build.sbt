@@ -24,8 +24,17 @@ ThisBuild / crossScalaVersions := Seq("3.3.0")
 // run tests sequentially for easier failure debugging
 Test / parallelExecution := false
 
+// throwing '-java-output-version 8' is crashing the compiler
+ThisBuild / tlJdkRelease := None
+
+// At least for now, I'd like any -W warnings to not crash the build
+ThisBuild / tlFatalWarnings := false
+
 def commonSettings = Seq(
-    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test,
+    // newer versions of sbt-typelevel throw new warning flags
+    // which my code is failing - filter them out until I can fix the code
+    Compile / scalacOptions ~= (_.filterNot { x => x.startsWith("-W") })
 )
 
 lazy val root = tlCrossRootProject
@@ -117,6 +126,11 @@ lazy val docs = project
     .in(file("site"))
     .dependsOn(core.jvm, units.jvm, spire.jvm, refined.jvm)
     .enablePlugins(TypelevelSitePlugin)
+    .settings(
+        // turn off the new -W warnings in mdoc scala compilations
+        // at least until I can get a better handle on how to work with them
+        Compile / scalacOptions ~= (_.filterNot { x => x.startsWith("-W") })
+    )
 
 // https://github.com/sbt/sbt-jmh
 // sbt "benchmarks/Jmh/run .*Benchmark"
