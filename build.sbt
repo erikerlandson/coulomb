@@ -6,6 +6,8 @@
 ThisBuild / tlBaseVersion := "0.7"
 
 // publish settings
+// artifacts now publish to s01.oss.sonatype.org, per:
+// https://github.com/erikerlandson/coulomb/issues/500
 ThisBuild / developers += tlGitHubDev("erikerlandson", "Erik Erlandson")
 ThisBuild / organization := "com.manyangled"
 ThisBuild / organizationName := "Erik Erlandson"
