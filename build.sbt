@@ -19,7 +19,7 @@ ThisBuild / tlCiReleaseBranches := Seq("scala3")
 ThisBuild / tlSitePublishBranch := Some("scala3")
 
 ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("snapshots")
-ThisBuild / crossScalaVersions := Seq("3.3.0")
+ThisBuild / crossScalaVersions := Seq("3.3.1")
 
 // run tests sequentially for easier failure debugging
 Test / parallelExecution := false
