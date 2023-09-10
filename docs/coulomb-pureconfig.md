@@ -34,16 +34,15 @@ import coulomb.policy.standard.given
 import scala.language.implicitConversions
 
 // unit definitions
-import coulomb.units.si.{*, given}
 import coulomb.units.si.prefixes.{*, given}
+import coulomb.units.info.{*, given}
+import coulomb.units.time.{*, given}
 
 // pureconfig defs
 import _root_.pureconfig.{*, given}
 
-// import coulomb-pureconfig defs
+// import basic coulomb-pureconfig defs
 import coulomb.pureconfig.*
-// use the DSL-based io definitions for RuntimeUnit objects
-import coulomb.pureconfig.policy.DSL.given
 ```
 
 ### examples
@@ -55,20 +54,60 @@ any type definitions inside that object will be included in the runtime.
 ```scala mdoc
 // define a pureconfig runtime with SI and SI prefix unit definitions
 given given_pureconfig: PureconfigRuntime = PureconfigRuntime.of[
-    "coulomb.units.si" *:
     "coulomb.units.si.prefixes" *:
+    "coulomb.units.info" *:
+    "coulomb.units.time" *:
     EmptyTuple
 ]
 ```
 
 ```scala mdoc
-// a simple configuration with one quantity
-val conf = ConfigSource.string("""{value: 3, unit: "kilometer / second^2"}""")
+case class Config(
+    duration: Quantity[Double, Second],
+    storage: Quantity[Double, Giga * Byte],
+    bandwidth: Quantity[Float, (Mega * Bit) / Second]
+)
 
-// load the value, using a different (but compatible) unit type
-val q = conf.load[Quantity[Float, Meter / (Second ^ 2)]]
+// use the DSL-based io definitions for RuntimeUnit objects
+import coulomb.pureconfig.policy.DSL.given
 
-// attempting to load as an incompatible unit will fail
-val f = conf.load[Quantity[Float, Meter / Second]]
+// pureconfig case class io is not yet automatically defined in scala 3
+given given_ConfigLoader: ConfigReader[Config] =
+    ConfigReader.forProduct3("duration", "storage", "bandwidth") {
+        (d: Quantity[Double, Second],
+        s: Quantity[Double, Giga * Byte],
+        b: Quantity[Float, (Mega * Bit) / Second]) =>
+        Config(d, s, b)
+    }
+```
+
+```scala mdoc
+// define a configuration source
+// this source uses units that are different than the Config type
+// definition, but they are convertable
+val source = ConfigSource.string("""
+{
+    duration: {value: 10, unit: minute},
+    storage: {value: 100, unit: megabyte},
+    bandwidth: {value: 200, unit: "gigabyte / second"}
+}
+""")
+
+// this load will succeed, with automatic unit conversions
+val conf = source.load[Config]
+```
+
+```scala mdoc
+// this config has the wrong unit for bandwidth
+val bad = ConfigSource.string("""
+{
+    duration: {value: 10, unit: minute},
+    storage: {value: 100, unit: megabyte},
+    bandwidth: {value: 200, unit: "gigabyte"}
+}
+""")
+
+// this load will fail because bandwidth units are incompatible
+val fail = bad.load[Config]
 ```
 
