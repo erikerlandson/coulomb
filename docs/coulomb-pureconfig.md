@@ -104,9 +104,7 @@ In this example, we will import the DSL-based derivations for
 RuntimeUnit objects, and demonstrate that these rules will 
 automatically convert compatible units, and load successfully.
 
-If a configuration value has _incompatible_ units,
-the load will fail with a corresponding error.
-```scala mdoc:nest
+```scala mdoc
 // use the DSL-based io definitions for RuntimeUnit objects
 import coulomb.pureconfig.policy.DSL.given
 
@@ -123,7 +121,12 @@ val source = ConfigSource.string("""
 
 // this load will succeed, with automatic unit conversions
 val conf = source.load[Config]
+```
 
+If a configuration value has _incompatible_ units,
+the load will fail with a corresponding error.
+
+```scala mdoc
 // this config has the wrong unit for bandwidth
 val bad = ConfigSource.string("""
 {
@@ -137,3 +140,72 @@ val bad = ConfigSource.string("""
 val fail = bad.load[Config]
 ```
 
+## IO Policies
+
+The `coulomb-pureconfig` integrations currently support two options for I/O "policies"
+which differ primarily in how one represents unit information.
+In the quick-start example above, the DSL-based policy was demonstrated.
+
+The second option is a JSON-based unit representation.
+Here, the units are defined using a JSON structured unit expression.
+This representation is more verbose,
+but it is more amenable to explicitly structured expressions.
+
+```scala mdoc:reset:invisible
+// if mdoc had push/pop, I would not have to copy all this
+import coulomb.*
+import coulomb.syntax.*
+import algebra.instances.all.given
+import coulomb.ops.algebra.all.given
+import coulomb.policy.standard.given
+import scala.language.implicitConversions
+import coulomb.units.si.prefixes.{*, given}
+import coulomb.units.info.{*, given}
+import coulomb.units.time.{*, given}
+import _root_.pureconfig.{*, given}
+import coulomb.pureconfig.*
+
+given given_pureconfig: PureconfigRuntime = PureconfigRuntime.of[
+    "coulomb.units.si.prefixes" *:
+    "coulomb.units.info" *:
+    "coulomb.units.time" *:
+    EmptyTuple
+]
+
+case class Config(
+    duration: Quantity[Double, Second],
+    storage: Quantity[Double, Giga * Byte],
+    bandwidth: Quantity[Float, (Mega * Bit) / Second]
+)
+
+given given_ConfigLoader(using
+    ConfigReader[Quantity[Double, Second]],
+    ConfigReader[Quantity[Double, Giga * Byte]],
+    ConfigReader[Quantity[Float, (Mega * Bit) / Second]]
+): ConfigReader[Config] =
+    ConfigReader.forProduct3("duration", "storage", "bandwidth") {
+        (d: Quantity[Double, Second],
+        s: Quantity[Double, Giga * Byte],
+        b: Quantity[Float, (Mega * Bit) / Second]) =>
+        Config(d, s, b)
+    }
+```
+
+```scala mdoc
+// use the JSON-based io definitions for RuntimeUnit objects
+import coulomb.pureconfig.policy.JSON.given
+
+// define a configuration source
+// this source uses units that are different than the Config type
+// definition, but they are convertable
+val source = ConfigSource.string("""
+{
+    duration: {value: 10, unit: minute},
+    storage: {value: 100, unit: {lhs: mega, op: "*", rhs: byte}},
+    bandwidth: {value: 200, unit: {lhs: {lhs: giga, op: "*", rhs: byte}, op: "/", rhs: second}}
+}
+""")
+
+// this load will succeed, with automatic unit conversions
+val conf = source.load[Config]
+```
