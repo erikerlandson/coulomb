@@ -128,10 +128,13 @@ object meta:
         tr: quotes.reflect.TypeRepr
     ): RuntimeUnit.UnitType =
         import quotes.reflect.*
-        // should add checking for types with type-args here
-        // possibly an explicit non dealiasing policy here would allow
-        // parameterized types to be handled via typedef aliases?
-        RuntimeUnit.UnitType(tr.typeSymbol.fullName)
+        // should I add checking for types with type-args here?
+        // de-aliasing here because otherwise type exposed via export
+        // can confuse the lookup. There might be a use for more complicated
+        // logic that handles cases where dealiasing is not what I want but
+        // until I see one I'm going to keep it simple.
+        // This pairs with dealias in moduleUnits function in mapping.scala
+        RuntimeUnit.UnitType(tr.dealias.typeSymbol.fullName)
 
     def fqTypeRepr(using Quotes)(path: String): quotes.reflect.TypeRepr =
         fqTypeRepr(path.split('.').toIndexedSeq)

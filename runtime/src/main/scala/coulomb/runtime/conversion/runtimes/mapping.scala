@@ -174,7 +174,10 @@ object meta:
         if (!msym.flags.is(Flags.Module))
             report.errorAndAbort(s"$mname is not a module")
         val usyms = msym.typeMembers.filter(isUnitSym)
-        usyms.map(_.typeRef)
+        // dealiasing here because otherwise types exposed via export
+        // can confuse the mapping.
+        // see also: typeReprUT function in runtime/infra/meta.scala
+        usyms.map(_.typeRef.dealias)
 
     def isUnitSym(using Quotes)(sym: quotes.reflect.Symbol): Boolean =
         sym.typeRef match
