@@ -140,6 +140,45 @@ val bad = ConfigSource.string("""
 val fail = bad.load[Config]
 ```
 
+## Integer Values
+
+In coulomb, conversion operations on integer values are considered to be
+[truncating][truncating conversions].
+They may lose precision due to integer truncation.
+Truncating conversions are generally explicit only,
+because this loss of precision is numerically unsafe.
+
+In pureconfig I/O, however, there is no way to explicitly invoke a truncating conversion.
+To mitigate this difficulty, the `coulomb-pureconfig` integrations will load without error
+if the conversion factor is exactly 1.
+
+@:callout(info)
+The safest way to ensure unit conversions will always succeed is to use fractional value types
+such as Float or Double.
+If desired,
+[coulomb-spire](coulomb-spire.md)
+provides integrations for fractional value types of higher precision.
+@:@
+
+```scala mdoc
+// source for a quantity value
+val qsrc = ConfigSource.string("""
+{
+    value: 3
+    unit: megabyte
+}
+""")
+
+// loading integer value types will succeed when type matches the config
+qsrc.load[Quantity[Int, Mega * Byte]]
+
+// it will also succeed whenever the conversion coefficient is exactly 1.
+qsrc.load[Quantity[Long, Byte * Mega]]
+
+// if the conversion is not exactly 1, load will fail
+qsrc.load[Quantity[Int, Kilo * Byte]]
+```
+
 ## IO Policies
 
 The `coulomb-pureconfig` integrations currently support two options for I/O "policies"
@@ -195,9 +234,7 @@ given given_ConfigLoader(using
 // use the JSON-based io definitions for RuntimeUnit objects
 import coulomb.pureconfig.policy.JSON.given
 
-// define a configuration source
-// this source uses units that are different than the Config type
-// definition, but they are convertable
+// this configuration source represents units in structured JSON
 val source = ConfigSource.string("""
 {
     duration: {value: 10, unit: minute},
