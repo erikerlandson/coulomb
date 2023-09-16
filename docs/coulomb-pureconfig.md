@@ -2,6 +2,13 @@
 
 The `coulomb-pureconfig` package defines `pureconfig` `ConfigReader` and `ConfigWriter` implicit context rules for `Quantity`, `RuntimeQuantity`, and `RuntimeUnit` objects.
 
+@:callout(info)
+At this time pureconfig does not cross-compile to ScalaJS or ScalaNative,
+and so `coulomb-pureconfig` also only builds for JVM.
+This issue is tracked by pureconfig at
+[#1307](https://github.com/pureconfig/pureconfig/issues/1307).
+@:@
+
 ## Quick Start
 
 Before you begin, it is recommended to first familiarize yourself with the
