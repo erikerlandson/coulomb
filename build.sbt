@@ -31,7 +31,7 @@ ThisBuild / tlJdkRelease := None
 ThisBuild / tlFatalWarnings := false
 
 def commonSettings = Seq(
-    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M8" % Test,
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-M10" % Test,
     // newer versions of sbt-typelevel throw new warning flags
     // which my code is failing - filter them out until I can fix the code
     Compile / scalacOptions ~= (_.filterNot { x => x.startsWith("-W") })
@@ -86,7 +86,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         name := "coulomb-testkit",
         libraryDependencies ++= Seq(
             "org.scalacheck" %%% "scalacheck" % "1.17.0",
-            "org.scalameta" %%% "munit-scalacheck" % "1.0.0-M8" % Test,
+            "org.scalameta" %%% "munit-scalacheck" % "1.0.0-M10" % Test,
             "org.typelevel" %%% "algebra-laws" % "2.10.0" % Test,
             "org.typelevel" %%% "discipline-munit" % "2.0.0-M3" % Test
         )
