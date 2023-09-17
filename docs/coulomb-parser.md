@@ -51,6 +51,9 @@ import coulomb.parser.standard.RuntimeUnitDslParser
 
 ### examples
 
+test link:
+@:api(coulomb.Quantity$)
+
 ```scala mdoc
 val dslparser: RuntimeUnitParser = RuntimeUnitDslParser.of[
     "coulomb.units.si" *:

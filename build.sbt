@@ -200,6 +200,8 @@ lazy val unidocs = project
 // https://typelevel.org/sbt-typelevel/site.html
 // sbt docs/tlSitePreview
 // http://localhost:4242
+import laika.ast.ExternalTarget
+import laika.rewrite.link.{LinkConfig, ApiLinks, SourceLinks, TargetDefinition}
 lazy val docs = project
     .in(file("site"))
     .dependsOn(
@@ -216,6 +218,18 @@ lazy val docs = project
         // turn off the new -W warnings in mdoc scala compilations
         // at least until I can get a better handle on how to work with them
         Compile / scalacOptions ~= (_.filterNot { x => x.startsWith("-W") })
+    )
+    .settings(
+        laikaConfig := LaikaConfig.defaults
+            .withConfigValue(
+                LinkConfig.empty
+                    .addApiLinks(
+                        // default will be coulomb api
+                        ApiLinks(baseUri =
+                            "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/"
+                        )
+                    )
+            )
     )
 
 // https://github.com/sbt/sbt-jmh
