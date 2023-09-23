@@ -236,6 +236,8 @@ lazy val docs = project
                         // https://github.com/typelevel/Laika/pull/541
                         TargetDefinition(
                             // intended usage: [Quantity][quantitytypedef]
+                            // Links to type defs do not work properly with laika '@:api(...)' constructs
+                            // which is going to make a lot of coulomb references harder to do.
                             "quantitytypedef",
                             ExternalTarget(
                                 "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
