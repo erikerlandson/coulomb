@@ -233,7 +233,12 @@ lazy val docs = project
                         // Target names need to be all lowercase.
                         // Note, this does not align with Laika docs.
                         // intended usage: [Quantity][quantitytypedef]
-                        TargetDefinition("quantitytypedef", ExternalTarget("https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"))
+                        TargetDefinition(
+                            "quantitytypedef",
+                            ExternalTarget(
+                                "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
+                            )
+                        )
                     )
             )
     )
