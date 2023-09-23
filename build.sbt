@@ -226,7 +226,8 @@ lazy val docs = project
                     .addApiLinks(
                         // default will be coulomb api
                         ApiLinks(baseUri =
-                            "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/"
+                            "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/",
+                            packagePrefix = "coulomb"
                         )
                     )
                     .addTargets(
