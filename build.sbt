@@ -224,11 +224,14 @@ lazy val docs = project
             .withConfigValue(
                 LinkConfig.empty
                     .addApiLinks(
-                        // default will be coulomb api
                         ApiLinks(
                             baseUri =
                                 "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/",
                             packagePrefix = "coulomb"
+                        ),
+                        ApiLinks(
+                            baseUri = "https://scala-lang.org/api/3.x/",
+                            packagePrefix = "scala"
                         )
                     )
                     .addTargets(
