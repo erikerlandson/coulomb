@@ -77,20 +77,34 @@ val dslparser: RuntimeUnitParser = RuntimeUnitDslParser.of[
 ]
 ```
 
-Parsing can fail, and so the `parse` method returns an `Either` object.
-In the following code, parsing a known unit results in a successful `Right` value.
+Parsing can fail, and so the `parse` method returns an @:api(scala.util.Either) object.
+In the following code, parsing a known unit `meter` results in a successful @:api(scala.util.Right) value.
+
+This example illustrates that unit names parse into a corresponding fully qualified
+unit type name, as would be used in static unit type expressions.
+@:api(coulomb.parser.standard.RuntimeUnitDslParser)
+maintains a mapping between static unit types and their names,
+as defined by the `showFull` method,
+such as `"meter"` <-> `coulomb.units.si$.Meter`
 
 @:callout(info)
-Most of the following examples will display `toString` values to improve readability.
+Scala 3 metaprogramming returns package objects with the `$` suffix,
+for example `si$` instead of `si`.
+This is mostly transparent to operations, unless you wish to refer
+directly to fully qualified types using the `@` prefix in the DSL,
+as illustrated in later examples.
 @:@
+
 
 ```scala mdoc
 val u1 = dslparser.parse("meter")
+
+// Most of the following examples will display with `toString` to improve readability.
 u1.toString
 ```
 
 A parsing failure, such as a unit name that the parser does not know about,
-results in a `Left` value containing a parsing error message. 
+results in a @:api(scala.util.Left) value containing a parsing error message. 
 
 ```scala mdoc
 dslparser.parse("nope")
@@ -121,9 +135,9 @@ dslparser.parse("(1000 * meter) / (second ^ 2)").toString
 
 You can also directly specify a fully qualified unit type name,
 by prepending with an `@` symbol.
-Note that these fully qualified names may use `name$` instead of `name`,
+Note that these fully qualified names may require `name$` instead of `name`,
 as with `si$` in the following:
 
 ```scala mdoc
-dslparser.parse("@coulomb.units.si$.Second")
+dslparser.parse("@coulomb.units.si$.Second").toString
 ```
