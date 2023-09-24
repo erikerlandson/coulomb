@@ -200,7 +200,7 @@ lazy val unidocs = project
 // https://typelevel.org/sbt-typelevel/site.html
 // sbt docs/tlSitePreview
 // http://localhost:4242
-import laika.ast.ExternalTarget
+import laika.ast.{ExternalTarget, InternalTarget, VirtualPath}
 import laika.rewrite.link.{LinkConfig, ApiLinks, SourceLinks, TargetDefinition}
 lazy val docs = project
     .in(file("site"))
@@ -246,6 +246,48 @@ lazy val docs = project
                             "quantitytypedef",
                             ExternalTarget(
                                 "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-core",
+                            InternalTarget(
+                                VirtualPath.parse("concepts.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-units",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-units.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-spire",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-spire.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-refined",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-refined.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-runtime",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-runtime.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-parser",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-parser.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-pureconfig",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-pureconfig.md")
                             )
                         )
                     )
