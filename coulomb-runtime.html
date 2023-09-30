@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="Typelevel Laika + Helium Theme" />
+  <title>coulomb-runtime</title>
+  
+  <meta name="author" content="coulomb contributors"/>
+  
+  <meta name="author" content="Erik Erlandson"/>
+  
+  
+  <meta name="description" content="docs"/>
+  
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
+  
+  <link rel="stylesheet" type="text/css" href="helium/icofont.min.css" />
+    <link rel="stylesheet" type="text/css" href="helium/laika-helium.css" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  
+  <script src="helium/laika-helium.js"></script>
+  
+  
+  
+  <script> /* for avoiding page load transitions */ </script>
+</head>
+
+  <body>
+
+    <header id="top-bar" class="light-default dark-default">
+
+  <div class="row">
+    <a id="nav-icon">
+      <i class="icofont-laika navigationMenu" title="Navigation">&#xefa2;</i>
+    </a>
+    
+    
+  </div>
+
+  <a class="icon-link glyph-link" href="index.html"><i class="icofont-laika home" title="Home">&#xef47;</i></a>
+
+  <div class="row links">
+    
+    <a class="icon-link svg-link" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/0.7.3/"><span class="api" title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
+  </g>
+</svg></span></a>
+    
+    <a class="icon-link svg-link" href="https://github.com/erikerlandson/coulomb"><span class="github" title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
+  </g>
+</svg></span></a>
+    
+  </div>  
+
+</header>
+    
+    <nav id="sidebar">
+
+  <div class="row">
+    
+    <a class="icon-link svg-link" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/0.7.3/"><span class="api" title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
+  </g>
+</svg></span></a>
+    
+    <a class="icon-link svg-link" href="https://github.com/erikerlandson/coulomb"><span class="github" title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
+  </g>
+</svg></span></a>
+    
+  </div>
+
+  <ul class="nav-list">
+    <li class="level1 nav-leaf"><a href="coulomb-core.html">coulomb-core</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-units.html">coulomb-units</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-spire.html">coulomb-spire</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-refined.html">coulomb-refined</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-pureconfig.html">coulomb-pureconfig</a></li>
+    <li class="level1 active nav-leaf"><a href="#">coulomb-runtime</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-parser.html">coulomb-parser</a></li>
+    <li class="level1 nav-leaf"><a href="develop.html">coulomb development</a></li>
+  </ul>
+
+</nav>
+
+    <div id="container">
+
+      
+<nav id="page-nav">
+  <p class="header"><a href="#">coulomb-runtime</a></p>
+
+  <ul class="nav-list">
+    <li class="level1 nav-node"><a href="#quick-start">Quick Start</a></li>
+    <li class="level2 nav-leaf"><a href="#packages">packages</a></li>
+    <li class="level2 nav-leaf"><a href="#import">import</a></li>
+    <li class="level2 nav-leaf"><a href="#examples">examples</a></li>
+  </ul>
+
+  <p class="footer"></p>
+</nav>
+
+
+      <main class="content">
+
+        <h1 id="coulomb-runtime" class="title">coulomb-runtime</h1>
+        <p>The <a href="#">coulomb-runtime</a> package implements
+        <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/RuntimeQuantity.html">RuntimeQuantity</a> and <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/RuntimeUnit.html">RuntimeUnit</a>.
+        Its primary use case at the time of this documentation is to support runtime I/O,
+        for example the <a href="coulomb-pureconfig.html">coulomb-pureconfig</a> package.</p>
+        
+        <h2 id="quick-start" class="section"><a class="anchor-link left" href="#quick-start"><i class="icofont-laika link">&#xef71;</i></a>Quick Start</h2>
+        
+        <h3 id="packages" class="section"><a class="anchor-link left" href="#packages"><i class="icofont-laika link">&#xef71;</i></a>packages</h3>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;com.manyangled&quot;</span><span> %% </span><span class="string-literal">&quot;coulomb-runtime&quot;</span><span> % </span><span class="string-literal">&quot;0.7.3&quot;</span><span>
+
+</span><span class="comment">// dependencies
+</span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;com.manyangled&quot;</span><span> %% </span><span class="string-literal">&quot;coulomb-core&quot;</span><span> % </span><span class="string-literal">&quot;0.7.3&quot;</span><span>
+
+</span><span class="comment">// coulomb predefined units
+</span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;com.manyangled&quot;</span><span> %% </span><span class="string-literal">&quot;coulomb-units&quot;</span><span> % </span><span class="string-literal">&quot;0.7.3&quot;</span></code></pre>
+        
+        <h3 id="import" class="section"><a class="anchor-link left" href="#import"><i class="icofont-laika link">&#xef71;</i></a>import</h3>
+        <pre><code class="nohighlight"><span class="comment">// fundamental coulomb types and methods
+// these include RuntimeUnit and RuntimeQuantity
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.*
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">syntax</span><span>.*
+
+</span><span class="comment">// algebraic definitions
+</span><span class="keyword">import</span><span> </span><span class="identifier">algebra</span><span>.</span><span class="identifier">instances</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">ops</span><span>.</span><span class="identifier">algebra</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
+
+</span><span class="comment">// unit and value type policies for operations
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">policy</span><span>.</span><span class="identifier">standard</span><span>.</span><span class="keyword">given</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">scala</span><span>.</span><span class="identifier">language</span><span>.</span><span class="identifier">implicitConversions</span><span>
+
+</span><span class="comment">// unit definitions
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.{*, </span><span class="keyword">given</span><span>}
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.</span><span class="identifier">prefixes</span><span>.{*, </span><span class="keyword">given</span><span>}
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">info</span><span>.{*, </span><span class="keyword">given</span><span>}
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">time</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="comment">// runtime definitions
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">conversion</span><span>.</span><span class="identifier">runtimes</span><span>.</span><span class="identifier">mapping</span><span>.</span><span class="type-name">MappingCoefficientRuntime</span></code></pre>
+        
+        <h3 id="examples" class="section"><a class="anchor-link left" href="#examples"><i class="icofont-laika link">&#xef71;</i></a>examples</h3>
+        <p><a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/RuntimeUnit.html">RuntimeUnit</a> is the core data structure of the <a href="#">coulomb-runtime</a> package.
+        It is a parallel runtime implementation of the standard static unit types and analysis
+        defined in <a href="coulomb-core.html">coulomb-core</a>.</p>
+        <p>The <code>RuntimeUnit.of</code> method makes it easy to create RuntimeUnit values from static unit types.
+        Additionally, you can apply the standard unit type operators <code>*</code>, <code>/</code> and <code>^</code> to build up unit expressions.</p>
+        <pre><code class="nohighlight"><span class="comment">// create RuntimeUnit values from static unit types
+</span><span class="keyword">val</span><span> </span><span class="identifier">k</span><span> = </span><span class="type-name">RuntimeUnit</span><span>.</span><span class="identifier">of</span><span>[</span><span class="type-name">Kilo</span><span>]
+</span><span class="keyword">val</span><span> </span><span class="identifier">d</span><span> = </span><span class="type-name">RuntimeUnit</span><span>.</span><span class="identifier">of</span><span>[</span><span class="type-name">Meter</span><span>]
+</span><span class="keyword">val</span><span> </span><span class="identifier">t</span><span> = </span><span class="type-name">RuntimeUnit</span><span>.</span><span class="identifier">of</span><span>[</span><span class="type-name">Second</span><span>]
+
+</span><span class="comment">// Build up unit expression from other expressions
+</span><span class="keyword">val</span><span> </span><span class="identifier">kps</span><span> = (</span><span class="identifier">k</span><span> * </span><span class="identifier">d</span><span>) / </span><span class="identifier">t</span><span>
+</span><span class="comment">// kps: Div = Div(
+//   num = Mul(
+//     lhs = UnitType(path = &quot;coulomb.units.si$.prefixes$.Kilo&quot;),
+//     rhs = UnitType(path = &quot;coulomb.units.si$.Meter&quot;)
+//   ),
+//   den = UnitType(path = &quot;coulomb.units.si$.Second&quot;)
+// )
+</span><span>
+</span><span class="comment">// values can be displayed with toString for readability
+</span><span class="identifier">kps</span><span>.</span><span class="identifier">toString</span><span>
+</span><span class="comment">// res0: String = &quot;(Kilo*Meter)/Second&quot;</span></code></pre>
+        <p>The <code>RuntimeUnit.of</code> method can be used with static unit types of arbitrary form.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">kps2</span><span> = </span><span class="type-name">RuntimeUnit</span><span>.</span><span class="identifier">of</span><span>[</span><span class="type-name">Kilo</span><span> * </span><span class="type-name">Meter</span><span> / </span><span class="type-name">Second</span><span>]
+</span><span class="identifier">kps2</span><span>.</span><span class="identifier">toString</span><span>
+</span><span class="comment">// res1: String = &quot;(Kilo*Meter)/Second&quot;</span></code></pre>
+        <p>A <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/RuntimeQuantity.html">RuntimeQuantity</a> is a value paired with a RuntimeUnit,
+        and is the runtime analog of <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/Quantity$.html">Quantity</a>.
+        The following example demonstrates some ways to create RuntimeQuantity objects.</p>
+        <pre><code class="nohighlight"><span class="comment">// a RuntimeQuantity is a value paired with a RuntimeUnit
+</span><span class="keyword">val</span><span> </span><span class="identifier">rq</span><span> = </span><span class="type-name">RuntimeQuantity</span><span>(</span><span class="number-literal">1f</span><span>, </span><span class="identifier">kps</span><span>)
+</span><span class="comment">// rq: RuntimeQuantity[Float] = RuntimeQuantity(
+//   value = 1.0F,
+//   unit = Div(
+//     num = Mul(
+//       lhs = UnitType(path = &quot;coulomb.units.si$.prefixes$.Kilo&quot;),
+//       rhs = UnitType(path = &quot;coulomb.units.si$.Meter&quot;)
+//     ),
+//     den = UnitType(path = &quot;coulomb.units.si$.Second&quot;)
+//   )
+// )
+</span><span>
+</span><span class="comment">// declare a RuntimeQuantity with a given RuntimeUnit
+</span><span class="number-literal">1f</span><span>.</span><span class="identifier">withRuntimeUnit</span><span>(</span><span class="identifier">kps</span><span>).</span><span class="identifier">toString</span><span>
+</span><span class="comment">// res2: String = &quot;RuntimeQuantity(1.0,(Kilo*Meter)/Second)&quot;
+</span><span>
+</span><span class="comment">// an equivalent RuntimeQuantity based on a static unit type
+</span><span class="number-literal">1f</span><span>.</span><span class="identifier">withRuntimeUnit</span><span>[(</span><span class="type-name">Kilo</span><span> * </span><span class="type-name">Meter</span><span>) / </span><span class="type-name">Second</span><span>].</span><span class="identifier">toString</span><span>
+</span><span class="comment">// res3: String = &quot;RuntimeQuantity(1.0,(Kilo*Meter)/Second)&quot;</span></code></pre>
+        <p>It is also possible to convert from <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/RuntimeQuantity.html">RuntimeQuantity</a> to <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/Quantity.html">Quantity</a>.
+        This is accomplished using a <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/CoefficientRuntime.html">CoefficientRuntime</a> in context.</p>
+        <p>As this example shows, you can list package names, which will import any unit types
+        into the CoefficientRuntime.</p>
+        <div class="callout info">
+          <i class="icofont-laika info">&#xef4e;</i>
+          <p>The <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/CoefficientRuntime.html">CoefficientRuntime</a> bridges the gap between runtime unit expresions and
+          static unit types.
+          It is what allows loading unit aware configurations, for example in <a href="coulomb-pureconfig.html">coulomb-pureconfig</a>.</p>
+        </div>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// declare a coefficient runtime that knows about SI units and prefixes
+</span><span class="keyword">given</span><span> </span><span class="keyword">given</span><span>_</span><span class="type-name">CRT</span><span>: </span><span class="type-name">CoefficientRuntime</span><span> = </span><span class="type-name">MappingCoefficientRuntime</span><span>.</span><span class="identifier">of</span><span>[
+    </span><span class="string-literal">&quot;coulomb.units.si&quot;</span><span> *:
+    </span><span class="string-literal">&quot;coulomb.units.si.prefixes&quot;</span><span> *:
+    </span><span class="type-name">EmptyTuple</span><span>
+]</span></code></pre>
+        <p>With a <a class="api" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/CoefficientRuntime.html">CoefficientRuntime</a>, we can convert from runtime quantities to
+        static typed quantities.
+        We cannot know at compile time if these conversions will succeed,
+        so these operations return an <a class="api" href="https://scala-lang.org/api/3.x/scala/util/Either.html">Either</a> value.</p>
+        <pre><code class="nohighlight"><span class="comment">// reconstruct the equivalent Quantity
+</span><span class="identifier">rq</span><span>.</span><span class="identifier">toQuantity</span><span>[</span><span class="type-name">Float</span><span>, </span><span class="type-name">Kilo</span><span> * </span><span class="type-name">Meter</span><span> / </span><span class="type-name">Second</span><span>]
+</span><span class="comment">// res4: Either[String, Quantity[Float, /[*[Kilo, Meter], Second]]] = Right(
+//   value = 1.0F
+// )
+</span><span>
+</span><span class="comment">// valid conversions of value types or unit types will also succeed
+</span><span class="identifier">rq</span><span>.</span><span class="identifier">toQuantity</span><span>[</span><span class="type-name">Double</span><span>, </span><span class="type-name">Meter</span><span> / </span><span class="type-name">Second</span><span>]
+</span><span class="comment">// res5: Either[String, Quantity[Double, /[Meter, Second]]] = Right(
+//   value = 1000.0
+// )
+</span><span>
+</span><span class="comment">// attempting to convert to incompatible units will fail
+</span><span class="identifier">rq</span><span>.</span><span class="identifier">toQuantity</span><span>[</span><span class="type-name">Float</span><span>, </span><span class="type-name">Second</span><span>]
+</span><span class="comment">// res6: Either[String, Quantity[Float, Second]] = Left(
+//   value = &quot;non-convertible units: (Kilo*Meter)/Second, Second&quot;
+// )</span></code></pre>
+
+        
+<hr class="footer-rule"/>
+<footer>
+  Site generated by <a href="https://typelevel.org/Laika/">Laika</a> with the Helium theme.
+</footer>
+
+
+      </main>
+
+    </div>
+
+  </body>
+
+</html>

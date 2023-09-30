@@ -84,11 +84,14 @@
   </div>
 
   <ul class="nav-list">
-    <li class="level1 nav-leaf"><a href="concepts.html">coulomb Concepts</a></li>
-    <li class="level1 nav-leaf"><a href="develop.html">coulomb Development</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-core.html">coulomb-core</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-units.html">coulomb-units</a></li>
     <li class="level1 active nav-leaf"><a href="#">coulomb-spire</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-refined.html">coulomb-refined</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-pureconfig.html">coulomb-pureconfig</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-runtime.html">coulomb-runtime</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-parser.html">coulomb-parser</a></li>
+    <li class="level1 nav-leaf"><a href="develop.html">coulomb development</a></li>
   </ul>
 
 </nav>
@@ -117,7 +120,7 @@
         <h1 id="coulomb-spire" class="title">coulomb-spire</h1>
         <p>The <code>coulomb-spire</code> package defines unit conversion, value conversion,
         and value resolution
-        <a href="concepts.html#coulomb-policies">policies</a>
+        <a href="coulomb-core.html#coulomb-policies">policies</a>
         for
         <a href="https://typelevel.org/spire/">spire</a>
         numeric types (and standard Scala numeric types).</p>
@@ -235,14 +238,14 @@
         
         <h2 id="policies" class="section"><a class="anchor-link left" href="#policies"><i class="icofont-laika link">&#xef71;</i></a>Policies</h2>
         <p>As with <code>coulomb-core</code>, the <code>coulomb-spire</code> package provides two predefined
-        <a href="concepts.html#coulomb-policies">policy</a>
+        <a href="coulomb-core.html#coulomb-policies">policy</a>
         options:</p>
         <ul>
           <li><code>coulomb.policy.spire.standard</code> - Supports implicit and explicit value and unit conversions, and value promotions for spire and Scala numeric types.</li>
           <li><code>coulomb.policy.spire.strict</code> - Only explicit value and unit conversions are supported.</li>
         </ul>
         <p>The
-        <a href="concepts.html#value-promotion-and-resolution">value resolution</a>
+        <a href="coulomb-core.html#value-promotion-and-resolution">value resolution</a>
         and promotion rules for <code>coulomb-spire</code> are extended to
         include <code>BigDecimal</code>, <code>BigInt</code>, <code>Rational</code>, <code>Algebraic</code> and <code>Real</code>.
         The resulting lattice of promotions looks like this:</p>

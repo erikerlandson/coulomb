@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="Typelevel Laika + Helium Theme" />
+  <title>coulomb-core</title>
+  
+  <meta name="author" content="coulomb contributors"/>
+  
+  <meta name="author" content="Erik Erlandson"/>
+  
+  
+  <meta name="description" content="docs"/>
+  
+  
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
+  
+  <link rel="stylesheet" type="text/css" href="helium/icofont.min.css" />
+    <link rel="stylesheet" type="text/css" href="helium/laika-helium.css" />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  
+  <script src="helium/laika-helium.js"></script>
+  
+  
+  
+  <script> /* for avoiding page load transitions */ </script>
+</head>
+
+  <body>
+
+    <header id="top-bar" class="light-default dark-default">
+
+  <div class="row">
+    <a id="nav-icon">
+      <i class="icofont-laika navigationMenu" title="Navigation">&#xefa2;</i>
+    </a>
+    
+    
+  </div>
+
+  <a class="icon-link glyph-link" href="index.html"><i class="icofont-laika home" title="Home">&#xef47;</i></a>
+
+  <div class="row links">
+    
+    <a class="icon-link svg-link" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/0.7.3/"><span class="api" title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
+  </g>
+</svg></span></a>
+    
+    <a class="icon-link svg-link" href="https://github.com/erikerlandson/coulomb"><span class="github" title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
+  </g>
+</svg></span></a>
+    
+  </div>  
+
+</header>
+    
+    <nav id="sidebar">
+
+  <div class="row">
+    
+    <a class="icon-link svg-link" href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/0.7.3/"><span class="api" title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
+  </g>
+</svg></span></a>
+    
+    <a class="icon-link svg-link" href="https://github.com/erikerlandson/coulomb"><span class="github" title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
+  </g>
+</svg></span></a>
+    
+  </div>
+
+  <ul class="nav-list">
+    <li class="level1 active nav-leaf"><a href="#">coulomb-core</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-units.html">coulomb-units</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-spire.html">coulomb-spire</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-refined.html">coulomb-refined</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-pureconfig.html">coulomb-pureconfig</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-runtime.html">coulomb-runtime</a></li>
+    <li class="level1 nav-leaf"><a href="coulomb-parser.html">coulomb-parser</a></li>
+    <li class="level1 nav-leaf"><a href="develop.html">coulomb development</a></li>
+  </ul>
+
+</nav>
+
+    <div id="container">
+
+      
+<nav id="page-nav">
+  <p class="header"><a href="#">coulomb-core</a></p>
+
+  <ul class="nav-list">
+    <li class="level1 nav-node"><a href="#quick-start">Quick Start</a></li>
+    <li class="level2 nav-leaf"><a href="#import">import</a></li>
+    <li class="level1 nav-leaf"><a href="#unit-analysis">Unit Analysis</a></li>
+    <li class="level1 nav-leaf"><a href="#quantity">Quantity</a></li>
+    <li class="level1 nav-leaf"><a href="#unit-expressions">Unit Expressions</a></li>
+    <li class="level1 nav-leaf"><a href="#unit-conversions">Unit Conversions</a></li>
+    <li class="level1 nav-leaf"><a href="#base-units-and-derived-units">Base Units and Derived Units</a></li>
+    <li class="level1 nav-leaf"><a href="#prefix-units">Prefix Units</a></li>
+    <li class="level1 nav-node"><a href="#value-types">Value Types</a></li>
+    <li class="level2 nav-leaf"><a href="#value-types-and-algebras">Value Types and Algebras</a></li>
+    <li class="level1 nav-leaf"><a href="#numeric-operations">Numeric Operations</a></li>
+    <li class="level1 nav-leaf"><a href="#truncating-operations">Truncating Operations</a></li>
+    <li class="level1 nav-node"><a href="#value-and-unit-conversions">Value and Unit Conversions</a></li>
+    <li class="level2 nav-leaf"><a href="#truncating-conversions">truncating conversions</a></li>
+    <li class="level2 nav-leaf"><a href="#implicit-conversions">implicit conversions</a></li>
+    <li class="level2 nav-leaf"><a href="#defining-conversions">defining conversions</a></li>
+    <li class="level1 nav-leaf"><a href="#value-promotion-and-resolution">Value Promotion and Resolution</a></li>
+    <li class="level1 nav-node"><a href="#temperature-and-time">Temperature and Time</a></li>
+    <li class="level2 nav-leaf"><a href="#delta-units">Delta Units</a></li>
+    <li class="level1 nav-leaf"><a href="#coulomb-policies">Coulomb Policies</a></li>
+  </ul>
+
+  <p class="footer"></p>
+</nav>
+
+
+      <main class="content">
+
+        <h1 id="coulomb-core" class="title">coulomb-core</h1>
+        <p>This page describes the fundamental <code>coulomb</code> concepts, implemented in <code>coulomb-core</code>.</p>
+        
+        <h2 id="quick-start" class="section"><a class="anchor-link left" href="#quick-start"><i class="icofont-laika link">&#xef71;</i></a>Quick Start</h2>
+        
+        <h3 id="import" class="section"><a class="anchor-link left" href="#import"><i class="icofont-laika link">&#xef71;</i></a>import</h3>
+        <pre><code class="nohighlight"><span class="comment">// fundamental coulomb types and methods
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.*
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">syntax</span><span>.*
+
+</span><span class="comment">// algebraic definitions
+</span><span class="keyword">import</span><span> </span><span class="identifier">algebra</span><span>.</span><span class="identifier">instances</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">ops</span><span>.</span><span class="identifier">algebra</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
+
+</span><span class="comment">// unit and value type policies for operations
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">policy</span><span>.</span><span class="identifier">standard</span><span>.</span><span class="keyword">given</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">scala</span><span>.</span><span class="identifier">language</span><span>.</span><span class="identifier">implicitConversions</span><span>
+
+</span><span class="comment">// unit definitions
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.{*, </span><span class="keyword">given</span><span>}</span></code></pre>
+        
+        <h2 id="unit-analysis" class="section"><a class="anchor-link left" href="#unit-analysis"><i class="icofont-laika link">&#xef71;</i></a>Unit Analysis</h2>
+        <p>Unit analysis - aka
+        <a href="https://en.wikipedia.org/wiki/Dimensional_analysis">dimensional analysis</a></p>
+        <ul>
+          <li>is the practice of tracking units of measure along with numeric computations as an informational aid and consistency check.
+          For example, if one has a duration <code>t = 10 seconds</code> and a distance <code>d = 100 meters</code>,
+          then unit analysis tells us that the value <code>d/t</code> has the unit <code>meters/second</code>.</li>
+        </ul>
+        <p>Unit analysis performs a very similar role to a
+        <a href="https://en.wikipedia.org/wiki/Type_system">type system</a>
+        in programming languages such as Scala.
+        Like data types, unit analysis provides us information about what operations may be allowed or disallowed.
+        Just as
+        <a href="https://docs.scala-lang.org/scala3/book/types-introduction.html">Scala&#39;s type system</a>
+        informs us that the expression <code>7 + false</code> is not a valid expression:</p>
+        <pre><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">bad</span><span> = </span><span class="number-literal">7</span><span> + </span><span class="boolean-literal">false</span><span>
+</span><span class="comment">// error:
+// None of the overloaded alternatives of method + in class Int with types
+//  (x: Double): Double
+//  (x: Float): Float
+//  (x: Long): Long
+//  (x: Int): Int
+//  (x: Char): Int
+//  (x: Short): Int
+//  (x: Byte): Int
+//  (x: String): String
+// match arguments ((false : Boolean))
+// val dyear = date2 - date1
+//                  ^</span></code></pre>
+        <p>unit analysis informs us that adding <code>meters + seconds</code> is not a valid computation.</p>
+        <p>As such, unit analysis is an excellent use case for representation in programming language type systems.
+        The <code>coulomb</code> library implements unit analysis using Scala&#39;s powerful type system features.</p>
+        
+        <h2 id="quantity" class="section"><a class="anchor-link left" href="#quantity"><i class="icofont-laika link">&#xef71;</i></a>Quantity</h2>
+        <p>In order to do unit analysis, we have to keep track of unit information along with our computations.
+        The <code>coulomb</code> library represents a value paired with a unit expression using the type <code>Quantity[V, U]</code>:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">time</span><span> = </span><span class="number-literal">10.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Second</span><span>]
+</span><span class="comment">// time: Quantity[Double, Second] = 10.0
+</span><span class="keyword">val</span><span> </span><span class="identifier">dist</span><span> = </span><span class="number-literal">100.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span>]
+</span><span class="comment">// dist: Quantity[Double, Meter] = 100.0
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">v</span><span> = </span><span class="identifier">dist</span><span> / </span><span class="identifier">time</span><span>
+</span><span class="comment">// v: Quantity[Double, /[Meter, Second]] = 10.0
+</span><span class="identifier">v</span><span>.</span><span class="identifier">show</span><span>
+</span><span class="comment">// res1: String = &quot;10.0 m/s&quot;</span></code></pre>
+        <p><code>Quantity[V, U]</code> has two type arguments: the type <code>V</code> represents the value type such as <code>Double</code>,
+        and <code>U</code> represents the unit type such as <code>Meter</code> or <code>Meter / Second</code>.
+        As the example above shows, when you do operations such as division on a <code>Quantity</code>,
+        <code>coulomb</code> automatically computes both the resulting value and its corresponding unit.</p>
+        
+        <h2 id="unit-expressions" class="section"><a class="anchor-link left" href="#unit-expressions"><i class="icofont-laika link">&#xef71;</i></a>Unit Expressions</h2>
+        <p>In the previous example we saw that a unit type <code>U</code> contains a unit expression.
+        Unit expressions may be a named type such as <code>Meter</code> or <code>Second</code>,
+        or more complex unit types can be constructed with the operator types <code>*</code>, <code>/</code> and <code>^</code>:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">time</span><span> = </span><span class="number-literal">60.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Second</span><span>]
+</span><span class="comment">// time: Quantity[Double, Second] = 60.0
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">speed</span><span> = </span><span class="number-literal">100.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span> / </span><span class="type-name">Second</span><span>]
+</span><span class="comment">// speed: Quantity[Double, /[Meter, Second]] = 100.0
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">force</span><span> = </span><span class="number-literal">5.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Kilogram</span><span> * </span><span class="type-name">Meter</span><span> / (</span><span class="type-name">Second</span><span> ^ </span><span class="number-literal">2</span><span>)]
+</span><span class="comment">// force: Quantity[Double, /[*[Kilogram, Meter], ^[Second, 2]]] = 5.0</span></code></pre>
+        <p>Unit expression types in <code>coulomb</code> can be composed to express units with arbitrary complexity.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">mksa</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="comment">// Electrical resistance expressed with SI base units
+</span><span class="keyword">val</span><span> </span><span class="identifier">resistance</span><span> = </span><span class="number-literal">1.0</span><span>.</span><span class="identifier">withUnit</span><span>[(</span><span class="type-name">Kilogram</span><span> * (</span><span class="type-name">Meter</span><span> ^ </span><span class="number-literal">2</span><span>)) / ((</span><span class="type-name">Second</span><span> ^ </span><span class="number-literal">3</span><span>) * (</span><span class="type-name">Ampere</span><span> ^ </span><span class="number-literal">2</span><span>))]
+</span><span class="comment">// resistance: Quantity[Double, /[*[Kilogram, ^[Meter, 2]], *[^[Second, 3], ^[Ampere, 2]]]] = 1.0
+</span><span>
+</span><span class="identifier">resistance</span><span>.</span><span class="identifier">show</span><span>
+</span><span class="comment">// res2: String = &quot;1.0 (kg m^2)/(s^3 A^2)&quot;
+</span><span>
+</span><span class="comment">// a shorter but equivalent unit type
+</span><span class="identifier">resistance</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Ohm</span><span>].</span><span class="identifier">show</span><span>
+</span><span class="comment">// res3: String = &quot;1.0 Ω&quot;</span></code></pre>
+        
+        <h2 id="unit-conversions" class="section"><a class="anchor-link left" href="#unit-conversions"><i class="icofont-laika link">&#xef71;</i></a>Unit Conversions</h2>
+        <p>In unit analysis, some units are convertible (aka
+        <a href="https://en.wikipedia.org/wiki/Dimensional_analysis">commensurable</a>).
+        The <code>coulomb</code> library performs unit conversions, and corresponding checks for convertability or inconvertability,
+        using
+        <a href="http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/">algorithmic unit analysis</a>.</p>
+        <p>For example one may convert a quantity of kilometers to miles, or meter/second to miles/hour,
+        or cubic meters to liters:</p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.</span><span class="identifier">prefixes</span><span>.{*, </span><span class="keyword">given</span><span>}
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">us</span><span>.{*, </span><span class="keyword">given</span><span>}
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">accepted</span><span>.{*, </span><span class="keyword">given</span><span>}
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">time</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">distance</span><span> = </span><span class="number-literal">100.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Kilo</span><span> * </span><span class="type-name">Meter</span><span>]
+</span><span class="comment">// distance: Quantity[Double, *[Kilo, Meter]] = 100.0
+</span><span>
+</span><span class="identifier">distance</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Mile</span><span>].</span><span class="identifier">show</span><span>
+</span><span class="comment">// res4: String = &quot;62.13711922373339 mi&quot;
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">speed</span><span> = </span><span class="number-literal">10.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span> / </span><span class="type-name">Second</span><span>]
+</span><span class="comment">// speed: Quantity[Double, /[Meter, Second]] = 10.0
+</span><span>
+</span><span class="identifier">speed</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Mile</span><span> / </span><span class="type-name">Hour</span><span>].</span><span class="identifier">show</span><span>
+</span><span class="comment">// res5: String = &quot;22.369362920544024 mi/h&quot;
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">volume</span><span> = </span><span class="number-literal">1.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span> ^ </span><span class="number-literal">3</span><span>]
+</span><span class="comment">// volume: Quantity[Double, ^[Meter, 3]] = 1.0
+</span><span>
+</span><span class="identifier">volume</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Liter</span><span>].</span><span class="identifier">show</span><span>
+</span><span class="comment">// res6: String = &quot;1000.0 l&quot;</span></code></pre>
+        <p>Other quantities are <em>not</em> convertible (aka incommensurable).
+        Attempting to convert such quantities in <code>coulomb</code> is a compile time type error.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// acre-feet is a unit of volume, and so will succeed:
+</span><span class="identifier">volume</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Acre</span><span> * </span><span class="type-name">Foot</span><span>].</span><span class="identifier">show</span><span>
+
+</span><span class="comment">// converting a volume to an area is a type error!
+</span><span class="identifier">volume</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Acre</span><span>].</span><span class="identifier">show</span><span>
+</span><span class="comment">// error:
+// unit type (Meter ^ 3) not convertable to Acre
+// val q1 = 1d.withUnit[Liter]
+//                           ^</span></code></pre>
+        
+        <h2 id="base-units-and-derived-units" class="section"><a class="anchor-link left" href="#base-units-and-derived-units"><i class="icofont-laika link">&#xef71;</i></a>Base Units and Derived Units</h2>
+        <p>In unit analysis,
+        <a href="https://en.wikipedia.org/wiki/Dimensional_analysis#Concrete_numbers_and_base_units">base units</a>
+        are the axiomatic units.
+        They typically express fundamental quantites, for example meters, seconds or kilograms in the
+        <a href="https://en.wikipedia.org/wiki/International_System_of_Units">SI unit system</a>.</p>
+        <p>The <code>coulomb-units</code> package defines the
+        <a href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/units/si$.html">SI base units</a>
+        but <code>coulomb</code> also makes it easy to define your own base units:</p>
+        <pre><code class="nohighlight"><span class="comment">// a new base unit for spicy heat
+</span><span class="keyword">object</span><span> </span><span class="identifier">spicy</span><span>:
+    </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">define</span><span>.*
+
+    </span><span class="keyword">final</span><span> </span><span class="keyword">type</span><span> </span><span class="type-name">Scoville</span><span>
+    </span><span class="keyword">given</span><span> </span><span class="identifier">unit_Scoville</span><span>: </span><span class="type-name">BaseUnit</span><span>[</span><span class="type-name">Scoville</span><span>, </span><span class="string-literal">&quot;scoville&quot;</span><span>, </span><span class="string-literal">&quot;sco&quot;</span><span>] = </span><span class="type-name">BaseUnit</span><span>()
+
+</span><span class="keyword">import</span><span> </span><span class="identifier">spicy</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">jalapeno</span><span> = </span><span class="number-literal">5000</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Scoville</span><span>]
+</span><span class="comment">// jalapeno: Quantity[Int, Scoville] = 5000
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">ghost</span><span> = </span><span class="number-literal">1000000</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Scoville</span><span>]
+</span><span class="comment">// ghost: Quantity[Int, Scoville] = 1000000</span></code></pre>
+        <p>Other units may be defined as compositions of base units.
+        These are referred to as derived units, or compound units.</p>
+        <pre><code class="nohighlight"><span class="keyword">object</span><span> </span><span class="identifier">nautical</span><span>:
+    </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">define</span><span>.*
+
+    </span><span class="keyword">export</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.{ </span><span class="type-name">Meter</span><span>, </span><span class="identifier">ctx_unit_Meter</span><span> }
+    </span><span class="keyword">export</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">time</span><span>.{ </span><span class="type-name">Hour</span><span>, </span><span class="identifier">ctx_unit_Hour</span><span> }
+
+    </span><span class="keyword">final</span><span> </span><span class="keyword">type</span><span> </span><span class="type-name">NauticalMile</span><span>
+    </span><span class="keyword">given</span><span> </span><span class="identifier">unit_NauticalMile</span><span>: </span><span class="type-name">DerivedUnit</span><span>[</span><span class="type-name">NauticalMile</span><span>, </span><span class="number-literal">1852</span><span> * </span><span class="type-name">Meter</span><span>, </span><span class="string-literal">&quot;nmile&quot;</span><span>, </span><span class="string-literal">&quot;nmi&quot;</span><span>] =
+        </span><span class="type-name">DerivedUnit</span><span>()
+
+    </span><span class="keyword">final</span><span> </span><span class="keyword">type</span><span> </span><span class="type-name">Knot</span><span>
+    </span><span class="keyword">given</span><span> </span><span class="identifier">unit_Knot</span><span>: </span><span class="type-name">DerivedUnit</span><span>[</span><span class="type-name">Knot</span><span>, </span><span class="type-name">NauticalMile</span><span> / </span><span class="type-name">Hour</span><span>, </span><span class="string-literal">&quot;knot&quot;</span><span>, </span><span class="string-literal">&quot;kt&quot;</span><span>] =
+        </span><span class="type-name">DerivedUnit</span><span>()
+
+</span><span class="keyword">import</span><span> </span><span class="identifier">nautical</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">dist</span><span> = (</span><span class="number-literal">1.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Knot</span><span>] * </span><span class="number-literal">1.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Hour</span><span>]).</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Meter</span><span>]
+</span><span class="comment">// dist: Quantity[Double, Meter] = 1852.0</span></code></pre>
+        <p><code>coulomb</code> permits any type to be treated as a unit.
+        Types not explicitly defined as units are treated as base units.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">class</span><span> </span><span class="type-name">Apple</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">apples</span><span> = </span><span class="number-literal">1</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Apple</span><span>] + </span><span class="number-literal">2</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Apple</span><span>]
+</span><span class="comment">// apples: Quantity[Int, Apple] = 3
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">s</span><span> = </span><span class="identifier">apples</span><span>.</span><span class="identifier">show</span><span>
+</span><span class="comment">// s: String = &quot;3 Apple&quot;</span></code></pre>
+        <p>Allowing arbitrary types to be manipulated as units introduces some interesting programming possibilities,
+        which are discussed in
+        <a href="http://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/">this blog post</a>.</p>
+        
+        <h2 id="prefix-units" class="section"><a class="anchor-link left" href="#prefix-units"><i class="icofont-laika link">&#xef71;</i></a>Prefix Units</h2>
+        <p>The standard SI unit system
+        <a href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/units/si$$prefixes$.html">prefixes</a>
+        such as &quot;kilo&quot; to represent 1000, &quot;micro&quot; to represent 10^-6, etc, are provided by the <code>coulomb-units</code> package.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.</span><span class="identifier">prefixes</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">dist</span><span> = </span><span class="number-literal">5.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Kilo</span><span> * </span><span class="type-name">Meter</span><span>]
+</span><span class="comment">// dist: Quantity[Double, *[Kilo, Meter]] = 5.0
+</span><span>
+</span><span class="identifier">dist</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Meter</span><span>].</span><span class="identifier">show</span><span>
+</span><span class="comment">// res8: String = &quot;5000.0 m&quot;</span></code></pre>
+        <p>The standard
+        <a href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/units/info$$prefixes$.html">binary prefixes</a>
+        which are frequently used in computing are also provided.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">info</span><span>.{*, </span><span class="keyword">given</span><span>}
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">info</span><span>.</span><span class="identifier">prefixes</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">memory</span><span> = </span><span class="number-literal">1.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Mebi</span><span> * </span><span class="type-name">Byte</span><span>]
+</span><span class="comment">// memory: Quantity[Double, *[Mebi, Byte]] = 1.0
+</span><span>
+</span><span class="identifier">memory</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Byte</span><span>].</span><span class="identifier">show</span><span>
+</span><span class="comment">// res9: String = &quot;1048576.0 B&quot;</span></code></pre>
+        <p>Unit prefixes in <code>coulomb</code> take advantage of Scala literal types,
+        and are defined as <code>DerivedUnit</code> for types that encode Rational numbers.
+        The numeric literal types <code>Int</code>, <code>Long</code>, <code>Float</code> and <code>Double</code> can all be
+        combined with the operator types <code>*</code>, <code>/</code> and <code>^</code> to express numeric constants.
+        Numeric values are processed at compile-time as arbitrary precision rationals,
+        and so you can easily express values with high precision and magnitudes.</p>
+        <pre><code class="nohighlight"><span class="keyword">object</span><span> </span><span class="identifier">prefixes</span><span>:
+    </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">define</span><span>.*
+
+    </span><span class="keyword">final</span><span> </span><span class="keyword">type</span><span> </span><span class="type-name">Dozen</span><span>
+    </span><span class="keyword">given</span><span> </span><span class="identifier">unit_Dozen</span><span>: </span><span class="type-name">DerivedUnit</span><span>[</span><span class="type-name">Dozen</span><span>, </span><span class="number-literal">12</span><span>, </span><span class="string-literal">&quot;dozen&quot;</span><span>, </span><span class="string-literal">&quot;doz&quot;</span><span>] = </span><span class="type-name">DerivedUnit</span><span>()
+
+    </span><span class="keyword">final</span><span> </span><span class="keyword">type</span><span> </span><span class="type-name">Googol</span><span>
+    </span><span class="keyword">given</span><span> </span><span class="identifier">unit_Googol</span><span>: </span><span class="type-name">DerivedUnit</span><span>[</span><span class="type-name">Googol</span><span>, </span><span class="number-literal">10</span><span> ^ </span><span class="number-literal">100</span><span>, </span><span class="string-literal">&quot;googol&quot;</span><span>, </span><span class="string-literal">&quot;gog&quot;</span><span>] = </span><span class="type-name">DerivedUnit</span><span>()
+
+    </span><span class="keyword">final</span><span> </span><span class="keyword">type</span><span> </span><span class="type-name">Percent</span><span>
+    </span><span class="keyword">given</span><span> </span><span class="identifier">unit_Percent</span><span>: </span><span class="type-name">DerivedUnit</span><span>[</span><span class="type-name">Percent</span><span>, </span><span class="number-literal">1</span><span> / </span><span class="number-literal">100</span><span>, </span><span class="string-literal">&quot;percent&quot;</span><span>, </span><span class="string-literal">&quot;%&quot;</span><span>] = </span><span class="type-name">DerivedUnit</span><span>()
+
+    </span><span class="keyword">final</span><span> </span><span class="keyword">type</span><span> </span><span class="type-name">Degree</span><span>
+    </span><span class="keyword">given</span><span> </span><span class="identifier">unit_Degree</span><span>: </span><span class="type-name">DerivedUnit</span><span>[</span><span class="type-name">Degree</span><span>, </span><span class="number-literal">3.14159265</span><span> / </span><span class="number-literal">180</span><span>, </span><span class="string-literal">&quot;degree&quot;</span><span>, </span><span class="string-literal">&quot;deg&quot;</span><span>] = </span><span class="type-name">DerivedUnit</span><span>()</span></code></pre>
+        
+        <h2 id="value-types" class="section"><a class="anchor-link left" href="#value-types"><i class="icofont-laika link">&#xef71;</i></a>Value Types</h2>
+        <p>Each <code>coulomb</code> quantity <code>Quantity[V, U]</code> pairs a value type <code>V</code> with a unit type <code>U</code>.
+        Value types are often numeric, however <code>coulomb</code> places no restriction on value types.
+        We have already seen that there are also no restrictions on unit type,
+        and so the following are perfectly legitimate:</p>
+        <pre><code class="nohighlight"><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">T</span><span>](</span><span class="identifier">t</span><span>: </span><span class="type-name">T</span><span>)
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">w</span><span> = </span><span class="type-name">Wrapper</span><span>(</span><span class="number-literal">42f</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span>]
+</span><span class="comment">// w: Quantity[Wrapper[Float], Meter] = Wrapper(t = 42.0F)
+</span><span>
+</span><span class="identifier">w</span><span>.</span><span class="identifier">show</span><span>
+</span><span class="comment">// res10: String = &quot;Wrapper(42.0) m&quot;
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">w2</span><span> = </span><span class="type-name">Wrapper</span><span>(</span><span class="number-literal">37D</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Vector</span><span>[</span><span class="type-name">Int</span><span>]]
+</span><span class="comment">// w2: Quantity[Wrapper[Double], Vector[Int]] = Wrapper(t = 37.0)
+</span><span>
+</span><span class="identifier">w2</span><span>.</span><span class="identifier">show</span><span>
+</span><span class="comment">// res11: String = &quot;Wrapper(37.0) Vector[Int]&quot;</span></code></pre>
+        
+        <h3 id="value-types-and-algebras" class="section"><a class="anchor-link left" href="#value-types-and-algebras"><i class="icofont-laika link">&#xef71;</i></a>Value Types and Algebras</h3>
+        <p>Although value and unit types are arbitrary for a <code>Quantity</code>, there is no free lunch.
+        Operations on quantity objects will only work if they are defined.
+        The following example will not compile because we have not defined what it means to add <code>Wrapper</code> objects:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// addition has not been defined for Wrapper types
+</span><span class="keyword">val</span><span> </span><span class="identifier">wsum</span><span> = </span><span class="identifier">w</span><span> + </span><span class="identifier">w</span><span>
+</span><span class="comment">// error: 
+// Addition not defined in scope for Quantity[Wrapper[Float], coulomb.units.si.Meter] and Quantity[Wrapper[Float], coulomb.units.si.Meter].
+// I found:
+// 
+//     coulomb.policy.standard.ctx_add_1V1U[Wrapper[Float], coulomb.units.si.Meter,
+//       Wrapper[Float], coulomb.units.si.Meter](&lt;:&lt;.refl[Wrapper[Float]],
+//       &lt;:&lt;.refl[coulomb.units.si.Meter],
+//       /* missing */summon[algebra.ring.AdditiveSemigroup[Wrapper[Float]]])
+// 
+// But no implicit values were found that match type algebra.ring.AdditiveSemigroup[Wrapper[Float]].</span></code></pre>
+        <p>The compiler error above indicates that it was unable to find an algebra that tells coulomb&#39;s
+        standard predefined rules how to add <code>Wrapper</code> objects.
+        Providing such a definition allows our example to compile.</p>
+        <pre><code class="nohighlight"><span class="keyword">object</span><span> </span><span class="identifier">wrapperalgebra</span><span>:
+    </span><span class="keyword">import</span><span> </span><span class="identifier">algebra</span><span>.</span><span class="identifier">ring</span><span>.</span><span class="type-name">AdditiveSemigroup</span><span>
+    </span><span class="keyword">given</span><span> </span><span class="identifier">add_Wrapper</span><span>[</span><span class="type-name">V</span><span>](</span><span class="keyword">using</span><span> </span><span class="identifier">vadd</span><span>: </span><span class="type-name">AdditiveSemigroup</span><span>[</span><span class="type-name">V</span><span>]): </span><span class="type-name">AdditiveSemigroup</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>]] =
+        </span><span class="keyword">new</span><span> </span><span class="type-name">AdditiveSemigroup</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>]]:
+            </span><span class="keyword">def</span><span> </span><span class="declaration-name">plus</span><span>(</span><span class="identifier">x</span><span>: </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>], </span><span class="identifier">y</span><span>: </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>]): </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>] =
+                </span><span class="type-name">Wrapper</span><span>(</span><span class="identifier">vadd</span><span>.</span><span class="identifier">plus</span><span>(</span><span class="identifier">x</span><span>.</span><span class="identifier">t</span><span>, </span><span class="identifier">y</span><span>.</span><span class="identifier">t</span><span>))
+
+</span><span class="comment">// import Wrapper algebras into scope
+</span><span class="keyword">import</span><span> </span><span class="identifier">wrapperalgebra</span><span>.</span><span class="keyword">given</span><span>
+
+</span><span class="comment">// adding Wrapper objects works now that we have defined an algebra
+</span><span class="keyword">val</span><span> </span><span class="identifier">wsum</span><span> = </span><span class="identifier">w</span><span> + </span><span class="identifier">w</span><span>
+</span><span class="comment">// wsum: Quantity[Wrapper[Float], Meter] = Wrapper(t = 84.0F)</span></code></pre>
+        
+        <h2 id="numeric-operations" class="section"><a class="anchor-link left" href="#numeric-operations"><i class="icofont-laika link">&#xef71;</i></a>Numeric Operations</h2>
+        <p><code>coulomb</code> supports the following numeric operations for any value type that defines the required algebras:</p>
+        <pre><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">v</span><span> = </span><span class="number-literal">2.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span>]
+</span><span class="comment">// v: Quantity[Double, Meter] = 2.0
+</span><span>
+</span><span class="comment">// negation
+</span><span>-</span><span class="identifier">v</span><span>
+</span><span class="comment">// res13: Quantity[Double, Meter] = -2.0
+</span><span>
+</span><span class="comment">// addition
+</span><span class="identifier">v</span><span> + </span><span class="identifier">v</span><span>
+</span><span class="comment">// res14: Quantity[Double, Meter] = 4.0
+</span><span>
+</span><span class="comment">// subtraction
+</span><span class="identifier">v</span><span> - </span><span class="identifier">v</span><span>
+</span><span class="comment">// res15: Quantity[Double, Meter] = 0.0
+</span><span>
+</span><span class="comment">// multiplication
+</span><span class="identifier">v</span><span> * </span><span class="identifier">v</span><span>
+</span><span class="comment">// res16: Quantity[Double, ^[Meter, 2]] = 4.0
+</span><span>
+</span><span class="comment">// division
+</span><span class="identifier">v</span><span> / </span><span class="identifier">v</span><span>
+</span><span class="comment">// res17: Quantity[Double, 1] = 1.0
+</span><span>
+</span><span class="comment">// power
+</span><span class="identifier">v</span><span>.</span><span class="identifier">pow</span><span>[</span><span class="number-literal">3</span><span>]
+</span><span class="comment">// res18: Quantity[Double, ^[Meter, 3]] = 8.0
+</span><span>
+</span><span class="comment">// comparisons
+</span><span>
+</span><span class="identifier">v</span><span> &lt;= </span><span class="identifier">v</span><span>
+</span><span class="comment">// res19: Boolean = true
+</span><span>
+</span><span class="identifier">v</span><span> &gt; </span><span class="identifier">v</span><span>
+</span><span class="comment">// res20: Boolean = false
+</span><span>
+</span><span class="identifier">v</span><span> === </span><span class="identifier">v</span><span>
+</span><span class="comment">// res21: Boolean = true
+</span><span>
+</span><span class="identifier">v</span><span> =!= </span><span class="identifier">v</span><span>
+</span><span class="comment">// res22: Boolean = false</span></code></pre>
+        
+        <h2 id="truncating-operations" class="section"><a class="anchor-link left" href="#truncating-operations"><i class="icofont-laika link">&#xef71;</i></a>Truncating Operations</h2>
+        <p>Some operations involving integral types such as <code>Int</code>, <code>Long</code>, or <code>BigInt</code>,
+        are considered &quot;truncating&quot; - they lose the fractional component of the result.
+        In coulomb these are distinguished with specific &quot;truncating&quot; operators:</p>
+        <pre><code class="nohighlight"><span class="comment">// fractional values (Double, Float, BigDecimal, Rational, etc)
+</span><span class="keyword">val</span><span> </span><span class="identifier">fractional</span><span> = </span><span class="number-literal">10.5</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span>]
+</span><span class="comment">// fractional: Quantity[Double, Meter] = 10.5
+</span><span>
+</span><span class="comment">// truncating value conversions (fractional -&gt; integral)
+</span><span class="keyword">val</span><span> </span><span class="identifier">integral</span><span> = </span><span class="identifier">fractional</span><span>.</span><span class="identifier">tToValue</span><span>[</span><span class="type-name">Int</span><span>]
+</span><span class="comment">// integral: Quantity[Int, Meter] = 10
+</span><span>
+</span><span class="comment">// truncating unit conversions
+</span><span class="identifier">integral</span><span>.</span><span class="identifier">tToUnit</span><span>[</span><span class="type-name">Yard</span><span>]
+</span><span class="comment">// res23: Quantity[Int, Yard] = 10
+</span><span>
+</span><span class="comment">// truncating division
+</span><span class="identifier">integral</span><span> </span><span class="identifier">`tquot`</span><span> </span><span class="number-literal">3</span><span>
+</span><span class="comment">// res24: Quantity[Int, Meter] = 3
+</span><span>
+</span><span class="comment">// truncating power
+</span><span class="identifier">integral</span><span>.</span><span class="identifier">tpow</span><span>[</span><span class="number-literal">1</span><span>/</span><span class="number-literal">2</span><span>]
+</span><span class="comment">// res25: Quantity[Int, ^[Meter, /[1, 2]]] = 3</span></code></pre>
+        <p>Non-truncating operations are defined in cases where the result will not discard fractional components:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// &quot;normal&quot; (aka truncating) operations work when fractional component of results are preserved
+</span><span class="identifier">fractional</span><span> / </span><span class="number-literal">3</span><span>
+</span><span class="comment">// res26: Quantity[Double, Meter] = 3.5</span></code></pre>
+        <p>Non-truncating operations are undefined on types that would cause truncation.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// standard division is undefined for cases that would truncate
+</span><span class="identifier">integral</span><span> / </span><span class="number-literal">3</span><span>
+</span><span class="comment">// error: 
+// Division not defined in scope for Quantity[Int, coulomb.units.si.Meter] and Quantity[Int, (1 : Int)].
+// I found:
+// 
+//     coulomb.policy.standard.ctx_div_2V2U[Int, coulomb.units.si.Meter, Int, (1 : Int)
+//       ](/* missing */summon[util.NotGiven[Int =:= Int]], ???, ???, ???, ???, ???)
+// 
+// But no implicit values were found that match type util.NotGiven[Int =:= Int].</span></code></pre>
+        
+        <h2 id="value-and-unit-conversions" class="section"><a class="anchor-link left" href="#value-and-unit-conversions"><i class="icofont-laika link">&#xef71;</i></a>Value and Unit Conversions</h2>
+        <p>In <code>coulomb</code>, a <code>Quantity[V, U]</code> may experience conversions along two possible axes:
+        converting value type <code>V</code> to a new value type <code>V2</code>, or converting unit <code>U</code> to a new unit <code>U2</code>:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">q</span><span> = </span><span class="number-literal">10d</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span>]
+</span><span class="comment">// q: Quantity[Double, Meter] = 10.0
+</span><span>
+</span><span class="comment">// convert value type
+</span><span class="identifier">q</span><span>.</span><span class="identifier">toValue</span><span>[</span><span class="type-name">Float</span><span>]
+</span><span class="comment">// res28: Quantity[Float, Meter] = 10.0F
+</span><span>
+</span><span class="comment">// convert unit type
+</span><span class="identifier">q</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Yard</span><span>]
+</span><span class="comment">// res29: Quantity[Double, Yard] = 10.936132983377078</span></code></pre>
+        <p>Value conversions are successful whenever the corresponding <code>ValueConversion[VF, VT]</code> context is in scope,
+        and similarly unit conversions are successful whenever the necessary <code>UnitConversion[V, UF, UT]</code> is in scope.</p>
+        <p>As you can see from the signature <code>UnitConversion[V, UF, UT]</code>, any unit conversion is with respect to a particular value type.
+        This is because the best way of converting from unit <code>UF</code> to <code>UT</code> will depend on the specific value type being converted.
+        You can look at examples of unit conversions defined in <code>coulomb-core</code>
+        <a href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/conversion/standard/unit$.html">here</a>.</p>
+        
+        <h3 id="truncating-conversions" class="section"><a class="anchor-link left" href="#truncating-conversions"><i class="icofont-laika link">&#xef71;</i></a>truncating conversions</h3>
+        <p>As we saw in
+        <a href="#truncating-operations">previous sections</a>,
+        some operations on coulomb quantities may result in &quot;truncation&quot; - the loss of fractional parts of values.
+        As with operations, truncating conversions are represented by distinct conversions
+        <code>TruncatingValueConversion[VF, VT]</code> and <code>TruncatingUnitConversion[V, UF, UT]</code>.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// a truncating value conversion (fractional -&gt; integral)
+</span><span class="keyword">val</span><span> </span><span class="identifier">qi</span><span> = </span><span class="identifier">q</span><span>.</span><span class="identifier">tToValue</span><span>[</span><span class="type-name">Int</span><span>]
+</span><span class="comment">// qi: Quantity[Int, Meter] = 10
+</span><span>
+</span><span class="comment">// a truncating unit conversion (on an integral type)
+</span><span class="identifier">qi</span><span>.</span><span class="identifier">tToUnit</span><span>[</span><span class="type-name">Yard</span><span>]
+</span><span class="comment">// res30: Quantity[Int, Yard] = 10</span></code></pre>
+        
+        <h3 id="implicit-conversions" class="section"><a class="anchor-link left" href="#implicit-conversions"><i class="icofont-laika link">&#xef71;</i></a>implicit conversions</h3>
+        <p>In Scala 3, implicit conversions are represented by <code>scala.Conversion[F, T]</code>,
+        which you can read more about
+        <a href="https://scala-lang.org/api/3.x/scala/Conversion.html">here</a>.</p>
+        <p>The <code>coulomb-core</code> library
+        <a href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/conversion/standard/scala$.html">pre-defines</a>
+        such implicit conversions,
+        based on ValueConversion and UnitConversion context in scope.
+        By convention, <code>coulomb</code> performs value conversions first, then unit conversions.</p>
+        <p>Implicit quantity conversions can be used in typical Scala scenarios:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// implicitly convert double to float, and then cubic meters to liters
+</span><span class="keyword">val</span><span> </span><span class="identifier">iconv</span><span>: </span><span class="type-name">Quantity</span><span>[</span><span class="type-name">Float</span><span>, </span><span class="type-name">Liter</span><span>] = </span><span class="number-literal">1.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span> ^ </span><span class="number-literal">3</span><span>]
+</span><span class="comment">// iconv: Quantity[Float, Liter] = 1000.0F</span></code></pre>
+        <p>However, numeric operators in <code>coulomb</code> may also make use of these implicit conversions:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">q1</span><span> = </span><span class="number-literal">1d</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Second</span><span>]
+</span><span class="comment">// q1: Quantity[Double, Second] = 1.0
+</span><span class="keyword">val</span><span> </span><span class="identifier">q2</span><span> = </span><span class="number-literal">1</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Minute</span><span>]
+</span><span class="comment">// q2: Quantity[Int, Minute] = 1
+</span><span>
+</span><span class="comment">// in this operation, q2&#39;s integer value is implicitly converted to double,
+// and then minutes are converted to seconds, and added to q1:
+</span><span class="identifier">q1</span><span> + </span><span class="identifier">q2</span><span>
+</span><span class="comment">// res31: Quantity[Double, Second] = 61.0</span></code></pre>
+        
+        <h3 id="defining-conversions" class="section"><a class="anchor-link left" href="#defining-conversions"><i class="icofont-laika link">&#xef71;</i></a>defining conversions</h3>
+        <p>The <code>coulomb-core</code> and <code>coulomb-spire</code> libraries define value and unit conversions for a wide variety of
+        popular numeric types, however you can also easily define your own.</p>
+        <pre><code class="nohighlight"><span class="keyword">object</span><span> </span><span class="identifier">wrapperconv</span><span>:
+    </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">conversion</span><span>.*
+
+    </span><span class="keyword">given</span><span> </span><span class="identifier">vconv_Wrapper</span><span>[</span><span class="type-name">VF</span><span>, </span><span class="type-name">VT</span><span>](</span><span class="keyword">using</span><span> </span><span class="identifier">vcv</span><span>: </span><span class="type-name">ValueConversion</span><span>[</span><span class="type-name">VF</span><span>, </span><span class="type-name">VT</span><span>]): </span><span class="type-name">ValueConversion</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VF</span><span>], </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VT</span><span>]] =
+        </span><span class="keyword">new</span><span> </span><span class="type-name">ValueConversion</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VF</span><span>], </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VT</span><span>]]:
+            </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">w</span><span>: </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VF</span><span>]): </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VT</span><span>] = </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VT</span><span>](</span><span class="identifier">vcv</span><span>(</span><span class="identifier">w</span><span>.</span><span class="identifier">t</span><span>))
+
+    </span><span class="keyword">given</span><span> </span><span class="identifier">uconv_Wrapper</span><span>[</span><span class="type-name">V</span><span>, </span><span class="type-name">UF</span><span>, </span><span class="type-name">UT</span><span>](</span><span class="keyword">using</span><span> </span><span class="identifier">ucv</span><span>: </span><span class="type-name">UnitConversion</span><span>[</span><span class="type-name">V</span><span>, </span><span class="type-name">UF</span><span>, </span><span class="type-name">UT</span><span>]): </span><span class="type-name">UnitConversion</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>], </span><span class="type-name">UF</span><span>, </span><span class="type-name">UT</span><span>] =
+        </span><span class="keyword">new</span><span> </span><span class="type-name">UnitConversion</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>], </span><span class="type-name">UF</span><span>, </span><span class="type-name">UT</span><span>]:
+            </span><span class="keyword">def</span><span> </span><span class="declaration-name">apply</span><span>(</span><span class="identifier">w</span><span>: </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>]): </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>] = </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">V</span><span>](</span><span class="identifier">ucv</span><span>(</span><span class="identifier">w</span><span>.</span><span class="identifier">t</span><span>))
+
+</span><span class="keyword">import</span><span> </span><span class="identifier">wrapperconv</span><span>.</span><span class="keyword">given</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">wq</span><span> = </span><span class="type-name">Wrapper</span><span>(</span><span class="number-literal">1d</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Minute</span><span>]
+</span><span class="comment">// wq: Quantity[Wrapper[Double], Minute] = Wrapper(t = 1.0)
+</span><span>
+</span><span class="identifier">wq</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Second</span><span>]
+</span><span class="comment">// res32: Quantity[Wrapper[Double], Second] = Wrapper(t = 60.0)
+</span><span>
+</span><span class="identifier">wq</span><span>.</span><span class="identifier">toValue</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">Float</span><span>]]
+</span><span class="comment">// res33: Quantity[Wrapper[Float], Minute] = Wrapper(t = 1.0F)</span></code></pre>
+        
+        <h2 id="value-promotion-and-resolution" class="section"><a class="anchor-link left" href="#value-promotion-and-resolution"><i class="icofont-laika link">&#xef71;</i></a>Value Promotion and Resolution</h2>
+        <p>We saw in our
+        <a href="#implicit-conversions">earlier example</a>
+        that <code>coulomb</code> can perform implicit value and unit conversions when doing numeric operations.
+        The high level logic (implemented in chained context rules) is:</p>
+        <ol class="arabic">
+          <li>&quot;Resolve&quot; left and right value types (<code>VL</code> and <code>VR</code>) into a final output type <code>VO</code></li>
+          <li>Apply implicit conversion <code>Quantity[VL, UL]</code> -&gt; <code>Quantity[VO, UL]</code></li>
+          <li>Apply implicit conversion <code>Quantity[VR, UR]</code> -&gt; <code>Quantity[VO, UL]</code></li>
+          <li>Perform the relevant algebraic operation, in value space <code>VO</code></li>
+          <li>Return the resulting value as <code>Quantity[VO, UL]</code></li>
+        </ol>
+        <p>Note that not all numeric operations require all of these steps,
+        however here is an example fragment of such code for addition which demonstrates them all:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">transparent</span><span> </span><span class="identifier">inline</span><span> </span><span class="keyword">given</span><span> </span><span class="identifier">ctx_add_2V2U</span><span>[</span><span class="type-name">VL</span><span>, </span><span class="type-name">UL</span><span>, </span><span class="type-name">VR</span><span>, </span><span class="type-name">UR</span><span>](</span><span class="identifier">using</span><span>
+    </span><span class="identifier">vres</span><span>: </span><span class="type-name">ValueResolution</span><span>[</span><span class="type-name">VL</span><span>, </span><span class="type-name">VR</span><span>],
+    </span><span class="identifier">icl</span><span>: </span><span class="type-name">Conversion</span><span>[</span><span class="type-name">Quantity</span><span>[</span><span class="type-name">VL</span><span>, </span><span class="type-name">UL</span><span>], </span><span class="type-name">Quantity</span><span>[</span><span class="identifier">vres</span><span>.</span><span class="type-name">VO</span><span>, </span><span class="type-name">UL</span><span>]],
+    </span><span class="identifier">icr</span><span>: </span><span class="type-name">Conversion</span><span>[</span><span class="type-name">Quantity</span><span>[</span><span class="type-name">VR</span><span>, </span><span class="type-name">UR</span><span>], </span><span class="type-name">Quantity</span><span>[</span><span class="identifier">vres</span><span>.</span><span class="type-name">VO</span><span>, </span><span class="type-name">UL</span><span>]],
+    </span><span class="identifier">alg</span><span>: </span><span class="type-name">AdditiveSemigroup</span><span>[</span><span class="identifier">vres</span><span>.</span><span class="type-name">VO</span><span>]
+        ): </span><span class="type-name">Add</span><span>[</span><span class="type-name">VL</span><span>, </span><span class="type-name">UL</span><span>, </span><span class="type-name">VR</span><span>, </span><span class="type-name">UR</span><span>] =
+    </span><span class="keyword">new</span><span> </span><span class="identifier">infra</span><span>.</span><span class="type-name">AddNC</span><span>((</span><span class="identifier">ql</span><span>: </span><span class="type-name">Quantity</span><span>[</span><span class="type-name">VL</span><span>, </span><span class="type-name">UL</span><span>], </span><span class="identifier">qr</span><span>: </span><span class="type-name">Quantity</span><span>[</span><span class="type-name">VR</span><span>, </span><span class="type-name">UR</span><span>]) =&gt; </span><span class="identifier">alg</span><span>.</span><span class="identifier">plus</span><span>(</span><span class="identifier">icl</span><span>(</span><span class="identifier">ql</span><span>).</span><span class="identifier">value</span><span>, </span><span class="identifier">icr</span><span>(</span><span class="identifier">qr</span><span>).</span><span class="identifier">value</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">UL</span><span>])</span></code></pre>
+        <p>In the example above, you can see that the context object that maps
+        <code>(VL, VR) =&gt; VO</code> is of type <code>ValueResolution[VL, VR]</code>.</p>
+        <p>It is possible to define all the necessary <code>ValueResolution[VL, VR]</code> for all possible pairs of
+        <code>(VL, VR)</code>, however for more than a small number of such types the number of pairs grows unwieldy
+        rather fast (quadratically fast in fact).
+        However, there is another preferred alternative that allows you to only define &quot;key&quot; pairs that
+        define a Directed Acyclic Graph, and the <code>coulomb</code> typeclass system will efficiently search this
+        space to identify the correct value of <code>ValueResolution[VL, VR]</code> at compile time.</p>
+        <p>Here is one example that captures the &quot;total ordering&quot; relation among value type resolutions
+        for <code>{Int, Long, Float, Double}</code> that comes with <code>coulomb-core</code>:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// ValuePromotion infers the transitive closure of all promotions
+</span><span class="keyword">given</span><span> </span><span class="identifier">ctx_vpp_standard</span><span>: </span><span class="type-name">ValuePromotionPolicy</span><span>[
+    (</span><span class="type-name">Int</span><span>, </span><span class="type-name">Long</span><span>) &amp;: (</span><span class="type-name">Long</span><span>, </span><span class="type-name">Float</span><span>) &amp;: (</span><span class="type-name">Float</span><span>, </span><span class="type-name">Double</span><span>) &amp;: </span><span class="type-name">TNil</span><span>
+] = </span><span class="type-name">ValuePromotionPolicy</span><span>()</span></code></pre>
+        <p>Using this, we can finish off our <code>Wrapper</code> example with some rules for generating <code>ValueResolution</code>.</p>
+        <pre><code class="nohighlight"><span class="keyword">object</span><span> </span><span class="identifier">wrappervr</span><span>:
+    </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">ops</span><span>.*
+    </span><span class="keyword">transparent</span><span> </span><span class="identifier">inline</span><span> </span><span class="keyword">given</span><span> </span><span class="identifier">vr_Wrapper</span><span>[</span><span class="type-name">VL</span><span>, </span><span class="type-name">VR</span><span>](</span><span class="keyword">using</span><span> </span><span class="identifier">vres</span><span>: </span><span class="type-name">ValueResolution</span><span>[</span><span class="type-name">VL</span><span>, </span><span class="type-name">VR</span><span>]): </span><span class="type-name">ValueResolution</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VL</span><span>], </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VR</span><span>]] =
+        </span><span class="keyword">new</span><span> </span><span class="type-name">ValueResolution</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VL</span><span>], </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">VR</span><span>]]:
+            </span><span class="keyword">type</span><span> </span><span class="type-name">VO</span><span> = </span><span class="type-name">Wrapper</span><span>[</span><span class="identifier">vres</span><span>.</span><span class="type-name">VO</span><span>]
+
+</span><span class="keyword">import</span><span> </span><span class="identifier">wrappervr</span><span>.</span><span class="keyword">given</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">wq1</span><span> = </span><span class="type-name">Wrapper</span><span>(</span><span class="number-literal">1d</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Second</span><span>]
+</span><span class="comment">// wq1: Quantity[Wrapper[Double], Second] = Wrapper(t = 1.0)
+</span><span class="keyword">val</span><span> </span><span class="identifier">wq2</span><span> = </span><span class="type-name">Wrapper</span><span>(</span><span class="number-literal">1f</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Minute</span><span>]
+</span><span class="comment">// wq2: Quantity[Wrapper[Float], Minute] = Wrapper(t = 1.0F)
+</span><span>
+</span><span class="identifier">wq1</span><span> + </span><span class="identifier">wq2</span><span>
+</span><span class="comment">// res34: Quantity[Wrapper[Double], Second] = Wrapper(t = 61.0)</span></code></pre>
+        
+        <h2 id="temperature-and-time" class="section"><a class="anchor-link left" href="#temperature-and-time"><i class="icofont-laika link">&#xef71;</i></a>Temperature and Time</h2>
+        <p>The <code>coulomb-units</code> library defines units for temperature and time.
+        When working with temperatures,
+        one must distinguish between absolute temperatures, and units of degrees.
+        Similarly, one must distinguish between absolute moments in time
+        (aka timestamps, or instants)
+        and units of duration.
+        Consider the following example:</p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">temperature</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="comment">// Here are two absolute temperatures
+</span><span class="keyword">val</span><span> </span><span class="identifier">cels1</span><span> = </span><span class="number-literal">10d</span><span>.</span><span class="identifier">withTemperature</span><span>[</span><span class="type-name">Celsius</span><span>]
+</span><span class="comment">// cels1: DeltaQuantity[Double, Celsius, Kelvin] = 10.0
+</span><span class="keyword">val</span><span> </span><span class="identifier">cels2</span><span> = </span><span class="number-literal">20d</span><span>.</span><span class="identifier">withTemperature</span><span>[</span><span class="type-name">Celsius</span><span>]
+</span><span class="comment">// cels2: DeltaQuantity[Double, Celsius, Kelvin] = 20.0
+</span><span>
+</span><span class="comment">// subtracting temperatures yields a Quantity of degrees:
+</span><span class="keyword">val</span><span> </span><span class="identifier">dcels</span><span> = </span><span class="identifier">cels2</span><span> - </span><span class="identifier">cels1</span><span>
+</span><span class="comment">// dcels: Quantity[Double, Celsius] = 10.0
+</span><span>
+</span><span class="comment">// you can add or subtract a quantity from a temperature, and get a new temperature
+</span><span class="identifier">cels2</span><span> + </span><span class="identifier">dcels</span><span>
+</span><span class="comment">// res35: DeltaQuantity[Double, Celsius, Kelvin] = 30.0
+</span><span class="identifier">cels2</span><span> - </span><span class="identifier">dcels</span><span>
+</span><span class="comment">// res36: DeltaQuantity[Double, Celsius, Kelvin] = 10.0</span></code></pre>
+        <p>As we saw in the example above, subtracting two absolute temperatures yields a Quantity of degrees.
+        However, temperature scales are &quot;anchored&quot; at an absolute reference point,
+        which makes <em>adding</em> absolute temperatures undefined.
+        For example <code>10C + 20C</code> does not equal <code>30C</code>.
+        Hence, it&#39;s an error to add two absolute temperatures.</p>
+        <pre><code class="nohighlight"><span class="comment">// adding absolute temperatures is a type error!
+</span><span class="identifier">cels1</span><span> + </span><span class="identifier">cels2</span><span>
+</span><span class="comment">// error: 
+// Addition not defined in scope for DeltaQuantity[Double, coulomb.units.temperature.Celsius] and Quantity[coulomb.units.temperature.Temperature[Double, coulomb.units.temperature.Celsius], (1 : Int)].
+// I found:
+// 
+//     coulomb.policy.standard.ctx_deltaaddq_2V2U[coulomb.units.si.Kelvin, Double,
+//       coulomb.units.temperature.Celsius,
+//       coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
+//         coulomb.units.temperature.Kelvin²],
+//     (1 : Int)](scala.util.NotGiven.value, scala.util.NotGiven.value,
+//       coulomb.ops.ValueResolution.ctx_VR_LpR[Double,
+//         coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
+//           coulomb.units.temperature.Kelvin²]
+//       ](
+//         new
+//           coulomb.ops.ValuePromotion[Double,
+//             coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
+//               coulomb.units.temperature.Kelvin²]
+//           ]
+//         ()
+//       ),
+//     ???, ???, ???)
+// 
+// But given instance ctx_VP_Path in object ValuePromotion does not match type coulomb.ops.ValuePromotion[Double,
+//   coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
+//     coulomb.units.temperature.Kelvin²]
+// ]
+// 
+// where:    Kelvin  is a type in object si with bounds 
+//           Kelvin² is a type in object temperature which is an alias of coulomb.units.si.Kelvin
+// .</span></code></pre>
+        <p>We can see that <code>coulomb</code> time units support an algebra that behaves the same as temperatures above:</p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">time</span><span>.{*, </span><span class="keyword">given</span><span>}
+
+</span><span class="comment">// Two absolute timestamps, relative to Jan 1 1970 (Unix epoch)
+</span><span class="keyword">val</span><span> </span><span class="identifier">date1</span><span> = </span><span class="number-literal">50d</span><span>.</span><span class="identifier">withEpochTime</span><span>[</span><span class="number-literal">365</span><span> * </span><span class="type-name">Day</span><span>]
+</span><span class="comment">// date1: DeltaQuantity[Double, *[365, Day], Second] = 50.0
+</span><span class="keyword">val</span><span> </span><span class="identifier">date2</span><span> = </span><span class="number-literal">51d</span><span>.</span><span class="identifier">withEpochTime</span><span>[</span><span class="number-literal">365</span><span> * </span><span class="type-name">Day</span><span>]
+</span><span class="comment">// date2: DeltaQuantity[Double, *[365, Day], Second] = 51.0
+</span><span>
+</span><span class="comment">// subtracting two absolute times yields a Quantity of time units
+</span><span class="keyword">val</span><span> </span><span class="identifier">dyear</span><span> = </span><span class="identifier">date2</span><span> - </span><span class="identifier">date1</span><span>
+</span><span class="comment">// dyear: Quantity[Double, *[365, Day]] = 1.0
+</span><span>
+</span><span class="comment">// one can add or subtract a Quantity from an absolute time
+</span><span class="identifier">date2</span><span> + </span><span class="identifier">dyear</span><span>
+</span><span class="comment">// res38: DeltaQuantity[Double, *[365, Day], Second] = 52.0
+</span><span class="identifier">date2</span><span> - </span><span class="identifier">dyear</span><span>
+</span><span class="comment">// res39: DeltaQuantity[Double, *[365, Day], Second] = 50.0</span></code></pre>
+        <pre><code class="nohighlight"><span class="comment">// adding absolute time values is an error
+</span><span class="identifier">date1</span><span> + </span><span class="identifier">date2</span><span>
+</span><span class="comment">// error: 
+// Addition not defined in scope for DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day] and Quantity[coulomb.units.time.EpochTime[Double, (365 : Int) * coulomb.units.time.Day], (1 : Int)].
+// I found:
+// 
+//     coulomb.policy.standard.ctx_deltaaddq_2V2U[coulomb.units.si.Second, Double,
+//       (365 : Int) * coulomb.units.time.Day,
+//       coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day,
+//         coulomb.units.si.Second],
+//     (1 : Int)](scala.util.NotGiven.value, scala.util.NotGiven.value,
+//       coulomb.ops.ValueResolution.ctx_VR_LpR[Double,
+//         coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day,
+//           coulomb.units.si.Second]
+//       ](
+//         new
+//           coulomb.ops.ValuePromotion[Double,
+//             coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day,
+//               coulomb.units.si.Second]
+//           ]
+//         ()
+//       ),
+//     ???, ???, ???)
+// 
+// But given instance ctx_VP_Path in object ValuePromotion does not match type coulomb.ops.ValuePromotion[Double,
+//   coulomb.DeltaQuantity[Double, (365 : Int) * coulomb.units.time.Day,
+//     coulomb.units.si.Second]
+// ].</span></code></pre>
+        
+        <h3 id="delta-units" class="section"><a class="anchor-link left" href="#delta-units"><i class="icofont-laika link">&#xef71;</i></a>Delta Units</h3>
+        <p>As these examples show, time and temperature units both involve a distinction between
+        &quot;absolute&quot; or &quot;positional&quot; values, and standard &quot;quantities&quot;, and the algebras
+        of these absolute values are the same under the hood.</p>
+        <p>In <code>coulomb-core</code> these kinds of absolute value are represented by a type <code>DeltaUnit[V, U, B]</code>,
+        where <code>V</code> and <code>U</code> are standard value and unit types, and <code>B</code> represents a base unit.
+        In the case of temperatures, the base unit is <code>Kelvin</code>, and in the case of time it is <code>Second</code>.</p>
+        <div class="callout info">
+          <i class="icofont-laika info">&#xef4e;</i>
+          <p><code>DeltaUnit[V, U, B]</code> is so named because the only algebraic operation one can do with
+          a pair of Delta Units is to subtract them.</p>
+        </div>
+        <p>The <code>DeltaUnit[V, U, B]</code> type supports the following algebra:</p>
+        <pre><code>DeltaUnit - DeltaUnit =&gt; Quantity
+DeltaUnit + Quantity =&gt; DeltaUnit
+DeltaUnit - Quantity =&gt; DeltaUnit</code></pre>
+        
+        <h2 id="coulomb-policies" class="section"><a class="anchor-link left" href="#coulomb-policies"><i class="icofont-laika link">&#xef71;</i></a>Coulomb Policies</h2>
+        <p>The <code>coulomb-core</code> library is designed so that very few typeclasses are hard-coded.
+        As previous sections demonstrate, it is relatively easy to implement your own typeclasses
+        if you need to work with custom types, or would prefer behaviors that are different than
+        available out-of-box typeclasses.</p>
+        <p>However, one tradeoff is that to obtain out-of-box features,
+        the programmer needs to import a somewhat unweildy number of typeclasses.</p>
+        <p>To help reduce the number of imports and make it easier to understand various behavior options,
+        <code>coulomb</code> takes advantage of the new Scala 3
+        <a href="https://docs.scala-lang.org/scala3/reference/other-new-features/export.html">export clauses</a>
+        to provide predefined groupings of imports which represent different &quot;policies&quot; for behavior.</p>
+        <p>The <code>coulomb-core</code> library defines two policies, which you can import from <code>coulomb.policy</code>.
+        The first, which is used by most of the examples in this documentation, is <code>coulomb.policy.standard</code>.
+        This policy supports:</p>
+        <ul>
+          <li>implicit value type promotions</li>
+          <li>implicit unit conversions</li>
+          <li>implicit value conversions</li>
+        </ul>
+        <p>Here is an example of using <code>coulomb.policy.standard</code></p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// note this does not include other necessary imports
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">policy</span><span>.</span><span class="identifier">standard</span><span>.</span><span class="keyword">given</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">scala</span><span>.</span><span class="identifier">language</span><span>.</span><span class="identifier">implicitConversions</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">q1</span><span> = </span><span class="number-literal">1d</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Liter</span><span>]
+</span><span class="comment">// q1: Quantity[Double, Liter] = 1.0
+</span><span class="keyword">val</span><span> </span><span class="identifier">q2</span><span> = </span><span class="number-literal">1</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span> ^ </span><span class="number-literal">3</span><span>]
+</span><span class="comment">// q2: Quantity[Int, ^[Meter, 3]] = 1
+</span><span>
+</span><span class="comment">// with &quot;standard&quot; policy, coulomb can resolve differing value types and unit types
+</span><span class="identifier">q1</span><span> + </span><span class="identifier">q2</span><span>
+</span><span class="comment">// res41: Quantity[Double, Liter] = 1001.0</span></code></pre>
+        <p>The second pre-defined policy is <code>couomb.policy.strict</code>,
+        which does <em>not</em> allow implicit conversions of values or units.
+        Operations involving identical value and unit types are always allowed,
+        as are <em>explicit</em> conversions:</p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">policy</span><span>.</span><span class="identifier">strict</span><span>.</span><span class="keyword">given</span><span>
+
+</span><span class="keyword">val</span><span> </span><span class="identifier">q1</span><span> = </span><span class="number-literal">1d</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Liter</span><span>]
+</span><span class="comment">// q1: Quantity[Double, Liter] = 1.0
+</span><span class="keyword">val</span><span> </span><span class="identifier">q2</span><span> = </span><span class="number-literal">2d</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Liter</span><span>]
+</span><span class="comment">// q2: Quantity[Double, Liter] = 2.0
+</span><span>
+</span><span class="comment">// strict policy allows operating with same unit and value
+</span><span class="identifier">q1</span><span> + </span><span class="identifier">q2</span><span>
+</span><span class="comment">// res43: Quantity[Double, Liter] = 3.0
+</span><span>
+</span><span class="comment">// explicit value and unit conversions are always allowed
+</span><span class="identifier">q1</span><span>.</span><span class="identifier">toValue</span><span>[</span><span class="type-name">Float</span><span>]
+</span><span class="comment">// res44: Quantity[Float, Liter] = 1.0F
+</span><span class="identifier">q1</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Meter</span><span> ^ </span><span class="number-literal">3</span><span>]
+</span><span class="comment">// res45: Quantity[Double, ^[Meter, 3]] = 0.001</span></code></pre>
+        <pre><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">q3</span><span> = </span><span class="number-literal">1</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span> ^ </span><span class="number-literal">3</span><span>]
+
+</span><span class="comment">// strict policy does not allow implicit value or unit conversions
+</span><span class="identifier">q1</span><span> + </span><span class="identifier">q3</span><span>
+</span><span class="comment">// error:
+// Addition not defined in scope for Quantity[Double, coulomb.units.accepted.Liter] and Quantity[Int, coulomb.units.si.Meter ^ (3 : Int)].
+// I found:
+// 
+//     coulomb.policy.strict.ctx_add_2V2U[Double, coulomb.units.accepted.Liter, Int,
+//       coulomb.units.si.Meter ^ (3 : Int)](scala.util.NotGiven.value,
+//       scala.util.NotGiven.value,
+//       new coulomb.ops.ValueResolution.NC[Any, Any, Any](), ???, ???, ???)
+// 
+// But Found:    coulomb.ops.ValueResolution.NC[Any, Any, Any]
+// Required: coulomb.ops.ValueResolution[Double, Int].
+// q1 + q3
+//      ^^</span></code></pre>
+        <p>The <code>coulomb-spire</code> library provides additional predefined policies that
+        support the standard Scala numeric types as well as spire&#39;s specialized types.</p>
+        <div class="callout info">
+          <i class="icofont-laika info">&#xef4e;</i>
+          <p>If you import <code>coulomb-spire</code> policies, do not also import <code>coulomb-core</code> policies.
+          Only one policy at a time should be imported.</p>
+        </div>
+
+        
+<hr class="footer-rule"/>
+<footer>
+  Site generated by <a href="https://typelevel.org/Laika/">Laika</a> with the Helium theme.
+</footer>
+
+
+      </main>
+
+    </div>
+
+  </body>
+
+</html>
