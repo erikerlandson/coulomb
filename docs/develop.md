@@ -1,4 +1,4 @@
-# coulomb Development
+# coulomb development
 
 ## sbt-typelevel
 

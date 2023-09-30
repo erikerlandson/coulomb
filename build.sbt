@@ -232,6 +232,11 @@ lazy val docs = project
                         ApiLinks(
                             baseUri = "https://scala-lang.org/api/3.x/",
                             packagePrefix = "scala"
+                        ),
+                        ApiLinks(
+                            baseUri =
+                                "https://javadoc.io/doc/com.github.pureconfig/pureconfig-core_3/latest/",
+                            packagePrefix = "pureconfig"
                         )
                     )
                     .addTargets(
@@ -246,6 +251,12 @@ lazy val docs = project
                             "quantitytypedef",
                             ExternalTarget(
                                 "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-introduction",
+                            InternalTarget(
+                                VirtualPath.parse("README.md")
                             )
                         ),
                         TargetDefinition(

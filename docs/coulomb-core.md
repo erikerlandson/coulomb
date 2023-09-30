@@ -1,6 +1,12 @@
-# coulomb Concepts
+# coulomb-core
 
-```scala mdoc:invisible
+This page describes the fundamental `coulomb` concepts, implemented in `coulomb-core`.
+
+## Quick Start
+
+### import
+
+```scala mdoc
 // fundamental coulomb types and methods
 import coulomb.*
 import coulomb.syntax.*

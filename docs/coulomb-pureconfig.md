@@ -1,6 +1,9 @@
 # coulomb-pureconfig
 
-The `coulomb-pureconfig` package defines `pureconfig` `ConfigReader` and `ConfigWriter` implicit context rules for `Quantity`, `RuntimeQuantity`, and `RuntimeUnit` objects.
+The `coulomb-pureconfig` package defines `pureconfig`
+@:api(pureconfig.ConfigReader) and @:api(pureconfig.ConfigWriter)
+implicit context rules for
+@:api(coulomb.Quantity$), @:api(coulomb.RuntimeQuantity), and @:api(coulomb.RuntimeUnit) objects.
 
 @:callout(info)
 At this time pureconfig does not cross-compile to ScalaJS or ScalaNative,
@@ -12,9 +15,9 @@ This issue is tracked by pureconfig at
 ## Quick Start
 
 Before you begin, it is recommended to first familiarize yourself with the
-[coulomb introduction](README.md)
+[coulomb introduction][coulomb-introduction]
 and
-[coulomb concepts](concepts.md).
+[coulomb-core].
 
 ### packages
 
