@@ -1,14 +1,11 @@
 # coulomb-parser
 
 The `coulomb-parser` package defines a unit expression parsing API and a reference unit expression DSL,
-which is used by runtime I/O integrations such as
-[coulomb-pureconfig](coulomb-pureconfig.md)
+which is used by runtime I/O integrations such as [coulomb-pureconfig]
 
 ## Quick Start
 
-Before you begin, it is recommended to first familiarize yourself with the
-[coulomb-runtime](coulomb-runtime.md)
-documentation.
+Before you begin, it is recommended to first familiarize yourself with the [coulomb-runtime] documentation.
 
 ### packages
 
