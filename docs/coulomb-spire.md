@@ -130,5 +130,5 @@ and so `Int` promotes to `Real`, etc.
 The definition of promotions for `coulomb-spire` can be browsed
 [here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/ops/resolution/spire$.html)
 
-[value-resolution-concepts]: concepts.md#value-promotion-and-resolution
-[policy-concepts]: concepts.md#coulomb-policies
+[value-resolution-concepts]: coulomb-core.md#value-promotion-and-resolution
+[policy-concepts]: coulomb-core.md#coulomb-policies

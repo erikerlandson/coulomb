@@ -139,7 +139,7 @@ plus(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
 Because the refined algebraic policy is an overlay,
 you can use it with your choice of base policies,
 for example with
-[core policies](concepts.md#coulomb-policies)
+[core policies](coulomb-core.md#coulomb-policies)
 or
 [spire policies](coulomb-spire.md#policies).
 @:@

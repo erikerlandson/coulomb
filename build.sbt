@@ -262,7 +262,7 @@ lazy val docs = project
                         TargetDefinition(
                             "coulomb-core",
                             InternalTarget(
-                                VirtualPath.parse("concepts.md")
+                                VirtualPath.parse("coulomb-core.md")
                             )
                         ),
                         TargetDefinition(
