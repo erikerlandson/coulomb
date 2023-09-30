@@ -71,10 +71,13 @@ val fail = time + dist
 
 | name | description |
 | ---: | :--- |
-| `coulomb-core` | Provides core `coulomb` logic. Defines policies for `Int`, `Long`, `Float`, `Double`. |
-| `coulomb-units` | Defines common units, including SI, MKSA, Accepted, time, temperature, and US traditional |
-| `coulomb-spire` | Defines policies for working with Spire and Scala numeric types |
-
+| [coulomb-core] | Provides core `coulomb` logic. Defines policies for `Int`, `Long`, `Float`, `Double`. |
+| [coulomb-units] | Defines common units, including SI, MKSA, Accepted, time, temperature, and US traditional |
+| [coulomb-spire] | Defines policies for working with Spire and Scala numeric types |
+| [coulomb-refined] | Unit analysis with typelevel [refined](https://github.com/fthomas/refined#refined-simple-refinement-types-for-scala) awareness |
+| [coulomb-pureconfig] | Configuration I/O with @:api(coulomb.Quantity$) values |
+| [coulomb-runtime] | Runtime units and quantities |
+| [coulomb-parser] | Parsing of expressions into runtime units |
 
 ## Resources
 

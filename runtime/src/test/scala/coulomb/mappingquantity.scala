@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package coulomb.ops.resolution
+import coulomb.testing.CoulombSuite
 
-object standard:
-    import coulomb.ops.ValuePromotionPolicy
+import coulomb.units.si.{*, given}
+import coulomb.units.si.prefixes.{*, given}
+import coulomb.units.us.{*, given}
 
-    // ValuePromotion infers the transitive closure of all promotions
-    given ctx_vpp_standard: ValuePromotionPolicy[
-        (Int, Long) *: (Long, Float) *: (Float, Double) *: EmptyTuple
-    ] = ValuePromotionPolicy()
+import coulomb.CoefficientRuntime
+import coulomb.conversion.runtimes.mapping.MappingCoefficientRuntime
+
+val mappingRT: CoefficientRuntime =
+    MappingCoefficientRuntime
+        .of["coulomb.units.si" *: "coulomb.units.si.prefixes" *: EmptyTuple]
+
+class MappingRuntimeQuantitySuite extends RuntimeQuantitySuite(using mappingRT)

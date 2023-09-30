@@ -6,6 +6,8 @@
 ThisBuild / tlBaseVersion := "0.7"
 
 // publish settings
+// artifacts now publish to s01.oss.sonatype.org, per:
+// https://github.com/erikerlandson/coulomb/issues/500
 ThisBuild / developers += tlGitHubDev("erikerlandson", "Erik Erlandson")
 ThisBuild / organization := "com.manyangled"
 ThisBuild / organizationName := "Erik Erlandson"
@@ -38,7 +40,17 @@ def commonSettings = Seq(
 )
 
 lazy val root = tlCrossRootProject
-    .aggregate(core, units, spire, refined, testkit, unidocs)
+    .aggregate(
+        core,
+        units,
+        runtime,
+        parser,
+        pureconfig,
+        spire,
+        refined,
+        testkit,
+        unidocs
+    )
 
 lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
@@ -58,6 +70,69 @@ lazy val units = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .settings(commonSettings: _*)
     .platformsSettings(JSPlatform, NativePlatform)(
         libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.5.0" % Test
+    )
+
+// see also: https://github.com/lampepfl/dotty/issues/7647
+lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("runtime"))
+    .settings(name := "coulomb-runtime")
+    .dependsOn(
+        core % "compile->compile;test->test",
+        units % Test
+    )
+    .settings(
+        tlVersionIntroduced := Map("3" -> "0.8.0")
+    )
+    .settings(commonSettings: _*)
+    .settings(
+        // staging compiler is only supported on JVM
+        // but is also used to satisfy builds on JS and Native
+        libraryDependencies += "org.scala-lang" %% "scala3-staging" % scalaVersion.value
+    )
+    .platformsSettings(JSPlatform, NativePlatform)(
+        // any unit tests using staging must be excluded from JS and Native
+        Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*stagingquantity.scala"
+    )
+
+// cats-parse doesn't seem to build for JS or Native
+lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("parser"))
+    .settings(name := "coulomb-parser")
+    .dependsOn(
+        core % "compile->compile;test->test",
+        runtime,
+        units % Test
+    )
+    .settings(
+        tlVersionIntroduced := Map("3" -> "0.8.0")
+    )
+    .settings(commonSettings: _*)
+    .settings(
+        libraryDependencies += "org.typelevel" %%% "cats-parse" % "0.3.10"
+    )
+
+// pureconfig doesn't currently build for JS or Native
+// https://github.com/pureconfig/pureconfig/issues/1307
+lazy val pureconfig = crossProject(
+    JVMPlatform /*, JSPlatform, NativePlatform */
+)
+    .crossType(CrossType.Pure)
+    .in(file("pureconfig"))
+    .settings(name := "coulomb-pureconfig")
+    .dependsOn(
+        core % "compile->compile;test->test",
+        runtime,
+        parser,
+        units % Test
+    )
+    .settings(
+        tlVersionIntroduced := Map("3" -> "0.8.0")
+    )
+    .settings(commonSettings: _*)
+    .settings(
+        libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.4"
     )
 
 lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
@@ -102,6 +177,9 @@ lazy val all = project
     .dependsOn(
         core.jvm,
         units.jvm,
+        runtime.jvm,
+        parser.jvm,
+        pureconfig.jvm,
         spire.jvm,
         refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
@@ -122,14 +200,109 @@ lazy val unidocs = project
 // https://typelevel.org/sbt-typelevel/site.html
 // sbt docs/tlSitePreview
 // http://localhost:4242
+import laika.ast.{ExternalTarget, InternalTarget, VirtualPath}
+import laika.rewrite.link.{LinkConfig, ApiLinks, SourceLinks, TargetDefinition}
 lazy val docs = project
     .in(file("site"))
-    .dependsOn(core.jvm, units.jvm, spire.jvm, refined.jvm)
+    .dependsOn(
+        core.jvm,
+        units.jvm,
+        runtime.jvm,
+        parser.jvm,
+        pureconfig.jvm,
+        spire.jvm,
+        refined.jvm
+    )
     .enablePlugins(TypelevelSitePlugin)
     .settings(
         // turn off the new -W warnings in mdoc scala compilations
         // at least until I can get a better handle on how to work with them
         Compile / scalacOptions ~= (_.filterNot { x => x.startsWith("-W") })
+    )
+    .settings(
+        laikaConfig := LaikaConfig.defaults
+            .withConfigValue(
+                LinkConfig.empty
+                    .addApiLinks(
+                        ApiLinks(
+                            baseUri =
+                                "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/",
+                            packagePrefix = "coulomb"
+                        ),
+                        ApiLinks(
+                            baseUri = "https://scala-lang.org/api/3.x/",
+                            packagePrefix = "scala"
+                        ),
+                        ApiLinks(
+                            baseUri =
+                                "https://javadoc.io/doc/com.github.pureconfig/pureconfig-core_3/latest/",
+                            packagePrefix = "pureconfig"
+                        )
+                    )
+                    .addTargets(
+                        // Target names need to be all lowercase.
+                        // Note, this does not align with Laika docs.
+                        // In future laika releases the names will be case insensitive, see:
+                        // https://github.com/typelevel/Laika/pull/541
+                        TargetDefinition(
+                            // intended usage: [Quantity][quantitytypedef]
+                            // Links to type defs do not work properly with laika '@:api(...)' constructs
+                            // which is going to make a lot of coulomb references harder to do.
+                            "quantitytypedef",
+                            ExternalTarget(
+                                "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-introduction",
+                            InternalTarget(
+                                VirtualPath.parse("README.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-core",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-core.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-units",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-units.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-spire",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-spire.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-refined",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-refined.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-runtime",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-runtime.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-parser",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-parser.md")
+                            )
+                        ),
+                        TargetDefinition(
+                            "coulomb-pureconfig",
+                            InternalTarget(
+                                VirtualPath.parse("coulomb-pureconfig.md")
+                            )
+                        )
+                    )
+            )
     )
 
 // https://github.com/sbt/sbt-jmh

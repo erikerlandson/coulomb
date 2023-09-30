@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package coulomb.ops.resolution
+import coulomb.testing.CoulombSuite
 
-object standard:
-    import coulomb.ops.ValuePromotionPolicy
+class ParserDSLSuite extends CoulombSuite:
+    import coulomb.*
+    import coulomb.syntax.*
+    import coulomb.parser.RuntimeUnitParser
+    import coulomb.parser.standard.RuntimeUnitDslParser
 
-    // ValuePromotion infers the transitive closure of all promotions
-    given ctx_vpp_standard: ValuePromotionPolicy[
-        (Int, Long) *: (Long, Float) *: (Float, Double) *: EmptyTuple
-    ] = ValuePromotionPolicy()
+    import coulomb.RuntimeUnit
+
+    val dslparser: RuntimeUnitParser =
+        RuntimeUnitDslParser.of[
+            "coulomb.units.si" *: "coulomb.units.si.prefixes" *: EmptyTuple
+        ]
+
+    test("smoke test") {
+        val t = dslparser.parse("kilometer")
+        println(t)
+    }

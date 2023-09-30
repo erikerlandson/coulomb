@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package coulomb.ops.resolution
+package coulomb.pureconfig.policy
 
-object standard:
-    import coulomb.ops.ValuePromotionPolicy
+object DSL:
+    export coulomb.pureconfig.io.rational.given
+    export coulomb.pureconfig.io.ruDSL.given
+    export coulomb.pureconfig.io.runtimeq.given
+    export coulomb.pureconfig.io.quantity.given
 
-    // ValuePromotion infers the transitive closure of all promotions
-    given ctx_vpp_standard: ValuePromotionPolicy[
-        (Int, Long) *: (Long, Float) *: (Float, Double) *: EmptyTuple
-    ] = ValuePromotionPolicy()
+object JSON:
+    export coulomb.pureconfig.io.rational.given
+    export coulomb.pureconfig.io.ruJSON.given
+    export coulomb.pureconfig.io.runtimeq.given
+    export coulomb.pureconfig.io.quantity.given

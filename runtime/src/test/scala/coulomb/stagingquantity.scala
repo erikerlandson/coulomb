@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package coulomb.ops.resolution
+import coulomb.testing.CoulombSuite
 
-object standard:
-    import coulomb.ops.ValuePromotionPolicy
+import scala.quoted.staging
+import coulomb.conversion.runtimes.staging.StagingCoefficientRuntime
 
-    // ValuePromotion infers the transitive closure of all promotions
-    given ctx_vpp_standard: ValuePromotionPolicy[
-        (Int, Long) *: (Long, Float) *: (Float, Double) *: EmptyTuple
-    ] = ValuePromotionPolicy()
+import coulomb.CoefficientRuntime
+
+val compiler: staging.Compiler =
+    staging.Compiler.make(classOf[staging.Compiler].getClassLoader)
+
+val stagingRT: CoefficientRuntime = StagingCoefficientRuntime()(using compiler)
+
+class StagingRuntimeQuantitySuite extends RuntimeQuantitySuite(using stagingRT)

@@ -168,10 +168,7 @@ object ValuePromotion:
     import scala.quoted.*
     import scala.language.implicitConversions
 
-    import coulomb.infra.meta.typestr
-
-    final type &:[H, T]
-    final type TNil
+    import coulomb.infra.meta.*
 
     transparent inline given ctx_VP_Path[VF, VT]: ValuePromotion[VF, VT] = ${
         vpPath[VF, VT]
@@ -206,20 +203,19 @@ object ValuePromotion:
                     iss.tree.tpe.baseType(
                         TypeRepr.of[ValuePromotionPolicy].typeSymbol
                     ): @unchecked
-                vpp2str(vppt)
+                vpp2str(typeReprList(vppt))
             case _ =>
                 report.error("no ValuePromotionPolicy was found in scope")
-                VppSet.empty[(String, String)]
+                null.asInstanceOf[Nothing]
 
     private def vpp2str(using Quotes)(
-        vpp: quotes.reflect.TypeRepr
+        vppl: List[quotes.reflect.TypeRepr]
     ): VppSet[(String, String)] =
         import quotes.reflect.*
-        vpp match
-            case t if (t =:= TypeRepr.of[TNil]) =>
-                VppSet.empty[(String, String)]
-            case AppliedType(v, List(AppliedType(t2, List(vf, vt)), tail))
-                if ((v =:= TypeRepr.of[&:]) && (t2 =:= TypeRepr.of[Tuple2])) =>
+        vppl match
+            case Nil => VppSet.empty[(String, String)]
+            case AppliedType(t2, List(vf, vt)) :: tail
+                if (t2 =:= TypeRepr.of[Tuple2]) =>
                 val vppset = vpp2str(tail)
                 vppset.add(
                     (
@@ -230,9 +226,9 @@ object ValuePromotion:
                 vppset
             case _ =>
                 report.error(
-                    s"type ${typestr(vpp)} is not a valid value promotion policy"
+                    s"type ${typestr(vppl.head)} is not a valid promotion pair"
                 )
-                VppSet.empty[(String, String)]
+                null.asInstanceOf[Nothing]
 
     private def pathexists(
         vf: String,
@@ -257,9 +253,10 @@ object ValuePromotion:
                 done = true
         haspath
 
-final class ValuePromotionPolicy[Pairs]
+final class ValuePromotionPolicy[Pairs <: Tuple]
 object ValuePromotionPolicy:
-    def apply[P](): ValuePromotionPolicy[P] = new ValuePromotionPolicy[P]
+    def apply[P <: Tuple](): ValuePromotionPolicy[P] =
+        new ValuePromotionPolicy[P]
 
 final case class ShowUnit[U](value: String)
 object ShowUnit:

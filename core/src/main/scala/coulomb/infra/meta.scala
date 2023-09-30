@@ -263,19 +263,49 @@ object meta:
 
     object baseunit:
         def unapply(using Quotes)(u: quotes.reflect.TypeRepr): Boolean =
+            u match
+                case baseunitTR(_) => true
+                case _             => false
+
+    object derivedunit:
+        def unapply(using qq: Quotes, mode: SigMode)(
+            u: quotes.reflect.TypeRepr
+        ): Option[(Rational, List[(quotes.reflect.TypeRepr, Rational)])] =
+            import quotes.reflect.*
+            u match
+                case derivedunitTR(dtr) =>
+                    mode match
+                        case SigMode.Simplify =>
+                            // don't expand the signature definition in simplify mode
+                            Some((Rational.const1, (u, Rational.const1) :: Nil))
+                        case _ =>
+                            val AppliedType(_, List(_, d, _, _)) =
+                                dtr: @unchecked
+                            Some(cansig(d))
+                case _ => None
+
+    object baseunitTR:
+        def unapply(using Quotes)(
+            u: quotes.reflect.TypeRepr
+        ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
             Implicits.search(
                 TypeRepr
                     .of[BaseUnit]
                     .appliedTo(List(u, TypeBounds.empty, TypeBounds.empty))
             ) match
-                case iss: ImplicitSearchSuccess => true
-                case _                          => false
+                case iss: ImplicitSearchSuccess =>
+                    Some(
+                        iss.tree.tpe.baseType(
+                            TypeRepr.of[BaseUnit].typeSymbol
+                        )
+                    )
+                case _ => None
 
-    object derivedunit:
-        def unapply(using qq: Quotes, mode: SigMode)(
+    object derivedunitTR:
+        def unapply(using Quotes)(
             u: quotes.reflect.TypeRepr
-        ): Option[(Rational, List[(quotes.reflect.TypeRepr, Rational)])] =
+        ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
             Implicits.search(
                 TypeRepr
@@ -290,16 +320,11 @@ object meta:
                     )
             ) match
                 case iss: ImplicitSearchSuccess =>
-                    mode match
-                        case SigMode.Simplify =>
-                            // don't expand the signature definition in simplify mode
-                            Some((Rational.const1, (u, Rational.const1) :: Nil))
-                        case _ =>
-                            val AppliedType(_, List(_, d, _, _)) =
-                                iss.tree.tpe.baseType(
-                                    TypeRepr.of[DerivedUnit].typeSymbol
-                                ): @unchecked
-                            Some(cansig(d))
+                    Some(
+                        iss.tree.tpe.baseType(
+                            TypeRepr.of[DerivedUnit].typeSymbol
+                        )
+                    )
                 case _ => None
 
     object deltaunit:
@@ -359,6 +384,20 @@ object meta:
             case _ if (e == Rational.const0) => Nil
             case Nil                         => Nil
             case (u, e0) :: tail             => (u, e0 * e) :: unifyPow(e, tail)
+
+    def typeReprList(using Quotes)(
+        tlist: quotes.reflect.TypeRepr
+    ): List[quotes.reflect.TypeRepr] =
+        import quotes.reflect.*
+        tlist match
+            case tnil if (tnil =:= TypeRepr.of[EmptyTuple]) => Nil
+            case AppliedType(t, List(head, tail)) if (t =:= TypeRepr.of[*:]) =>
+                head :: typeReprList(tail)
+            case _ =>
+                report.errorAndAbort(
+                    s"typeReprList: bad type list ${tlist.show}"
+                )
+                null.asInstanceOf[Nothing]
 
     def typestr(using Quotes)(t: quotes.reflect.TypeRepr): String =
         // The policy goal here is that type aliases are never expanded.
