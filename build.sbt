@@ -137,7 +137,9 @@ lazy val pureconfig = crossProject(
     )
 
 lazy val ciris = crossProject(
-    JVMPlatform, JSPlatform, NativePlatform
+    JVMPlatform,
+    JSPlatform,
+    NativePlatform
 )
     .crossType(CrossType.Pure)
     .in(file("ciris"))
