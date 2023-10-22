@@ -200,8 +200,8 @@ lazy val unidocs = project
 // https://typelevel.org/sbt-typelevel/site.html
 // sbt docs/tlSitePreview
 // http://localhost:4242
-import laika.ast.{ExternalTarget, InternalTarget, VirtualPath}
-import laika.rewrite.link.{LinkConfig, ApiLinks, SourceLinks, TargetDefinition}
+import laika.ast.VirtualPath
+import laika.config.{LinkConfig, ApiLinks, SourceLinks, TargetDefinition}
 lazy val docs = project
     .in(file("site"))
     .dependsOn(
@@ -225,81 +225,62 @@ lazy val docs = project
                 LinkConfig.empty
                     .addApiLinks(
                         ApiLinks(
-                            baseUri =
-                                "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/",
-                            packagePrefix = "coulomb"
-                        ),
+                            "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/"
+                        ).withPackagePrefix("coulomb")
+                    )
+                    .addApiLinks(
                         ApiLinks(
-                            baseUri = "https://scala-lang.org/api/3.x/",
-                            packagePrefix = "scala"
-                        ),
+                            "https://scala-lang.org/api/3.x/"
+                        ).withPackagePrefix("scala")
+                    )
+                    .addApiLinks(
                         ApiLinks(
-                            baseUri =
-                                "https://javadoc.io/doc/com.github.pureconfig/pureconfig-core_3/latest/",
-                            packagePrefix = "pureconfig"
-                        )
+                            "https://javadoc.io/doc/com.github.pureconfig/pureconfig-core_3/latest/"
+                        ).withPackagePrefix("pureconfig")
                     )
                     .addTargets(
                         // Target names need to be all lowercase.
                         // Note, this does not align with Laika docs.
                         // In future laika releases the names will be case insensitive, see:
                         // https://github.com/typelevel/Laika/pull/541
-                        TargetDefinition(
+                        TargetDefinition.external(
                             // intended usage: [Quantity][quantitytypedef]
                             // Links to type defs do not work properly with laika '@:api(...)' constructs
                             // which is going to make a lot of coulomb references harder to do.
                             "quantitytypedef",
-                            ExternalTarget(
-                                "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
-                            )
+                            "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
                         ),
-                        TargetDefinition(
+                        TargetDefinition.internal(
                             "coulomb-introduction",
-                            InternalTarget(
-                                VirtualPath.parse("README.md")
-                            )
+                            VirtualPath.parse("README.md")
                         ),
-                        TargetDefinition(
+                        TargetDefinition.internal(
                             "coulomb-core",
-                            InternalTarget(
-                                VirtualPath.parse("coulomb-core.md")
-                            )
+                            VirtualPath.parse("coulomb-core.md")
                         ),
-                        TargetDefinition(
+                        TargetDefinition.internal(
                             "coulomb-units",
-                            InternalTarget(
-                                VirtualPath.parse("coulomb-units.md")
-                            )
+                            VirtualPath.parse("coulomb-units.md")
                         ),
-                        TargetDefinition(
+                        TargetDefinition.internal(
                             "coulomb-spire",
-                            InternalTarget(
-                                VirtualPath.parse("coulomb-spire.md")
-                            )
+                            VirtualPath.parse("coulomb-spire.md")
                         ),
-                        TargetDefinition(
+                        TargetDefinition.internal(
                             "coulomb-refined",
-                            InternalTarget(
-                                VirtualPath.parse("coulomb-refined.md")
-                            )
+                            VirtualPath.parse("coulomb-refined.md")
                         ),
-                        TargetDefinition(
+                        TargetDefinition.internal(
                             "coulomb-runtime",
-                            InternalTarget(
-                                VirtualPath.parse("coulomb-runtime.md")
-                            )
+                            VirtualPath.parse("coulomb-runtime.md")
                         ),
-                        TargetDefinition(
+                        TargetDefinition.internal(
                             "coulomb-parser",
-                            InternalTarget(
-                                VirtualPath.parse("coulomb-parser.md")
-                            )
+                            VirtualPath.parse("coulomb-parser.md")
                         ),
-                        TargetDefinition(
+                        TargetDefinition.internal(
                             "coulomb-pureconfig",
-                            InternalTarget(
-                                VirtualPath.parse("coulomb-pureconfig.md")
-                            )
+                            VirtualPath.parse("coulomb-pureconfig.md")
                         )
                     )
             )
