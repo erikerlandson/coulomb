@@ -15,4 +15,4 @@ addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.6")
 
 // snapshot to pick up bug fix
 // https://github.com/scalameta/mdoc/pull/664
-addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.3.7")
+addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.3.8")
