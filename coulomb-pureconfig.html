@@ -22,12 +22,9 @@
   
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
   
-  <link rel="stylesheet" type="text/css" href="helium/icofont.min.css" />
-    <link rel="stylesheet" type="text/css" href="helium/laika-helium.css" />
-    <link rel="stylesheet" type="text/css" href="styles.css" />
-  
-  <script src="helium/laika-helium.js"></script>
-  
+  <link rel="stylesheet" type="text/css" href="helium/site/icofont.min.css" />
+    <link rel="stylesheet" type="text/css" href="helium/site/laika-helium.css" />
+  <script src="helium/site/laika-helium.js"></script>
   
   
   <script> /* for avoiding page load transitions */ </script>
@@ -224,7 +221,7 @@
     bandwidth: {value: 200, unit: &quot;gigabyte / second&quot;}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@508d8801
+</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@292769f7
 </span><span>
 </span><span class="comment">// this load will succeed, with automatic unit conversions
 </span><span class="keyword">val</span><span> </span><span class="identifier">conf</span><span> = </span><span class="identifier">source</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
@@ -241,7 +238,7 @@
     bandwidth: {value: 200, unit: &quot;gigabyte&quot;}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// bad: ConfigObjectSource = pureconfig.ConfigObjectSource@4e647761
+</span><span class="comment">// bad: ConfigObjectSource = pureconfig.ConfigObjectSource@310f4c5b
 </span><span>
 </span><span class="comment">// this load will fail because bandwidth units are incompatible
 </span><span class="keyword">val</span><span> </span><span class="identifier">fail</span><span> = </span><span class="identifier">bad</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
@@ -284,7 +281,7 @@
     unit: megabyte
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// qsrc: ConfigObjectSource = pureconfig.ConfigObjectSource@28874c5b
+</span><span class="comment">// qsrc: ConfigObjectSource = pureconfig.ConfigObjectSource@ec6fc49
 </span><span>
 </span><span class="comment">// loading integer value types will succeed when type matches the config
 </span><span class="identifier">qsrc</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Quantity</span><span>[</span><span class="type-name">Int</span><span>, </span><span class="type-name">Mega</span><span> * </span><span class="type-name">Byte</span><span>]]
@@ -334,7 +331,7 @@
     bandwidth: {value: 200, unit: {lhs: {lhs: giga, op: &quot;*&quot;, rhs: byte}, op: &quot;/&quot;, rhs: second}}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@1eebcdbf
+</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@2cebfd18
 </span><span>
 </span><span class="comment">// this load will succeed, with automatic unit conversions
 </span><span class="keyword">val</span><span> </span><span class="identifier">conf</span><span> = </span><span class="identifier">source</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
