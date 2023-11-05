@@ -594,3 +594,59 @@ object Quantity:
             ord: Ord[VL, UL, VR, UR]
         ): Boolean =
             ord(ql, qr) >= 0
+
+object scoped:
+    import coulomb.conversion.UnitConversion
+
+    abstract class ScopedQuantity[V, U, B]:
+        def quantity: Quantity[V, U]
+
+    object ScopedQuantity:
+        extension [SQ[v, u] <: ScopedQuantity[v, u, ?], VL, UL](sql: SQ[VL, UL])
+            inline def value: VL = sql.quantity.value 
+            transparent inline def +[VR, UR](sqr: SQ[VR, UR])(using
+                add: Add[VL, UL, VR, UR],
+                sqc: ScopedQuantityConstructor[SQ]
+            ): SQ[add.VO, add.UO] =
+                sqc.constructFrom(sql.quantity + sqr.quantity)
+
+    trait ScopedQuantityCompanion[SQ[v, u] <: ScopedQuantity[v, u, ?], B]:
+        def apply[V, U](q: Quantity[V, U])(using
+            uc: UnitConversion[Double, U, B],
+            sqc: ScopedQuantityConstructor[SQ]
+        ): SQ[V, U] =
+            sqc.constructFrom(q)
+
+    abstract class ScopedQuantityConstructor[SQ[v, u] <: ScopedQuantity[v, u, ?]]:
+        def constructFrom[V, U](q: Quantity[V, U]): SQ[V, U]
+
+object testunits:
+    import coulomb.*
+    import coulomb.define.*
+
+    final type Meter
+    given ctx_unit_Meter: BaseUnit[Meter, "meter", "m"] = BaseUnit()
+
+    final type Second
+    given ctx_unit_Second: BaseUnit[Second, "second", "s"] = BaseUnit()
+
+    final type Yard
+    given ctx_unit_Yard
+        : DerivedUnit[Yard, (9144 / 10000) * Meter, "yard", "yd"] =
+        DerivedUnit()
+
+    final type Minute
+    given ctx_unit_Minute: DerivedUnit[Minute, 60 * Second, "minute", "min"] =
+        DerivedUnit()
+
+object test:
+    import coulomb.scoped.*
+    import coulomb.testunits.{*, given}
+
+    abstract class Depth[V, U] extends ScopedQuantity[V, U, Meter]
+    object Depth extends ScopedQuantityCompanion[Depth, Meter]
+    given ScopedQuantityConstructor[Depth] with
+        def constructFrom[V, U](q: Quantity[V, U]): Depth[V, U] =
+            new Depth[V, U]:
+                val quantity = q
+
