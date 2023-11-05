@@ -650,3 +650,9 @@ object test:
             new Depth[V, U]:
                 val quantity = q
 
+    abstract class Wavelength[V, U] extends ScopedQuantity[V, U, Meter]
+    object Wavelength extends ScopedQuantityCompanion[Wavelength, Meter]
+    given ScopedQuantityConstructor[Wavelength] with
+        def constructFrom[V, U](q: Quantity[V, U]): Wavelength[V, U] =
+            new Wavelength[V, U]:
+                val quantity = q
