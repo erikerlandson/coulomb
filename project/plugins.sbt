@@ -1,7 +1,5 @@
 resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
-//val sbtTypelevelVersion = "0.4.22"
-//val sbtTypelevelVersion = "0.5.4"
 val sbtTypelevelVersion = "0.6.1"
 
 addSbtPlugin("org.typelevel" % "sbt-typelevel" % sbtTypelevelVersion)
@@ -14,6 +12,4 @@ addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
 
 addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.6")
 
-// snapshot to pick up bug fix
-// https://github.com/scalameta/mdoc/pull/664
-addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.4.0")
+addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.5.0")
