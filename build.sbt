@@ -110,7 +110,7 @@ lazy val parser = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
     .settings(commonSettings: _*)
     .settings(
-        libraryDependencies += "org.typelevel" %%% "cats-parse" % "0.3.10"
+        libraryDependencies += "org.typelevel" %%% "cats-parse" % "1.0.0"
     )
 
 // pureconfig doesn't currently build for JS or Native
