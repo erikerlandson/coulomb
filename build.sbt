@@ -19,6 +19,8 @@ ThisBuild / startYear := Some(2022)
 // ci settings
 ThisBuild / tlCiReleaseBranches := Seq("scala3")
 ThisBuild / tlSitePublishBranch := Some("scala3")
+// use jdk 17 in ci builds
+ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 
 ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 ThisBuild / crossScalaVersions := Seq("3.3.1")
