@@ -16,8 +16,8 @@
 
 package coulomb.collection.immutable
 
-import scala.collection.{ AbstractIterator, StrictOptimizedSeqOps, View, mutable }
-import scala.collection.immutable.{ IndexedSeq, IndexedSeqOps }
+import scala.collection.{AbstractIterator, StrictOptimizedSeqOps, View, mutable}
+import scala.collection.immutable.{IndexedSeq, IndexedSeqOps}
 import scala.reflect.ClassTag
 
 import coulomb.*
@@ -25,10 +25,9 @@ import coulomb.syntax.*
 
 final class QuantityVector[V, U] private (
     val values: Vector[V]
-) extends
-    IndexedSeq[Quantity[V, U]],
-    IndexedSeqOps[Quantity[V, U], IndexedSeq, QuantityVector[V, U]],
-    StrictOptimizedSeqOps[Quantity[V, U], IndexedSeq, QuantityVector[V, U]]:
+) extends IndexedSeq[Quantity[V, U]],
+      IndexedSeqOps[Quantity[V, U], IndexedSeq, QuantityVector[V, U]],
+      StrictOptimizedSeqOps[Quantity[V, U], IndexedSeq, QuantityVector[V, U]]:
 
     def length: Int = values.length
 
@@ -37,11 +36,15 @@ final class QuantityVector[V, U] private (
 
     override def empty: QuantityVector[V, U] = QuantityVector.empty[V, U]
 
-    override protected def fromSpecific(it: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
+    override protected def fromSpecific(
+        it: IterableOnce[Quantity[V, U]]
+    ): QuantityVector[V, U] =
         QuantityVector.from(it)
 
-    override protected def newSpecificBuilder: mutable.Builder[Quantity[V, U], QuantityVector[V, U]] =
-        mutable.ArrayBuffer.newBuilder[Quantity[V, U]]
+    override protected def newSpecificBuilder
+        : mutable.Builder[Quantity[V, U], QuantityVector[V, U]] =
+        mutable.ArrayBuffer
+            .newBuilder[Quantity[V, U]]
             .mapResult(QuantityVector.from)
 
     override def iterator: Iterator[Quantity[V, U]] =
@@ -59,4 +62,3 @@ object QuantityVector:
     def from[V, U](it: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
         // may be able to optimize with a case statement here
         new QuantityVector[V, U](Vector.from(it.iterator.map(_.value)))
-
