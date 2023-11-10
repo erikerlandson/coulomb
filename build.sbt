@@ -45,6 +45,7 @@ lazy val root = tlCrossRootProject
     .aggregate(
         core,
         units,
+        collections,
         runtime,
         parser,
         pureconfig,
@@ -73,6 +74,20 @@ lazy val units = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .platformsSettings(JSPlatform, NativePlatform)(
         libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.5.0" % Test
     )
+
+lazy val collections = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+    .crossType(CrossType.Pure)
+    .in(file("collections"))
+    .settings(name := "coulomb-collections")
+    .dependsOn(
+        core % "compile->compile;test->test",
+        units % Test
+    )
+    .settings(
+        tlVersionIntroduced := Map("3" -> "0.8.1")
+    )
+    .settings(commonSettings: _*)
+    .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.10.0")
 
 // see also: https://github.com/lampepfl/dotty/issues/7647
 lazy val runtime = crossProject(JVMPlatform, JSPlatform, NativePlatform)
@@ -179,6 +194,7 @@ lazy val all = project
     .dependsOn(
         core.jvm,
         units.jvm,
+        collections.jvm,
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
@@ -209,6 +225,7 @@ lazy val docs = project
     .dependsOn(
         core.jvm,
         units.jvm,
+        collections.jvm,
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
