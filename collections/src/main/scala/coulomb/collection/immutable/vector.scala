@@ -22,6 +22,7 @@ import scala.reflect.ClassTag
 
 import coulomb.*
 import coulomb.syntax.*
+import coulomb.conversion.*
 
 final class QuantityVector[V, U] private (
     val values: Vector[V]
@@ -55,7 +56,7 @@ final class QuantityVector[V, U] private (
     def flatMap[VF, UF](
         f: Quantity[V, U] => IterableOnce[Quantity[VF, UF]]
     ): QuantityVector[VF, UF] =
-        strictOptimizedFlatMap(newSpecificBuilderQV[VF, UV], f)
+        strictOptimizedFlatMap(newSpecificBuilderQV[VF, UF], f)
 
     override def empty: QuantityVector[V, U] = QuantityVector.empty[V, U]
 
@@ -74,7 +75,34 @@ final class QuantityVector[V, U] private (
             .newBuilder[Quantity[VB, UB]]
             .mapResult(QuantityVector.from)
 
+    def toValue[VO](using
+        vc: ValueConversion[V, VO]
+    ): QuantityVector[VO, U] =
+        QuantityVector[U](values.map { v => vc(v) })
+
+    def toUnit[UO](using
+        uc: UnitConversion[V, U, UO]
+    ): QuantityVector[V, UO] =
+        QuantityVector[UO](values.map { v => uc(v) })
+
+    def toVU[VO, UO](using
+        vc: ValueConversion[V, VO],
+        uc: UnitConversion[VO, U, UO]
+    ): QuantityVector[VO, UO] =
+        QuantityVector[UO](values.map { v => uc(vc(v)) })
+
 object QuantityVector:
+    def apply[U](using a: Applier[U]) = a
+
+    class Applier[U]:
+        def apply[V](vs: IterableOnce[V]): QuantityVector[V, U] =
+            new QuantityVector[V, U](Vector.from(vs))
+        def apply[V](vs: V*): QuantityVector[V, U] =
+            new QuantityVector[V, U](Vector.from(vs))
+
+    object Applier:
+        given ctx_Applier[U]: Applier[U] = new Applier[U]
+
     def apply[V, U](args: Quantity[V, U]*): QuantityVector[V, U] =
         from(args)
 
