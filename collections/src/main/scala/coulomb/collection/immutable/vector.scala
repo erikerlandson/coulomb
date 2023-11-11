@@ -110,5 +110,13 @@ object QuantityVector:
         new QuantityVector[V, U](Vector.empty[V])
 
     def from[V, U](it: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
-        // may be able to optimize with a case statement here
-        new QuantityVector[V, U](Vector.from(it.iterator.map(_.value)))
+        it match
+            case qv: QuantityVector[?, ?] =>
+                // this trick works because we already know that the
+                // element type is Quantity[V, U]
+                qv.asInstanceOf[QuantityVector[V, U]]
+            case seq: scala.collection.Seq[?] =>
+                val qs = seq.asInstanceOf[scala.collection.Seq[Quantity[V, U]]]
+                new QuantityVector[V, U](Vector.from(qs.map(_.value)))
+            case _ =>
+                new QuantityVector[V, U](Vector.from(it.iterator.map(_.value)))
