@@ -12,4 +12,4 @@ addSbtPlugin("org.portable-scala" % "sbt-scala-native-crossproject" % "1.3.2")
 
 addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.6")
 
-addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.5.0")
+addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.5.1")
