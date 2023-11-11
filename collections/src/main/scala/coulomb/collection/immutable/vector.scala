@@ -29,10 +29,33 @@ final class QuantityVector[V, U] private (
       IndexedSeqOps[Quantity[V, U], IndexedSeq, QuantityVector[V, U]],
       StrictOptimizedSeqOps[Quantity[V, U], IndexedSeq, QuantityVector[V, U]]:
 
+    override def className = "QuantityVector"
+
     def length: Int = values.length
 
     def apply(idx: Int): Quantity[V, U] =
         values(idx).withUnit[U]
+
+    override def iterator: Iterator[Quantity[V, U]] =
+        values.iterator.map(_.withUnit[U])
+
+    inline final def ++(
+        suffix: IterableOnce[Quantity[V, U]]
+    ): QuantityVector[V, U] =
+        concat(suffix)
+
+    def concat(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
+        strictOptimizedConcat(suffix, newSpecificBuilder)
+
+    def map[VF, UF](
+        f: Quantity[V, U] => Quantity[VF, UF]
+    ): QuantityVector[VF, UF] =
+        strictOptimizedMap(newSpecificBuilderQV[VF, UF], f)
+
+    def flatMap[VF, UF](
+        f: Quantity[V, U] => IterableOnce[Quantity[VF, UF]]
+    ): QuantityVector[VF, UF] =
+        strictOptimizedFlatMap(newSpecificBuilderQV[VF, UV], f)
 
     override def empty: QuantityVector[V, U] = QuantityVector.empty[V, U]
 
@@ -43,14 +66,13 @@ final class QuantityVector[V, U] private (
 
     override protected def newSpecificBuilder
         : mutable.Builder[Quantity[V, U], QuantityVector[V, U]] =
+        newSpecificBuilderQV[V, U]
+
+    protected def newSpecificBuilderQV[VB, UB]
+        : mutable.Builder[Quantity[VB, UB], QuantityVector[VB, UB]] =
         mutable.ArrayBuffer
-            .newBuilder[Quantity[V, U]]
+            .newBuilder[Quantity[VB, UB]]
             .mapResult(QuantityVector.from)
-
-    override def iterator: Iterator[Quantity[V, U]] =
-        values.iterator.map(_.withUnit[U])
-
-    override def className = "QuantityVector"
 
 object QuantityVector:
     def apply[V, U](args: Quantity[V, U]*): QuantityVector[V, U] =
