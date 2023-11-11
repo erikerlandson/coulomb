@@ -3,7 +3,7 @@
 // and check in the updates to github workflow yamls
 
 // base version for assessing MIMA
-ThisBuild / tlBaseVersion := "0.8"
+ThisBuild / tlBaseVersion := "0.9"
 
 // publish settings
 // artifacts now publish to s01.oss.sonatype.org, per:
