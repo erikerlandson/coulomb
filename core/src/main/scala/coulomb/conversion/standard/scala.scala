@@ -26,25 +26,24 @@ object scala:
     // whenever a valid conversion exists:
     // https://docs.scala-lang.org/scala3/reference/contextual/conversions.html
 
-    given ctx_Quantity_Conversion_1V1U[V, U]
-        : Conversion[Quantity[V, U], Quantity[V, U]] =
-        (q: Quantity[V, U]) => q
+    given ctx_Quantity_Conversion_1V1U[V, U]: QuantityConversion[V, U, V, U] =
+        new QuantityConversion[V, U, V, U]((v: V) => v)
 
     given ctx_Quantity_Conversion_1V2U[V, UF, UT](using
         uc: UnitConversion[V, UF, UT]
-    ): Conversion[Quantity[V, UF], Quantity[V, UT]] =
-        (q: Quantity[V, UF]) => uc(q.value).withUnit[UT]
+    ): QuantityConversion[V, UF, V, UT] =
+        new QuantityConversion[V, UF, V, UT](uc)
 
     given ctx_Quantity_Conversion_2V1U[U, VF, VT](using
         vc: ValueConversion[VF, VT]
-    ): Conversion[Quantity[VF, U], Quantity[VT, U]] =
-        (q: Quantity[VF, U]) => vc(q.value).withUnit[U]
+    ): QuantityConversion[VF, U, VT, U] =
+        new QuantityConversion[VF, U, VT, U](vc)
 
     given ctx_Quantity_Conversion_2V2U[VF, UF, VT, UT](using
         vc: ValueConversion[VF, VT],
         uc: UnitConversion[VT, UF, UT]
-    ): Conversion[Quantity[VF, UF], Quantity[VT, UT]] =
-        (q: Quantity[VF, UF]) => uc(vc(q.value)).withUnit[UT]
+    ): QuantityConversion[VF, UF, VT, UT] =
+        new QuantityConversion[VF, UF, VT, UT]((v: VF) => uc(vc(v)))
 
     given ctx_DeltaQuantity_conversion_2V2U[B, VF, UF, VT, UT](using
         vc: ValueConversion[VF, VT],

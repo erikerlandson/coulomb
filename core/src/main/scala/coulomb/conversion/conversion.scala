@@ -18,6 +18,9 @@ package coulomb.conversion
 
 import scala.annotation.implicitNotFound
 
+import coulomb.*
+import coulomb.syntax.*
+
 /** conversion of value types, assuming some constant unit type */
 @implicitNotFound("No value conversion in scope for value types ${VF} => ${VT}")
 abstract class ValueConversion[VF, VT] extends (VF => VT)
@@ -49,3 +52,12 @@ abstract class DeltaUnitConversion[V, B, UF, UT] extends (V => V)
     "No truncating unit conversion in scope for value type ${V}, unit types ${UF} => ${UT}"
 )
 abstract class TruncatingDeltaUnitConversion[V, B, UF, UT] extends (V => V)
+
+/** scala.Conversion for Quantity[VF, UF] => Quantity[VT, UT] */
+@implicitNotFound(
+    "No Conversion in context for Quantity[${VF}, ${UF}] => Quantity[${VT}, ${UT}]"
+)
+class QuantityConversion[VF, UF, VT, UT](val raw: VF => VT)
+    extends _root_.scala.Conversion[Quantity[VF, UF], Quantity[VT, UT]]:
+    inline def apply(q: Quantity[VF, UF]): Quantity[VT, UT] =
+        raw(q.value).withUnit[UT]
