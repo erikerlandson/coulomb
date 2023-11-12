@@ -202,6 +202,12 @@ lazy val all = project
         refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
     .settings(name := "coulomb-all")
+    .settings(
+        // when you import in the REPL, this warning is ridiculous
+        Compile / console.key / scalacOptions ~= (_.filterNot {
+            _ == "-Wunused:imports"
+        })
+    )
     .enablePlugins(NoPublishPlugin) // don't publish
 
 // a published artifact aggregating API docs for viewing at javadoc.io
