@@ -1,6 +1,6 @@
 resolvers ++= Resolver.sonatypeOssRepos("snapshots")
 
-val sbtTypelevelVersion = "0.6.1"
+val sbtTypelevelVersion = "0.6.2"
 
 addSbtPlugin("org.typelevel" % "sbt-typelevel" % sbtTypelevelVersion)
 addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % sbtTypelevelVersion)
