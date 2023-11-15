@@ -40,13 +40,62 @@ final class QuantityVector[V, U] private (
     override def iterator: Iterator[Quantity[V, U]] =
         values.iterator.map(_.withUnit[U])
 
-    inline final def ++(
-        suffix: IterableOnce[Quantity[V, U]]
+    inline def ++(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
+        concat(suffix)
+
+    inline def ++[VS, US](suffix: IterableOnce[Quantity[VS, US]])(using
+        qc: scala.Conversion[Quantity[VS, US], Quantity[V, U]]
     ): QuantityVector[V, U] =
         concat(suffix)
 
     def concat(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
-        strictOptimizedConcat(suffix, newSpecificBuilder)
+        val svec: Vector[V] = suffix match
+            case qve: QuantityVector[?, ?] =>
+                qve.asInstanceOf[QuantityVector[V, U]].values
+            case seqe: scala.collection.Seq[?] =>
+                val seq =
+                    seqe.asInstanceOf[scala.collection.Seq[Quantity[V, U]]]
+                Vector.from(seq.map(_.value))
+            case _ =>
+                Vector.from(suffix.iterator.map(_.value))
+        new QuantityVector[V, U](values ++ svec)
+
+    def concat[VS, US](suffix: IterableOnce[Quantity[VS, US]])(using
+        cnv: scala.Conversion[Quantity[VS, US], Quantity[V, U]]
+    ): QuantityVector[V, U] =
+        val svec: Vector[V] = cnv match
+            // if we have a QuantityConversion we can optimize
+            // by applying directly to raw values
+            case qce: QuantityConversion[?, ?, ?, ?] =>
+                val qc = qce.asInstanceOf[QuantityConversion[VS, US, V, U]]
+                suffix match
+                    case qve: QuantityVector[?, ?] =>
+                        qve.asInstanceOf[QuantityVector[VS, US]]
+                            .values
+                            .map(qc.raw)
+                    case seqe: scala.collection.Seq[?] =>
+                        val seq = seqe.asInstanceOf[
+                            scala.collection.Seq[Quantity[VS, US]]
+                        ]
+                        Vector.from(seq.map { e => qc.raw(e.value) })
+                    case _ =>
+                        Vector.from(suffix.iterator.map { e =>
+                            qc.raw(e.value)
+                        })
+            case _ =>
+                // if it isn't a QuantityConversion, we can only assume basic
+                // scala.Conversion function
+                suffix match
+                    case qve: QuantityVector[?, ?] =>
+                        qve.asInstanceOf[QuantityVector[VS, US]].map(cnv).values
+                    case seqe: scala.collection.Seq[?] =>
+                        val seq = seqe.asInstanceOf[
+                            scala.collection.Seq[Quantity[VS, US]]
+                        ]
+                        Vector.from(seq.map(cnv(_).value))
+                    case _ =>
+                        Vector.from(suffix.iterator.map(cnv(_).value))
+        new QuantityVector[V, U](values ++ svec)
 
     def map[VF, UF](
         f: Quantity[V, U] => Quantity[VF, UF]
@@ -120,3 +169,20 @@ object QuantityVector:
                 new QuantityVector[V, U](Vector.from(qs.map(_.value)))
             case _ =>
                 new QuantityVector[V, U](Vector.from(it.iterator.map(_.value)))
+
+object benchmark:
+    import java.time.*
+
+    def time[X](x: => X, n: Int = 11): Double = {
+        var t0 = Instant.now.toEpochMilli
+        val times = for {
+            _ <- 0 until n
+        } yield {
+            val _ = x
+            val t = Instant.now.toEpochMilli
+            val tt = (t - t0).toDouble / 1000.0
+            t0 = t
+            tt
+        }
+        times(times.length / 2)
+    }
