@@ -221,7 +221,7 @@
     bandwidth: {value: 200, unit: &quot;gigabyte / second&quot;}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@31b0081d
+</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@afe686a
 </span><span>
 </span><span class="comment">// this load will succeed, with automatic unit conversions
 </span><span class="keyword">val</span><span> </span><span class="identifier">conf</span><span> = </span><span class="identifier">source</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
@@ -238,7 +238,7 @@
     bandwidth: {value: 200, unit: &quot;gigabyte&quot;}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// bad: ConfigObjectSource = pureconfig.ConfigObjectSource@68150a51
+</span><span class="comment">// bad: ConfigObjectSource = pureconfig.ConfigObjectSource@1ea36aa8
 </span><span>
 </span><span class="comment">// this load will fail because bandwidth units are incompatible
 </span><span class="keyword">val</span><span> </span><span class="identifier">fail</span><span> = </span><span class="identifier">bad</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
@@ -281,7 +281,7 @@
     unit: megabyte
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// qsrc: ConfigObjectSource = pureconfig.ConfigObjectSource@1df9a1b2
+</span><span class="comment">// qsrc: ConfigObjectSource = pureconfig.ConfigObjectSource@147a86d7
 </span><span>
 </span><span class="comment">// loading integer value types will succeed when type matches the config
 </span><span class="identifier">qsrc</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Quantity</span><span>[</span><span class="type-name">Int</span><span>, </span><span class="type-name">Mega</span><span> * </span><span class="type-name">Byte</span><span>]]
@@ -331,7 +331,7 @@
     bandwidth: {value: 200, unit: {lhs: {lhs: giga, op: &quot;*&quot;, rhs: byte}, op: &quot;/&quot;, rhs: second}}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@32e7a94c
+</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@35a25dc6
 </span><span>
 </span><span class="comment">// this load will succeed, with automatic unit conversions
 </span><span class="keyword">val</span><span> </span><span class="identifier">conf</span><span> = </span><span class="identifier">source</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
