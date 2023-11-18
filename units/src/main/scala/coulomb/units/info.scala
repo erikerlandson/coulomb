@@ -40,7 +40,7 @@ object info:
      *   care should be taken to distinguish from `scala.Byte`
      */
     final type Byte
-    given ctx_unit_Byte: BaseUnit[Byte, "byte", "B"] = BaseUnit()
+    given unit_Byte: BaseUnit[Byte, "byte", "B"] = BaseUnit()
 
     /**
      * The fundamental unit of information: a single "yes/no" answer.
@@ -49,7 +49,7 @@ object info:
      *   - https://en.wikipedia.org/wiki/Shannon_(unit)
      */
     final type Bit
-    given ctx_unit_Bit: DerivedUnit[Bit, Byte / 8, "bit", "b"] = DerivedUnit()
+    given unit_Bit: DerivedUnit[Bit, Byte / 8, "bit", "b"] = DerivedUnit()
 
     /**
      * Logarithmic unit of information
@@ -58,7 +58,7 @@ object info:
      *   - https://en.wikipedia.org/wiki/Entropy_(information_theory)
      */
     final type Nat
-    given ctx_unit_Nat: DerivedUnit[Nat, 1.4426950409 * Bit, "nat", "nat"] =
+    given unit_Nat: DerivedUnit[Nat, 1.4426950409 * Bit, "nat", "nat"] =
         DerivedUnit()
 
     /**
@@ -72,40 +72,40 @@ object info:
     object prefixes:
         /** Binary prefix for 1024 */
         final type Kibi
-        given ctx_unit_Kibi: DerivedUnit[Kibi, 1024, "kibi", "Ki"] =
+        given unit_Kibi: DerivedUnit[Kibi, 1024, "kibi", "Ki"] =
             DerivedUnit()
 
         /** Binary prefix for 1024 ^ 2 */
         final type Mebi
-        given ctx_unit_Mebi: DerivedUnit[Mebi, 1024 ^ 2, "mebi", "Mi"] =
+        given unit_Mebi: DerivedUnit[Mebi, 1024 ^ 2, "mebi", "Mi"] =
             DerivedUnit()
 
         /** Binary prefix for 1024 ^ 3 */
         final type Gibi
-        given ctx_unit_Gibi: DerivedUnit[Gibi, 1024 ^ 3, "gibi", "Gi"] =
+        given unit_Gibi: DerivedUnit[Gibi, 1024 ^ 3, "gibi", "Gi"] =
             DerivedUnit()
 
         /** Binary prefix for 1024 ^ 4 */
         final type Tebi
-        given ctx_unit_Tebi: DerivedUnit[Tebi, 1024 ^ 4, "tebi", "Ti"] =
+        given unit_Tebi: DerivedUnit[Tebi, 1024 ^ 4, "tebi", "Ti"] =
             DerivedUnit()
 
         /** Binary prefix for 1024 ^ 5 */
         final type Pebi
-        given ctx_unit_Pebi: DerivedUnit[Pebi, 1024 ^ 5, "pebi", "Pi"] =
+        given unit_Pebi: DerivedUnit[Pebi, 1024 ^ 5, "pebi", "Pi"] =
             DerivedUnit()
 
         /** Binary prefix for 1024 ^ 6 */
         final type Exbi
-        given ctx_unit_Exbi: DerivedUnit[Exbi, 1024 ^ 6, "exbi", "Ei"] =
+        given unit_Exbi: DerivedUnit[Exbi, 1024 ^ 6, "exbi", "Ei"] =
             DerivedUnit()
 
         /** Binary prefix for 1024 ^ 7 */
         final type Zebi
-        given ctx_unit_Zebi: DerivedUnit[Zebi, 1024 ^ 7, "zebi", "Zi"] =
+        given unit_Zebi: DerivedUnit[Zebi, 1024 ^ 7, "zebi", "Zi"] =
             DerivedUnit()
 
         /** Binary prefix for 1024 ^ 8 */
         final type Yobi
-        given ctx_unit_Yobi: DerivedUnit[Yobi, 1024 ^ 8, "yobi", "Yi"] =
+        given unit_Yobi: DerivedUnit[Yobi, 1024 ^ 8, "yobi", "Yi"] =
             DerivedUnit()

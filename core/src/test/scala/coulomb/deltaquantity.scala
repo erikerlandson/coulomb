@@ -20,16 +20,8 @@ class DeltaQuantitySuite extends CoulombSuite:
     import coulomb.*
     import coulomb.syntax.*
     import coulomb.testing.units.{*, given}
-    import algebra.instances.all.given
-    import coulomb.ops.algebra.all.given
 
-    test("lift via DeltaQuantity") {
-        DeltaQuantity[Meter, Meter](3.14).assertDQ[Double, Meter](3.14)
-        DeltaQuantity[Second, Second](7.7f).assertDQ[Float, Second](7.7f)
-        DeltaQuantity[Kilogram, Kilogram](42L).assertDQ[Long, Kilogram](42)
-        DeltaQuantity[Liter, Liter](99).assertDQ[Int, Liter](99)
-        DeltaQuantity[Minute, Minute]("foo").assertDQ[String, Minute]("foo")
-    }
+    import spire.std.any.{*, given}
 
     test("lift via withDeltaUnit") {
         1d.withDeltaUnit[Meter, Meter].assertDQ[Double, Meter](1)
@@ -56,8 +48,6 @@ class DeltaQuantitySuite extends CoulombSuite:
     }
 
     test("toValue") {
-        import coulomb.policy.strict.given
-
         100.withDeltaUnit[Celsius, Kelvin]
             .toValue[Int]
             .assertDQ[Int, Celsius](100)
@@ -84,8 +74,6 @@ class DeltaQuantitySuite extends CoulombSuite:
             .toValue[Double]
             .assertDQ[Double, Celsius](100)
 
-        assertCE("100f.withDeltaUnit[Celsius, Kelvin].toValue[Int]")
-        assertCE("100f.withDeltaUnit[Celsius, Kelvin].toValue[Long]")
         100f.withDeltaUnit[Celsius, Kelvin]
             .toValue[Float]
             .assertDQ[Float, Celsius](100)
@@ -93,37 +81,15 @@ class DeltaQuantitySuite extends CoulombSuite:
             .toValue[Double]
             .assertDQ[Double, Celsius](100)
 
-        assertCE("100d.withDeltaUnit[Celsius, Kelvin].toValue[Int]")
-        assertCE("100d.withDeltaUnit[Celsius, Kelvin].toValue[Long]")
         100d.withDeltaUnit[Celsius, Kelvin]
             .toValue[Float]
             .assertDQ[Float, Celsius](100)
         100d.withDeltaUnit[Celsius, Kelvin]
             .toValue[Double]
             .assertDQ[Double, Celsius](100)
-
-        1.999f
-            .withDeltaUnit[Minute, Second]
-            .tToValue[Int]
-            .assertDQ[Int, Minute](1)
-        0.999f
-            .withDeltaUnit[Minute, Second]
-            .tToValue[Long]
-            .assertDQ[Long, Minute](0)
-
-        1.999d
-            .withDeltaUnit[Minute, Second]
-            .tToValue[Int]
-            .assertDQ[Int, Minute](1)
-        0.999d
-            .withDeltaUnit[Minute, Second]
-            .tToValue[Long]
-            .assertDQ[Long, Minute](0)
     }
 
     test("toUnit") {
-        import coulomb.policy.strict.given
-
         37d.withDeltaUnit[Celsius, Kelvin]
             .toUnit[Fahrenheit]
             .assertDQD[Double, Fahrenheit](98.6)
@@ -133,18 +99,9 @@ class DeltaQuantitySuite extends CoulombSuite:
 
         assertCE("37L.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit]")
         assertCE("37.withDeltaUnit[Celsius, Kelvin].toUnit[Fahrenheit]")
-
-        37L.withDeltaUnit[Celsius, Kelvin]
-            .tToUnit[Fahrenheit]
-            .assertDQ[Long, Fahrenheit](98)
-        37.withDeltaUnit[Celsius, Kelvin]
-            .tToUnit[Fahrenheit]
-            .assertDQ[Int, Fahrenheit](98)
     }
 
-    test("subtraction strict") {
-        import coulomb.policy.strict.given
-
+    test("subtraction") {
         // 1V1U
         (100d.withDeltaUnit[Celsius, Kelvin] - 50d
             .withDeltaUnit[Celsius, Kelvin])
@@ -155,29 +112,16 @@ class DeltaQuantitySuite extends CoulombSuite:
             .assertQ[Long, Kelvin](50)
         (10.withDeltaUnit[Second, Second] - 5.withDeltaUnit[Second, Second])
             .assertQ[Int, Second](5)
-    }
 
-    test("subtraction standard") {
-        import coulomb.policy.standard.given
-
-        // 2V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 50f
+        (100d.withDeltaUnit[Celsius, Kelvin] - 50d
             .withDeltaUnit[Celsius, Kelvin])
             .assertQ[Double, Celsius](50)
-        // 1V2U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 122d
+        (100f.withDeltaUnit[Celsius, Kelvin] - 122f
             .withDeltaUnit[Fahrenheit, Kelvin])
-            .assertQD[Double, Celsius](50)
-        // 2V2U
-        (100f.withDeltaUnit[Celsius, Kelvin] - 122d
-            .withDeltaUnit[Fahrenheit, Kelvin])
-            .assertQD[Double, Celsius](50)
+            .assertQD[Float, Celsius](50)
     }
 
-    test("quantity subtraction strict") {
-        import coulomb.policy.strict.given
-
-        // 1V1U
+    test("quantity subtraction") {
         (100d.withDeltaUnit[Celsius, Kelvin] - 50d.withUnit[Celsius])
             .assertDQ[Double, Celsius](50)
         (10f.withDeltaUnit[Minute, Second] - 5f.withUnit[Minute])
@@ -186,26 +130,14 @@ class DeltaQuantitySuite extends CoulombSuite:
             .assertDQ[Long, Kelvin](50)
         (10.withDeltaUnit[Second, Second] - 5.withUnit[Second])
             .assertDQ[Int, Second](5)
-    }
 
-    test("quantity subtraction standard") {
-        import coulomb.policy.standard.given
-
-        // 2V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 50f.withUnit[Celsius])
+        (100d.withDeltaUnit[Celsius, Kelvin] - 50d.withUnit[Celsius])
             .assertDQ[Double, Celsius](50)
-        // 1V2U
-        (100d.withDeltaUnit[Celsius, Kelvin] - 90d.withUnit[Fahrenheit])
-            .assertDQD[Double, Celsius](50)
-        // 2V2U
-        (100f.withDeltaUnit[Celsius, Kelvin] - 90d.withUnit[Fahrenheit])
-            .assertDQD[Double, Celsius](50)
+        (100f.withDeltaUnit[Celsius, Kelvin] - 90f.withUnit[Fahrenheit])
+            .assertDQD[Float, Celsius](50)
     }
 
-    test("quantity addition strict") {
-        import coulomb.policy.strict.given
-
-        // 1V1U
+    test("quantity addition") {
         (100d.withDeltaUnit[Celsius, Kelvin] + 50d.withUnit[Celsius])
             .assertDQ[Double, Celsius](150)
         (10f.withDeltaUnit[Minute, Second] + 5f.withUnit[Minute])
@@ -214,25 +146,14 @@ class DeltaQuantitySuite extends CoulombSuite:
             .assertDQ[Long, Kelvin](150)
         (10.withDeltaUnit[Second, Second] + 5.withUnit[Second])
             .assertDQ[Int, Second](15)
-    }
 
-    test("quantity addition standard") {
-        import coulomb.policy.standard.given
-
-        // 2V1U
-        (100d.withDeltaUnit[Celsius, Kelvin] + 50f.withUnit[Celsius])
+        (100d.withDeltaUnit[Celsius, Kelvin] + 50d.withUnit[Celsius])
             .assertDQ[Double, Celsius](150)
-        // 1V2U
-        (100d.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit])
-            .assertDQD[Double, Celsius](150)
-        // 2V2U
-        (100f.withDeltaUnit[Celsius, Kelvin] + 90d.withUnit[Fahrenheit])
-            .assertDQD[Double, Celsius](150)
+        (100f.withDeltaUnit[Celsius, Kelvin] + 90f.withUnit[Fahrenheit])
+            .assertDQD[Float, Celsius](150)
     }
 
-    test("less-than strict") {
-        import coulomb.policy.strict.given
-
+    test("less-than") {
         assertEquals(
             7d.withDeltaUnit[Minute, Second] < 8d.withDeltaUnit[Minute, Second],
             true
@@ -249,34 +170,22 @@ class DeltaQuantitySuite extends CoulombSuite:
             7.withDeltaUnit[Minute, Second] < 7.withDeltaUnit[Minute, Second],
             false
         )
-    }
 
-    test("less-than standard") {
-        import coulomb.policy.standard.given
-
-        // 1V2U
         assertEquals(
             36d.withDeltaUnit[Celsius, Kelvin] < 98.6d
                 .withDeltaUnit[Fahrenheit, Kelvin],
             true
         )
-        // 2V1U
         assertEquals(
-            36f.withDeltaUnit[Celsius, Kelvin] < 36d
+            36f.withDeltaUnit[Celsius, Kelvin] < 36f
                 .withDeltaUnit[Celsius, Kelvin],
-            false
-        )
-        // 2V2U
-        assertEquals(
-            38d.withDeltaUnit[Celsius, Kelvin] < 98.6f
-                .withDeltaUnit[Fahrenheit, Kelvin],
             false
         )
     }
 
     test("cats Eq, Ord, Hash") {
         import cats.kernel.{Eq, Hash, Order}
-        import coulomb.policy.strict.given
+        import coulomb.integrations.cats.all.given
 
         val q1 = 1.withDeltaUnit[Meter, Meter]
         val q2 = 1.withDeltaUnit[Meter, Meter]

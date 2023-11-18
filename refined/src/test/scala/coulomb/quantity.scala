@@ -23,10 +23,11 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
 
     import coulomb.*
     import coulomb.syntax.*
-    import coulomb.syntax.refined.*
 
     import algebra.instances.all.given
-    import coulomb.ops.algebra.all.{*, given}
+
+    import coulomb.integrations.refined.all.given
+    import coulomb.integrations.refined.syntax.*
 
     import coulomb.units.si.{*, given}
     import coulomb.units.si.prefixes.{*, given}
@@ -99,9 +100,6 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
     }
 
     test("toValue") {
-        import coulomb.policy.strict.given
-        import coulomb.policy.overlay.refined.algebraic.given
-
         1.withRP[Positive]
             .withUnit[Meter]
             .toValue[Refined[Double, Positive]]
@@ -111,18 +109,10 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
             .toValue[Refined[Float, NonNegative]]
             .assertQ[Refined[Float, NonNegative], Meter](1f.withRP[NonNegative])
 
-        assertCE(
-            "1d.withRP[Positive].withUnit[Meter].toValue[Refined[Int, Positive]]"
-        )
-
-        1.5.withRP[Positive]
+        1d.withRP[Positive]
             .withUnit[Meter]
-            .tToValue[Refined[Int, Positive]]
+            .toValue[Refined[Int, Positive]]
             .assertQ[Refined[Int, Positive], Meter](1.withRP[Positive])
-        1.5f.withRP[NonNegative]
-            .withUnit[Meter]
-            .tToValue[Refined[Int, NonNegative]]
-            .assertQ[Refined[Int, NonNegative], Meter](1.withRP[NonNegative])
 
         refineVU[Positive, Meter](1)
             .toValue[RefinedE[Double, Positive]]
@@ -136,9 +126,6 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
     }
 
     test("toUnit") {
-        import coulomb.policy.strict.given
-        import coulomb.policy.overlay.refined.algebraic.given
-
         1d.withRP[Positive]
             .withUnit[Kilo * Meter]
             .toUnit[Meter]
@@ -151,15 +138,6 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
             )
 
         assertCE("1.withRP[Positive].withUnit[Kilo * Meter].toUnit[Meter]")
-
-        1.withRP[Positive]
-            .withUnit[Meter]
-            .tToUnit[Yard]
-            .assertQ[Refined[Int, Positive], Yard](1.withRP[Positive])
-        1.withRP[NonNegative]
-            .withUnit[Meter]
-            .tToUnit[Yard]
-            .assertQ[Refined[Int, NonNegative], Yard](1.withRP[NonNegative])
 
         refineVU[Positive, Kilo * Meter](1d)
             .toUnit[Meter]
@@ -174,10 +152,7 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         )
     }
 
-    test("add strict") {
-        import coulomb.policy.strict.given
-        import coulomb.policy.overlay.refined.algebraic.given
-
+    test("add") {
         (1d.withRP[Positive]
             .withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter])
             .assertQ[Refined[Double, Positive], Meter](3d.withRP[Positive])
@@ -199,9 +174,6 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         assertCE(
             "1d.withRP[NonNegative].withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter]"
         )
-        assertCE(
-            "1d.withRP[Positive].withUnit[Meter] + 2d.withRP[Positive].withUnit[Yard]"
-        )
 
         val x = refineVU[Positive, Meter](1d)
         val z = refineVU[Positive, Meter](0d)
@@ -216,52 +188,29 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         val v = refineVU[Positive, Meter](2000000000)
         assert(v.value.isRight)
         assert((v + v).value.isLeft)
-    }
-
-    test("add standard") {
-        import coulomb.policy.standard.given
-        import coulomb.policy.overlay.refined.algebraic.given
 
         // same unit and value type
         (1d.withRP[Positive]
             .withUnit[Meter] + 2d.withRP[Positive].withUnit[Meter])
             .assertQ[Refined[Double, Positive], Meter](3d.withRP[Positive])
 
-        // same unit, differing value types
-        (1L.withRP[NonNegative]
-            .withUnit[Meter] + 2f.withRP[NonNegative].withUnit[Meter])
-            .assertQ[Refined[Float, NonNegative], Meter](3f.withRP[NonNegative])
-
         // same value, differing units
         (1f.withRP[Positive]
             .withUnit[Meter] + 1f.withRP[Positive].withUnit[Kilo * Meter])
             .assertQ[Refined[Float, Positive], Meter](1001f.withRP[Positive])
 
-        // value and unit type are different
-        (1.withRP[Positive]
-            .withUnit[Meter] + 1d.withRP[Positive].withUnit[Kilo * Meter])
-            .assertQ[Refined[Double, Positive], Meter](1001d.withRP[Positive])
-        (1f.withRP[NonNegative]
-            .withUnit[Meter] + 1L.withRP[NonNegative].withUnit[Kilo * Meter])
-            .assertQ[Refined[Float, NonNegative], Meter](
-                1001f.withRP[NonNegative]
-            )
-
-        val x = refineVU[Positive, Meter](1d)
-        val y = refineVU[Positive, Kilo * Meter](1)
-        val z = refineVU[Positive, Kilo * Meter](0)
-        (x + y).assertQ[RefinedE[Double, Positive], Meter](
+        val x2 = refineVU[Positive, Meter](1d)
+        val y2 = refineVU[Positive, Kilo * Meter](1d)
+        val z2 = refineVU[Positive, Kilo * Meter](0d)
+        (x2 + y2).assertQ[RefinedE[Double, Positive], Meter](
             refineV[Positive](1001d)
         )
-        assert((x + z).value.isLeft)
-        assert((z + x).value.isLeft)
-        assert((z + z).value.isLeft)
+        assert((x2 + z2).value.isLeft)
+        assert((z2 + x2).value.isLeft)
+        assert((z2 + z2).value.isLeft)
     }
 
-    test("multiply strict") {
-        import coulomb.policy.strict.given
-        import coulomb.policy.overlay.refined.algebraic.given
-
+    test("multiply") {
         (2d.withRP[Positive]
             .withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter])
             .assertQ[Refined[Double, Positive], Meter ^ 2](6d.withRP[Positive])
@@ -292,11 +241,6 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         val v = refineVU[Positive, Meter](Double.MinPositiveValue)
         assert(v.value.isRight)
         assert((v * v).value.isLeft)
-    }
-
-    test("multiply standard") {
-        import coulomb.policy.standard.given
-        import coulomb.policy.overlay.refined.algebraic.given
 
         (2f.withRP[Positive]
             .withUnit[Meter] * 3f.withRP[Positive].withUnit[Meter])
@@ -307,30 +251,18 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
                 6L.withRP[NonNegative]
             )
 
-        (2.withRP[Positive]
-            .withUnit[Meter] * 3d.withRP[Positive].withUnit[Meter])
-            .assertQ[Refined[Double, Positive], Meter ^ 2](6d.withRP[Positive])
-        (2f.withRP[NonNegative]
-            .withUnit[Meter] * 3L.withRP[NonNegative].withUnit[Meter])
-            .assertQ[Refined[Float, NonNegative], Meter ^ 2](
-                6f.withRP[NonNegative]
-            )
-
-        val x = refineVU[Positive, Meter](2d)
-        val y = refineVU[Positive, Meter](2)
-        val z = refineVU[Positive, Meter](0)
-        (x * y).assertQ[RefinedE[Double, Positive], Meter ^ 2](
+        val x2 = refineVU[Positive, Meter](2d)
+        val y2 = refineVU[Positive, Meter](2d)
+        val z2 = refineVU[Positive, Meter](0d)
+        (x2 * y2).assertQ[RefinedE[Double, Positive], Meter ^ 2](
             refineV[Positive](4d)
         )
-        assert((x * z).value.isLeft)
-        assert((z * x).value.isLeft)
-        assert((z * z).value.isLeft)
+        assert((x2 * z2).value.isLeft)
+        assert((z2 * x2).value.isLeft)
+        assert((z2 * z2).value.isLeft)
     }
 
-    test("divide strict") {
-        import coulomb.policy.strict.given
-        import coulomb.policy.overlay.refined.algebraic.given
-
+    test("divide") {
         (12d.withRP[Positive]
             .withUnit[Meter] / 3d.withRP[Positive].withUnit[Second])
             .assertQ[Refined[Double, Positive], Meter / Second](
@@ -365,27 +297,11 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
         val v = refineVU[Positive, Meter](Double.MinPositiveValue)
         assert(v.value.isRight)
         assert((v / x).value.isLeft)
-    }
-
-    test("divide standard") {
-        import coulomb.policy.standard.given
-        import coulomb.policy.overlay.refined.algebraic.given
 
         (12d.withRP[Positive]
             .withUnit[Meter] / 3d.withRP[Positive].withUnit[Second])
             .assertQ[Refined[Double, Positive], Meter / Second](
                 4d.withRP[Positive]
-            )
-
-        (12d.withRP[Positive]
-            .withUnit[Meter] / 3.withRP[Positive].withUnit[Second])
-            .assertQ[Refined[Double, Positive], Meter / Second](
-                4d.withRP[Positive]
-            )
-        (12.withRP[Positive]
-            .withUnit[Meter] / 3f.withRP[Positive].withUnit[Second])
-            .assertQ[Refined[Float, Positive], Meter / Second](
-                4f.withRP[Positive]
             )
 
         // NonNegative is not multiplicative group
@@ -397,19 +313,16 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
             "12.withRP[Positive].withUnit[Meter] / 3.withRP[Positive].withUnit[Second]"
         )
 
-        val x = refineVU[Positive, Meter](6d)
-        val y = refineVU[Positive, Meter](2)
-        val z = refineVU[Positive, Meter](0d)
-        (x / y).assertQ[RefinedE[Double, Positive], 1](refineV[Positive](3d))
-        assert((x / z).value.isLeft)
-        assert((z / x).value.isLeft)
-        assert((z / z).value.isLeft)
+        val x2 = refineVU[Positive, Meter](6d)
+        val y2 = refineVU[Positive, Meter](2d)
+        val z2 = refineVU[Positive, Meter](0d)
+        (x2 / y2).assertQ[RefinedE[Double, Positive], 1](refineV[Positive](3d))
+        assert((x2 / z2).value.isLeft)
+        assert((z2 / x2).value.isLeft)
+        assert((z2 / z2).value.isLeft)
     }
 
     test("power") {
-        import coulomb.policy.strict.given
-        import coulomb.policy.overlay.refined.algebraic.given
-
         // FractionalPower (algebras supporting rational exponents)
         2d.withRP[Positive]
             .withUnit[Meter]
@@ -425,12 +338,15 @@ class RefinedQuantityAlgebraicSuite extends CoulombSuite:
             .assertQ[Refined[Double, Positive], 1 / Meter](
                 0.5d.withRP[Positive]
             )
-        4d.withRP[Positive]
-            .withUnit[Meter]
-            .pow[1 / 2]
-            .assertQ[Refined[Double, Positive], Meter ^ (1 / 2)](
-                2d.withRP[Positive]
-            )
+
+        // supporting fractional exponents requires definition of
+        // givens for Fractional[Refined[V, P]]
+        // 4d.withRP[Positive]
+        //    .withUnit[Meter]
+        //    .pow[1 / 2]
+        //    .assertQ[Refined[Double, Positive], Meter ^ (1 / 2)](
+        //        2d.withRP[Positive]
+        //    )
 
         // non-negative integer exponents allowed by multiplicative monoid
         2.withRP[Positive]

@@ -20,7 +20,7 @@ import scala.quoted.staging
 
 import coulomb.*
 import coulomb.infra.runtime.meta
-import coulomb.rational.Rational
+import spire.math.Rational
 
 // a CoefficientRuntime that leverages a staging compiler to do runtime magic
 // it will be possible to define other flavors of CoefficientRuntime that

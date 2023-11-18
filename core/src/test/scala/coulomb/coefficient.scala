@@ -18,29 +18,30 @@ import coulomb.testing.CoulombSuite
 
 class CoefficientSuite extends CoulombSuite:
     import coulomb.*
-    import coulomb.policy.standard.given
     import coulomb.testing.units.{*, given}
-    import coulomb.rational.Rational
-    import algebra.instances.all.given
-    import coulomb.ops.algebra.all.{*, given}
+
+    import spire.implicits.*
+    import spire.math.Rational
+
+    import coulomb.conversion.Coefficient
 
     test("identical units") {
-        assert(coefficient[Rational, Meter, Meter] eq Rational.const1)
-        assert(coefficient[Rational, Liter, Liter] eq Rational.const1)
+        assert(Coefficient[Rational, Meter, Meter] eq Rational.one)
+        assert(Coefficient[Rational, Liter, Liter] eq Rational.one)
         assert(
-            coefficient[
+            Coefficient[
                 Rational,
                 Kilogram * Meter / (Second ^ 2),
                 Kilogram * Meter / (Second ^ 2)
-            ] eq Rational.const1
+            ] eq Rational.one
         )
     }
 
     test("convertible units") {
-        assertEquals(coefficient[Rational, Meter, Yard], Rational(10000, 9144))
-        assertEquals(coefficient[Rational, Meter ^ 3, Liter], Rational(1000))
+        assertEquals(Coefficient[Rational, Meter, Yard], Rational(10000, 9144))
+        assertEquals(Coefficient[Rational, Meter ^ 3, Liter], Rational(1000))
         assertEquals(
-            coefficient[
+            Coefficient[
                 Rational,
                 Kilogram * Meter / (Second ^ 2),
                 Pound * Yard / (Minute ^ 2)
@@ -48,37 +49,37 @@ class CoefficientSuite extends CoulombSuite:
             Rational(50000000000000L, 5760623099L)
         )
         assertEquals(
-            coefficient[Rational, Meter ^ 3, 1000 * Liter],
+            Coefficient[Rational, Meter ^ 3, 1000 * Liter],
             Rational(1)
         )
         assertEquals(
-            coefficient[Rational, Meter, Kilo * Yard],
+            Coefficient[Rational, Meter, Kilo * Yard],
             Rational(10, 9144)
         )
     }
 
     test("non-convertible units") {
-        assertCE("coefficient[Rational, Meter, Second]")
-        assertCE("coefficient[Rational, Meter ^ 2, Liter]")
+        assertCE("Coefficient[Rational, Meter, Second]")
+        assertCE("Coefficient[Rational, Meter ^ 2, Liter]")
         assertCE(
-            "coefficient[Rational, Kilogram * Meter / (Second ^ 2), Pound * Yard / (Minute ^ 3)]"
+            "Coefficient[Rational, Kilogram * Meter / (Second ^ 2), Pound * Yard / (Minute ^ 3)]"
         )
     }
 
     test("units with embedded coefficients") {
-        assertEquals(coefficient[Rational, 10 * Meter, Meter], Rational(10))
-        assertEquals(coefficient[Rational, Meter, (1 / 3) * Meter], Rational(3))
+        assertEquals(Coefficient[Rational, 10 * Meter, Meter], Rational(10))
+        assertEquals(Coefficient[Rational, Meter, (1 / 3) * Meter], Rational(3))
         assertEquals(
-            coefficient[Rational, (10 ^ 6) * Meter, Meter],
+            Coefficient[Rational, (10 ^ 6) * Meter, Meter],
             Rational(1000000)
         )
-        assertEquals(coefficient[Rational, Meter, 1.5 * Meter], Rational(2, 3))
+        assertEquals(Coefficient[Rational, Meter, 1.5 * Meter], Rational(2, 3))
         assertEquals(
-            coefficient[Rational, Meter, 1.25f * Meter],
+            Coefficient[Rational, Meter, 1.25f * Meter],
             Rational(4, 5)
         )
         assertEquals(
-            coefficient[Rational, ((1 / 3L) * (10L ^ 100)) * Meter, Meter],
+            Coefficient[Rational, ((1 / 3L) * (10L ^ 100)) * Meter, Meter],
             Rational(1, 3) * Rational(10).pow(100)
         )
     }

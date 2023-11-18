@@ -29,12 +29,12 @@ object constants:
     import coulomb.*
     import coulomb.syntax.*
     import coulomb.define.*
-    import coulomb.rational.Rational
+    import spire.math.Rational
     import coulomb.conversion.ValueConversion
 
     export coulomb.units.mksa.{*, given}
-    export coulomb.units.si.{Mole, ctx_unit_Mole, Kelvin, ctx_unit_Kelvin}
-    export coulomb.units.si.prefixes.{Giga, ctx_unit_Giga}
+    export coulomb.units.si.{Mole, unit_Mole, Kelvin, unit_Kelvin}
+    export coulomb.units.si.prefixes.{Giga, unit_Giga}
 
     /**
      * Obtain a Quantity representing a physical constant
@@ -60,7 +60,7 @@ object constants:
 
     /** Speed of light in a vacuum: 299792458 m/s */
     final type SpeedOfLight
-    given ctx_unit_SpeedOfLight: DerivedUnit[
+    given unit_SpeedOfLight: DerivedUnit[
         SpeedOfLight,
         299792458 * Meter / Second,
         "speed-of-light",
@@ -70,7 +70,7 @@ object constants:
 
     /** Planck's constant: 6.62607015×10−34 J⋅s */
     final type PlanckConstant
-    given ctx_unit_PlanckConstant: DerivedUnit[
+    given unit_PlanckConstant: DerivedUnit[
         PlanckConstant,
         (662607015 / (10 ^ 42)) * Joule * Second,
         "planck-constant",
@@ -79,7 +79,7 @@ object constants:
 
     /** Reduced Planck Constant: 1.054571817×10−34 J⋅s */
     final type ReducedPlanckConstant
-    given ctx_unit_ReducedPlanckConstant: DerivedUnit[
+    given unit_ReducedPlanckConstant: DerivedUnit[
         ReducedPlanckConstant,
         (1054571817 / (10 ^ 43)) * Joule * Second,
         "reduced-planck-constant",
@@ -88,7 +88,7 @@ object constants:
 
     /** Newton's constant of gravitation: 6.67430(15)×10−11 m3⋅kg−1⋅s−2 */
     final type GravitationalConstant
-    given ctx_unit_GravitationalConstant: DerivedUnit[
+    given unit_GravitationalConstant: DerivedUnit[
         GravitationalConstant,
         (667430 / (10 ^ 16)) * (Meter ^ 3) / (Kilogram * (Second ^ 2)),
         "gravitational-constant",
@@ -97,7 +97,7 @@ object constants:
 
     /** Vacuum electric permittivity: 8.8541878128(13)×10−12 F/m */
     final type VacuumElectricPermittivity
-    given ctx_unit_VacuumElectricPermittivity: DerivedUnit[
+    given unit_VacuumElectricPermittivity: DerivedUnit[
         VacuumElectricPermittivity,
         (88541878128L / (10 ^ 22)) * Farad / Meter,
         "vacuum-electric-permittivity",
@@ -106,7 +106,7 @@ object constants:
 
     /** Vacuum magnetic permeability: 1.25663706212(19)×10−6 N⋅A−2 */
     final type VacuumMagneticPermeability
-    given ctx_unit_VacuumMagneticPermeability: DerivedUnit[
+    given unit_VacuumMagneticPermeability: DerivedUnit[
         VacuumMagneticPermeability,
         (125663706212L / (10 ^ 17)) * Newton / (Ampere ^ 2),
         "vacuum-magnetic-permeability",
@@ -115,7 +115,7 @@ object constants:
 
     /** Characteristic impedance of vacuum: 376.730313668(57) Ω */
     final type CharacteristicImpedanceOfVacuum
-    given ctx_unit_CharacteristicImpedanceOfVacuum: DerivedUnit[
+    given unit_CharacteristicImpedanceOfVacuum: DerivedUnit[
         CharacteristicImpedanceOfVacuum,
         (376730313668L / (10 ^ 9)) * Ohm,
         "characteristic-impedance-of-vacuum",
@@ -124,7 +124,7 @@ object constants:
 
     /** The elementary charge: 1.602176634×10−19 C */
     final type ElementaryCharge
-    given ctx_unit_ElementaryCharge: DerivedUnit[
+    given unit_ElementaryCharge: DerivedUnit[
         ElementaryCharge,
         (1602176634L / (10 ^ 28)) * Coulomb,
         "elementary-charge",
@@ -133,7 +133,7 @@ object constants:
 
     /** Avogadro's number: 6.02214076×10+23 mol-1 */
     final type AvogadroConstant
-    given ctx_unit_AvogadroConstant: DerivedUnit[
+    given unit_AvogadroConstant: DerivedUnit[
         AvogadroConstant,
         (602214076L * (10 ^ 15)) / Mole,
         "avogadro-constant",
@@ -142,7 +142,7 @@ object constants:
 
     /** Boltzmann's constant: 1.380649×10−23 J⋅K−1 */
     final type BoltzmannConstant
-    given ctx_unit_BoltzmannConstant: DerivedUnit[
+    given unit_BoltzmannConstant: DerivedUnit[
         BoltzmannConstant,
         (1380649L / (10 ^ 29)) * Joule / Kelvin,
         "boltzmann-constant",
@@ -151,7 +151,7 @@ object constants:
 
     /** Conductance quantum: 7.748091729...×10−5 S */
     final type ConductanceQuantum
-    given ctx_unit_ConductanceQuantum: DerivedUnit[
+    given unit_ConductanceQuantum: DerivedUnit[
         ConductanceQuantum,
         (7748091729L / (10 ^ 14)) * Siemens,
         "conductance-quantum",
@@ -160,7 +160,7 @@ object constants:
 
     /** Josephson constant: 483597.8484...×10+9 Hz/V */
     final type JosephsonConstant
-    given ctx_unit_JosephsonConstant: DerivedUnit[
+    given unit_JosephsonConstant: DerivedUnit[
         JosephsonConstant,
         (4835978484L * (10 ^ 5)) * Hertz / Volt,
         "josephson-constant",
@@ -169,7 +169,7 @@ object constants:
 
     /** Von Klitzing constant: 25812.80745... Ω */
     final type VonKlitzingConstant
-    given ctx_unit_VonKlitzingConstant: DerivedUnit[
+    given unit_VonKlitzingConstant: DerivedUnit[
         VonKlitzingConstant,
         (2581280745L / (10 ^ 5)) * Ohm,
         "von-klitzing-constant",
@@ -178,7 +178,7 @@ object constants:
 
     /** Magnetic flux quantum: 2.067833848...×10−15 Wb */
     final type MagneticFluxQuantum
-    given ctx_unit_MagneticFluxQuantum: DerivedUnit[
+    given unit_MagneticFluxQuantum: DerivedUnit[
         MagneticFluxQuantum,
         (2067833848L / (10 ^ 24)) * Weber,
         "magnetic-flux-quantum",
@@ -187,7 +187,7 @@ object constants:
 
     /** Bohr magneton: 9.2740100783(28)×10−24 J/T */
     final type BohrMagneton
-    given ctx_unit_BohrMagneton: DerivedUnit[
+    given unit_BohrMagneton: DerivedUnit[
         BohrMagneton,
         (92740100783L / (10 ^ 34)) * Joule / Tesla,
         "bohr-magneton",
@@ -196,7 +196,7 @@ object constants:
 
     /** Nuclear magneton: 5.0507837461(15)×10−27 J/T */
     final type NuclearMagneton
-    given ctx_unit_NuclearMagneton: DerivedUnit[
+    given unit_NuclearMagneton: DerivedUnit[
         NuclearMagneton,
         (50507837461L / (10 ^ 37)) * Joule / Tesla,
         "nuclear-magneton",
@@ -205,7 +205,7 @@ object constants:
 
     /** Fine structure constant: 7.2973525693(11)×10−3 */
     final type FineStructureConstant
-    given ctx_unit_FineStructureConstant: DerivedUnit[
+    given unit_FineStructureConstant: DerivedUnit[
         FineStructureConstant,
         (72973525693L / (10 ^ 13)),
         "fine-structure-constant",
@@ -214,7 +214,7 @@ object constants:
 
     /** Inverse fine structure constant: 137.035999084 */
     final type InverseFineStructureConstant
-    given ctx_unit_InverseFineStructureConstant: DerivedUnit[
+    given unit_InverseFineStructureConstant: DerivedUnit[
         InverseFineStructureConstant,
         (137035999084L / (10 ^ 9)),
         "inverse-fine-structure-constant",
@@ -223,7 +223,7 @@ object constants:
 
     /** Electron mass: 9.1093837015(28)×10−31 kg */
     final type ElectronMass
-    given ctx_unit_ElectronMass: DerivedUnit[
+    given unit_ElectronMass: DerivedUnit[
         ElectronMass,
         (91093837015L / (10 ^ 41)) * Kilogram,
         "electron-mass",
@@ -233,7 +233,7 @@ object constants:
 
     /** Proton mass: 1.67262192369(51)×10−27 kg */
     final type ProtonMass
-    given ctx_unit_ProtonMass: DerivedUnit[
+    given unit_ProtonMass: DerivedUnit[
         ProtonMass,
         (167262192369L / (10 ^ 38)) * Kilogram,
         "proton-mass",
@@ -243,7 +243,7 @@ object constants:
 
     /** Neutron mass: 1.67492749804(95)×10−27 kg */
     final type NeutronMass
-    given ctx_unit_NeutronMass: DerivedUnit[
+    given unit_NeutronMass: DerivedUnit[
         NeutronMass,
         (167492749804L / (10 ^ 38)) * Kilogram,
         "neutron-mass",
@@ -253,7 +253,7 @@ object constants:
 
     /** Bohr radius: 5.29177210903(80)×10−11 m */
     final type BohrRadius
-    given ctx_unit_BohrRadius: DerivedUnit[
+    given unit_BohrRadius: DerivedUnit[
         BohrRadius,
         (529177210903L / (10 ^ 22)) * Meter,
         "bohr-radius",
@@ -263,7 +263,7 @@ object constants:
 
     /** Classical electron radius: 2.8179403262(13)×10−15 m */
     final type ClassicalElectronRadius
-    given ctx_unit_ClassicalElectronRadius: DerivedUnit[
+    given unit_ClassicalElectronRadius: DerivedUnit[
         ClassicalElectronRadius,
         (28179403262L / (10 ^ 25)) * Meter,
         "classical-electron-radius",
@@ -272,7 +272,7 @@ object constants:
 
     /** Electron g-factor: −2.00231930436256(35) */
     final type ElectronGFactor
-    given ctx_unit_ElectronGFactor: DerivedUnit[
+    given unit_ElectronGFactor: DerivedUnit[
         ElectronGFactor,
         (-200231930436256L / (10 ^ 14)),
         "electron-g-factor",
@@ -282,7 +282,7 @@ object constants:
 
     /** Fermi coupling constant: 1.1663787(6)×10−5 GeV−2 */
     final type FermiCouplingConstant
-    given ctx_unit_FermiCouplingConstant: DerivedUnit[
+    given unit_FermiCouplingConstant: DerivedUnit[
         FermiCouplingConstant,
         (11663787L / (10 ^ 12)) * ((Giga * ElectronVolt) ^ -2),
         "fermi-coupling-constant",
@@ -291,7 +291,7 @@ object constants:
 
     /** electron volt: 1.602176634×10−19 J */
     final type ElectronVolt
-    given ctx_unit_ElectronVolt: DerivedUnit[
+    given unit_ElectronVolt: DerivedUnit[
         ElectronVolt,
         (1602176634L / (10 ^ 28)) * Joule,
         "electron-volt",
@@ -301,7 +301,7 @@ object constants:
 
     /** atomic mass constant: 1.66053906660(50)×10−27 kg */
     final type AtomicMassConstant
-    given ctx_unit_AtomicMassConstant: DerivedUnit[
+    given unit_AtomicMassConstant: DerivedUnit[
         AtomicMassConstant,
         (166053906660L / (10 ^ 38)) * Kilogram,
         "atomic-mass-constant",
@@ -310,7 +310,7 @@ object constants:
 
     /** Faraday constant: 96485.33212... C/mol */
     final type FaradayConstant
-    given ctx_unit_FaradayConstant: DerivedUnit[
+    given unit_FaradayConstant: DerivedUnit[
         FaradayConstant,
         (9648533212L / (10 ^ 5)) * Coulomb / Mole,
         "faraday-constant",
@@ -319,7 +319,7 @@ object constants:
 
     /** Molar gas constant: 8.314462618... J/(mol⋅K) */
     final type MolarGasConstant
-    given ctx_unit_MolarGasConstant: DerivedUnit[
+    given unit_MolarGasConstant: DerivedUnit[
         MolarGasConstant,
         (8314462618L / (10 ^ 9)) * Joule / (Mole * Kelvin),
         "molar-gas-constant",
@@ -328,7 +328,7 @@ object constants:
 
     /** Molar mass constant: 0.99999999965(30)×10−3 kg/mol */
     final type MolarMassConstant
-    given ctx_unit_MolarMassConstant: DerivedUnit[
+    given unit_MolarMassConstant: DerivedUnit[
         MolarMassConstant,
         (99999999965L / (10 ^ 14)) * Kilogram / Mole,
         "molar-mass-constant",
@@ -337,7 +337,7 @@ object constants:
 
     /** Stefan-Boltzmann constant: 5.670374419...×10−8 W⋅m−2⋅K−4 */
     final type StefanBoltzmannConstant
-    given ctx_unit_StefanBoltzmannConstant: DerivedUnit[
+    given unit_StefanBoltzmannConstant: DerivedUnit[
         StefanBoltzmannConstant,
         (5670374419L / (10 ^ 17)) * Watt / ((Meter ^ 2) * (Kelvin ^ 4)),
         "stefan-boltzmann-constant",
@@ -361,7 +361,7 @@ object constants:
             class NC[CU, QUp](val value: Rational) extends ConstQ[CU]:
                 type QU = QUp
 
-            transparent inline given ctx_ConstQ[CU]: ConstQ[CU] = ${
+            transparent inline given g_ConstQ[CU]: ConstQ[CU] = ${
                 constq[CU]
             }
 
@@ -379,4 +379,4 @@ object constants:
                         report.error(
                             s"constq: unrecognized unit declaration: ${typestr(u)}"
                         )
-                        '{ new NC[CU, Nothing](Rational.const0) }
+                        '{ new NC[CU, Nothing](Rational.zero) }

@@ -45,11 +45,6 @@ import coulomb.syntax.*
 
 // algebraic definitions
 import algebra.instances.all.given
-import coulomb.ops.algebra.all.given
-
-// unit and value type policies for operations
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
 
 // unit definitions
 import coulomb.units.si.prefixes.{*, given}
@@ -57,10 +52,10 @@ import coulomb.units.info.{*, given}
 import coulomb.units.time.{*, given}
 
 // pureconfig defs
-import _root_.pureconfig.{*, given}
+import pureconfig.{*, given}
 
 // import basic coulomb-pureconfig defs
-import coulomb.pureconfig.*
+import coulomb.integrations.pureconfig.*
 ```
 
 ### examples
@@ -116,7 +111,7 @@ automatically convert compatible units, and load successfully.
 
 ```scala mdoc
 // use the DSL-based io definitions for RuntimeUnit objects
-import coulomb.pureconfig.policy.DSL.given
+import coulomb.integrations.pureconfig.DSL.given
 
 // define a configuration source
 // this source uses units that are different than the Config type
@@ -153,9 +148,9 @@ val fail = bad.load[Config]
 ## Integer Values
 
 In coulomb, conversion operations on integer values are considered to be
-[truncating][truncating conversions].
+truncating conversions.
 They may lose precision due to integer truncation.
-Truncating conversions are generally explicit only,
+Truncating conversions are generally not supported in coulomb,
 because this loss of precision is numerically unsafe.
 
 In pureconfig I/O, however, there is no way to explicitly invoke a truncating conversion.
@@ -165,9 +160,6 @@ if the conversion factor is exactly 1.
 @:callout(info)
 The safest way to ensure unit conversions will always succeed is to use fractional value types
 such as Float or Double.
-If desired,
-[coulomb-spire](coulomb-spire.md)
-provides integrations for fractional value types of higher precision.
 @:@
 
 ```scala mdoc
@@ -205,14 +197,11 @@ but it is more amenable to explicitly structured expressions.
 import coulomb.*
 import coulomb.syntax.*
 import algebra.instances.all.given
-import coulomb.ops.algebra.all.given
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
 import coulomb.units.si.prefixes.{*, given}
 import coulomb.units.info.{*, given}
 import coulomb.units.time.{*, given}
-import _root_.pureconfig.{*, given}
-import coulomb.pureconfig.*
+import pureconfig.{*, given}
+import coulomb.integrations.pureconfig.*
 
 given given_pureconfig: PureconfigRuntime = PureconfigRuntime.of[
     "coulomb.units.si.prefixes" *:
@@ -242,7 +231,7 @@ given given_ConfigLoader(using
 
 ```scala mdoc
 // use the JSON-based io definitions for RuntimeUnit objects
-import coulomb.pureconfig.policy.JSON.given
+import coulomb.integrations.pureconfig.JSON.given
 
 // this configuration source represents units in structured JSON
 val source = ConfigSource.string("""

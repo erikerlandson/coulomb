@@ -29,11 +29,6 @@ import coulomb.syntax.*
 
 // algebraic definitions
 import algebra.instances.all.given
-import coulomb.ops.algebra.all.given
-
-// unit and value type policies for operations
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
 
 // unit definitions
 import coulomb.units.si.{*, given}
@@ -43,7 +38,7 @@ import coulomb.units.time.{*, given}
 
 // parsing definitions
 import coulomb.parser.RuntimeUnitParser
-import coulomb.parser.standard.RuntimeUnitDslParser
+import coulomb.parser.dsl.RuntimeUnitDslParser
 ```
 
 ### examples

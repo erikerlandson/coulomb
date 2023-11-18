@@ -20,7 +20,7 @@ class ParserDSLSuite extends CoulombSuite:
     import coulomb.*
     import coulomb.syntax.*
     import coulomb.parser.RuntimeUnitParser
-    import coulomb.parser.standard.RuntimeUnitDslParser
+    import coulomb.parser.dsl.RuntimeUnitDslParser
 
     import coulomb.RuntimeUnit
 

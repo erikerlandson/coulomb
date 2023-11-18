@@ -28,13 +28,8 @@ Import `coulomb` definitions:
 import coulomb.*
 import coulomb.syntax.*
 
-// algebraic definitions
+// algebraic typeclass definitions
 import algebra.instances.all.given
-import coulomb.ops.algebra.all.given
-
-// unit and value type policies for operations
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
 
 // unit definitions
 import coulomb.units.si.{*, given}
@@ -47,7 +42,7 @@ Use `coulomb` to do typelevel unit analysis in Scala!
 val a = 9.8.withUnit[Meter / (Second ^ 2)]
 
 // time or duration
-val t = 10.withUnit[Second]
+val t = 10.0.withUnit[Second]
 
 // velocity
 val v = a * t
@@ -73,7 +68,6 @@ val fail = time + dist
 | ---: | :--- |
 | [coulomb-core] | Provides core `coulomb` logic. Defines policies for `Int`, `Long`, `Float`, `Double`. |
 | [coulomb-units] | Defines common units, including SI, MKSA, Accepted, time, temperature, and US traditional |
-| [coulomb-spire] | Defines policies for working with Spire and Scala numeric types |
 | [coulomb-refined] | Unit analysis with typelevel [refined](https://github.com/fthomas/refined#refined-simple-refinement-types-for-scala) awareness |
 | [coulomb-pureconfig] | Configuration I/O with @:api(coulomb.Quantity$) values |
 | [coulomb-runtime] | Runtime units and quantities |

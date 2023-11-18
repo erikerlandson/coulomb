@@ -20,6 +20,23 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations.*
 
+object algebras:
+    import algebra.ring.*
+    // inlining typeclass methods can be leveraged by inline code
+    // however so far, only for these "static" typeclass objects.
+    // For cases where the typeclass has to be constructed per invocation,
+    // it seems to be impossible for scala to make "full" use of the inlining,
+    // so I am not going to try to in-line methods for typeclasses that
+    // must be non-static functions of their types, for example UnitConversion
+    given DoubleIsField: Field[Double] with
+        inline def zero: Double = 0.0
+        inline def one: Double = 1.0
+        inline def plus(x: Double, y: Double): Double = x + y
+        inline def negate(x: Double): Double = -x
+        override inline def minus(x: Double, y: Double): Double = x - y
+        inline def times(x: Double, y: Double): Double = x * y
+        inline def div(x: Double, y: Double): Double = x / y
+
 @State(Scope.Thread)
 @Fork(1)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -32,9 +49,6 @@ class QuantityBenchmark:
     import coulomb.syntax.*
     import coulomb.testing.units.{*, given}
     import algebra.instances.all.given
-    import coulomb.ops.algebra.all.given
-
-    import coulomb.policy.standard.given
 
     var data: Vector[Quantity[Double, Meter]] =
         Vector.empty[Quantity[Double, Meter]]
@@ -49,7 +63,7 @@ class QuantityBenchmark:
 
     @Benchmark
     def add1V1U_opt(): Quantity[Double, Meter] =
-        import coulomb.ops.standard.optimizations.all.given
+        import coulomb.benchmarks.algebras.given
         data.foldLeft(0d.withUnit[Meter]) { (s, x) => s + x }
 
     @Benchmark
@@ -58,23 +72,5 @@ class QuantityBenchmark:
 
     @Benchmark
     def add1V2U_opt(): Quantity[Double, Kilo * Meter] =
-        import coulomb.ops.standard.optimizations.all.given
+        import coulomb.benchmarks.algebras.given
         data.foldLeft(0d.withUnit[Kilo * Meter]) { (s, x) => s + x }
-
-    @Benchmark
-    def add2V1U(): Quantity[Float, Meter] =
-        data.foldLeft(0f.withUnit[Meter]) { (s, x) => s + x }
-
-    @Benchmark
-    def add2V1U_opt(): Quantity[Float, Meter] =
-        import coulomb.ops.standard.optimizations.all.given
-        data.foldLeft(0f.withUnit[Meter]) { (s, x) => s + x }
-
-    @Benchmark
-    def add2V2U(): Quantity[Float, Kilo * Meter] =
-        data.foldLeft(0f.withUnit[Kilo * Meter]) { (s, x) => s + x }
-
-    @Benchmark
-    def add2V2U_opt(): Quantity[Float, Kilo * Meter] =
-        import coulomb.ops.standard.optimizations.all.given
-        data.foldLeft(0f.withUnit[Kilo * Meter]) { (s, x) => s + x }
