@@ -2,6 +2,7 @@
 // sbt githubWorkflowGenerate
 // and check in the updates to github workflow yamls
 
+// this line to kick off pull request from branch 'simplify-coulomb'
 // base version for assessing MIMA
 ThisBuild / tlBaseVersion := "0.8"
 
