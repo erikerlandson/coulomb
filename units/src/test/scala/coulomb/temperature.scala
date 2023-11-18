@@ -19,17 +19,13 @@ import coulomb.testing.CoulombSuite
 class TemperatureUnitsSuite extends CoulombSuite:
     import coulomb.*
     import coulomb.syntax.*
+    import coulomb.units.syntax.*
     import coulomb.units.temperature.{*, given}
     import algebra.instances.all.given
 
     // There are various cases and combinations that are not enumerated here,
     // because they are enumerated in TimeUnitsSuite, and both are implemented
     // with DeltaQuantity under the hood
-
-    test("lift via Temperature") {
-        Temperature[Kelvin](1d).assertDQ[Double, Kelvin](1)
-        Temperature[Kelvin](1).assertDQ[Int, Kelvin](1)
-    }
 
     test("lift via withTemperature") {
         1d.withTemperature[Celsius].assertDQ[Double, Celsius](1)
@@ -50,53 +46,37 @@ class TemperatureUnitsSuite extends CoulombSuite:
     }
 
     test("toValue") {
-        import coulomb.policy.strict.given
-
         1.withTemperature[Celsius].toValue[Float].assertDQ[Float, Celsius](1)
-        1d.withTemperature[Celsius].tToValue[Int].assertDQ[Int, Celsius](1)
     }
 
     test("toUnit") {
-        import coulomb.policy.strict.given
-
         37d.withTemperature[Celsius]
             .toUnit[Fahrenheit]
             .assertDQD[Double, Fahrenheit](98.6)
-        37.withTemperature[Celsius]
-            .tToUnit[Fahrenheit]
-            .assertDQ[Int, Fahrenheit](98)
     }
 
     test("subtraction standard") {
-        import coulomb.policy.standard.given
-
-        (100.withTemperature[Celsius] - 122d.withTemperature[Fahrenheit])
+        (100d.withTemperature[Celsius] - 122d.withTemperature[Fahrenheit])
             .assertQD[Double, Celsius](50)
     }
 
     test("quantity subtraction standard") {
-        import coulomb.policy.standard.given
-
-        (100.withTemperature[Celsius] - 90d.withUnit[Fahrenheit])
+        (100d.withTemperature[Celsius] - 90d.withUnit[Fahrenheit])
             .assertDQD[Double, Celsius](50)
     }
 
     test("quantity addition standard") {
-        import coulomb.policy.standard.given
-
-        (100.withTemperature[Celsius] + 90d.withUnit[Fahrenheit])
+        (100d.withTemperature[Celsius] + 90d.withUnit[Fahrenheit])
             .assertDQD[Double, Celsius](150)
     }
 
     test("less-than standard") {
-        import coulomb.policy.standard.given
-
         assertEquals(
-            100d.withTemperature[Celsius] < 100f.withTemperature[Fahrenheit],
+            100d.withTemperature[Celsius] < 100d.withTemperature[Fahrenheit],
             false
         )
         assertEquals(
-            0f.withTemperature[Fahrenheit] < 0L.withTemperature[Celsius],
+            0f.withTemperature[Fahrenheit] < 0f.withTemperature[Celsius],
             true
         )
     }

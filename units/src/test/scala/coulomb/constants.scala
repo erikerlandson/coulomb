@@ -18,7 +18,6 @@ import coulomb.testing.CoulombSuite
 
 class PhysicalConstantsSuite extends CoulombSuite:
     import coulomb.*
-    import coulomb.policy.standard.given
     import coulomb.units.constants.{*, given}
 
     test("physical constant values") {

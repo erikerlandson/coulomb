@@ -16,21 +16,36 @@
 
 package coulomb.infra
 
-import coulomb.rational.Rational
+import spire.math.{Rational, SafeLong}
+
 import coulomb.*
 import coulomb.define.*
+import coulomb.infra.utils.*
 
 object meta:
     import scala.unchecked
     import scala.quoted.*
     import scala.language.implicitConversions
 
-    given ctx_RationalToExpr: ToExpr[Rational] with
+    given g_SafeLongToExpr: ToExpr[SafeLong] with
+        def apply(s: SafeLong)(using Quotes): Expr[SafeLong] = s match
+            case v if (v == SafeLong.zero) => '{ SafeLong.zero }
+            case v if (v == SafeLong.one)  => '{ SafeLong.one }
+            case v if (v.isValidLong) =>
+                '{ SafeLong(${ Expr(s.getLong.get) }) }
+            case _ => '{ SafeLong(${ Expr(s.toBigInt) }) }
+
+    given g_RationalToExpr: ToExpr[Rational] with
         def apply(r: Rational)(using Quotes): Expr[Rational] = r match
-            // Rational(1) is a useful special case to have predefined
-            // could we get clever with some kind of expression caching/sharing here?
-            case v if (v == 1) => '{ Rational.const1 }
-            case _             => '{ Rational(${ Expr(r.n) }, ${ Expr(r.d) }) }
+            case v if (v == Rational.zero) => '{ Rational.zero }
+            case v if (v == Rational.one)  => '{ Rational.one }
+            case _ =>
+                '{
+                    Rational(
+                        ${ Expr(r.numerator) },
+                        ${ Expr(r.denominator) }
+                    )
+                }
 
     sealed class SigMode
     object SigMode:
@@ -75,17 +90,28 @@ object meta:
 
         def apply(using Quotes)(v: Rational): quotes.reflect.TypeRepr =
             import quotes.reflect.*
-            if (v.d == 1) then bigintTE(v.n)
-            else TypeRepr.of[/].appliedTo(List(bigintTE(v.n), bigintTE(v.d)))
+            if (v.denominator == 1) then bigintTE(v.numerator)
+            else
+                TypeRepr
+                    .of[/]
+                    .appliedTo(
+                        List(bigintTE(v.numerator), bigintTE(v.denominator))
+                    )
 
     object bigintTE:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[BigInt] =
             import quotes.reflect.*
             tr match
-                case ConstantType(IntConstant(v))    => Some(BigInt(v))
-                case ConstantType(LongConstant(v))   => Some(BigInt(v))
-                case ConstantType(StringConstant(v)) => Some(BigInt(v))
-                case _                               => None
+                case ConstantType(IntConstant(v))  => Some(BigInt(v))
+                case ConstantType(LongConstant(v)) => Some(BigInt(v))
+                case ConstantType(StringConstant(v)) =>
+                    scala.util.Try { BigInt(v) } match
+                        case scala.util.Success(b) => Some(b)
+                        case _                     => None
+                case _ => None
+
+        def apply(using Quotes)(v: SafeLong): quotes.reflect.TypeRepr =
+            bigintTE(v.toBigInt)
 
         def apply(using Quotes)(v: BigInt): quotes.reflect.TypeRepr =
             import quotes.reflect.*
@@ -105,16 +131,18 @@ object meta:
         Quotes
     )(u1: quotes.reflect.TypeRepr, u2: quotes.reflect.TypeRepr): Rational =
         import quotes.reflect.*
-        // the fundamental algorithmic unit analysis criterion:
-        // http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/
-        given sigmode: SigMode = SigMode.Canonical
-        val (rcoef, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
-        if (rsig == Nil) then rcoef
+        if (u1 =:= u2) Rational.one
         else
-            report.error(
-                s"unit type ${typestr(u1)} not convertable to ${typestr(u2)}"
-            )
-            Rational.const0
+            // the fundamental algorithmic unit analysis criterion:
+            // http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/
+            given sigmode: SigMode = SigMode.Canonical
+            val (rcoef, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
+            if (rsig == Nil) then rcoef
+            else
+                report.error(
+                    s"unit type ${typestr(u1)} not convertable to ${typestr(u2)}"
+                )
+                Rational.zero
 
     def offset(using
         Quotes
@@ -123,10 +151,10 @@ object meta:
         // given sigmode: SigMode = SigMode.Simplify
         u match
             case deltaunit(offset, d) if convertible(d, b) => offset
-            case _ if convertible(u, b)                    => Rational.const0
+            case _ if convertible(u, b)                    => Rational.zero
             case _ =>
                 report.error(s"bad DeltaUnit in offset: ${typestr(u)}")
-                Rational.const0
+                Rational.zero
 
     def convertible(using
         Quotes
@@ -135,12 +163,6 @@ object meta:
         given sigmode: SigMode = SigMode.Canonical
         val (_, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
         rsig == Nil
-
-    @deprecated("unused, keeping this to satisfy MIMA")
-    def matchingdelta(using
-        Quotes
-    )(db: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Boolean =
-        false
 
     // returns tuple: (expr-for-coef, type-of-Res)
     def cansig(using qq: Quotes, mode: SigMode)(
@@ -159,8 +181,8 @@ object meta:
                 mode match
                     case SigMode.Simplify =>
                         // in simplify mode we preserve constants in the signature
-                        if (c == 1) (Rational.const1, Nil)
-                        else (Rational.const1, (u, Rational.const1) :: Nil)
+                        if (c == 1) (Rational.one, Nil)
+                        else (Rational.one, (u, Rational.one) :: Nil)
                     case _ => (c, Nil)
             // traverse down the operator types first, since that can be done without
             // any attempts to look up context variables for BaseUnit and DerivedUnit,
@@ -177,26 +199,26 @@ object meta:
                 (lcoef / rcoef, usig)
             case AppliedType(op, List(b, p)) if (op =:= TypeRepr.of[^]) =>
                 val (bcoef, bsig) = cansig(b)
-                val rationalTE(e) = p: @unchecked
-                if (e == 0) (Rational.const1, Nil)
+                val e = p match
+                    case rationalTE(r) => r
+                    case _ =>
+                        report.error("improper unit exponent")
+                        Rational.zero
+                if (e == 0) (Rational.one, Nil)
                 else if (e == 1) (bcoef, bsig)
-                else if (e.n.isValidInt && e.d.isValidInt)
-                    val ucoef =
-                        if (e.d == 1) bcoef.pow(e.n.toInt)
-                        else bcoef.pow(e.n.toInt).root(e.d.toInt)
-                    val usig = unifyPow(e, bsig)
-                    (ucoef, usig)
+                else if (e.numerator.isValidInt && e.denominator.isValidInt)
+                    (bcoef.fpow(e), unifyPow(e, bsig))
                 else
                     report.error(s"bad exponent in cansig: ${typestr(u)}")
-                    (Rational.const0, Nil)
-            case baseunit() => (Rational.const1, (u, Rational.const1) :: Nil)
+                    (Rational.zero, Nil)
+            case baseunit() => (Rational.one, (u, Rational.one) :: Nil)
             case derivedunit(ucoef, usig) =>
                 mode match
                     case SigMode.Canonical => (ucoef, usig)
-                    case _                 => (Rational.const1, (u, Rational.const1) :: Nil)
+                    case _                 => (Rational.one, (u, Rational.one) :: Nil)
             case _ =>
                 // treat any other type as if it were a BaseUnit
-                (Rational.const1, (u, Rational.const1) :: Nil)
+                (Rational.one, (u, Rational.one) :: Nil)
 
     def sortsig(using Quotes)(
         sig: List[(quotes.reflect.TypeRepr, Rational)]
@@ -277,7 +299,7 @@ object meta:
                     mode match
                         case SigMode.Simplify =>
                             // don't expand the signature definition in simplify mode
-                            Some((Rational.const1, (u, Rational.const1) :: Nil))
+                            Some((Rational.one, (u, Rational.one) :: Nil))
                         case _ =>
                             val AppliedType(_, List(_, d, _, _)) =
                                 dtr: @unchecked
@@ -370,10 +392,10 @@ object meta:
         op: (Rational, Rational) => Rational
     ): List[(quotes.reflect.TypeRepr, Rational)] =
         sig match
-            case Nil => (u, op(Rational.const0, e)) :: Nil
+            case Nil => (u, op(Rational.zero, e)) :: Nil
             case (u0, e0) :: tail if (u =:= u0) =>
                 val ei = op(e0, e)
-                if (ei == Rational.const0) tail else (u, ei) :: tail
+                if (ei == Rational.zero) tail else (u, ei) :: tail
             case (u0, e0) :: tail => (u0, e0) :: insertTerm(u, e, tail, op)
 
     def unifyPow(using Quotes)(
@@ -381,9 +403,9 @@ object meta:
         sig: List[(quotes.reflect.TypeRepr, Rational)]
     ): List[(quotes.reflect.TypeRepr, Rational)] =
         sig match
-            case _ if (e == Rational.const0) => Nil
-            case Nil                         => Nil
-            case (u, e0) :: tail             => (u, e0 * e) :: unifyPow(e, tail)
+            case _ if (e == Rational.zero) => Nil
+            case Nil                       => Nil
+            case (u, e0) :: tail           => (u, e0 * e) :: unifyPow(e, tail)
 
     def typeReprList(using Quotes)(
         tlist: quotes.reflect.TypeRepr
@@ -410,8 +432,11 @@ object meta:
         def work(trp: TypeRepr): String =
             val tr = if (dealias) trp.dealias else trp
             tr match
-                case typealias(_) => tr.typeSymbol.name
-                case unitconst(v) => s"$v"
+                case typealias(_)                    => tr.typeSymbol.name
+                case ConstantType(IntConstant(v))    => s"$v"
+                case ConstantType(DoubleConstant(v)) => s"$v"
+                case ConstantType(StringConstant(v)) => s"\"$v\""
+                case unitconst(v)                    => s"$v"
                 case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[*] =>
                     s"(${work(lhs)} * ${work(rhs)})"
                 case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[/] =>

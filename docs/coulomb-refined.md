@@ -36,17 +36,12 @@ import eu.timepit.refined.numeric.*
 
 // algebraic definitions
 import algebra.instances.all.given
-import coulomb.ops.algebra.all.{*, given}
-
-// standard policy for spire and scala types
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
 
 // overlay policy for refined integrations
-import coulomb.policy.overlay.refined.algebraic.given
+import coulomb.integrations.refined.all.given
 
 // coulomb syntax for refined integrations
-import coulomb.syntax.refined.*
+import coulomb.integrations.refined.syntax.*
 ```
 
 ### examples
@@ -115,34 +110,6 @@ pe1 + pe1
 // algebras operating on Left values result in a Left
 pe1 + pe2
 ```
-
-## Policies
-
-### policy overlays
-
-The `coulomb-refined` package currently provides a single "overlay" policy.
-An overlay policy is designed to work with any other policies currently in scope,
-and lift them into another abstraction;
-in this case, lifting policies for value type(s) `V` into `Refined[V, P]`.
-The `Refined` abstraction guarantees that a value of type `V` satisfies some predicate `P`,
-and the semantics of `V` remain otherwise unchanged.
-
-For example, given any algebra in scope for a type `V` that defines addition,
-the `coulomb-refined` overlay defines the corresponding `Refined[V, P]` addition
-like so:
-```scala
-plus(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
-// (x.value + y.value) refined by P
-```
-
-@:callout(info)
-Because the refined algebraic policy is an overlay,
-you can use it with your choice of base policies,
-for example with
-[core policies](coulomb-core.md#coulomb-policies)
-or
-[spire policies](coulomb-spire.md#policies).
-@:@
 
 ### algebraic policy table
 

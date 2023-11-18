@@ -13,11 +13,6 @@ import coulomb.syntax.*
 
 // algebraic definitions
 import algebra.instances.all.given
-import coulomb.ops.algebra.all.given
-
-// unit and value type policies for operations
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
 
 // unit definitions
 import coulomb.units.si.{*, given}
@@ -168,8 +163,8 @@ These are referred to as derived units, or compound units.
 object nautical:
     import coulomb.define.*
 
-    export coulomb.units.si.{ Meter, ctx_unit_Meter }
-    export coulomb.units.time.{ Hour, ctx_unit_Hour }
+    export coulomb.units.si.{ Meter, unit_Meter }
+    export coulomb.units.time.{ Hour, unit_Hour }
 
     final type NauticalMile
     given unit_NauticalMile: DerivedUnit[NauticalMile, 1852 * Meter, "nmile", "nmi"] =
@@ -269,6 +264,22 @@ val w2 = Wrapper(37D).withUnit[Vector[Int]]
 w2.show
 ```
 
+### Numeric Value Types
+
+The coulomb core libraries provide support for the following numeric types:
+
+| Value Type | Defined In |
+| --- | --- |
+| Int | Scala |
+| Long | Scala |
+| Float | Scala |
+| Double | Scala |
+| BigInt | Scala |
+| BigDecimal | Scala |
+| Rational | Spire |
+| Algebraic | Spire |
+| Real | Spire |
+
 ### Value Types and Algebras
 
 Although value and unit types are arbitrary for a `Quantity`, there is no free lunch.
@@ -335,41 +346,6 @@ v === v
 v =!= v
 ```
 
-## Truncating Operations
-
-Some operations involving integral types such as `Int`, `Long`, or `BigInt`,
-are considered "truncating" - they lose the fractional component of the result.
-In coulomb these are distinguished with specific "truncating" operators:
-
-```scala mdoc
-// fractional values (Double, Float, BigDecimal, Rational, etc)
-val fractional = 10.5.withUnit[Meter]
-
-// truncating value conversions (fractional -> integral)
-val integral = fractional.tToValue[Int]
-
-// truncating unit conversions
-integral.tToUnit[Yard]
-
-// truncating division
-integral `tquot` 3
-
-// truncating power
-integral.tpow[1/2]
-```
-
-Non-truncating operations are defined in cases where the result will not discard fractional components:
-```scala mdoc
-// "normal" (aka truncating) operations work when fractional component of results are preserved
-fractional / 3
-```
-
-Non-truncating operations are undefined on types that would cause truncation.
-```scala mdoc:fail
-// standard division is undefined for cases that would truncate
-integral / 3
-```
-
 ## Value and Unit Conversions
 
 In `coulomb`, a `Quantity[V, U]` may experience conversions along two possible axes:
@@ -393,22 +369,6 @@ This is because the best way of converting from unit `UF` to `UT` will depend on
 You can look at examples of unit conversions defined in `coulomb-core`
 [here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/conversion/standard/unit$.html).
 
-### truncating conversions
-
-As we saw in
-[previous sections][Truncating Operations],
-some operations on coulomb quantities may result in "truncation" - the loss of fractional parts of values.
-As with operations, truncating conversions are represented by distinct conversions
-`TruncatingValueConversion[VF, VT]` and `TruncatingUnitConversion[V, UF, UT]`.
-
-```scala mdoc
-// a truncating value conversion (fractional -> integral)
-val qi = q.tToValue[Int]
-
-// a truncating unit conversion (on an integral type)
-qi.tToUnit[Yard]
-```
-
 ### implicit conversions
 
 In Scala 3, implicit conversions are represented by `scala.Conversion[F, T]`,
@@ -417,30 +377,28 @@ which you can read more about
 
 The `coulomb-core` library
 [pre-defines](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/conversion/standard/scala$.html)
-such implicit conversions,
-based on ValueConversion and UnitConversion context in scope.
-By convention, `coulomb` performs value conversions first, then unit conversions.
+implicit unit conversions,
+based on `UnitConversion` context in scope.
 
 Implicit quantity conversions can be used in typical Scala scenarios:
 
 ```scala mdoc
-// implicitly convert double to float, and then cubic meters to liters
-val iconv: Quantity[Float, Liter] = 1.0.withUnit[Meter ^ 3]
+import scala.language.implicitConversions
+import coulomb.conversion.implicits.given
+
+// implicitly convert cubic meters to liters
+val iconv: Quantity[Double, Liter] = 1.0.withUnit[Meter ^ 3]
+
+// implicitly convert "raw" values to unitless Quantity
+val uq: Quantity[Int, 1] = 100
 ```
 
-However, numeric operators in `coulomb` may also make use of these implicit conversions:
-```scala mdoc
-val q1 = 1d.withUnit[Second]
-val q2 = 1.withUnit[Minute]
-
-// in this operation, q2's integer value is implicitly converted to double,
-// and then minutes are converted to seconds, and added to q1:
-q1 + q2
-```
+@:callout(info)
+Implicit value conversions are not supported by the coulomb library.
+@:@
 
 ### defining conversions
-
-The `coulomb-core` and `coulomb-spire` libraries define value and unit conversions for a wide variety of
+The `coulomb-core` libraries define value and unit conversions for a wide variety of
 popular numeric types, however you can also easily define your own.
 
 ```scala mdoc
@@ -464,69 +422,6 @@ wq.toUnit[Second]
 wq.toValue[Wrapper[Float]]
 ```
 
-## Value Promotion and Resolution
-
-We saw in our
-[earlier example][implicit conversions]
-that `coulomb` can perform implicit value and unit conversions when doing numeric operations.
-The high level logic (implemented in chained context rules) is:
-
-1. "Resolve" left and right value types (`VL` and `VR`) into a final output type `VO`
-1. Apply implicit conversion `Quantity[VL, UL]` -> `Quantity[VO, UL]`
-1. Apply implicit conversion `Quantity[VR, UR]` -> `Quantity[VO, UL]`
-1. Perform the relevant algebraic operation, in value space `VO`
-1. Return the resulting value as `Quantity[VO, UL]`
-
-Note that not all numeric operations require all of these steps,
-however here is an example fragment of such code for addition which demonstrates them all:
-
-```scala
-transparent inline given ctx_add_2V2U[VL, UL, VR, UR](using
-    vres: ValueResolution[VL, VR],
-    icl: Conversion[Quantity[VL, UL], Quantity[vres.VO, UL]],
-    icr: Conversion[Quantity[VR, UR], Quantity[vres.VO, UL]],
-    alg: AdditiveSemigroup[vres.VO]
-        ): Add[VL, UL, VR, UR] =
-    new infra.AddNC((ql: Quantity[VL, UL], qr: Quantity[VR, UR]) => alg.plus(icl(ql).value, icr(qr).value).withUnit[UL])
-```
-
-In the example above, you can see that the context object that maps
-`(VL, VR) => VO` is of type `ValueResolution[VL, VR]`.
-
-It is possible to define all the necessary `ValueResolution[VL, VR]` for all possible pairs of
-`(VL, VR)`, however for more than a small number of such types the number of pairs grows unwieldy
-rather fast (quadratically fast in fact).
-However, there is another preferred alternative that allows you to only define "key" pairs that
-define a Directed Acyclic Graph, and the `coulomb` typeclass system will efficiently search this
-space to identify the correct value of `ValueResolution[VL, VR]` at compile time.
-
-Here is one example that captures the "total ordering" relation among value type resolutions
-for `{Int, Long, Float, Double}` that comes with `coulomb-core`:
-
-```scala
-// ValuePromotion infers the transitive closure of all promotions
-given ctx_vpp_standard: ValuePromotionPolicy[
-    (Int, Long) &: (Long, Float) &: (Float, Double) &: TNil
-] = ValuePromotionPolicy()
-```
-
-Using this, we can finish off our `Wrapper` example with some rules for generating `ValueResolution`.
-
-```scala mdoc
-object wrappervr:
-    import coulomb.ops.*
-    transparent inline given vr_Wrapper[VL, VR](using vres: ValueResolution[VL, VR]): ValueResolution[Wrapper[VL], Wrapper[VR]] =
-        new ValueResolution[Wrapper[VL], Wrapper[VR]]:
-            type VO = Wrapper[vres.VO]
-
-import wrappervr.given
-
-val wq1 = Wrapper(1d).withUnit[Second]
-val wq2 = Wrapper(1f).withUnit[Minute]
-
-wq1 + wq2
-```
-
 ## Temperature and Time
 
 The `coulomb-units` library defines units for temperature and time.
@@ -538,7 +433,10 @@ and units of duration.
 Consider the following example:
 
 ```scala mdoc
+// import temperature units
 import coulomb.units.temperature.{*, given}
+// import extensions for temp and time
+import coulomb.units.syntax.*
 
 // Here are two absolute temperatures
 val cels1 = 10d.withTemperature[Celsius]
@@ -606,93 +504,3 @@ DeltaUnit - DeltaUnit => Quantity
 DeltaUnit + Quantity => DeltaUnit
 DeltaUnit - Quantity => DeltaUnit
 ```
-
-## Coulomb Policies
-
-The `coulomb-core` library is designed so that very few typeclasses are hard-coded.
-As previous sections demonstrate, it is relatively easy to implement your own typeclasses
-if you need to work with custom types, or would prefer behaviors that are different than
-available out-of-box typeclasses.
-
-However, one tradeoff is that to obtain out-of-box features,
-the programmer needs to import a somewhat unweildy number of typeclasses.
-
-To help reduce the number of imports and make it easier to understand various behavior options,
-`coulomb` takes advantage of the new Scala 3
-[export clauses](https://docs.scala-lang.org/scala3/reference/other-new-features/export.html)
-to provide predefined groupings of imports which represent different "policies" for behavior.
-
-The `coulomb-core` library defines two policies, which you can import from `coulomb.policy`.
-The first, which is used by most of the examples in this documentation, is `coulomb.policy.standard`.
-This policy supports:
-
-- implicit value type promotions
-- implicit unit conversions
-- implicit value conversions
-
-Here is an example of using `coulomb.policy.standard`
-
-```scala mdoc:nest
-// note this does not include other necessary imports
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
-
-val q1 = 1d.withUnit[Liter]
-val q2 = 1.withUnit[Meter ^ 3]
-
-// with "standard" policy, coulomb can resolve differing value types and unit types
-q1 + q2
-```
-
-```scala mdoc:reset:invisible
-// here we are resetting the compile context
-// to demonstrate strict policy
-
-// fundamental coulomb types and methods
-import coulomb.*
-import coulomb.syntax.*
-
-// algebraic definitions
-import algebra.instances.all.given
-import coulomb.ops.algebra.all.given
-
-// unit definitions
-import coulomb.units.si.{*, given}
-import coulomb.units.mksa.{*, given}
-import coulomb.units.time.{*, given}
-import coulomb.units.accepted.{*, given}
-```
-
-The second pre-defined policy is `couomb.policy.strict`,
-which does *not* allow implicit conversions of values or units.
-Operations involving identical value and unit types are always allowed,
-as are *explicit* conversions:
-
-```scala mdoc
-import coulomb.policy.strict.given
-
-val q1 = 1d.withUnit[Liter]
-val q2 = 2d.withUnit[Liter]
-
-// strict policy allows operating with same unit and value
-q1 + q2
-
-// explicit value and unit conversions are always allowed
-q1.toValue[Float]
-q1.toUnit[Meter ^ 3]
-```
-
-```scala mdoc:fail
-val q3 = 1.withUnit[Meter ^ 3]
-
-// strict policy does not allow implicit value or unit conversions
-q1 + q3
-```
-
-The `coulomb-spire` library provides additional predefined policies that
-support the standard Scala numeric types as well as spire's specialized types.
-
-@:callout(info)
-If you import `coulomb-spire` policies, do not also import `coulomb-core` policies.
-Only one policy at a time should be imported.
-@:@

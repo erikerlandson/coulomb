@@ -53,9 +53,7 @@ scala> import coulomb.*
      | import coulomb.syntax.*
      |
      | import algebra.instances.all.given
-     | import coulomb.ops.algebra.spire.all.given
      |
-     | import coulomb.policy.spire.standard.given
      | import coulomb.units.si.*
      | import coulomb.units.si.given
 

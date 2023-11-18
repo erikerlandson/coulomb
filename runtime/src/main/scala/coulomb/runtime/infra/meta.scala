@@ -20,7 +20,7 @@ import scala.quoted.*
 import scala.util.{Try, Success, Failure}
 
 import coulomb.*
-import coulomb.rational.Rational
+import spire.math.Rational
 
 object meta:
     import scala.unchecked
@@ -29,19 +29,19 @@ object meta:
     import coulomb.infra.meta.{*, given}
     import coulomb.conversion.coefficients.coefficientRational
 
-    given ctx_RuntimeUnitConstToExpr: ToExpr[RuntimeUnit.UnitConst] with
+    given g_RuntimeUnitConstToExpr: ToExpr[RuntimeUnit.UnitConst] with
         def apply(uc: RuntimeUnit.UnitConst)(using
             Quotes
         ): Expr[RuntimeUnit.UnitConst] =
             '{ RuntimeUnit.UnitConst(${ Expr(uc.value) }) }
 
-    given ctx_RuntimeUnitTypeToExpr: ToExpr[RuntimeUnit.UnitType] with
+    given g_RuntimeUnitTypeToExpr: ToExpr[RuntimeUnit.UnitType] with
         def apply(ut: RuntimeUnit.UnitType)(using
             Quotes
         ): Expr[RuntimeUnit.UnitType] =
             '{ RuntimeUnit.UnitType(${ Expr(ut.path) }) }
 
-    given ctx_RuntimeUnitToExpr: ToExpr[RuntimeUnit] with
+    given g_RuntimeUnitToExpr: ToExpr[RuntimeUnit] with
         def apply(rtu: RuntimeUnit)(using Quotes): Expr[RuntimeUnit] =
             rtu match
                 case uc: RuntimeUnit.UnitConst => Expr(uc)

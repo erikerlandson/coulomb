@@ -29,45 +29,45 @@ object mksa:
     import coulomb.units.si.*
     import coulomb.units.mks.*
 
-    export coulomb.units.si.{Ampere, ctx_unit_Ampere}
+    export coulomb.units.si.{Ampere, unit_Ampere}
     export coulomb.units.mks.{*, given}
 
     /** Unit of electric charge */
     final type Coulomb
-    given ctx_unit_Coulomb
-        : DerivedUnit[Coulomb, Ampere * Second, "coulomb", "C"] = DerivedUnit()
+    given unit_Coulomb: DerivedUnit[Coulomb, Ampere * Second, "coulomb", "C"] =
+        DerivedUnit()
 
     /** Unit of electric voltage */
     final type Volt
-    given ctx_unit_Volt: DerivedUnit[Volt, Watt / Ampere, "volt", "V"] =
+    given unit_Volt: DerivedUnit[Volt, Watt / Ampere, "volt", "V"] =
         DerivedUnit()
 
     /** Unit of electric resistance */
     final type Ohm
-    given ctx_unit_Ohm: DerivedUnit[Ohm, Volt / Ampere, "ohm", "Ω"] =
+    given unit_Ohm: DerivedUnit[Ohm, Volt / Ampere, "ohm", "Ω"] =
         DerivedUnit()
 
     /** Unit of electric capacitance */
     final type Farad
-    given ctx_unit_Farad: DerivedUnit[Farad, Coulomb / Volt, "farad", "F"] =
+    given unit_Farad: DerivedUnit[Farad, Coulomb / Volt, "farad", "F"] =
         DerivedUnit()
 
     /** Unit of electric conductance */
     final type Siemens
-    given ctx_unit_Siemens: DerivedUnit[Siemens, 1 / Ohm, "siemens", "S"] =
+    given unit_Siemens: DerivedUnit[Siemens, 1 / Ohm, "siemens", "S"] =
         DerivedUnit()
 
     /** Unit of magnetic flux */
     final type Weber
-    given ctx_unit_Weber: DerivedUnit[Weber, Volt * Second, "weber", "Wb"] =
+    given unit_Weber: DerivedUnit[Weber, Volt * Second, "weber", "Wb"] =
         DerivedUnit()
 
     /** Unit of magnetic flux density */
     final type Tesla
-    given ctx_unit_Tesla
-        : DerivedUnit[Tesla, Weber / (Meter ^ 2), "tesla", "T"] = DerivedUnit()
+    given unit_Tesla: DerivedUnit[Tesla, Weber / (Meter ^ 2), "tesla", "T"] =
+        DerivedUnit()
 
     /** Unit of electric inductance */
     final type Henry
-    given ctx_unit_Henry: DerivedUnit[Henry, Weber / Ampere, "henry", "H"] =
+    given unit_Henry: DerivedUnit[Henry, Weber / Ampere, "henry", "H"] =
         DerivedUnit()
