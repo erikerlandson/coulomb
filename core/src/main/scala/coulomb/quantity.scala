@@ -130,7 +130,9 @@ opaque type Quantity[V, U] = V
 
 /** Defines Quantity constructors and extension methods */
 object Quantity:
+    import _root_.algebra.ring.*
     import syntax.withUnit
+    import coulomb.ops.SimplifiedUnit
 
     /**
      * Lift a raw value of type V into a unit quantity
@@ -268,8 +270,10 @@ object Quantity:
          * -q // => Quantity[Meter](-1)
          *   }}}
          */
-        inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
-            neg(ql)
+        inline def unary_-(using
+            alg: AdditiveGroup[VL]
+        ): Quantity[VL, UL] =
+            alg.negate(ql.value).withUnit[UL]
 
         /**
          * add this quantity to another
@@ -293,10 +297,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using
-            add: Add[VL, UL, VR, UR]
-        ): Quantity[add.VO, add.UO] =
-            add.eval(ql, qr)
+        inline def +(qr: Quantity[VL, UL])(using
+            alg: AdditiveSemigroup[VL]
+        ): Quantity[VL, UL] =
+            alg.plus(ql.value, qr.value).withUnit[UL]
 
         /**
          * subtract another quantity from this one
@@ -320,10 +324,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using
-            sub: Sub[VL, UL, VR, UR]
-        ): Quantity[sub.VO, sub.UO] =
-            sub.eval(ql, qr)
+        inline def -(qr: Quantity[VL, UL])(using
+            alg: AdditiveGroup[VL]
+        ): Quantity[VL, UL] =
+            alg.minus(ql.value, qr.value).withUnit[UL]
 
         /**
          * multiply this quantity by another
@@ -345,10 +349,11 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using
-            mul: Mul[VL, UL, VR, UR]
-        ): Quantity[mul.VO, mul.UO] =
-            mul.eval(ql, qr)
+        transparent inline def *[UR](qr: Quantity[VL, UR])(using
+            alg: MultiplicativeSemigroup[VL],
+            su: SimplifiedUnit[UL * UR]
+        ): Quantity[VL, su.UO] =
+            alg.times(ql.value, qr.value).withUnit[su.UO]
 
         /**
          * divide this quantity by another
@@ -370,10 +375,11 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using
-            div: Div[VL, UL, VR, UR]
-        ): Quantity[div.VO, div.UO] =
-            div.eval(ql, qr)
+        transparent inline def /[UR](qr: Quantity[VL, UR])(using
+            alg: MultiplicativeGroup[VL],
+            su: SimplifiedUnit[UL / UR]
+        ): Quantity[VL, su.UO] =
+            alg.div(ql.value, qr.value).withUnit[su.UO]
 
         /**
          * divide this quantity by another, using truncating (integer) division
