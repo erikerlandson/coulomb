@@ -131,6 +131,7 @@ opaque type Quantity[V, U] = V
 /** Defines Quantity constructors and extension methods */
 object Quantity:
     import _root_.algebra.ring.*
+    import cats.kernel.Order
     import syntax.withUnit
     import coulomb.ops.SimplifiedUnit
 
@@ -401,10 +402,11 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using
-            tq: TQuot[VL, UL, VR, UR]
-        ): Quantity[tq.VO, tq.UO] =
-            tq.eval(ql, qr)
+        transparent inline def tquot[UR](qr: Quantity[VL, UR])(using
+            alg: TruncatedDivision[VL],
+            su: SimplifiedUnit[UL / UR]
+        ): Quantity[VL, su.UO] =
+            alg.tquot(ql.value, qr.value).withUnit[su.UO]
 
         /**
          * raise this quantity to a rational or integer power
@@ -466,10 +468,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def ===[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def ===(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) == 0
+            ord.compare(ql.value, qr.value) == 0
 
         /**
          * test this quantity for inequality with another
@@ -492,10 +494,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def =!=[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def =!=(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) != 0
+            ord.compare(ql.value, qr.value) != 0
 
         /**
          * test if this quantity is less than another
@@ -518,10 +520,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def <[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def <(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) < 0
+            ord.compare(ql.value, qr.value) < 0
 
         /**
          * test if this quantity is less than or equal to another
@@ -544,10 +546,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def <=[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def <=(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) <= 0
+            ord.compare(ql.value, qr.value) <= 0
 
         /**
          * test if this quantity is greater than another
@@ -570,10 +572,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def >[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def >(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) > 0
+          ord.compare(ql.value, qr.value) > 0
 
         /**
          * test if this quantity is greater than or equal to another
@@ -596,7 +598,7 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def >=[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def >=(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) >= 0
+          ord.compare(ql.value, qr.value) >= 0
