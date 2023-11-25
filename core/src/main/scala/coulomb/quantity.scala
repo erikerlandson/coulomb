@@ -130,10 +130,15 @@ opaque type Quantity[V, U] = V
 
 /** Defines Quantity constructors and extension methods */
 object Quantity:
+    import scala.compiletime
     import _root_.algebra.ring.*
     import cats.kernel.Order
     import syntax.withUnit
     import coulomb.ops.SimplifiedUnit
+    import coulomb.rational.typeexpr
+    import coulomb.ops.algebra.FractionalPower
+    import coulomb.policy.priority.*
+    import scala.util.NotGiven
 
     /**
      * Lift a raw value of type V into a unit quantity
@@ -422,10 +427,36 @@ object Quantity:
          * q.pow[-1]  // => Quantity[1 / Meter](0.5)
          *   }}}
          */
-        transparent inline def pow[P](using
-            pow: Pow[VL, UL, P]
-        ): Quantity[pow.VO, pow.UO] =
-            pow.eval(ql)
+        transparent inline def pow[E](using
+            su: SimplifiedUnit[UL ^ E]
+        ): Quantity[VL, su.UO] =
+            compiletime.summonFrom {
+                case alg: FractionalPower[VL] =>
+                    alg.pow(ql.value, typeexpr.double[E]).withUnit[su.UO]
+                case alg: MultiplicativeGroup[VL] =>
+                    compiletime.summonFrom {
+                        case aie: typeexpr.AllInt[E] =>
+                            alg.pow(ql.value, aie.value).withUnit[su.UO]
+                        case _ =>
+                            compiletime.error("exponent must be integer")
+                    }
+                case alg: MultiplicativeMonoid[VL] =>
+                    compiletime.summonFrom {
+                        case nnie: typeexpr.NonNegInt[E] =>
+                            alg.pow(ql.value, nnie.value).withUnit[su.UO]
+                        case _ =>
+                            compiletime.error("exponent must be integer >= 0")
+                    }
+                case alg: MultiplicativeSemigroup[VL] =>
+                    compiletime.summonFrom {
+                        case pie: typeexpr.PosInt[E] =>
+                            alg.pow(ql.value, pie.value).withUnit[su.UO]
+                        case _ =>
+                            compiletime.error("exponent must be integer > 0")
+                    }
+                case _ =>
+                    compiletime.error("no algebra in context that supports power")
+            }
 
         /**
          * raise this quantity to a rational or integer power, with integer
@@ -602,3 +633,28 @@ object Quantity:
             ord: Order[VL]
         ): Boolean =
           ord.compare(ql.value, qr.value) >= 0
+
+object test:
+    import _root_.algebra.ring.*
+    import cats.kernel.Order
+    import syntax.withUnit
+    import coulomb.ops.SimplifiedUnit
+    import coulomb.rational.typeexpr
+    import coulomb.ops.algebra.FractionalPower
+    import coulomb.policy.priority.*
+
+    case class TestFP(value: Double)
+    object TestFP:
+        given FractionalPower[TestFP] with
+            def pow(x: TestFP, e: Double): TestFP =
+                TestFP(math.pow(x.value, e))
+
+    case class TestMG(value: Double)
+    object TestMG:
+        given ggg(using alg: MultiplicativeGroup[Double]): MultiplicativeGroup[TestMG] =
+            new MultiplicativeGroup[TestMG]:
+                def one: TestMG = TestMG(1.0)
+                def times(x: TestMG, y: TestMG): TestMG =
+                    TestMG(alg.times(x.value, y.value))
+                def div(x: TestMG, y: TestMG): TestMG =
+                    TestMG(alg.div(x.value, y.value))
