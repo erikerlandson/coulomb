@@ -84,7 +84,10 @@ object meta:
             tr match
                 case ConstantType(IntConstant(v))    => Some(BigInt(v))
                 case ConstantType(LongConstant(v))   => Some(BigInt(v))
-                case ConstantType(StringConstant(v)) => Some(BigInt(v))
+                case ConstantType(StringConstant(v)) =>
+                    scala.util.Try { BigInt(v) } match
+                        case scala.util.Success(b) => Some(b)
+                        case _ => None
                 case _                               => None
 
         def apply(using Quotes)(v: BigInt): quotes.reflect.TypeRepr =
@@ -136,12 +139,6 @@ object meta:
         val (_, rsig) = cansig(TypeRepr.of[/].appliedTo(List(u1, u2)))
         rsig == Nil
 
-    @deprecated("unused, keeping this to satisfy MIMA")
-    def matchingdelta(using
-        Quotes
-    )(db: quotes.reflect.TypeRepr, b: quotes.reflect.TypeRepr): Boolean =
-        false
-
     // returns tuple: (expr-for-coef, type-of-Res)
     def cansig(using qq: Quotes, mode: SigMode)(
         uu: quotes.reflect.TypeRepr
@@ -177,7 +174,11 @@ object meta:
                 (lcoef / rcoef, usig)
             case AppliedType(op, List(b, p)) if (op =:= TypeRepr.of[^]) =>
                 val (bcoef, bsig) = cansig(b)
-                val rationalTE(e) = p: @unchecked
+                val e = p match
+                    case rationalTE(r) => r
+                    case _ =>
+                        report.error("improper unit exponent")
+                        Rational.const0
                 if (e == 0) (Rational.const1, Nil)
                 else if (e == 1) (bcoef, bsig)
                 else if (e.n.isValidInt && e.d.isValidInt)

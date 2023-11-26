@@ -141,7 +141,7 @@ object typeexpr:
 
     inline def rational[E]: Rational = ${ meta.teToRational[E] }
     inline def bigInt[E]: BigInt = ${ meta.teToBigInt[E] }
-    inline def double[E]: Double = ${ meta.teToDouble[E] }
+    transparent inline def double[E]: Double = ${ meta.teToDouble[E] }
 
     @implicitNotFound("type expr ${E} is not a non-negative Int")
     class NonNegInt[E](val value: Int)
@@ -185,8 +185,11 @@ object typeexpr:
 
         def teToDouble[E](using Quotes, Type[E]): Expr[Double] =
             import quotes.reflect.*
-            val rationalTE(v) = TypeRepr.of[E]: @unchecked
-            Expr(v.toDouble)
+            TypeRepr.of[E] match
+                case rationalTE(v) => Expr(v.toDouble)
+                case tr =>
+                    report.error(s"type ${typestr(tr)} cannot be converted to Double")
+                    Expr(0.0)
 
         def teToNonNegInt[E](using Quotes, Type[E]): Expr[NonNegInt[E]] =
             import quotes.reflect.*

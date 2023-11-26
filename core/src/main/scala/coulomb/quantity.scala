@@ -59,9 +59,6 @@ final type /[L, R]
  */
 final type ^[B, E]
 
-@deprecated("Unitless should be replaced by integer literal type '1'")
-final type Unitless = 1
-
 /**
  * obtain a string representation of a unit type, using unit abbreviation forms
  * @tparam U
@@ -658,3 +655,46 @@ object test:
                     TestMG(alg.times(x.value, y.value))
                 def div(x: TestMG, y: TestMG): TestMG =
                     TestMG(alg.div(x.value, y.value))
+
+object repro:
+    type +[L, R]
+
+    abstract class TypeLevelSum[E]:
+        type Sum
+
+    object TypeLevelSum:
+        import scala.quoted.*
+
+        transparent inline given gvn_TypeLevelSum[E]: TypeLevelSum[E] =
+            ${ tlSum[E] }
+
+        def tlSum[E](using Quotes, Type[E]): Expr[TypeLevelSum[E]] =
+            import quotes.reflect.*
+            tls(TypeRepr.of[E]).asType match
+                case '[s] =>
+                    '{ new TypeLevelSum[E] { type Sum = s } }
+
+        def tls(using Quotes)(tr: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
+            import quotes.reflect.*
+            tr match
+                case doubleTE(sum) => ConstantType(DoubleConstant(sum))
+                case _ =>
+                    report.error("error!")
+                    TypeRepr.of[Nothing]
+
+        object doubleTE:
+            def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Double] =
+                import quotes.reflect.*
+                tr match
+                    case AppliedType(op, List(doubleTE(x), doubleTE(y)))
+                        if (op =:= TypeRepr.of[+]) =>
+                            Some(x + y)
+                    case ConstantType(IntConstant(v))    => Some(v.toDouble)
+                    case ConstantType(DoubleConstant(v))   => Some(v)
+                    case ConstantType(StringConstant(v)) =>
+                        scala.util.Try { v.toDouble } match
+                            case scala.util.Success(x) => Some(x)
+                            case _ => None
+                    case _ => 
+                        report.error("error!")
+                        None
