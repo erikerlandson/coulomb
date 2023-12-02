@@ -412,6 +412,9 @@ object meta:
             val tr = if (dealias) trp.dealias else trp
             tr match
                 case typealias(_) => tr.typeSymbol.name
+                case ConstantType(IntConstant(v)) => s"$v"
+                case ConstantType(DoubleConstant(v)) => s"$v"
+                case ConstantType(StringConstant(v)) => s"\"$v\""
                 case unitconst(v) => s"$v"
                 case AppliedType(op, List(lhs, rhs)) if op =:= TypeRepr.of[*] =>
                     s"(${work(lhs)} * ${work(rhs)})"

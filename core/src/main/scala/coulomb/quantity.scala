@@ -132,7 +132,7 @@ object Quantity:
     import cats.kernel.Order
     import syntax.withUnit
     import coulomb.ops.SimplifiedUnit
-    import coulomb.rational.typeexpr
+    import coulomb.infra.typeexpr
     import coulomb.ops.algebra.FractionalPower
     import coulomb.policy.priority.*
     import scala.util.NotGiven
@@ -429,28 +429,13 @@ object Quantity:
         ): Quantity[VL, su.UO] =
             compiletime.summonFrom {
                 case alg: FractionalPower[VL] =>
-                    alg.pow(ql.value, typeexpr.double[E]).withUnit[su.UO]
+                    alg.pow(ql.value, typeexpr.asDouble[E]).withUnit[su.UO]
                 case alg: MultiplicativeGroup[VL] =>
-                    compiletime.summonFrom {
-                        case aie: typeexpr.AllInt[E] =>
-                            alg.pow(ql.value, aie.value).withUnit[su.UO]
-                        case _ =>
-                            compiletime.error("exponent must be integer")
-                    }
+                    alg.pow(ql.value, typeexpr.asInt[E]).withUnit[su.UO]
                 case alg: MultiplicativeMonoid[VL] =>
-                    compiletime.summonFrom {
-                        case nnie: typeexpr.NonNegInt[E] =>
-                            alg.pow(ql.value, nnie.value).withUnit[su.UO]
-                        case _ =>
-                            compiletime.error("exponent must be integer >= 0")
-                    }
+                    alg.pow(ql.value, typeexpr.asNonNegInt[E]).withUnit[su.UO]
                 case alg: MultiplicativeSemigroup[VL] =>
-                    compiletime.summonFrom {
-                        case pie: typeexpr.PosInt[E] =>
-                            alg.pow(ql.value, pie.value).withUnit[su.UO]
-                        case _ =>
-                            compiletime.error("exponent must be integer > 0")
-                    }
+                    alg.pow(ql.value, typeexpr.asPosInt[E]).withUnit[su.UO]
                 case _ =>
                     compiletime.error("no algebra in context that supports power")
             }
@@ -655,46 +640,3 @@ object test:
                     TestMG(alg.times(x.value, y.value))
                 def div(x: TestMG, y: TestMG): TestMG =
                     TestMG(alg.div(x.value, y.value))
-
-object repro:
-    type +[L, R]
-
-    abstract class TypeLevelSum[E]:
-        type Sum
-
-    object TypeLevelSum:
-        import scala.quoted.*
-
-        transparent inline given gvn_TypeLevelSum[E]: TypeLevelSum[E] =
-            ${ tlSum[E] }
-
-        def tlSum[E](using Quotes, Type[E]): Expr[TypeLevelSum[E]] =
-            import quotes.reflect.*
-            tls(TypeRepr.of[E]).asType match
-                case '[s] =>
-                    '{ new TypeLevelSum[E] { type Sum = s } }
-
-        def tls(using Quotes)(tr: quotes.reflect.TypeRepr): quotes.reflect.TypeRepr =
-            import quotes.reflect.*
-            tr match
-                case doubleTE(sum) => ConstantType(DoubleConstant(sum))
-                case _ =>
-                    report.error("error!")
-                    TypeRepr.of[Nothing]
-
-        object doubleTE:
-            def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[Double] =
-                import quotes.reflect.*
-                tr match
-                    case AppliedType(op, List(doubleTE(x), doubleTE(y)))
-                        if (op =:= TypeRepr.of[+]) =>
-                            Some(x + y)
-                    case ConstantType(IntConstant(v))    => Some(v.toDouble)
-                    case ConstantType(DoubleConstant(v))   => Some(v)
-                    case ConstantType(StringConstant(v)) =>
-                        scala.util.Try { v.toDouble } match
-                            case scala.util.Success(x) => Some(x)
-                            case _ => None
-                    case _ => 
-                        report.error("error!")
-                        None
