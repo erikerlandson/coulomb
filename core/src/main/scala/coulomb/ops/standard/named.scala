@@ -17,13 +17,6 @@
 package coulomb.ops.standard
 
 object named:
-    export add.infra.AddNC
-    export sub.infra.SubNC
-    export mul.infra.MulNC
-    export div.infra.DivNC
-    export tquot.infra.TQuotNC
-    export pow.infra.PowNC
-    export tpow.infra.TPowNC
     export deltasub.infra.DeltaSubNC
     export deltasubq.infra.DeltaSubQNC
     export deltaaddq.infra.DeltaAddQNC
