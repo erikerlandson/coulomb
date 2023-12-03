@@ -29,7 +29,6 @@ package coulomb.policy
  * }}}
  */
 object standard:
-    export coulomb.ops.standard.all.given
     export coulomb.ops.resolution.standard.given
     export coulomb.conversion.standard.value.given
     export coulomb.conversion.standard.unit.given
@@ -53,7 +52,6 @@ object standard:
  * }}}
  */
 object strict:
-    export coulomb.ops.standard.all.given
     export coulomb.conversion.standard.value.given
     export coulomb.conversion.standard.unit.given
     export coulomb.ops.algebra.cats.all.given

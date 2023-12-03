@@ -18,7 +18,6 @@ package coulomb.ops.algebra.cats
 
 import algebra.ring.*
 import cats.kernel.*
-import coulomb.ops.standard.*
 import coulomb.rational.*
 
 object rational:
