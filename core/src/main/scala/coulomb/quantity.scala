@@ -134,7 +134,6 @@ object Quantity:
     import coulomb.ops.SimplifiedUnit
     import coulomb.infra.typeexpr
     import coulomb.ops.algebra.FractionalPower
-    import coulomb.policy.priority.*
     import scala.util.NotGiven
 
     /**
@@ -623,7 +622,6 @@ object test:
     import coulomb.ops.SimplifiedUnit
     import coulomb.rational.typeexpr
     import coulomb.ops.algebra.FractionalPower
-    import coulomb.policy.priority.*
 
     case class TestFP(value: Double)
     object TestFP:
