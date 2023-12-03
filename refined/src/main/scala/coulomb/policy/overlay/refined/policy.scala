@@ -18,6 +18,5 @@ package coulomb.policy.overlay.refined
 
 object algebraic:
     export coulomb.ops.algebra.refined.all.given
-    export coulomb.ops.resolution.refined.given
     export coulomb.conversion.refined.value.given
     export coulomb.conversion.refined.unit.given
