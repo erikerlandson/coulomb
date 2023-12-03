@@ -16,8 +16,6 @@
 
 package coulomb
 
-import coulomb.ops.*
-import coulomb.rational.Rational
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
 
@@ -95,7 +93,7 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  *   the coefficient of conversion from UF to UT If UF and UT are not
  *   convertible, causes a compilation failure.
  */
-inline def coefficient[V, UF, UT](using vc: ValueConversion[Rational, V]): V =
+inline def coefficient[V, UF, UT](using vc: ValueConversion[coulomb.rational.Rational, V]): V =
     import coulomb.conversion.coefficients.coefficientRational
     vc(coefficientRational[UF, UT])
 
@@ -134,7 +132,7 @@ object Quantity:
     import coulomb.ops.SimplifiedUnit
     import coulomb.infra.typeexpr
     import coulomb.ops.algebra.FractionalPower
-    import scala.util.NotGiven
+    import coulomb.ops.algebra.TruncatingPower
 
     /**
      * Lift a raw value of type V into a unit quantity
@@ -442,7 +440,7 @@ object Quantity:
         /**
          * raise this quantity to a rational or integer power, with integer
          * truncated result
-         * @tparam P
+         * @tparam E
          *   the power, or exponent
          * @return
          *   this quantity raised to exponent `P`, truncated to integer type
@@ -454,10 +452,11 @@ object Quantity:
          * q.tpow[-1]  // => Quantity[1 / Meter](0)
          *   }}}
          */
-        transparent inline def tpow[P](using
-            tp: TPow[VL, UL, P]
-        ): Quantity[tp.VO, tp.UO] =
-            tp.eval(ql)
+        transparent inline def tpow[E](using
+            alg: TruncatingPower[VL],
+            su: SimplifiedUnit[UL ^ E]
+        ): Quantity[VL, su.UO] =
+            alg.tpow(ql.value, typeexpr.asDouble[E]).withUnit[su.UO]
 
         /**
          * test this quantity for equality with another
