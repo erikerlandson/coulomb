@@ -17,15 +17,6 @@
 package coulomb.ops.standard
 
 object all:
-    export neg.given
-    export add.given
-    export sub.given
-    export mul.given
-    export div.given
-    export tquot.given
-    export pow.given
-    export tpow.given
-    export ord.given
     export deltasub.given
     export deltasubq.given
     export deltaaddq.given
