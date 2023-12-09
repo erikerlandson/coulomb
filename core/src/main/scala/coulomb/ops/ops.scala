@@ -20,6 +20,10 @@ import scala.annotation.implicitNotFound
 
 import coulomb.*
 
+object stub:
+    val v = 0
+
+/*
 @implicitNotFound("Negation not defined in scope for Quantity[${V}, ${U}]")
 abstract class Neg[V, U] extends (Quantity[V, U] => Quantity[V, U])
 
@@ -121,139 +125,5 @@ abstract class DeltaAddQ[B, VL, UL, VR, UR]:
 )
 abstract class DeltaOrd[B, VL, UL, VR, UR]
     extends ((DeltaQuantity[VL, UL, B], DeltaQuantity[VR, UR, B]) => Int)
+*/
 
-@implicitNotFound("Unable to simplify unit type ${U}")
-abstract class SimplifiedUnit[U]:
-    type UO
-
-object SimplifiedUnit:
-    import scala.quoted.*
-
-    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
-        ${ simplifiedUnit[U] }
-
-    class NC[U, UOp] extends SimplifiedUnit[U]:
-        type UO = UOp
-
-    private def simplifiedUnit[U](using
-        Quotes,
-        Type[U]
-    ): Expr[SimplifiedUnit[U]] =
-        import quotes.reflect.*
-        coulomb.infra.meta.simplify(TypeRepr.of[U]).asType match
-            case '[uo] => '{ new NC[U, uo] }
-
-/** Resolve the operator output type for left and right argument types */
-@implicitNotFound(
-    "No output type resolution in scope for argument value types ${VL} and ${VR}"
-)
-abstract class ValueResolution[VL, VR]:
-    type VO
-
-object ValueResolution:
-    transparent inline given ctx_VR_XpX[V]: ValueResolution[V, V] =
-        new NC[V, V, V]
-    transparent inline given ctx_VR_LpR[VL, VR](using
-        ValuePromotion[VL, VR]
-    ): ValueResolution[VL, VR] = new NC[VL, VR, VR]
-    transparent inline given ctx_VR_RpL[VL, VR](using
-        ValuePromotion[VR, VL]
-    ): ValueResolution[VL, VR] = new NC[VL, VR, VL]
-    class NC[VL, VR, VOp] extends ValueResolution[VL, VR]:
-        type VO = VOp
-
-final class ValuePromotion[VF, VT]
-
-object ValuePromotion:
-    import scala.quoted.*
-    import scala.language.implicitConversions
-
-    import coulomb.infra.meta.*
-
-    transparent inline given ctx_VP_Path[VF, VT]: ValuePromotion[VF, VT] = ${
-        vpPath[VF, VT]
-    }
-
-    private type VppSet[T] = scala.collection.mutable.HashSet[T]
-    private val VppSet = scala.collection.mutable.HashSet
-
-    private def vpPath[VF, VT](using
-        Quotes,
-        Type[VF],
-        Type[VT]
-    ): Expr[ValuePromotion[VF, VT]] =
-        import quotes.reflect.*
-        // Dealiasing is important because I am working with string type names.
-        // Ability to hash, == or < directly on TypeRepr objects might allow me to
-        // use Set[TypeRepr] but not sure if it is possible.
-        val (vf, vt) = (TypeRepr.of[VF].dealias, TypeRepr.of[VT].dealias)
-        if (pathexists(vf.typeSymbol.fullName, vt.typeSymbol.fullName, getvpp))
-            '{ new ValuePromotion[VF, VT] }
-        else
-            report.error(s"no promotion from ${typestr(vf)} => ${typestr(vt)}")
-            '{ new ValuePromotion[VF, VT] }
-
-    private def getvpp(using Quotes): VppSet[(String, String)] =
-        import quotes.reflect.*
-        Implicits.search(
-            TypeRepr.of[ValuePromotionPolicy].appliedTo(List(TypeBounds.empty))
-        ) match
-            case iss: ImplicitSearchSuccess =>
-                val AppliedType(_, List(vppt)) =
-                    iss.tree.tpe.baseType(
-                        TypeRepr.of[ValuePromotionPolicy].typeSymbol
-                    ): @unchecked
-                vpp2str(typeReprList(vppt))
-            case _ =>
-                report.error("no ValuePromotionPolicy was found in scope")
-                null.asInstanceOf[Nothing]
-
-    private def vpp2str(using Quotes)(
-        vppl: List[quotes.reflect.TypeRepr]
-    ): VppSet[(String, String)] =
-        import quotes.reflect.*
-        vppl match
-            case Nil => VppSet.empty[(String, String)]
-            case AppliedType(t2, List(vf, vt)) :: tail
-                if (t2 =:= TypeRepr.of[Tuple2]) =>
-                val vppset = vpp2str(tail)
-                vppset.add(
-                    (
-                        vf.dealias.typeSymbol.fullName,
-                        vt.dealias.typeSymbol.fullName
-                    )
-                )
-                vppset
-            case _ =>
-                report.error(
-                    s"type ${typestr(vppl.head)} is not a valid promotion pair"
-                )
-                null.asInstanceOf[Nothing]
-
-    private def pathexists(
-        vf: String,
-        vt: String,
-        edges: VppSet[(String, String)]
-    ): Boolean =
-        val reachable = VppSet(vf)
-        var haspath = false
-        var done = false
-        // print(s"\n\nvf= $vf   vt= $vt\n")
-        while (!done) do
-            val prevsize = reachable.size
-            val next = reachable.flatMap(r =>
-                edges.filter { (f, _) => f == r }.map { (_, t) => t }
-            )
-            reachable.addAll(next)
-            // print(s"reachable= $reachable\n")
-            if (reachable.contains(vt))
-                haspath = true
-                done = true
-            if (reachable.size == prevsize)
-                done = true
-        haspath
-
-final class ValuePromotionPolicy[Pairs <: Tuple]
-object ValuePromotionPolicy:
-    def apply[P <: Tuple](): ValuePromotionPolicy[P] =
-        new ValuePromotionPolicy[P]

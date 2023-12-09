@@ -16,23 +16,12 @@
 
 package coulomb.ops.algebra
 
-import algebra.ring.TruncatedDivision
+import _root_.algebra.ring.*
 
 import coulomb.*
 import coulomb.syntax.*
-import coulomb.ops.*
+import coulomb.conversion.ValueConversion
 
 object double:
     given ctx_Double_is_FractionalPower: FractionalPower[Double] =
         (v: Double, e: Double) => math.pow(v, e)
-
-    extension (vl: Double)
-        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using
-            mul: Mul[Double, 1, VR, UR]
-        ): Quantity[mul.VO, mul.UO] =
-            mul.eval(vl.withUnit[1], qr)
-
-        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using
-            div: Div[Double, 1, VR, UR]
-        ): Quantity[div.VO, div.UO] =
-            div.eval(vl.withUnit[1], qr)

@@ -16,6 +16,7 @@
 
 package coulomb
 
+import scala.annotation.implicitNotFound
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
 
@@ -56,6 +57,27 @@ final type /[L, R]
  *   }}}
  */
 final type ^[B, E]
+
+@implicitNotFound("Unable to simplify unit type ${U}")
+abstract class SimplifiedUnit[U]:
+    type UO
+
+object SimplifiedUnit:
+    import scala.quoted.*
+
+    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
+        ${ simplifiedUnit[U] }
+
+    class NC[U, UOp] extends SimplifiedUnit[U]:
+        type UO = UOp
+
+    private def simplifiedUnit[U](using
+        Quotes,
+        Type[U]
+    ): Expr[SimplifiedUnit[U]] =
+        import quotes.reflect.*
+        coulomb.infra.meta.simplify(TypeRepr.of[U]).asType match
+            case '[uo] => '{ new NC[U, uo] }
 
 /**
  * obtain a string representation of a unit type, using unit abbreviation forms
@@ -129,7 +151,6 @@ object Quantity:
     import _root_.algebra.ring.*
     import cats.kernel.Order
     import syntax.withUnit
-    import coulomb.ops.SimplifiedUnit
     import coulomb.infra.typeexpr
     import coulomb.ops.algebra.FractionalPower
     import coulomb.ops.algebra.TruncatingPower
@@ -618,7 +639,6 @@ object test:
     import _root_.algebra.ring.*
     import cats.kernel.Order
     import syntax.withUnit
-    import coulomb.ops.SimplifiedUnit
     import coulomb.rational.typeexpr
     import coulomb.ops.algebra.FractionalPower
 

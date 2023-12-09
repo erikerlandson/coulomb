@@ -16,11 +16,11 @@
 
 package coulomb.ops.algebra
 
-import _root_.algebra.ring.TruncatedDivision
+import _root_.algebra.ring.*
 
 import coulomb.*
 import coulomb.syntax.*
-import coulomb.ops.*
+import coulomb.conversion.ValueConversion
 
 object long:
     given ctx_Long_is_TruncatingPower: TruncatingPower[Long] with
@@ -37,14 +37,3 @@ object long:
             : _root_.algebra.ring.AdditiveCommutativeMonoid[Long] = ???
         def order: _root_.cats.kernel.Order[Long] = ???
         def signum(a: Long): Int = ???
-
-    extension (vl: Long)
-        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using
-            mul: Mul[Long, 1, VR, UR]
-        ): Quantity[mul.VO, mul.UO] =
-            mul.eval(vl.withUnit[1], qr)
-
-        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using
-            div: Div[Long, 1, VR, UR]
-        ): Quantity[div.VO, div.UO] =
-            div.eval(vl.withUnit[1], qr)

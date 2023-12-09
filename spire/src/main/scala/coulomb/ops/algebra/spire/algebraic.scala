@@ -33,14 +33,3 @@ object algebraic:
         val b2a = summon[ValueConversion[BigDecimal, Algebraic]]
         val bf = summon[Fractional[BigDecimal]]
         (v: Algebraic, e: Double) => b2a(bf.fpow(a2b(v), e))
-
-    extension (vl: Algebraic)
-        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using
-            mul: Mul[Algebraic, 1, VR, UR]
-        ): Quantity[mul.VO, mul.UO] =
-            mul.eval(vl.withUnit[1], qr)
-
-        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using
-            div: Div[Algebraic, 1, VR, UR]
-        ): Quantity[div.VO, div.UO] =
-            div.eval(vl.withUnit[1], qr)
