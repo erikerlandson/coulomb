@@ -82,7 +82,7 @@ object typeexpr:
             case rationalTE(v) => Expr(v)
             case tr =>
                 report.error(s"type ${typestr(tr)} cannot be converted to Rational")
-                Expr(Rational.const0)
+                Expr(Rational.zero)
 
     private def teToBigInt[E](using Quotes, Type[E]): Expr[BigInt] =
         import quotes.reflect.*

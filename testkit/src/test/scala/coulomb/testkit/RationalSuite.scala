@@ -26,7 +26,7 @@ import org.scalacheck.Prop.*
 class RationalSuite extends DisciplineSuite:
     property("rational identity") {
         forAll { (r: Rational) =>
-            r == Rational.const0 || (Rational.const1 / r) * r == Rational.const1
+            r == Rational.zero || (Rational.one / r) * r == Rational.one
         }
     }
 

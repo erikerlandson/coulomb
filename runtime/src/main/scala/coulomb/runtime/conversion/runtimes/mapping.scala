@@ -44,7 +44,7 @@ sealed abstract class MappingCoefficientRuntime extends CoefficientRuntime:
             case RuntimeUnit.UnitConst(c) =>
                 Right(Canonical(c, Canonical.one.sig))
             case u: RuntimeUnit.UnitType if (base.contains(u)) =>
-                Right(Canonical(Rational.const1, HashMap(u -> Rational.const1)))
+                Right(Canonical(Rational.one, HashMap(u -> Rational.one)))
             case u: RuntimeUnit.UnitType if (derived.contains(u)) =>
                 canonical(derived(u))
             case _ => Left(s"canonical: unrecognized unit $u")
@@ -67,7 +67,7 @@ case class Canonical(coef: Rational, sig: Map[RuntimeUnit.UnitType, Rational]):
         val Canonical(rcoef, rsig) = that
         val s = Canonical
             .merge(sig, rsig)(_ + _)
-            .filter { case (_, e) => e != Rational.const0 }
+            .filter { case (_, e) => e != Rational.zero }
         Canonical(coef * rcoef, s)
 
     def /(that: Canonical): Canonical =
@@ -75,12 +75,12 @@ case class Canonical(coef: Rational, sig: Map[RuntimeUnit.UnitType, Rational]):
         val rneg = rsig.map { case (u, e) => (u, -e) }
         val s = Canonical
             .merge(sig, rneg)(_ + _)
-            .filter { case (_, e) => e != Rational.const0 }
+            .filter { case (_, e) => e != Rational.zero }
         Canonical(coef / rcoef, s)
 
     def pow(e: Rational): Canonical =
-        if (e == Rational.const0) Canonical.one
-        else if (e == Rational.const1) this
+        if (e == Rational.zero) Canonical.one
+        else if (e == Rational.one) this
         else
             val s = sig.map { case (u, ue) => (u, ue * e) }
             Canonical(coef.pow(e), s)
@@ -94,7 +94,7 @@ object Canonical:
         r1.concat(r2).concat(ri)
 
     val one: Canonical = Canonical(
-        Rational.const1,
+        Rational.one,
         HashMap.empty[RuntimeUnit.UnitType, Rational]
     )
 

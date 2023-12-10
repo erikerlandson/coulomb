@@ -57,7 +57,7 @@ sealed abstract class RuntimeUnit:
                 den.toRational match
                     case Left(e) => Left(e)
                     case Right(dv) =>
-                        if (dv == Rational.const0)
+                        if (dv == Rational.zero)
                             Left("toRational: div by zero")
                         else
                             for {

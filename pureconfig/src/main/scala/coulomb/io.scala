@@ -227,7 +227,7 @@ object quantity:
             val uto = RuntimeUnit.of[U]
             crt.coefficientRational(ufrom, uto) match
                 case Right(coef) =>
-                    if (coef == Rational.const1)
+                    if (coef == Rational.one)
                         // units are same or equivalent (conversion coefficient is 1)
                         // so it is valid to load directly without applying conversion coefficient
                         Right(rq.value.withUnit[U])

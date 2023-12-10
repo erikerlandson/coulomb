@@ -379,4 +379,4 @@ object constants:
                         report.error(
                             s"constq: unrecognized unit declaration: ${typestr(u)}"
                         )
-                        '{ new NC[CU, Nothing](Rational.const0) }
+                        '{ new NC[CU, Nothing](Rational.zero) }

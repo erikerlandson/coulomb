@@ -29,7 +29,7 @@ object meta:
         def apply(r: Rational)(using Quotes): Expr[Rational] = r match
             // Rational(1) is a useful special case to have predefined
             // could we get clever with some kind of expression caching/sharing here?
-            case v if (v == 1) => '{ Rational.const1 }
+            case v if (v == 1) => '{ Rational.one }
             case _             => '{ Rational(${ Expr(r.n) }, ${ Expr(r.d) }) }
 
     sealed class SigMode
@@ -117,7 +117,7 @@ object meta:
             report.error(
                 s"unit type ${typestr(u1)} not convertable to ${typestr(u2)}"
             )
-            Rational.const0
+            Rational.zero
 
     def offset(using
         Quotes
@@ -126,10 +126,10 @@ object meta:
         // given sigmode: SigMode = SigMode.Simplify
         u match
             case deltaunit(offset, d) if convertible(d, b) => offset
-            case _ if convertible(u, b)                    => Rational.const0
+            case _ if convertible(u, b)                    => Rational.zero
             case _ =>
                 report.error(s"bad DeltaUnit in offset: ${typestr(u)}")
-                Rational.const0
+                Rational.zero
 
     def convertible(using
         Quotes
@@ -156,8 +156,8 @@ object meta:
                 mode match
                     case SigMode.Simplify =>
                         // in simplify mode we preserve constants in the signature
-                        if (c == 1) (Rational.const1, Nil)
-                        else (Rational.const1, (u, Rational.const1) :: Nil)
+                        if (c == 1) (Rational.one, Nil)
+                        else (Rational.one, (u, Rational.one) :: Nil)
                     case _ => (c, Nil)
             // traverse down the operator types first, since that can be done without
             // any attempts to look up context variables for BaseUnit and DerivedUnit,
@@ -178,8 +178,8 @@ object meta:
                     case rationalTE(r) => r
                     case _ =>
                         report.error("improper unit exponent")
-                        Rational.const0
-                if (e == 0) (Rational.const1, Nil)
+                        Rational.zero
+                if (e == 0) (Rational.one, Nil)
                 else if (e == 1) (bcoef, bsig)
                 else if (e.n.isValidInt && e.d.isValidInt)
                     val ucoef =
@@ -189,15 +189,15 @@ object meta:
                     (ucoef, usig)
                 else
                     report.error(s"bad exponent in cansig: ${typestr(u)}")
-                    (Rational.const0, Nil)
-            case baseunit() => (Rational.const1, (u, Rational.const1) :: Nil)
+                    (Rational.zero, Nil)
+            case baseunit() => (Rational.one, (u, Rational.one) :: Nil)
             case derivedunit(ucoef, usig) =>
                 mode match
                     case SigMode.Canonical => (ucoef, usig)
-                    case _                 => (Rational.const1, (u, Rational.const1) :: Nil)
+                    case _                 => (Rational.one, (u, Rational.one) :: Nil)
             case _ =>
                 // treat any other type as if it were a BaseUnit
-                (Rational.const1, (u, Rational.const1) :: Nil)
+                (Rational.one, (u, Rational.one) :: Nil)
 
     def sortsig(using Quotes)(
         sig: List[(quotes.reflect.TypeRepr, Rational)]
@@ -278,7 +278,7 @@ object meta:
                     mode match
                         case SigMode.Simplify =>
                             // don't expand the signature definition in simplify mode
-                            Some((Rational.const1, (u, Rational.const1) :: Nil))
+                            Some((Rational.one, (u, Rational.one) :: Nil))
                         case _ =>
                             val AppliedType(_, List(_, d, _, _)) =
                                 dtr: @unchecked
@@ -371,10 +371,10 @@ object meta:
         op: (Rational, Rational) => Rational
     ): List[(quotes.reflect.TypeRepr, Rational)] =
         sig match
-            case Nil => (u, op(Rational.const0, e)) :: Nil
+            case Nil => (u, op(Rational.zero, e)) :: Nil
             case (u0, e0) :: tail if (u =:= u0) =>
                 val ei = op(e0, e)
-                if (ei == Rational.const0) tail else (u, ei) :: tail
+                if (ei == Rational.zero) tail else (u, ei) :: tail
             case (u0, e0) :: tail => (u0, e0) :: insertTerm(u, e, tail, op)
 
     def unifyPow(using Quotes)(
@@ -382,7 +382,7 @@ object meta:
         sig: List[(quotes.reflect.TypeRepr, Rational)]
     ): List[(quotes.reflect.TypeRepr, Rational)] =
         sig match
-            case _ if (e == Rational.const0) => Nil
+            case _ if (e == Rational.zero) => Nil
             case Nil                         => Nil
             case (u, e0) :: tail             => (u, e0 * e) :: unifyPow(e, tail)
 

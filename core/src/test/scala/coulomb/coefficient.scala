@@ -25,14 +25,14 @@ class CoefficientSuite extends CoulombSuite:
     import coulomb.ops.algebra.all.{*, given}
 
     test("identical units") {
-        assert(coefficient[Rational, Meter, Meter] eq Rational.const1)
-        assert(coefficient[Rational, Liter, Liter] eq Rational.const1)
+        assert(coefficient[Rational, Meter, Meter] eq Rational.one)
+        assert(coefficient[Rational, Liter, Liter] eq Rational.one)
         assert(
             coefficient[
                 Rational,
                 Kilogram * Meter / (Second ^ 2),
                 Kilogram * Meter / (Second ^ 2)
-            ] eq Rational.const1
+            ] eq Rational.one
         )
     }
 
