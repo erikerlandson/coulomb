@@ -20,6 +20,8 @@ import scala.annotation.implicitNotFound
 
 import _root_.algebra.ring.*
 
+import _root_.spire.math.*
+
 import coulomb.*
 import coulomb.syntax.*
 
@@ -42,8 +44,13 @@ abstract class TruncatingPower[V]:
 object all:
     export coulomb.ops.algebra.int.given
     export coulomb.ops.algebra.long.given
+    export coulomb.ops.algebra.bigint.given
     export coulomb.ops.algebra.float.given
     export coulomb.ops.algebra.double.given
+    export coulomb.ops.algebra.bigdecimal.given
+    export coulomb.ops.algebra.rational.given
+    export coulomb.ops.algebra.real.given
+    export coulomb.ops.algebra.algebraic.given
 
 object int:
     given ctx_Int_is_TruncatingPower: TruncatingPower[Int] with
@@ -77,6 +84,23 @@ object long:
         def order: _root_.cats.kernel.Order[Long] = ???
         def signum(a: Long): Int = ???
 
+object bigint:
+    given ctx_BigInt_is_TruncatingPower: TruncatingPower[BigInt] =
+        (v: BigInt, e: Double) =>
+            summon[Fractional[Rational]].fpow(Rational(v), e).toBigInt
+
+    given ctx_BigInt_is_TruncatedDivision: TruncatedDivision[BigInt] with
+        def tquot(x: BigInt, y: BigInt): BigInt = x / y
+        // I don't care about these
+        def tmod(x: BigInt, y: BigInt): BigInt = ???
+        def fquot(x: BigInt, y: BigInt): BigInt = ???
+        def fmod(x: BigInt, y: BigInt): BigInt = ???
+        def abs(a: BigInt): BigInt = ???
+        def additiveCommutativeMonoid
+            : _root_.algebra.ring.AdditiveCommutativeMonoid[BigInt] = ???
+        def order: _root_.cats.kernel.Order[BigInt] = ???
+        def signum(a: BigInt): Int = ???
+
 object float:
     given ctx_Float_is_FractionalPower: FractionalPower[Float] =
         (v: Float, e: Double) => math.pow(v.toDouble, e).toFloat
@@ -85,4 +109,28 @@ object double:
     given ctx_Double_is_FractionalPower: FractionalPower[Double] =
         (v: Double, e: Double) => math.pow(v, e)
 
+object bigdecimal:
+    given ctx_BigDecimal_is_FractionalPower: FractionalPower[BigDecimal] =
+        (v: BigDecimal, e: Double) => summon[Fractional[BigDecimal]].fpow(v, e)
 
+object rational:
+    given ctx_Rational_is_FractionalPower: FractionalPower[Rational] =
+        (v: Rational, e: Double) =>
+            if (e.isValidInt) v.pow(e.toInt)
+            else summon[Fractional[Rational]].fpow(v, e)
+
+object real:
+    given ctx_Real_is_FractionalPower: FractionalPower[Real] =
+        (v: Real, e: Double) => summon[Fractional[Real]].fpow(v, e)
+
+object algebraic:
+    import coulomb.conversion.ValueConversion
+    import coulomb.conversion.standard.value.given
+
+    given ctx_Algebraic_is_FractionalPower: FractionalPower[Algebraic] =
+        // Fractional[Algebraic] exists but throws errors, so
+        // do the fpow() in BigDecimal
+        val a2b = summon[ValueConversion[Algebraic, BigDecimal]]
+        val b2a = summon[ValueConversion[BigDecimal, Algebraic]]
+        val bf = summon[Fractional[BigDecimal]]
+        (v: Algebraic, e: Double) => b2a(bf.fpow(a2b(v), e))
