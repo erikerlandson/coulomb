@@ -16,7 +16,7 @@
 
 package coulomb.infra
 
-import coulomb.rational.Rational
+import spire.math.Rational
 import coulomb.*
 import coulomb.define.*
 

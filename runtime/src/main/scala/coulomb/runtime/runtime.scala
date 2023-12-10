@@ -18,7 +18,7 @@ package coulomb
 
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
-import coulomb.rational.Rational
+import spire.math.Rational
 import coulomb.conversion.*
 
 sealed abstract class RuntimeUnit:

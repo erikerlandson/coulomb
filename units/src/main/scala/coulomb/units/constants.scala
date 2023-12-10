@@ -29,7 +29,7 @@ object constants:
     import coulomb.*
     import coulomb.syntax.*
     import coulomb.define.*
-    import coulomb.rational.Rational
+    import spire.math.Rational
     import coulomb.conversion.ValueConversion
 
     export coulomb.units.mksa.{*, given}

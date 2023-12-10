@@ -17,7 +17,7 @@
 package coulomb
 package testkit
 
-import coulomb.rational.*
+import spire.math.*
 import coulomb.syntax.*
 import org.scalacheck.*
 

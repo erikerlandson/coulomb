@@ -19,7 +19,7 @@ package coulomb.testkit
 import algebra.laws.*
 import cats.kernel.laws.discipline.*
 import coulomb.ops.algebra.cats.all.given
-import coulomb.rational.*
+import spire.math.*
 import munit.DisciplineSuite
 import org.scalacheck.Prop.*
 

@@ -18,7 +18,7 @@ package coulomb.conversion.spire
 
 import spire.math.{Rational, SafeLong}
 
-import coulomb.rational.{Rational => CoulombRational}
+import spire.math.{Rational => CoulombRational}
 
 object coefficients:
     inline def coefficientRational[UF, UT]: Rational = ${

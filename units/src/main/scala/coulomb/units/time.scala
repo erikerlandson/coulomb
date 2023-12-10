@@ -224,7 +224,7 @@ object javatime:
     /** Conversion typeclasses between `coulomb` types and `java.time` types */
     object conversions:
         import coulomb.conversion.*
-        import coulomb.rational.Rational
+        import spire.math.Rational
 
         /**
          * A typeclass for converting a `Duration` to an equivalent `Quantity`

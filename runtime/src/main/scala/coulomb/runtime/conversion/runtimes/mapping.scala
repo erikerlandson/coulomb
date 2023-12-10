@@ -19,7 +19,7 @@ package coulomb.conversion.runtimes.mapping
 import scala.collection.immutable.HashMap
 
 import coulomb.*
-import coulomb.rational.Rational
+import spire.math.Rational
 
 sealed abstract class MappingCoefficientRuntime extends CoefficientRuntime:
     // can protected members change and preserve binary compatibility?

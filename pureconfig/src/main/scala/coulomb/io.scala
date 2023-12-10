@@ -30,7 +30,7 @@ import algebra.ring.MultiplicativeSemigroup
 
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
-import coulomb.rational.Rational
+import spire.math.Rational
 import coulomb.conversion.ValueConversion
 
 import coulomb.parser.RuntimeUnitParser

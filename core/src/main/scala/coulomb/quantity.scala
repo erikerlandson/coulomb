@@ -115,7 +115,7 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  *   the coefficient of conversion from UF to UT If UF and UT are not
  *   convertible, causes a compilation failure.
  */
-inline def coefficient[V, UF, UT](using vc: ValueConversion[coulomb.rational.Rational, V]): V =
+inline def coefficient[V, UF, UT](using vc: ValueConversion[spire.math.Rational, V]): V =
     import coulomb.conversion.coefficients.coefficientRational
     vc(coefficientRational[UF, UT])
 
@@ -639,7 +639,7 @@ object test:
     import _root_.algebra.ring.*
     import cats.kernel.Order
     import syntax.withUnit
-    import coulomb.rational.typeexpr
+    import spire.math.typeexpr
     import coulomb.ops.algebra.FractionalPower
 
     case class TestFP(value: Double)

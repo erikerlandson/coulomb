@@ -20,7 +20,7 @@ object typeexpr:
     import scala.util.{Try, Success}
     import scala.quoted.*
     import scala.language.implicitConversions
-    import coulomb.rational.Rational
+    import spire.math.Rational
     import coulomb.infra.meta.{
         rationalTE,
         bigintTE,

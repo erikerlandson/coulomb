@@ -19,7 +19,7 @@ package coulomb.conversion.standard
 object unit:
     import coulomb.conversion.*
     import coulomb.conversion.coefficients.*
-    import coulomb.rational.Rational
+    import spire.math.Rational
 
     inline given ctx_UC_Rational[UF, UT]: UnitConversion[Rational, UF, UT] =
         new infra.RationalUC[UF, UT](coefficientRational[UF, UT])

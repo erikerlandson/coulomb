@@ -20,7 +20,7 @@ class CoefficientSuite extends CoulombSuite:
     import coulomb.*
     import coulomb.policy.standard.given
     import coulomb.testing.units.{*, given}
-    import coulomb.rational.Rational
+    import spire.math.Rational
     import algebra.instances.all.given
     import coulomb.ops.algebra.all.{*, given}
 

@@ -16,7 +16,7 @@
 
 package coulomb.conversion
 
-import coulomb.rational.Rational
+import spire.math.Rational
 
 object coefficients:
     inline def coefficientRational[U1, U2]: Rational = ${
@@ -43,6 +43,20 @@ object coefficients:
         meta.deltaOffsetDouble[U, B]
     }
     inline def deltaOffsetFloat[U, B]: Float = ${ meta.deltaOffsetFloat[U, B] }
+
+    inline def coefficientRational[UF, UT]: Rational = ${
+        meta.coefficientSpireRational[UF, UT]
+    }
+    inline def coefficientBigDecimal[UF, UT]: BigDecimal = ${
+        meta.coefficientBigDecimal[UF, UT]
+    }
+
+    inline def deltaOffsetRational[U, B]: Rational = ${
+        meta.deltaOffsetSpireRational[U, B]
+    }
+    inline def deltaOffsetBigDecimal[U, B]: BigDecimal = ${
+        meta.deltaOffsetBigDecimal[U, B]
+    }
 
     object meta:
         import scala.quoted.*
