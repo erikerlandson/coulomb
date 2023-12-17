@@ -24,8 +24,6 @@ import eu.timepit.refined.*
 import eu.timepit.refined.api.*
 import eu.timepit.refined.numeric.*
 
-import coulomb.ops.algebra.FractionalPower
-
 object all:
     given ctx_AdditiveSemigroup_Refined_Positive[V](using
         alg: AdditiveSemigroup[V],
@@ -56,12 +54,6 @@ object all:
         vld: Validate[V, NonNegative]
     ): MultiplicativeMonoid[Refined[V, NonNegative]] =
         new infra.MMR[V, NonNegative]
-
-    given ctx_FractionalPower_Refined_Positive[V](using
-        alg: FractionalPower[V],
-        vld: Validate[V, Positive]
-    ): FractionalPower[Refined[V, Positive]] =
-        new infra.FPR[V, Positive]
 
     given ctx_AdditiveSemigroup_Refined_Either[V, P](using
         alg: AdditiveSemigroup[Refined[V, P]]
@@ -101,11 +93,6 @@ object all:
             with MultiplicativeGroup[Refined[V, P]]:
             def div(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
                 refineV[P].unsafeFrom(alg.div(x.value, y.value))
-
-        class FPR[V, P](using alg: FractionalPower[V], vld: Validate[V, P])
-            extends FractionalPower[Refined[V, P]]:
-            def pow(v: Refined[V, P], e: Double): Refined[V, P] =
-                refineV[P].unsafeFrom(alg.pow(v.value, e))
 
         class ASGRE[V, P](using alg: AdditiveSemigroup[Refined[V, P]])
             extends AdditiveSemigroup[Either[String, Refined[V, P]]]:
@@ -160,13 +147,3 @@ object all:
                         Try(alg.div(xv, yv)) match
                             case Success(z) => Right(z)
                             case Failure(e) => Left(e.getMessage)
-
-        class FPRE[V, P](using alg: FractionalPower[Refined[V, P]])
-            extends FractionalPower[Either[String, Refined[V, P]]]:
-            def pow(
-                v: Either[String, Refined[V, P]],
-                e: Double
-            ): Either[String, Refined[V, P]] =
-                Try(v.map(alg.pow(_, e))) match
-                    case Success(z) => z
-                    case Failure(e) => Left(e.getMessage)

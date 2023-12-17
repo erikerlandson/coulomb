@@ -43,10 +43,10 @@ object standard:
             def paren(s: String, tl: Boolean): String =
                 if (tl) s else s"($s)"
             def rparen(r: Rational, tl: Boolean): String =
-                if (r.d == 1)
-                    s"${r.n}"
+                if (r.denominator == 1)
+                    s"${r.numerator}"
                 else
-                    paren(s"${r.n}/${r.d}", tl)
+                    paren(s"${r.numerator}/${r.denominator}", tl)
             def work(u: RuntimeUnit, tl: Boolean = false): String =
                 u match
                     case RuntimeUnit.UnitConst(value) =>

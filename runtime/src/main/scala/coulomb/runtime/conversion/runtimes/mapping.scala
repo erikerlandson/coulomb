@@ -19,6 +19,7 @@ package coulomb.conversion.runtimes.mapping
 import scala.collection.immutable.HashMap
 
 import coulomb.*
+import coulomb.infra.utils.*
 import spire.math.Rational
 
 sealed abstract class MappingCoefficientRuntime extends CoefficientRuntime:
@@ -83,7 +84,7 @@ case class Canonical(coef: Rational, sig: Map[RuntimeUnit.UnitType, Rational]):
         else if (e == Rational.one) this
         else
             val s = sig.map { case (u, ue) => (u, ue * e) }
-            Canonical(coef.pow(e), s)
+            Canonical(coef.fpow(e), s)
 
 object Canonical:
     def merge[K, V](m1: Map[K, V], m2: Map[K, V])(f: (V, V) => V): Map[K, V] =

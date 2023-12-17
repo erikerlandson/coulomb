@@ -18,6 +18,7 @@ package coulomb
 
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
+import coulomb.infra.utils.*
 import spire.math.Rational
 import coulomb.conversion.*
 
@@ -66,7 +67,7 @@ sealed abstract class RuntimeUnit:
             case RuntimeUnit.Pow(b, e) =>
                 for {
                     bv <- b.toRational
-                } yield bv.pow(e)
+                } yield bv.fpow(e)
             case _ =>
                 Left(s"toRational: bad rational expression: $this")
 

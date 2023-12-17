@@ -28,29 +28,22 @@ import _root_.pureconfig.error.CannotConvert
 
 import algebra.ring.MultiplicativeSemigroup
 
+import spire.math.Rational
+
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
-import spire.math.Rational
 import coulomb.conversion.ValueConversion
 
 import coulomb.parser.RuntimeUnitParser
 
-object testing:
-    // probably useful for unit testing, will keep them here for now
-    extension [V, U](q: Quantity[V, U])
-        inline def toCV(using ConfigWriter[Quantity[V, U]]): ConfigValue =
-            ConfigWriter[Quantity[V, U]].to(q)
-    extension (conf: ConfigValue)
-        inline def toQuantity[V, U](using
-            ConfigReader[Quantity[V, U]]
-        ): Quantity[V, U] =
-            ConfigReader[Quantity[V, U]].from(conf).toSeq.head
-
 object rational:
-    extension (v: BigInt)
+    import coulomb.infra.utils.*
+    import spire.math.SafeLong
+
+    extension (v: SafeLong)
         def toCV: ConfigValue =
             if (v.isValidInt) ConfigWriter[Int].to(v.toInt)
-            else ConfigWriter[BigInt].to(v)
+            else ConfigWriter[BigInt].to(v.toBigInt)
 
     given ctx_RationalReader: ConfigReader[Rational] =
         ConfigReader[BigInt].map(Rational(_, 1))
@@ -62,11 +55,11 @@ object rational:
 
     given ctx_RationalWriter: ConfigWriter[Rational] =
         ConfigWriter.fromFunction[Rational] { r =>
-            if (r.d == 1)
-                ConfigValueFactory.fromAnyRef(r.n.toCV)
+            if (r.denominator == 1)
+                ConfigValueFactory.fromAnyRef(r.numerator.toCV)
             else
                 ConfigValueFactory.fromAnyRef(
-                    Map("n" -> r.n.toCV, "d" -> r.d.toCV).asJava
+                    Map("n" -> r.numerator.toCV, "d" -> r.denominator.toCV).asJava
                 )
         }
 
