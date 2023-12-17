@@ -49,7 +49,6 @@ lazy val root = tlCrossRootProject
         runtime,
         parser,
         pureconfig,
-        spire,
         refined,
         testkit,
         unidocs
@@ -139,14 +138,6 @@ lazy val pureconfig = crossProject(
         libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.4"
     )
 
-lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
-    .in(file("spire"))
-    .settings(name := "coulomb-spire")
-    .dependsOn(core % "compile->compile;test->test", units % Test)
-    .settings(commonSettings: _*)
-    .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
-
 lazy val refined = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("refined"))
@@ -184,7 +175,6 @@ lazy val all = project
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
-        spire.jvm,
         refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
     .settings(name := "coulomb-all")
@@ -214,7 +204,6 @@ lazy val docs = project
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
-        spire.jvm,
         refined.jvm
     )
     .enablePlugins(TypelevelSitePlugin)
