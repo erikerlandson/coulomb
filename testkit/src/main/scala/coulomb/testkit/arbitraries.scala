@@ -17,19 +17,9 @@
 package coulomb
 package testkit
 
-import spire.math.*
+import coulomb.*
 import coulomb.syntax.*
 import org.scalacheck.*
-
-given Arbitrary[Rational] = Arbitrary(
-    for
-        n <- Arbitrary.arbitrary[BigInt]
-        d <- Arbitrary.arbitrary[BigInt].suchThat(_ != 0)
-    yield Rational(n, d)
-)
-
-given Cogen[Rational] =
-    summon[Cogen[(BigInt, BigInt)]].contramap(r => (r.n, r.d))
 
 given [V, U](using arbV: Arbitrary[V]): Arbitrary[Quantity[V, U]] =
     Arbitrary(arbV.arbitrary.map(_.withUnit[U]))
