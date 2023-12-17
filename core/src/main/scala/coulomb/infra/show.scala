@@ -59,8 +59,8 @@ object show:
             // by the time my metaprogramming sees it.
             case typealias(_) => typestr(u)
             case unitconst(v) =>
-                if (v.d == 1) v.n.toString
-                else s"${v.n.toString}/${v.d.toString}"
+                if (v.denominator == 1) v.numerator.toString
+                else s"${v.numerator.toString}/${v.denominator.toString}"
             case flatmul(t) => termstr(t, render)
             case AppliedType(op, List(lu, unitconst1()))
                 if (op =:= TypeRepr.of[/]) =>
@@ -118,7 +118,7 @@ object show:
         p match
             case bigintTE(v) if (v >= 0) => v.toString
             case bigintTE(v) if (v < 0)  => s"(${v.toString})"
-            case rationalTE(v)           => s"(${v.n.toString}/${v.d.toString})"
+            case rationalTE(v)           => s"(${v.numerator.toString}/${v.denominator.toString})"
             case _                       => "!!!"
 
     def paren(using

@@ -16,21 +16,36 @@
 
 package coulomb.infra
 
-import spire.math.Rational
+import spire.math.{Rational, SafeLong}
+
 import coulomb.*
 import coulomb.define.*
+import coulomb.infra.utils.*
 
 object meta:
     import scala.unchecked
     import scala.quoted.*
     import scala.language.implicitConversions
 
+    given ctx_SafeLongToExpr: ToExpr[SafeLong] with
+        def apply(s: SafeLong)(using Quotes): Expr[SafeLong] = s match
+            case v if (v == SafeLong.zero) => '{ SafeLong.zero }
+            case v if (v == SafeLong.one)  => '{ SafeLong.one }
+            case v if (v.isValidLong) =>
+                '{ SafeLong(${ Expr(s.getLong.get) }) }
+            case _ => '{ SafeLong(${ Expr(s.toBigInt) }) }
+
     given ctx_RationalToExpr: ToExpr[Rational] with
         def apply(r: Rational)(using Quotes): Expr[Rational] = r match
-            // Rational(1) is a useful special case to have predefined
-            // could we get clever with some kind of expression caching/sharing here?
-            case v if (v == 1) => '{ Rational.one }
-            case _             => '{ Rational(${ Expr(r.n) }, ${ Expr(r.d) }) }
+            case v if (v == Rational.zero) => '{ Rational.zero }
+            case v if (v == Rational.one)  => '{ Rational.one }
+            case _ =>
+                '{
+                    Rational(
+                        ${ Expr(r.numerator) },
+                        ${ Expr(r.denominator) }
+                    )
+                }
 
     sealed class SigMode
     object SigMode:
@@ -75,8 +90,8 @@ object meta:
 
         def apply(using Quotes)(v: Rational): quotes.reflect.TypeRepr =
             import quotes.reflect.*
-            if (v.d == 1) then bigintTE(v.n)
-            else TypeRepr.of[/].appliedTo(List(bigintTE(v.n), bigintTE(v.d)))
+            if (v.denominator == 1) then bigintTE(v.numerator)
+            else TypeRepr.of[/].appliedTo(List(bigintTE(v.numerator), bigintTE(v.denominator)))
 
     object bigintTE:
         def unapply(using Quotes)(tr: quotes.reflect.TypeRepr): Option[BigInt] =
@@ -89,6 +104,9 @@ object meta:
                         case scala.util.Success(b) => Some(b)
                         case _ => None
                 case _                               => None
+
+        def apply(using Quotes)(v: SafeLong): quotes.reflect.TypeRepr =
+            bigintTE(v.toBigInt)
 
         def apply(using Quotes)(v: BigInt): quotes.reflect.TypeRepr =
             import quotes.reflect.*
@@ -181,12 +199,8 @@ object meta:
                         Rational.zero
                 if (e == 0) (Rational.one, Nil)
                 else if (e == 1) (bcoef, bsig)
-                else if (e.n.isValidInt && e.d.isValidInt)
-                    val ucoef =
-                        if (e.d == 1) bcoef.pow(e.n.toInt)
-                        else bcoef.pow(e.n.toInt).root(e.d.toInt)
-                    val usig = unifyPow(e, bsig)
-                    (ucoef, usig)
+                else if (e.numerator.isValidInt && e.denominator.isValidInt)
+                    (bcoef.fpow(e), unifyPow(e, bsig))
                 else
                     report.error(s"bad exponent in cansig: ${typestr(u)}")
                     (Rational.zero, Nil)

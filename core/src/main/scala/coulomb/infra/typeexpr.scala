@@ -20,13 +20,16 @@ object typeexpr:
     import scala.util.{Try, Success}
     import scala.quoted.*
     import scala.language.implicitConversions
+
     import spire.math.Rational
+
     import coulomb.infra.meta.{
         rationalTE,
         bigintTE,
         ctx_RationalToExpr,
         typestr
     }
+    import coulomb.infra.utils.*
 
     inline def asInt[E]: Int = ${ teToInt[E] }
 
@@ -44,7 +47,7 @@ object typeexpr:
         import quotes.reflect.*
         TypeRepr.of[E] match
             case ConstantType(IntConstant(v)) => Expr(v)
-            case rationalTE(v) if ((v.d == 1) && v.n.isValidInt) => Expr(v.n.toInt)
+            case rationalTE(v) if ((v.denominator == 1) && v.numerator.isValidInt) => Expr(v.numerator.toInt)
             case tr =>
                 report.error(s"type ${typestr(tr)} cannot be converted to Int")
                 Expr(0)
@@ -53,7 +56,7 @@ object typeexpr:
         import quotes.reflect.*
         TypeRepr.of[E] match
             case ConstantType(IntConstant(v)) if (v > 0) => Expr(v)
-            case rationalTE(v) if ((v.d == 1) && v.n.isValidInt && (v.n > 0)) => Expr(v.n.toInt)
+            case rationalTE(v) if ((v.denominator == 1) && v.numerator.isValidInt && (v.numerator > 0)) => Expr(v.numerator.toInt)
             case tr =>
                 report.error(s"type ${typestr(tr)} cannot be converted to positive Int")
                 Expr(0)
@@ -62,7 +65,7 @@ object typeexpr:
         import quotes.reflect.*
         TypeRepr.of[E] match
             case ConstantType(IntConstant(v)) if (v >= 0) => Expr(v)
-            case rationalTE(v) if ((v.d == 1) && v.n.isValidInt && (v.n >= 0)) => Expr(v.n.toInt)
+            case rationalTE(v) if ((v.denominator == 1) && v.numerator.isValidInt && (v.numerator >= 0)) => Expr(v.numerator.toInt)
             case tr =>
                 report.error(s"type ${typestr(tr)} cannot be converted to non-negative Int")
                 Expr(0)

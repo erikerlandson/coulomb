@@ -150,10 +150,9 @@ object Quantity:
     import scala.compiletime
     import _root_.algebra.ring.*
     import cats.kernel.Order
+    import spire.math.{Integral, Fractional, Rational}
     import syntax.withUnit
     import coulomb.infra.typeexpr
-    import coulomb.ops.algebra.FractionalPower
-    import coulomb.ops.algebra.TruncatingPower
 
     /**
      * Lift a raw value of type V into a unit quantity
@@ -446,8 +445,13 @@ object Quantity:
             su: SimplifiedUnit[UL ^ E]
         ): Quantity[VL, su.UO] =
             compiletime.summonFrom {
-                case alg: FractionalPower[VL] =>
-                    alg.pow(ql.value, typeexpr.asDouble[E]).withUnit[su.UO]
+                case alg: Fractional[VL] =>
+                    val e = typeexpr.asRational[E]
+                    val p: VL = if ((e.denominator == 1) && (e.numerator.isValidInt))
+                        alg.pow(ql.value, e.numerator.toInt)
+                    else
+                        alg.fpow(ql.value, alg.fromRational(e))
+                    p.withUnit[su.UO]
                 case alg: MultiplicativeGroup[VL] =>
                     alg.pow(ql.value, typeexpr.asInt[E]).withUnit[su.UO]
                 case alg: MultiplicativeMonoid[VL] =>
@@ -474,10 +478,29 @@ object Quantity:
          *   }}}
          */
         transparent inline def tpow[E](using
-            alg: TruncatingPower[VL],
             su: SimplifiedUnit[UL ^ E]
         ): Quantity[VL, su.UO] =
-            alg.tpow(ql.value, typeexpr.asDouble[E]).withUnit[su.UO]
+            inline compiletime.erasedValue[VL] match
+                case _: Int =>
+                    val b = ql.value.asInstanceOf[Int].toDouble
+                    val e = typeexpr.asDouble[E]
+                    val p = math.pow(b, e).toInt
+                    p.asInstanceOf[VL].withUnit[su.UO]
+                case _: Long =>
+                    val b = ql.value.asInstanceOf[Long].toDouble
+                    val e = typeexpr.asDouble[E]
+                    val p = math.pow(b, e).toLong
+                    p.asInstanceOf[VL].withUnit[su.UO]
+                case _ =>
+                    compiletime.summonFrom {
+                        case alg: Integral[VL] =>
+                            val b = alg.toRational(ql.value)
+                            val e = typeexpr.asRational[E]
+                            val p = Fractional[Rational].fpow(b, e)
+                            alg.fromRational(p).withUnit[su.UO]
+                        case _ =>
+                            compiletime.error("no algebra in context that supports truncated power")
+                    }
 
         /**
          * test this quantity for equality with another
@@ -639,7 +662,7 @@ object test:
     import _root_.algebra.ring.*
     import cats.kernel.Order
     import syntax.withUnit
-    import spire.math.typeexpr
+    import coulomb.infra.typeexpr
     import coulomb.ops.algebra.FractionalPower
 
     case class TestFP(value: Double)
