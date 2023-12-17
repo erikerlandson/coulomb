@@ -657,26 +657,3 @@ object Quantity:
             ord: Order[VL]
         ): Boolean =
           ord.compare(ql.value, qr.value) >= 0
-
-object test:
-    import _root_.algebra.ring.*
-    import cats.kernel.Order
-    import syntax.withUnit
-    import coulomb.infra.typeexpr
-    import coulomb.ops.algebra.FractionalPower
-
-    case class TestFP(value: Double)
-    object TestFP:
-        given FractionalPower[TestFP] with
-            def pow(x: TestFP, e: Double): TestFP =
-                TestFP(math.pow(x.value, e))
-
-    case class TestMG(value: Double)
-    object TestMG:
-        given ggg(using alg: MultiplicativeGroup[Double]): MultiplicativeGroup[TestMG] =
-            new MultiplicativeGroup[TestMG]:
-                def one: TestMG = TestMG(1.0)
-                def times(x: TestMG, y: TestMG): TestMG =
-                    TestMG(alg.times(x.value, y.value))
-                def div(x: TestMG, y: TestMG): TestMG =
-                    TestMG(alg.div(x.value, y.value))
