@@ -17,6 +17,9 @@
 package coulomb
 
 import scala.annotation.implicitNotFound
+
+import spire.math.Rational
+
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
 
@@ -115,9 +118,17 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  *   the coefficient of conversion from UF to UT If UF and UT are not
  *   convertible, causes a compilation failure.
  */
-inline def coefficient[V, UF, UT](using vc: ValueConversion[spire.math.Rational, V]): V =
-    import coulomb.conversion.coefficients.coefficientRational
-    vc(coefficientRational[UF, UT])
+inline def coefficient[V, UF, UT]: V =
+    import coulomb.conversion.coefficients.*
+    inline compiletime.erasedValue[V] match
+        case _: Double => coefficientDouble[UF, UT].asInstanceOf[V]
+        case _ =>
+            compiletime.summonFrom {
+                case vc: ValueConversion[Rational, V] =>
+                    vc(coefficientRational[UF, UT])
+                case _ =>
+                    compiletime.error("nope.")
+            }
 
 package syntax {
     // this has to be in a separated namespace:
@@ -238,10 +249,20 @@ object Quantity:
          * q.toUnit[Hectare] // => compile error
          *   }}}
          */
-        inline def toUnit[U](using
-            conv: UnitConversion[VL, UL, U]
-        ): Quantity[VL, U] =
-            conv(ql.value).withUnit[U]
+        inline def toUnit[U]: Quantity[VL, U] =
+            import coulomb.conversion.coefficients.*
+            inline compiletime.erasedValue[VL] match
+                case _: Double =>
+                    (coefficientDouble[UL, U] * ql.value.asInstanceOf[Double])
+                        .asInstanceOf[VL]
+                        .withUnit[U]
+                case _ =>
+                    compiletime.summonFrom {
+                        case conv: UnitConversion[VL, UL, U] =>
+                            conv(ql.value).withUnit[U]
+                        case _ =>
+                            compiletime.error("no!")
+                    }
 
         /**
          * convert a quantity to an integer value type from a fractional type
@@ -657,3 +678,53 @@ object Quantity:
             ord: Order[VL]
         ): Boolean =
           ord.compare(ql.value, qr.value) >= 0
+
+object qvcsyntax:
+    extension[V](v: V)
+        inline def asQVC[U]: QVC[V, U] =
+            QVC[V, U](v)
+
+case class QVC[V, U](val value: V) extends AnyVal:
+    import qvcsyntax.*
+    inline def toUnit[UT]: QVC[V, UT] =
+        import coulomb.conversion.coefficients.*
+        inline compiletime.erasedValue[V] match
+            case _: Double =>
+                (coefficientDouble[U, UT] * value.asInstanceOf[Double])
+                    .asInstanceOf[V]
+                    .asQVC[UT]
+            case _ =>
+                compiletime.summonFrom {
+                    case conv: UnitConversion[V, U, UT] =>
+                        QVC[V, UT](conv(value))
+                    case _ =>
+                        compiletime.error("no!")
+                }
+
+object hoohoo:
+    import qvcsyntax.*
+    val q1 = 1.0.asQVC[1000]
+    val q2 = q1.toUnit[1]
+/*
+    def f(q: QVC[Double, 1000]): QVC[Double, 1] =
+        q.toUnit[1]
+*/
+
+object googoo:
+    import syntax.*
+    val q1 = 1.0.withUnit[1000]
+    val q2 = q1.toUnit[1]
+    //val q2 = q1.toUnit[1]
+ 
+object foofoo:
+    import coulomb.syntax.*
+    import coulomb.policy.standard.given
+    val q1 = 1.0.withUnit[1000]
+    //val q2 = q1.toUnit[1]
+
+object foofoo2:
+    import coulomb.syntax.*
+    import coulomb.policy.standard.given
+    val q1 = 1f.withUnit[1000]
+    val q2 = q1.toUnit[1]
+

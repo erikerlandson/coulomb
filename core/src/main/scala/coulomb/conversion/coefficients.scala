@@ -25,8 +25,14 @@ object coefficients:
     inline def coefficientDouble[U1, U2]: Double = ${
         meta.coefficientDouble[U1, U2]
     }
+    inline def coefficientDoubleJ[U1, U2]: java.lang.Double = ${
+        meta.coefficientDoubleJ[U1, U2]
+    }
     inline def coefficientFloat[U1, U2]: Float = ${
         meta.coefficientFloat[U1, U2]
+    }
+    inline def coefficientBigDecimal[UF, UT]: BigDecimal = ${
+        meta.coefficientBigDecimal[UF, UT]
     }
 
     inline def coefficientNumDouble[U1, U2]: Double = ${
@@ -44,10 +50,6 @@ object coefficients:
     }
     inline def deltaOffsetFloat[U, B]: Float = ${ meta.deltaOffsetFloat[U, B] }
 
-    inline def coefficientBigDecimal[UF, UT]: BigDecimal = ${
-        meta.coefficientBigDecimal[UF, UT]
-    }
-
     inline def deltaOffsetBigDecimal[U, B]: BigDecimal = ${
         meta.deltaOffsetBigDecimal[U, B]
     }
@@ -55,6 +57,11 @@ object coefficients:
     object meta:
         import scala.quoted.*
         import coulomb.infra.meta.{*, given}
+
+        given ctx_JavaDoubleToExpr: ToExpr[java.lang.Double] with
+            def apply(v: java.lang.Double)(using Quotes): Expr[java.lang.Double] =
+                val vd: Double = v
+                '{ java.lang.Double.valueOf(${Expr(vd)}) }
 
         def coefficientRational[U1, U2](using
             Quotes,
@@ -73,6 +80,15 @@ object coefficients:
             import quotes.reflect.*
             val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
             Expr(c.toDouble)
+
+        def coefficientDoubleJ[U1, U2](using
+            Quotes,
+            Type[U1],
+            Type[U2]
+        ): Expr[java.lang.Double] =
+            import quotes.reflect.*
+            val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
+            Expr(java.lang.Double.valueOf(c.toDouble))
 
         def coefficientFloat[U1, U2](using
             Quotes,
