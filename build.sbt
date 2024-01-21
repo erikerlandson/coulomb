@@ -48,6 +48,7 @@ lazy val root = tlCrossRootProject
         runtime,
         parser,
         pureconfig,
+        ciris,
         spire,
         refined,
         testkit,
@@ -137,6 +138,28 @@ lazy val pureconfig = crossProject(
         libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.5"
     )
 
+lazy val ciris = crossProject(
+    JVMPlatform,
+    JSPlatform,
+    NativePlatform
+)
+    .crossType(CrossType.Pure)
+    .in(file("ciris"))
+    .settings(name := "coulomb-ciris")
+    .dependsOn(
+        core % "compile->compile;test->test",
+        runtime,
+        parser,
+        units % Test
+    )
+    .settings(
+        tlVersionIntroduced := Map("3" -> "0.8.1")
+    )
+    .settings(commonSettings: _*)
+    .settings(
+        libraryDependencies += "is.cir" %%% "ciris" % "3.3.0"
+    )
+
 lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("spire"))
@@ -182,6 +205,7 @@ lazy val all = project
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
+        ciris.jvm,
         spire.jvm,
         refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
@@ -212,6 +236,7 @@ lazy val docs = project
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
+        ciris.jvm,
         spire.jvm,
         refined.jvm
     )
