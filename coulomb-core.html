@@ -496,9 +496,10 @@
 // I found:
 // 
 //     coulomb.policy.standard.ctx_div_2V2U[Int, coulomb.units.si.Meter, Int, (1 : Int)
-//       ](/* missing */summon[util.NotGiven[Int =:= Int]], ???, ???, ???, ???, ???)
+//       ](/* missing */summon[scala.util.NotGiven[Int =:= Int]], ???, ???, ???, ???,
+//       ???)
 // 
-// But no implicit values were found that match type util.NotGiven[Int =:= Int].</span></code></pre>
+// But no implicit values were found that match type scala.util.NotGiven[Int =:= Int].</span></code></pre>
         
         <h2 id="value-and-unit-conversions" class="section"><a class="anchor-link left" href="#value-and-unit-conversions"><i class="icofont-laika link">&#xef71;</i></a>Value and Unit Conversions</h2>
         <p>In <code>coulomb</code>, a <code>Quantity[V, U]</code> may experience conversions along two possible axes:
