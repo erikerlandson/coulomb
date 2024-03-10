@@ -675,16 +675,16 @@
 //     coulomb.policy.standard.ctx_deltaaddq_2V2U[coulomb.units.si.Kelvin, Double,
 //       coulomb.units.temperature.Celsius,
 //       coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
-//         coulomb.units.temperature.Kelvin²],
+//         coulomb.units.temperature.Kelvin],
 //     (1 : Int)](scala.util.NotGiven.value, scala.util.NotGiven.value,
 //       coulomb.ops.ValueResolution.ctx_VR_LpR[Double,
 //         coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
-//           coulomb.units.temperature.Kelvin²]
+//           coulomb.units.temperature.Kelvin]
 //       ](
 //         new
 //           coulomb.ops.ValuePromotion[Double,
 //             coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
-//               coulomb.units.temperature.Kelvin²]
+//               coulomb.units.temperature.Kelvin]
 //           ]
 //         ()
 //       ),
@@ -692,12 +692,8 @@
 // 
 // But given instance ctx_VP_Path in object ValuePromotion does not match type coulomb.ops.ValuePromotion[Double,
 //   coulomb.DeltaQuantity[Double, coulomb.units.temperature.Celsius,
-//     coulomb.units.temperature.Kelvin²]
-// ]
-// 
-// where:    Kelvin  is a type in object si with bounds 
-//           Kelvin² is a type in object temperature which is an alias of coulomb.units.si.Kelvin
-// .</span></code></pre>
+//     coulomb.units.temperature.Kelvin]
+// ].</span></code></pre>
         <p>We can see that <code>coulomb</code> time units support an algebra that behaves the same as temperatures above:</p>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">time</span><span>.{*, </span><span class="keyword">given</span><span>}
 
