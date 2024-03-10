@@ -134,7 +134,7 @@ lazy val pureconfig = crossProject(
     )
     .settings(commonSettings: _*)
     .settings(
-        libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.5"
+        libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.6"
     )
 
 lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
