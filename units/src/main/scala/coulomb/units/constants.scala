@@ -29,7 +29,7 @@ object constants:
     import coulomb.*
     import coulomb.syntax.*
     import coulomb.define.*
-    import coulomb.rational.Rational
+    import spire.math.Rational
     import coulomb.conversion.ValueConversion
 
     export coulomb.units.mksa.{*, given}
@@ -379,4 +379,4 @@ object constants:
                         report.error(
                             s"constq: unrecognized unit declaration: ${typestr(u)}"
                         )
-                        '{ new NC[CU, Nothing](Rational.const0) }
+                        '{ new NC[CU, Nothing](Rational.zero) }

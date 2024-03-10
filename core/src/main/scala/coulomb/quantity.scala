@@ -16,8 +16,10 @@
 
 package coulomb
 
-import coulomb.ops.*
-import coulomb.rational.Rational
+import scala.annotation.implicitNotFound
+
+import spire.math.Rational
+
 import coulomb.conversion.{ValueConversion, UnitConversion}
 import coulomb.conversion.{TruncatingValueConversion, TruncatingUnitConversion}
 
@@ -59,8 +61,26 @@ final type /[L, R]
  */
 final type ^[B, E]
 
-@deprecated("Unitless should be replaced by integer literal type '1'")
-final type Unitless = 1
+@implicitNotFound("Unable to simplify unit type ${U}")
+abstract class SimplifiedUnit[U]:
+    type UO
+
+object SimplifiedUnit:
+    import scala.quoted.*
+
+    transparent inline given ctx_SimplifiedUnit[U]: SimplifiedUnit[U] =
+        ${ simplifiedUnit[U] }
+
+    class NC[U, UOp] extends SimplifiedUnit[U]:
+        type UO = UOp
+
+    private def simplifiedUnit[U](using
+        Quotes,
+        Type[U]
+    ): Expr[SimplifiedUnit[U]] =
+        import quotes.reflect.*
+        coulomb.infra.meta.simplify(TypeRepr.of[U]).asType match
+            case '[uo] => '{ new NC[U, uo] }
 
 /**
  * obtain a string representation of a unit type, using unit abbreviation forms
@@ -98,9 +118,17 @@ inline def showUnitFull[U]: String = ${ coulomb.infra.show.showFull[U] }
  *   the coefficient of conversion from UF to UT If UF and UT are not
  *   convertible, causes a compilation failure.
  */
-inline def coefficient[V, UF, UT](using vc: ValueConversion[Rational, V]): V =
-    import coulomb.conversion.coefficients.coefficientRational
-    vc(coefficientRational[UF, UT])
+inline def coefficient[V, UF, UT]: V =
+    import coulomb.conversion.coefficients.*
+    inline compiletime.erasedValue[V] match
+        case _: Double => coefficientDouble[UF, UT].asInstanceOf[V]
+        case _ =>
+            compiletime.summonFrom {
+                case vc: ValueConversion[Rational, V] =>
+                    vc(coefficientRational[UF, UT])
+                case _ =>
+                    compiletime.error("nope.")
+            }
 
 package syntax {
     // this has to be in a separated namespace:
@@ -130,7 +158,12 @@ opaque type Quantity[V, U] = V
 
 /** Defines Quantity constructors and extension methods */
 object Quantity:
+    import scala.compiletime
+    import _root_.algebra.ring.*
+    import cats.kernel.Order
+    import spire.math.{Integral, Fractional, Rational}
     import syntax.withUnit
+    import coulomb.infra.typeexpr
 
     /**
      * Lift a raw value of type V into a unit quantity
@@ -216,10 +249,20 @@ object Quantity:
          * q.toUnit[Hectare] // => compile error
          *   }}}
          */
-        inline def toUnit[U](using
-            conv: UnitConversion[VL, UL, U]
-        ): Quantity[VL, U] =
-            conv(ql.value).withUnit[U]
+        inline def toUnit[U]: Quantity[VL, U] =
+            import coulomb.conversion.coefficients.*
+            inline compiletime.erasedValue[VL] match
+                case _: Double =>
+                    (coefficientDouble[UL, U] * ql.value.asInstanceOf[Double])
+                        .asInstanceOf[VL]
+                        .withUnit[U]
+                case _ =>
+                    compiletime.summonFrom {
+                        case conv: UnitConversion[VL, UL, U] =>
+                            conv(ql.value).withUnit[U]
+                        case _ =>
+                            compiletime.error("no!")
+                    }
 
         /**
          * convert a quantity to an integer value type from a fractional type
@@ -268,8 +311,10 @@ object Quantity:
          * -q // => Quantity[Meter](-1)
          *   }}}
          */
-        inline def unary_-(using neg: Neg[VL, UL]): Quantity[VL, UL] =
-            neg(ql)
+        inline def unary_-(using
+            alg: AdditiveGroup[VL]
+        ): Quantity[VL, UL] =
+            alg.negate(ql.value).withUnit[UL]
 
         /**
          * add this quantity to another
@@ -293,10 +338,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using
-            add: Add[VL, UL, VR, UR]
-        ): Quantity[add.VO, add.UO] =
-            add.eval(ql, qr)
+        inline def +(qr: Quantity[VL, UL])(using
+            alg: AdditiveSemigroup[VL]
+        ): Quantity[VL, UL] =
+            alg.plus(ql.value, qr.value).withUnit[UL]
 
         /**
          * subtract another quantity from this one
@@ -320,10 +365,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using
-            sub: Sub[VL, UL, VR, UR]
-        ): Quantity[sub.VO, sub.UO] =
-            sub.eval(ql, qr)
+        inline def -(qr: Quantity[VL, UL])(using
+            alg: AdditiveGroup[VL]
+        ): Quantity[VL, UL] =
+            alg.minus(ql.value, qr.value).withUnit[UL]
 
         /**
          * multiply this quantity by another
@@ -345,10 +390,11 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def *[VR, UR](qr: Quantity[VR, UR])(using
-            mul: Mul[VL, UL, VR, UR]
-        ): Quantity[mul.VO, mul.UO] =
-            mul.eval(ql, qr)
+        transparent inline def *[UR](qr: Quantity[VL, UR])(using
+            alg: MultiplicativeSemigroup[VL],
+            su: SimplifiedUnit[UL * UR]
+        ): Quantity[VL, su.UO] =
+            alg.times(ql.value, qr.value).withUnit[su.UO]
 
         /**
          * divide this quantity by another
@@ -370,10 +416,11 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def /[VR, UR](qr: Quantity[VR, UR])(using
-            div: Div[VL, UL, VR, UR]
-        ): Quantity[div.VO, div.UO] =
-            div.eval(ql, qr)
+        transparent inline def /[UR](qr: Quantity[VL, UR])(using
+            alg: MultiplicativeGroup[VL],
+            su: SimplifiedUnit[UL / UR]
+        ): Quantity[VL, su.UO] =
+            alg.div(ql.value, qr.value).withUnit[su.UO]
 
         /**
          * divide this quantity by another, using truncating (integer) division
@@ -395,10 +442,11 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def tquot[VR, UR](qr: Quantity[VR, UR])(using
-            tq: TQuot[VL, UL, VR, UR]
-        ): Quantity[tq.VO, tq.UO] =
-            tq.eval(ql, qr)
+        transparent inline def tquot[UR](qr: Quantity[VL, UR])(using
+            alg: TruncatedDivision[VL],
+            su: SimplifiedUnit[UL / UR]
+        ): Quantity[VL, su.UO] =
+            alg.tquot(ql.value, qr.value).withUnit[su.UO]
 
         /**
          * raise this quantity to a rational or integer power
@@ -414,15 +462,31 @@ object Quantity:
          * q.pow[-1]  // => Quantity[1 / Meter](0.5)
          *   }}}
          */
-        transparent inline def pow[P](using
-            pow: Pow[VL, UL, P]
-        ): Quantity[pow.VO, pow.UO] =
-            pow.eval(ql)
+        transparent inline def pow[E](using
+            su: SimplifiedUnit[UL ^ E]
+        ): Quantity[VL, su.UO] =
+            compiletime.summonFrom {
+                case alg: Fractional[VL] =>
+                    val e = typeexpr.asRational[E]
+                    val p: VL = if ((e.denominator == 1) && (e.numerator.isValidInt))
+                        alg.pow(ql.value, e.numerator.toInt)
+                    else
+                        alg.fpow(ql.value, alg.fromRational(e))
+                    p.withUnit[su.UO]
+                case alg: MultiplicativeGroup[VL] =>
+                    alg.pow(ql.value, typeexpr.asInt[E]).withUnit[su.UO]
+                case alg: MultiplicativeMonoid[VL] =>
+                    alg.pow(ql.value, typeexpr.asNonNegInt[E]).withUnit[su.UO]
+                case alg: MultiplicativeSemigroup[VL] =>
+                    alg.pow(ql.value, typeexpr.asPosInt[E]).withUnit[su.UO]
+                case _ =>
+                    compiletime.error("no algebra in context that supports power")
+            }
 
         /**
          * raise this quantity to a rational or integer power, with integer
          * truncated result
-         * @tparam P
+         * @tparam E
          *   the power, or exponent
          * @return
          *   this quantity raised to exponent `P`, truncated to integer type
@@ -434,10 +498,30 @@ object Quantity:
          * q.tpow[-1]  // => Quantity[1 / Meter](0)
          *   }}}
          */
-        transparent inline def tpow[P](using
-            tp: TPow[VL, UL, P]
-        ): Quantity[tp.VO, tp.UO] =
-            tp.eval(ql)
+        transparent inline def tpow[E](using
+            su: SimplifiedUnit[UL ^ E]
+        ): Quantity[VL, su.UO] =
+            inline compiletime.erasedValue[VL] match
+                case _: Int =>
+                    val b = ql.value.asInstanceOf[Int].toDouble
+                    val e = typeexpr.asDouble[E]
+                    val p = math.pow(b, e).toInt
+                    p.asInstanceOf[VL].withUnit[su.UO]
+                case _: Long =>
+                    val b = ql.value.asInstanceOf[Long].toDouble
+                    val e = typeexpr.asDouble[E]
+                    val p = math.pow(b, e).toLong
+                    p.asInstanceOf[VL].withUnit[su.UO]
+                case _ =>
+                    compiletime.summonFrom {
+                        case alg: Integral[VL] =>
+                            val b = alg.toRational(ql.value)
+                            val e = typeexpr.asRational[E]
+                            val p = Fractional[Rational].fpow(b, e)
+                            alg.fromRational(p).withUnit[su.UO]
+                        case _ =>
+                            compiletime.error("no algebra in context that supports truncated power")
+                    }
 
         /**
          * test this quantity for equality with another
@@ -460,10 +544,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def ===[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def ===(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) == 0
+            ord.compare(ql.value, qr.value) == 0
 
         /**
          * test this quantity for inequality with another
@@ -486,10 +570,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def =!=[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def =!=(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) != 0
+            ord.compare(ql.value, qr.value) != 0
 
         /**
          * test if this quantity is less than another
@@ -512,10 +596,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def <[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def <(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) < 0
+            ord.compare(ql.value, qr.value) < 0
 
         /**
          * test if this quantity is less than or equal to another
@@ -538,10 +622,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def <=[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def <=(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) <= 0
+            ord.compare(ql.value, qr.value) <= 0
 
         /**
          * test if this quantity is greater than another
@@ -564,10 +648,10 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def >[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def >(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) > 0
+          ord.compare(ql.value, qr.value) > 0
 
         /**
          * test if this quantity is greater than or equal to another
@@ -590,7 +674,57 @@ object Quantity:
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        inline def >=[VR, UR](qr: Quantity[VR, UR])(using
-            ord: Ord[VL, UL, VR, UR]
+        inline def >=(qr: Quantity[VL, UL])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) >= 0
+          ord.compare(ql.value, qr.value) >= 0
+
+object qvcsyntax:
+    extension[V](v: V)
+        inline def asQVC[U]: QVC[V, U] =
+            QVC[V, U](v)
+
+case class QVC[V, U](val value: V) extends AnyVal:
+    import qvcsyntax.*
+    inline def toUnit[UT]: QVC[V, UT] =
+        import coulomb.conversion.coefficients.*
+        inline compiletime.erasedValue[V] match
+            case _: Double =>
+                (coefficientDouble[U, UT] * value.asInstanceOf[Double])
+                    .asInstanceOf[V]
+                    .asQVC[UT]
+            case _ =>
+                compiletime.summonFrom {
+                    case conv: UnitConversion[V, U, UT] =>
+                        QVC[V, UT](conv(value))
+                    case _ =>
+                        compiletime.error("no!")
+                }
+
+object hoohoo:
+    import qvcsyntax.*
+    val q1 = 1.0.asQVC[1000]
+    val q2 = q1.toUnit[1]
+/*
+    def f(q: QVC[Double, 1000]): QVC[Double, 1] =
+        q.toUnit[1]
+*/
+
+object googoo:
+    import syntax.*
+    val q1 = 1.0.withUnit[1000]
+    val q2 = q1.toUnit[1]
+    //val q2 = q1.toUnit[1]
+ 
+object foofoo:
+    import coulomb.syntax.*
+    import coulomb.policy.standard.given
+    val q1 = 1.0.withUnit[1000]
+    //val q2 = q1.toUnit[1]
+
+object foofoo2:
+    import coulomb.syntax.*
+    import coulomb.policy.standard.given
+    val q1 = 1f.withUnit[1000]
+    val q2 = q1.toUnit[1]
+

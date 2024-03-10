@@ -17,62 +17,47 @@
 package coulomb.conversion.standard
 
 object value:
-    import coulomb.conversion.*
-    import coulomb.rational.Rational
+    import _root_.scala.util.NotGiven
 
-    given ctx_VC_Double[VF](using
-        num: Numeric[VF]
-    ): ValueConversion[VF, Double] =
-        new ValueConversion[VF, Double]:
-            def apply(v: VF): Double = num.toDouble(v)
+    import _root_.spire.math.*
 
-    given ctx_VC_Float[VF](using num: Numeric[VF]): ValueConversion[VF, Float] =
-        new ValueConversion[VF, Float]:
-            def apply(v: VF): Float = num.toFloat(v)
+    import coulomb.conversion.{ValueConversion, TruncatingValueConversion}
 
-    given ctx_VC_Long[VF](using num: Integral[VF]): ValueConversion[VF, Long] =
-        new ValueConversion[VF, Long]:
-            def apply(v: VF): Long = num.toLong(v)
+    // coulomb's standard conversions are based on the typelevel/spire
+    // typeclasses ConvertableTo and ConvertableFrom, as well as
+    // spire's categorizations of Fractional vs "not Fractional",
+    // i.e. integer types
+    //
+    // spire's system includes definitions for scala's native
+    // numeric types, including BigDecimal and BigInt
+    //
+    // extending this conversion system to other non-spire value
+    // types can be accomplished by defining ConvertableFrom,
+    // ConvertableTo and Fractional (if the type is fractional),
+    // appropriately for such non-spire types.
 
-    given ctx_TVC_Long[VF](using
-        num: Fractional[VF]
-    ): TruncatingValueConversion[VF, Long] =
-        new TruncatingValueConversion[VF, Long]:
-            def apply(v: VF): Long = num.toLong(v)
+    // anything can be safely converted to a fractional value type
+    given ctx_spire_VC_XF[VF, VT](using
+        vtf: Fractional[VT],
+        cf: ConvertableFrom[VF],
+        ct: ConvertableTo[VT]
+    ): ValueConversion[VF, VT] =
+        (v: VF) => ct.fromType(v)
 
-    given ctx_VC_Int[VF](using num: Integral[VF]): ValueConversion[VF, Int] =
-        new ValueConversion[VF, Int]:
-            def apply(v: VF): Int = num.toInt(v)
+    // integer types can safely convert to each other
+    given ctx_spire_VC_II[VF, VT](using
+        vti: NotGiven[Fractional[VT]],
+        vfi: NotGiven[Fractional[VF]],
+        cf: ConvertableFrom[VF],
+        ct: ConvertableTo[VT]
+    ): ValueConversion[VF, VT] =
+        (v: VF) => ct.fromType(v)
 
-    given ctx_TVC_Int[VF](using
-        num: Fractional[VF]
-    ): TruncatingValueConversion[VF, Int] =
-        new TruncatingValueConversion[VF, Int]:
-            def apply(v: VF): Int = num.toInt(v)
-
-    given ctx_VC_Rational_Rational: ValueConversion[Rational, Rational] with
-        def apply(v: Rational): Rational = v
-
-    given ctx_VC_Rational_Double: ValueConversion[Rational, Double] with
-        def apply(v: Rational): Double = v.toDouble
-
-    given ctx_VC_Rational_Float: ValueConversion[Rational, Float] with
-        def apply(v: Rational): Float = v.toFloat
-
-    given ctx_TVC_Rational_Long: TruncatingValueConversion[Rational, Long] with
-        def apply(v: Rational): Long = v.toLong
-
-    given ctx_TVC_Rational_Int: TruncatingValueConversion[Rational, Int] with
-        def apply(v: Rational): Int = v.toInt
-
-    given ctx_VC_Double_Rational: ValueConversion[Double, Rational] with
-        def apply(v: Double): Rational = Rational(v)
-
-    given ctx_VC_Float_Rational: ValueConversion[Float, Rational] with
-        def apply(v: Float): Rational = Rational(v)
-
-    given ctx_VC_Long_Rational: ValueConversion[Long, Rational] with
-        def apply(v: Long): Rational = Rational(v)
-
-    given ctx_VC_Int_Rational: ValueConversion[Int, Rational] with
-        def apply(v: Int): Rational = Rational(v)
+    // converting fractional types to integer types is truncating
+    given ctx_spire_TVC_FI[VF, VT](using
+        vti: NotGiven[Fractional[VT]],
+        vff: Fractional[VF],
+        cf: ConvertableFrom[VF],
+        ct: ConvertableTo[VT]
+    ): TruncatingValueConversion[VF, VT] =
+        (v: VF) => ct.fromType(v)

@@ -20,7 +20,7 @@ import scala.quoted.*
 import scala.util.{Try, Success, Failure}
 
 import coulomb.*
-import coulomb.rational.Rational
+import spire.math.Rational
 
 object meta:
     import scala.unchecked

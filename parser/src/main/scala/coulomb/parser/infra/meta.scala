@@ -19,7 +19,7 @@ package coulomb.parser.infra
 import scala.util.{Try, Success, Failure}
 
 import coulomb.RuntimeUnit
-import coulomb.rational.Rational
+import spire.math.Rational
 
 object meta:
     import scala.quoted.*

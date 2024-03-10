@@ -19,7 +19,7 @@ package coulomb.pureconfig
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
 
-import coulomb.rational.Rational
+import spire.math.Rational
 
 import coulomb.parser.RuntimeUnitParser
 

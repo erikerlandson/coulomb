@@ -17,21 +17,24 @@
 package coulomb.ops.algebra.cats
 
 object deltaquantity:
+    import scala.util.NotGiven
     import _root_.cats.kernel.{Eq, Hash, Order}
     import coulomb.DeltaQuantity
-    import coulomb.policy.priority.*
 
-    given ctx_DeltaQuantity_Order[V, U, B](using Prio0)(using
+    given ctx_DeltaQuantity_Order[V, U, B](using
         ord: Order[V]
     ): Order[DeltaQuantity[V, U, B]] =
         new infra.QOrder[V, U, B](ord)
 
-    given ctx_DeltaQuantity_Hash[V, U, B](using Prio1)(using
+    given ctx_DeltaQuantity_Hash[V, U, B](using
+        noo: NotGiven[Order[V]],
         h: Hash[V]
     ): Hash[DeltaQuantity[V, U, B]] =
         new infra.QHash[V, U, B](h)
 
-    given ctx_DeltaQuantity_Eq[V, U, B](using Prio2)(using
+    given ctx_DeltaQuantity_Eq[V, U, B](using
+        noo: NotGiven[Order[V]],
+        noh: NotGiven[Hash[V]],
         e: Eq[V]
     ): Eq[DeltaQuantity[V, U, B]] =
         new infra.QEq[V, U, B](e)

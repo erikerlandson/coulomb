@@ -16,38 +16,6 @@
 
 package coulomb.policy
 
-object priority:
-    // lower number = higher priority
-    class Prio0 extends Prio1
-    object Prio0 { given p: Prio0 = Prio0() }
-
-    class Prio1 extends Prio2
-    object Prio1 { given p: Prio1 = Prio1() }
-
-    class Prio2 extends Prio3
-    object Prio2 { given p: Prio2 = Prio2() }
-
-    class Prio3 extends Prio4
-    object Prio3 { given p: Prio3 = Prio3() }
-
-    class Prio4 extends Prio5
-    object Prio4 { given p: Prio4 = Prio4() }
-
-    class Prio5 extends Prio6
-    object Prio5 { given p: Prio5 = Prio5() }
-
-    class Prio6 extends Prio7
-    object Prio6 { given p: Prio6 = Prio6() }
-
-    class Prio7 extends Prio8
-    object Prio7 { given p: Prio7 = Prio7() }
-
-    class Prio8 extends Prio9
-    object Prio8 { given p: Prio8 = Prio8() }
-
-    class Prio9
-    object Prio9 { given p: Prio9 = Prio9() }
-
 /**
  * A policy that supports all standard operation definitions, including those
  * involving implicit conversions of units or value types.
@@ -61,8 +29,6 @@ object priority:
  * }}}
  */
 object standard:
-    export coulomb.ops.standard.all.given
-    export coulomb.ops.resolution.standard.given
     export coulomb.conversion.standard.value.given
     export coulomb.conversion.standard.unit.given
     export coulomb.conversion.standard.scala.given
@@ -85,7 +51,6 @@ object standard:
  * }}}
  */
 object strict:
-    export coulomb.ops.standard.all.given
     export coulomb.conversion.standard.value.given
     export coulomb.conversion.standard.unit.given
     export coulomb.ops.algebra.cats.all.given

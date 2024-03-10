@@ -18,7 +18,8 @@ package coulomb
 
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
-import coulomb.rational.Rational
+import coulomb.infra.utils.*
+import spire.math.Rational
 import coulomb.conversion.*
 
 sealed abstract class RuntimeUnit:
@@ -57,7 +58,7 @@ sealed abstract class RuntimeUnit:
                 den.toRational match
                     case Left(e) => Left(e)
                     case Right(dv) =>
-                        if (dv == Rational.const0)
+                        if (dv == Rational.zero)
                             Left("toRational: div by zero")
                         else
                             for {
@@ -66,7 +67,7 @@ sealed abstract class RuntimeUnit:
             case RuntimeUnit.Pow(b, e) =>
                 for {
                     bv <- b.toRational
-                } yield bv.pow(e)
+                } yield bv.fpow(e)
             case _ =>
                 Left(s"toRational: bad rational expression: $this")
 

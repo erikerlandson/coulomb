@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package coulomb.policy.spire
+package coulomb.infra
 
-object standard:
-    export coulomb.ops.standard.all.given
-    export coulomb.ops.resolution.spire.given
-    export coulomb.conversion.spire.value.given
-    export coulomb.conversion.spire.unit.given
-    export coulomb.conversion.standard.scala.given
+import spire.math.*
+import spire.algebra.*
+import coulomb.*
 
-object strict:
-    export coulomb.ops.standard.all.given
-    export coulomb.conversion.spire.value.given
-    export coulomb.conversion.spire.unit.given
+object utils:
+    extension(v: Rational)
+        def fpow(e: Rational): Rational =
+            if ((e.denominator == 1) && (e.numerator.isValidInt))
+                v.pow(e.numerator.toInt)
+            else
+                Fractional[Rational].fpow(v, e)
+
+    extension(v: SafeLong)
+        def isValidInt: Boolean =
+            if (v.isValidLong) then
+                val vl = v.toLong
+                (vl >= Int.MinValue) && (vl <= Int.MaxValue)
+            else
+                false

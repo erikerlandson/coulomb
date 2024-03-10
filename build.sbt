@@ -2,6 +2,7 @@
 // sbt githubWorkflowGenerate
 // and check in the updates to github workflow yamls
 
+// this line to kick off pull request from branch 'simplify-coulomb'
 // base version for assessing MIMA
 ThisBuild / tlBaseVersion := "0.8"
 
@@ -48,7 +49,6 @@ lazy val root = tlCrossRootProject
         runtime,
         parser,
         pureconfig,
-        spire,
         refined,
         testkit,
         unidocs
@@ -60,6 +60,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .settings(name := "coulomb-core")
     .settings(commonSettings: _*)
     .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.10.0")
+    .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
     .platformsSettings(JSPlatform, NativePlatform)(
         Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*serde.scala"
     )
@@ -137,14 +138,6 @@ lazy val pureconfig = crossProject(
         libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.6"
     )
 
-lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
-    .in(file("spire"))
-    .settings(name := "coulomb-spire")
-    .dependsOn(core % "compile->compile;test->test", units % Test)
-    .settings(commonSettings: _*)
-    .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
-
 lazy val refined = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("refined"))
@@ -182,7 +175,6 @@ lazy val all = project
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
-        spire.jvm,
         refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
     .settings(name := "coulomb-all")
@@ -212,7 +204,6 @@ lazy val docs = project
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
-        spire.jvm,
         refined.jvm
     )
     .enablePlugins(TypelevelSitePlugin)

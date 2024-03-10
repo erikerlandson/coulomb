@@ -17,7 +17,6 @@
 package coulomb
 
 import coulomb.syntax.*
-import coulomb.ops.*
 import coulomb.conversion.*
 
 package syntax {
@@ -55,6 +54,9 @@ opaque type DeltaQuantity[V, U, B] = V
 
 /** Defines DeltaQuantity constructors and extension methods */
 object DeltaQuantity:
+    import _root_.algebra.ring.*
+    import cats.kernel.Order
+
     /**
      * Lift a raw value of type V into a unit quantity
      * @tparam U
@@ -190,10 +192,6 @@ object DeltaQuantity:
 
         /**
          * subtract another delta-quantity from this one
-         * @tparam VR
-         *   right hand value type
-         * @tparam UR
-         *   right hand unit type
          * @param qr
          *   right hand delta-quantity
          * @return
@@ -205,22 +203,16 @@ object DeltaQuantity:
          * t1 - t2 // => Quantity[Double, Day](7.0)
          *   }}}
          * @note
-         *   unit types `UL` and `UR` must be convertable
-         * @note
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def -[VR, UR](qr: DeltaQuantity[VR, UR, B])(using
-            sub: DeltaSub[B, VL, UL, VR, UR]
-        ): Quantity[sub.VO, sub.UO] =
-            sub.eval(ql, qr)
+        inline def -(qr: DeltaQuantity[VL, UL, B])(using
+            alg: AdditiveGroup[VL]
+        ): Quantity[VL, UL] =
+            alg.minus(ql.value, qr.value).withUnit[UL]
 
         /**
          * subtract quantity from this delta-quantity
-         * @tparam VR
-         *   right hand value type
-         * @tparam UR
-         *   right hand unit type
          * @param qr
          *   right hand quantity
          * @return
@@ -232,22 +224,19 @@ object DeltaQuantity:
          * t1 - q // => EpochTime[Double, Day](7.0)
          *   }}}
          * @note
-         *   unit types `UL` and `UR` must be convertable
-         * @note
          *   result may depend on what algebras, policies, and other typeclasses
          *   are in scope
          */
-        transparent inline def -[VR, UR](qr: Quantity[VR, UR])(using
-            sub: DeltaSubQ[B, VL, UL, VR, UR]
-        ): DeltaQuantity[sub.VO, sub.UO, B] =
-            sub.eval(ql, qr)
+        // work around a weird type erasure problem,
+        // spcifically with '-' operator overloadings
+        @scala.annotation.targetName("dqMinusQ")
+        inline def -(qr: Quantity[VL, UL])(using
+            alg: AdditiveGroup[VL]
+        ): DeltaQuantity[VL, UL, B] =
+            alg.minus(ql.value, qr.value).withDeltaUnit[UL, B]
 
         /**
          * add a quantity to this delta-quantity
-         * @tparam VR
-         *   right hand value type
-         * @tparam UR
-         *   right hand unit type
          * @param qr
          *   right hand quantity
          * @return
@@ -258,75 +247,50 @@ object DeltaQuantity:
          * val q = (1.0).withUnit[Week]
          * t1 + q // => EpochTime[Double, Day](21.0)
          *   }}}
-         * @note
-         *   unit types `UL` and `UR` must be convertable
-         * @note
-         *   result may depend on what algebras, policies, and other typeclasses
-         *   are in scope
          */
-        transparent inline def +[VR, UR](qr: Quantity[VR, UR])(using
-            add: DeltaAddQ[B, VL, UL, VR, UR]
-        ): DeltaQuantity[add.VO, add.UO, B] =
-            add.eval(ql, qr)
+        inline def +(qr: Quantity[VL, UL])(using
+            alg: AdditiveSemigroup[VL]
+        ): DeltaQuantity[VL, UL, B] =
+            alg.plus(ql.value, qr.value).withDeltaUnit[UL, B]
 
         /**
          * test this delta-quantity for equality with another
-         * @tparam VR
-         *   value type of the right hand quantity
-         * @tparam UR
-         *   unit type of the right hand quantity
          * @param qr
          *   the right hand quantity
          * @return
-         *   true if right hand value equals the left (after any conversions),
-         *   false otherwise
+         *   true if right hand value equals the left, false otherwise
          * @example
          *   {{{
          * val t1 = (14.0).withEpochTime[Day]
          * val t2 = 2.withEpochTime[Week]
          * t1 === t2 // => true
          *   }}}
-         * @note
-         *   result may depend on what algebras, policies, and other typeclasses
-         *   are in scope
          */
-        inline def ===[VR, UR](qr: DeltaQuantity[VR, UR, B])(using
-            ord: DeltaOrd[B, VL, UL, VR, UR]
+        inline def ===(qr: DeltaQuantity[VL, UL, B])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) == 0
+            ord.compare(ql.value, qr.value) == 0
 
         /**
          * test this delta-quantity for inequality with another
-         * @tparam VR
-         *   value type of the right hand quantity
-         * @tparam UR
-         *   unit type of the right hand quantity
          * @param qr
          *   the right hand quantity
          * @return
-         *   true if right hand value does not equal the left (after any
-         *   conversions), false otherwise
+         *   true if right hand value does not equal the left, false otherwise
          * @example
          *   {{{
          * val t1 = (14.0).withEpochTime[Day]
          * val t2 = 2.withEpochTime[Week]
          * t1 =!= t2 // => false
          *   }}}
-         * @note
-         *   result may depend on what algebras, policies, and other typeclasses
-         *   are in scope
          */
-        inline def =!=[VR, UR](qr: DeltaQuantity[VR, UR, B])(using
-            ord: DeltaOrd[B, VL, UL, VR, UR]
+        inline def =!=(qr: DeltaQuantity[VL, UL, B])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) != 0
+            ord.compare(ql.value, qr.value) != 0
 
         /**
          * test if this delta-quantity is less than another
-         * @tparam VR
-         *   value type of the right hand quantity
-         * @tparam UR
-         *   unit type of the right hand quantity
          * @param qr
          *   the right hand quantity
          * @return
@@ -338,21 +302,14 @@ object DeltaQuantity:
          * val t2 = 3.withEpochTime[Week]
          * t1 < t2 // => true
          *   }}}
-         * @note
-         *   result may depend on what algebras, policies, and other typeclasses
-         *   are in scope
          */
-        inline def <[VR, UR](qr: DeltaQuantity[VR, UR, B])(using
-            ord: DeltaOrd[B, VL, UL, VR, UR]
+        inline def <(qr: DeltaQuantity[VL, UL, B])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) < 0
+            ord.compare(ql.value, qr.value) < 0
 
         /**
          * test if this delta-quantity is less than or equal to than another
-         * @tparam VR
-         *   value type of the right hand quantity
-         * @tparam UR
-         *   unit type of the right hand quantity
          * @param qr
          *   the right hand quantity
          * @return
@@ -364,21 +321,18 @@ object DeltaQuantity:
          * val t2 = 3.withEpochTime[Week]
          * t1 <= t2 // => true
          *   }}}
-         * @note
-         *   result may depend on what algebras, policies, and other typeclasses
-         *   are in scope
          */
-        inline def <=[VR, UR](qr: DeltaQuantity[VR, UR, B])(using
-            ord: DeltaOrd[B, VL, UL, VR, UR]
+        inline def <=(qr: DeltaQuantity[VL, UL, B])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) <= 0
+            ord.compare(ql.value, qr.value) <= 0
 
-        inline def >[VR, UR](qr: DeltaQuantity[VR, UR, B])(using
-            ord: DeltaOrd[B, VL, UL, VR, UR]
+        inline def >(qr: DeltaQuantity[VL, UL, B])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) > 0
+            ord.compare(ql.value, qr.value) > 0
 
-        inline def >=[VR, UR](qr: DeltaQuantity[VR, UR, B])(using
-            ord: DeltaOrd[B, VL, UL, VR, UR]
+        inline def >=(qr: DeltaQuantity[VL, UL, B])(using
+            ord: Order[VL]
         ): Boolean =
-            ord(ql, qr) >= 0
+            ord.compare(ql.value, qr.value) >= 0
