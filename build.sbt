@@ -23,7 +23,7 @@ ThisBuild / tlSitePublishBranch := Some("scala3")
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 
 ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("snapshots")
-ThisBuild / crossScalaVersions := Seq("3.4.0")
+ThisBuild / crossScalaVersions := Seq("3.4.1")
 
 // run tests sequentially for easier failure debugging
 Test / parallelExecution := false
