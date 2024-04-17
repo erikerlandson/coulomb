@@ -162,7 +162,7 @@ lazy val testkit = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .settings(
         name := "coulomb-testkit",
         libraryDependencies ++= Seq(
-            "org.scalacheck" %%% "scalacheck" % "1.17.0",
+            "org.scalacheck" %%% "scalacheck" % "1.17.1",
             "org.scalameta" %%% "munit-scalacheck" % "1.0.0-M11" % Test,
             "org.typelevel" %%% "algebra-laws" % "2.10.0" % Test,
             "org.typelevel" %%% "discipline-munit" % "2.0.0-M3" % Test
