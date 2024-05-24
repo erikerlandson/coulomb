@@ -35,7 +35,7 @@ ThisBuild / tlJdkRelease := None
 ThisBuild / tlFatalWarnings := false
 
 def commonSettings = Seq(
-    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0-RC1" % Test,
+    libraryDependencies += "org.scalameta" %%% "munit" % "1.0.0" % Test,
     // newer versions of sbt-typelevel throw new warning flags
     // which my code is failing - filter them out until I can fix the code
     Compile / scalacOptions ~= (_.filterNot { x => x.startsWith("-W") })
