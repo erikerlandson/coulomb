@@ -233,7 +233,7 @@ object Quantity:
          * q1 * q2 // => Quantity[Meter ^ 2](6.0)
          *   }}}
          */
-        transparent inline def *[UR](qr: Quantity[V, UR])(using
+        inline def *[UR](qr: Quantity[V, UR])(using
             alg: MultiplicativeSemigroup[V],
             su: SimplifiedUnit[U * UR]
         ): Quantity[V, su.UO] =
@@ -271,7 +271,7 @@ object Quantity:
          * q1 / q2 // => Quantity[Meter / Second](1.5)
          *   }}}
          */
-        transparent inline def /[UR](qr: Quantity[V, UR])(using
+        inline def /[UR](qr: Quantity[V, UR])(using
             alg: MultiplicativeGroup[V],
             su: SimplifiedUnit[U / UR]
         ): Quantity[V, su.UO] =
@@ -309,7 +309,7 @@ object Quantity:
          * q1.tquot(q2) // => Quantity[Meter / Second](2)
          *   }}}
          */
-        transparent inline def tquot[UR](qr: Quantity[V, UR])(using
+        inline def tquot[UR](qr: Quantity[V, UR])(using
             alg: TruncatedDivision[V],
             su: SimplifiedUnit[U / UR]
         ): Quantity[V, su.UO] =
@@ -336,7 +336,7 @@ object Quantity:
          *   MultiplicativeMonoid[V] supports integers >= 0.
          *   MultiplicativeSemigroup[V] supports integers > 0.
          */
-        transparent inline def pow[E](using
+        inline def pow[E](using
             su: SimplifiedUnit[U ^ E]
         ): Quantity[V, su.UO] =
             val v: V = compiletime.summonFrom {
