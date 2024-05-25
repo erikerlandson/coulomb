@@ -26,7 +26,7 @@ Unit analysis - aka
 For example, if one has a duration `t = 10 seconds` and a distance `d = 100 meters`,
 then unit analysis tells us that the value `d/t` has the unit `meters/second`.
 
-Unit analysis performs a very similar role to a
+Unit analysis performs a role very similar to a
 [type system](https://en.wikipedia.org/wiki/Type_system)
 in programming languages such as Scala.
 Like data types, unit analysis provides us information about what operations may be allowed or disallowed.
@@ -34,7 +34,7 @@ Just as
 [Scala's type system](https://docs.scala-lang.org/scala3/book/types-introduction.html)
 informs us that the expression `7 + false` is not a valid expression:
 
-```scala mdoc:nest:fail
+```scala mdoc:fail
 val bad = 7 + false
 ```
 
@@ -48,7 +48,7 @@ The `coulomb` library implements unit analysis using Scala's powerful type syste
 In order to do unit analysis, we have to keep track of unit information along with our computations.
 The `coulomb` library represents a value paired with a unit expression using the type `Quantity[V, U]`:
 
-```scala mdoc:nest
+```scala mdoc
 val time = 10.0.withUnit[Second]
 val dist = 100.0.withUnit[Meter]
 
@@ -194,7 +194,7 @@ Allowing arbitrary types to be manipulated as units introduces some interesting 
 which are discussed in
 [this blog post](http://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/).
 
-## Prefix Units
+### Prefix Units
 
 The standard SI unit system
 [prefixes](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/units/si$$prefixes$.html)
@@ -266,7 +266,7 @@ w2.show
 
 ### Numeric Value Types
 
-The coulomb core libraries provide support for the following numeric types:
+The coulomb core libraries provide out-of-box support for the following numeric types:
 
 | Value Type | Defined In |
 | --- | --- |
@@ -335,8 +335,7 @@ v / v
 // power
 v.pow[3]
 
-// comparisons
-
+// comparison operators
 v <= v
 
 v > v
@@ -346,9 +345,77 @@ v === v
 v =!= v
 ```
 
+### Truncating Division
+
+`coulomb` also supports truncating division via the `tquot` operator,
+typically used for integral types.
+The standard typelevel `cats` algebras do not define truncating division,
+however you can import these typeclasses from `spire`.
+
+```scala mdoc
+// import spire algebra typeclasses to include TruncatedDivision
+import spire.std.any.given
+
+// truncating integer division
+5.withUnit[Meter] `tquot` 2.withUnit[Second]
+```
+
+### Operations and Conversions
+
+#### Unit Conversions
+
+`coulomb` will implicitly convert units to align them for operations,
+such as addition, subtraction or comparisons.
+Units are always converted to the units of the left-hand operand.
+In the following examples, you can see that kilometers are converted to meters before operating.
+
+```scala mdoc
+1000.0.withUnit[Meter] + 1.0.withUnit[Kilo * Meter]
+
+1000.0.withUnit[Meter] - 0.5.withUnit[Kilo * Meter]
+
+1000.0.withUnit[Meter] === 1.0.withUnit[Kilo * Meter]
+
+1000.0.withUnit[Meter] > 0.5.withUnit[Kilo * Meter]
+```
+
+@:callout(info)
+`coulomb` only defines implicit unit conversions on fractional value types,
+such as `Double`, `Float`, `BigDecimal` and Spire types like `Rational` or `Real`.
+Unit conversions on integral types such as `Int` or `Long` are not supported
+due to the numeric instability caused by integer value truncations.
+@:@
+
+#### Value Conversions
+
+`coulomb` does not perform implicit value conversions, as illustrated in the following:
+
+```scala mdoc:fail
+// coulomb will not convert double to float implicitly
+1f.withUnit[Meter] + 1d.withUnit[Meter]
+```
+
+However, you can always convert values using the `toValue` method.
+
+```scala mdoc
+// use toValue method to align value types
+1f.withUnit[Meter] + 1d.withUnit[Meter].toValue[Float]
+```
+
+@:callout(info)
+Releases of `coulomb` prior to 0.9 supported implicit value conversions.
+Implicit value conversions were removed for a variety of reasons.
+Changing value types involves subtle tradeoffs in numeric precision that are best left to the developer.
+Additionally, implicit value conversions interact with Scala's native value conversions 
+(e.g. promoting Float to Double)
+in ways that are difficult to untangle.
+Removing implicit value conversions has allowed substantial simplifications to `coulomb`'s
+system of typeclasses.
+@:@
+
 ## Value and Unit Conversions
 
-In `coulomb`, a `Quantity[V, U]` may experience conversions along two possible axes:
+In `coulomb`, a `Quantity[V, U]` may experience two kinds of conversion:
 converting value type `V` to a new value type `V2`, or converting unit `U` to a new unit `U2`:
 
 ```scala mdoc
@@ -364,12 +431,21 @@ q.toUnit[Yard]
 Value conversions are successful whenever the corresponding `ValueConversion[VF, VT]` context is in scope,
 and similarly unit conversions are successful whenever the necessary `UnitConversion[V, UF, UT]` is in scope.
 
-As you can see from the signature `UnitConversion[V, UF, UT]`, any unit conversion is with respect to a particular value type.
-This is because the best way of converting from unit `UF` to `UT` will depend on the specific value type being converted.
+As you can see from the signature `UnitConversion[V, UF, UT]`,
+any unit conversion is with respect to a particular value type.
+This is because the best way of converting from unit `UF` to `UT` will
+depend on the specific value type being converted.
 You can look at examples of unit conversions defined in `coulomb-core`
 [here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/conversion/standard/unit$.html).
 
-### implicit conversions
+@:callout(info)
+`coulomb` only predefines `UnitConversion` typeclasses for fractional types
+such as `Double`, `Float`, `BigDecimal`, etc.
+Unit conversions on non fractional integral types are not numerically safe,
+due to the presence of integer truncations.
+@:@
+
+### Implicit Conversions
 
 In Scala 3, implicit conversions are represented by `scala.Conversion[F, T]`,
 which you can read more about
@@ -379,6 +455,11 @@ The `coulomb-core` library
 [pre-defines](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/conversion/standard/scala$.html)
 implicit unit conversions,
 based on `UnitConversion` context in scope.
+
+@:callout(info)
+The `coulomb` libraries themselves do not make use of Scala implicit conversions.
+You only need to import them if you want to use them in your own code.
+@:@
 
 Implicit quantity conversions can be used in typical Scala scenarios:
 
@@ -393,11 +474,7 @@ val iconv: Quantity[Double, Liter] = 1.0.withUnit[Meter ^ 3]
 val uq: Quantity[Int, 1] = 100
 ```
 
-@:callout(info)
-Implicit value conversions are not supported by the coulomb library.
-@:@
-
-### defining conversions
+### Defining Conversions
 The `coulomb-core` libraries define value and unit conversions for a wide variety of
 popular numeric types, however you can also easily define your own.
 
