@@ -19,15 +19,6 @@ The `coulomb-units` package defines several groups of commonly used units.
 
 ## Quick Start
 
-```scala mdoc:invisible
-// fundamental coulomb types and methods
-import coulomb.*
-import coulomb.syntax.*
-
-// algebraic definitions
-import algebra.instances.all.given
-```
-
 ### documentation
 
 API documentation for `coulomb-units` can be viewed
@@ -49,6 +40,13 @@ In order to use a unit definition, both the unit type and its corresponding cont
 In Scala 3 one does this with the following idiom:
 
 ```scala mdoc
+// fundamental coulomb types and methods
+import coulomb.*
+import coulomb.syntax.*
+
+// algebraic definitions
+import algebra.instances.all.given
+
 // import both types and context variables ("givens")
 import coulomb.units.mksa.{*, given}
 import coulomb.units.us.{*, given}
