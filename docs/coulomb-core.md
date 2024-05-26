@@ -4,6 +4,18 @@ This page describes the fundamental `coulomb` concepts, implemented in `coulomb-
 
 ## Quick Start
 
+### packages
+
+Include `coulomb-core` with your Scala project:
+
+```scala
+libraryDependencies += "com.manyangled" %% "coulomb-core" % "@VERSION@"
+
+// coulomb's predefined units package
+// (optional if you are defining your own units)
+libraryDependencies += "com.manyangled" %% "coulomb-units" % "@VERSION@"
+```
+
 ### import
 
 ```scala mdoc
@@ -14,7 +26,7 @@ import coulomb.syntax.*
 // algebraic definitions
 import algebra.instances.all.given
 
-// unit definitions
+// SI unit definitions
 import coulomb.units.si.{*, given}
 ```
 
