@@ -91,7 +91,7 @@ derivation of ConfigReader for case classes.
 
 ```scala mdoc
 // defined with 'using' context so that this function defers
-// resolution and can operate with multiple pureconfig io policies
+// resolution and can operate with multiple pureconfig io formats 
 given given_ConfigLoader(using
     ConfigReader[Quantity[Double, Second]],
     ConfigReader[Quantity[Double, Giga * Byte]],
@@ -150,7 +150,7 @@ val fail = bad.load[Config]
 In coulomb, conversion operations on integer values are considered to be
 truncating conversions.
 They may lose precision due to integer truncation.
-Truncating conversions are generally not supported in coulomb,
+Implicitly truncating conversions are generally not supported in coulomb,
 because this loss of precision is numerically unsafe.
 
 In pureconfig I/O, however, there is no way to explicitly invoke a truncating conversion.
@@ -181,11 +181,11 @@ qsrc.load[Quantity[Long, Byte * Mega]]
 qsrc.load[Quantity[Int, Kilo * Byte]]
 ```
 
-## IO Policies
+## IO Formats
 
-The `coulomb-pureconfig` integrations currently support two options for I/O "policies"
+The `coulomb-pureconfig` integrations currently support two options for I/O, 
 which differ primarily in how one represents unit information.
-In the quick-start example above, the DSL-based policy was demonstrated.
+In the quick-start example above, the DSL-based format was demonstrated.
 
 The second option is a JSON-based unit representation.
 Here, the units are defined using a JSON structured unit expression.
