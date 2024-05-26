@@ -1,3 +1,5 @@
+/* This has stopped working, I'll keep it in case I figure out how to fix it */
+
 /* when mdoc renders "long" comments, clip them and provide a scrollbar */
 .comment {
   /* set display as block or the other settings don't work */
