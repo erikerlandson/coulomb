@@ -1,6 +1,6 @@
 # coulomb-refined
 
-The `coulomb-refined` package defines policies and utilities for integrating the
+The `coulomb-refined` package defines algebra typeclasses for integrating the
 [refined](https://github.com/fthomas/refined#refined-simple-refinement-types-for-scala)
 typelevel libraries with `coulomb`.
 
@@ -22,8 +22,6 @@ libraryDependencies += "com.manyangled" %% "coulomb-refined" % "@VERSION@"
 
 ### import
 
-To import the standard coulomb policy with the refined overlay:
-
 ```scala mdoc
 // fundamental coulomb types and methods
 import coulomb.*
@@ -37,7 +35,7 @@ import eu.timepit.refined.numeric.*
 // algebraic definitions
 import algebra.instances.all.given
 
-// overlay policy for refined integrations
+// algebra typeclasses for refined integrations
 import coulomb.integrations.refined.all.given
 
 // coulomb syntax for refined integrations
@@ -68,7 +66,7 @@ as the following code demonstrates.
 
 @:callout(info)
 The
-[table][algebraic-policy-table]
+[table][algebra-support-table]
 below summarizes the full list of supported `refined` predicates and associated algebras.
 @:@
 
@@ -111,9 +109,9 @@ pe1 + pe1
 pe1 + pe2
 ```
 
-### algebraic policy table
+### algebra support table
 
-The following table summarizes the "algebraic" overlay policy.
+The following table summarizes the algebras and operations supported by this package.
 Examples of Fractional value types include Double, Float, BigDecimal, spire Rational, etc.
 Integral value types include Int, Long, BigInt, etc.
 
