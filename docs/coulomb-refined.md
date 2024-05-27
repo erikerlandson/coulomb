@@ -8,8 +8,8 @@ typelevel libraries with `coulomb`.
 
 ### documentation
 
-You can browse the `coulomb-refined` policies
-[here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/policy/overlay/refined.html).
+You can browse the `coulomb-refined` api definitions
+[here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/integrations/refined/index.html).
 
 ### packages
 
@@ -45,8 +45,10 @@ import coulomb.integrations.refined.syntax.*
 ### examples
 
 Examples in this section will use the following workaround as a replacement for
-[refineMV](https://github.com/fthomas/refined/issues/932)
-until it is ported forward to Scala 3.
+[refineMV][refinedapidocs]
+until it is
+[ported forward](https://github.com/fthomas/refined/issues/932)
+to Scala 3.
 
 ```scala mdoc
 // a workaround for refineMV not being available in scala3
@@ -60,7 +62,10 @@ import workaround.*
 ```
 
 The `coulomb-refined` package supports `refined` predicates that are algebraically well-behaved for applicable operations.
-Primarily this means the predicates `Positive` and `NonNegative`.
+Primarily this means the predicates
+[Positive][refinedapidocs]
+and
+[NonNegative][refinedapidocs].
 For example, the positive doubles are an additive semigroup and multiplicative group,
 as the following code demonstrates.
 
@@ -90,8 +95,10 @@ pos2 / pos3
 pos2.pow[0]
 ```
 
-The standard `refined` function for refining values with run-time checking is `refineV`,
-which returns an `Either`.
+The standard `refined` function for refining values with run-time checking is
+[refineV][refinedapidocs],
+which returns an
+@:api(scala.util.Either).
 The `coulomb-refined` package supplies a similar variation `refinedVU`.
 These objects are also supported by algebras.
 
@@ -112,8 +119,10 @@ pe1 + pe2
 ### algebra support table
 
 The following table summarizes the algebras and operations supported by this package.
-Examples of Fractional value types include Double, Float, BigDecimal, spire Rational, etc.
-Integral value types include Int, Long, BigInt, etc.
+Examples of Fractional value types include `Double`, `Float`,
+@:api(scala.math.BigDecimal),
+spire @:api(spire.math.Rational), etc.
+Integral value types include `Int`, `Long`, @:api(scala.math.BigInt), etc.
 
 | Value Type | Predicate | Add Alg | Mult Alg | `+` | `*` | `/` | `pow` (exponent) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
