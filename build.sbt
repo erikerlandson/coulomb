@@ -241,8 +241,32 @@ lazy val docs = project
                     )
                     .addApiLinks(
                         ApiLinks(
+                            "https://javadoc.io/doc/org.typelevel/algebra_3/latest/"
+                        ).withPackagePrefix("algebra")
+                    )
+                    .addApiLinks(
+                        ApiLinks(
+                            "https://javadoc.io/doc/org.typelevel/cats-core_3/latest/"
+                        ).withPackagePrefix("cats")
+                    )
+                    .addApiLinks(
+                        ApiLinks(
+                            "https://javadoc.io/doc/org.typelevel/spire_3/latest/"
+                        ).withPackagePrefix("spire")
+                    )
+                    .addApiLinks(
+                        ApiLinks(
                             "https://javadoc.io/doc/com.github.pureconfig/pureconfig-core_3/latest/"
                         ).withPackagePrefix("pureconfig")
+                    )
+                    .addApiLinks(
+                        // the refined api link isn't super helpful because @:api(...)
+                        // doesn't work for type defs or methods, which is most of
+                        // what refined provides
+                        ApiLinks(
+                            // refined is not publishing scaladoc for scala 3 yet
+                            "https://javadoc.io/doc/eu.timepit/refined_2.13/latest/"
+                        ).withPackagePrefix("eu.timepit.refined")
                     )
                     .addTargets(
                         // Target names need to be all lowercase.
@@ -255,6 +279,10 @@ lazy val docs = project
                             // which is going to make a lot of coulomb references harder to do.
                             "quantitytypedef",
                             "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
+                        ),
+                        TargetDefinition.external(
+                            "refinedapidocs",
+                            "https://javadoc.io/doc/eu.timepit/refined_2.13/latest/eu/timepit/refined/index.html"
                         ),
                         TargetDefinition.internal(
                             "coulomb-introduction",
