@@ -2,6 +2,8 @@
 // sbt githubWorkflowGenerate
 // and check in the updates to github workflow yamls
 
+// This is to trigger a snapshot build
+
 // base version for assessing MIMA
 ThisBuild / tlBaseVersion := "0.8"
 
