@@ -176,8 +176,8 @@
 //  (x: Byte): Int
 //  (x: String): String
 // match arguments ((false : Boolean))
-// val dyear = date2 - date1
-//                  ^</span></code></pre>
+// val bad = 7 + false
+//           ^^^</span></code></pre>
         <p>unit analysis informs us that adding <code>meters + seconds</code> is not a valid computation.</p>
         <p>As such, unit analysis is an excellent use case for representation in programming language type systems.
         The <code>coulomb</code> library implements unit analysis using Scala&#39;s powerful type system features.</p>
@@ -264,8 +264,8 @@
 </span><span class="identifier">volume</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Acre</span><span>].</span><span class="identifier">show</span><span>
 </span><span class="comment">// error:
 // unit type (Meter ^ 3) not convertable to Acre
-// val q1 = 1d.withUnit[Liter]
-//                           ^</span></code></pre>
+// volume.toUnit[Acre].show
+//                    ^</span></code></pre>
         
         <h2 id="base-units-and-derived-units" class="section"><a class="anchor-link left" href="#base-units-and-derived-units"><i class="icofont-laika link">&#xef71;</i></a>Base Units and Derived Units</h2>
         <p>In unit analysis,
@@ -389,9 +389,9 @@
         <p>Although value and unit types are arbitrary for a <code>Quantity</code>, there is no free lunch.
         Operations on quantity objects will only work if they are defined.
         The following example will not compile because we have not defined what it means to add <code>Wrapper</code> objects:</p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// addition has not been defined for Wrapper types
+        <pre><code class="nohighlight"><span class="comment">// addition has not been defined for Wrapper types
 </span><span class="keyword">val</span><span> </span><span class="identifier">wsum</span><span> = </span><span class="identifier">w</span><span> + </span><span class="identifier">w</span><span>
-</span><span class="comment">// error: 
+</span><span class="comment">// error:
 // Addition not defined in scope for Quantity[Wrapper[Float], coulomb.units.si.Meter] and Quantity[Wrapper[Float], coulomb.units.si.Meter].
 // I found:
 // 
@@ -400,7 +400,9 @@
 //       &lt;:&lt;.refl[coulomb.units.si.Meter],
 //       /* missing */summon[algebra.ring.AdditiveSemigroup[Wrapper[Float]]])
 // 
-// But no implicit values were found that match type algebra.ring.AdditiveSemigroup[Wrapper[Float]].</span></code></pre>
+// But no implicit values were found that match type algebra.ring.AdditiveSemigroup[Wrapper[Float]].
+// val wsum = w + w
+//                ^</span></code></pre>
         <p>The compiler error above indicates that it was unable to find an algebra that tells coulomb&#39;s
         standard predefined rules how to add <code>Wrapper</code> objects.
         Providing such a definition allows our example to compile.</p>
@@ -814,7 +816,7 @@ DeltaUnit - Quantity =&gt; DeltaUnit</code></pre>
 
 </span><span class="comment">// strict policy does not allow implicit value or unit conversions
 </span><span class="identifier">q1</span><span> + </span><span class="identifier">q3</span><span>
-</span><span class="comment">// error:
+</span><span class="comment">// error: 
 // Addition not defined in scope for Quantity[Double, coulomb.units.accepted.Liter] and Quantity[Int, coulomb.units.si.Meter ^ (3 : Int)].
 // I found:
 // 
@@ -824,9 +826,7 @@ DeltaUnit - Quantity =&gt; DeltaUnit</code></pre>
 //       new coulomb.ops.ValueResolution.NC[Any, Any, Any](), ???, ???, ???)
 // 
 // But Found:    coulomb.ops.ValueResolution.NC[Any, Any, Any]
-// Required: coulomb.ops.ValueResolution[Double, Int].
-// q1 + q3
-//      ^^</span></code></pre>
+// Required: coulomb.ops.ValueResolution[Double, Int].</span></code></pre>
         <p>The <code>coulomb-spire</code> library provides additional predefined policies that
         support the standard Scala numeric types as well as spire&#39;s specialized types.</p>
         <div class="callout info">
