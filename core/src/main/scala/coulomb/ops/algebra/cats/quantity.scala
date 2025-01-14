@@ -21,17 +21,23 @@ object quantity:
     import coulomb.Quantity
     import coulomb.policy.priority.*
 
-    given ctx_Quantity_Order[V, U](using Prio0)(using
+    given ctx_Quantity_Order[V, U](using
+        Prio0
+    )(using
         ord: Order[V]
     ): Order[Quantity[V, U]] =
         new infra.QOrder[V, U](ord)
 
-    given ctx_Quantity_Hash[V, U](using Prio1)(using
+    given ctx_Quantity_Hash[V, U](using
+        Prio1
+    )(using
         h: Hash[V]
     ): Hash[Quantity[V, U]] =
         new infra.QHash[V, U](h)
 
-    given ctx_Quantity_Eq[V, U](using Prio2)(using
+    given ctx_Quantity_Eq[V, U](using
+        Prio2
+    )(using
         e: Eq[V]
     ): Eq[Quantity[V, U]] =
         new infra.QEq[V, U](e)

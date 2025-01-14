@@ -28,7 +28,9 @@ object pow:
     import coulomb.ops.algebra.FractionalPower
     import coulomb.policy.priority.*
 
-    transparent inline given ctx_pow_FractionalPower[V, U, E](using Prio0)(using
+    transparent inline given ctx_pow_FractionalPower[V, U, E](using
+        Prio0
+    )(using
         alg: FractionalPower[V],
         su: SimplifiedUnit[U ^ E]
     ): Pow[V, U, E] =
@@ -37,8 +39,9 @@ object pow:
             alg.pow(q.value, e).withUnit[su.UO]
         )
 
-    transparent inline given ctx_pow_MultiplicativeGroup[V, U, E](using Prio1)(
-        using
+    transparent inline given ctx_pow_MultiplicativeGroup[V, U, E](using
+        Prio1
+    )(using
         alg: MultiplicativeGroup[V],
         aie: typeexpr.AllInt[E],
         su: SimplifiedUnit[U ^ E]
@@ -48,8 +51,9 @@ object pow:
             alg.pow(q.value, e).withUnit[su.UO]
         )
 
-    transparent inline given ctx_pow_MultiplicativeMonoid[V, U, E](using Prio2)(
-        using
+    transparent inline given ctx_pow_MultiplicativeMonoid[V, U, E](using
+        Prio2
+    )(using
         alg: MultiplicativeMonoid[V],
         nnie: typeexpr.NonNegInt[E],
         su: SimplifiedUnit[U ^ E]
