@@ -21,17 +21,23 @@ object deltaquantity:
     import coulomb.DeltaQuantity
     import coulomb.policy.priority.*
 
-    given ctx_DeltaQuantity_Order[V, U, B](using Prio0)(using
+    given ctx_DeltaQuantity_Order[V, U, B](using
+        Prio0
+    )(using
         ord: Order[V]
     ): Order[DeltaQuantity[V, U, B]] =
         new infra.QOrder[V, U, B](ord)
 
-    given ctx_DeltaQuantity_Hash[V, U, B](using Prio1)(using
+    given ctx_DeltaQuantity_Hash[V, U, B](using
+        Prio1
+    )(using
         h: Hash[V]
     ): Hash[DeltaQuantity[V, U, B]] =
         new infra.QHash[V, U, B](h)
 
-    given ctx_DeltaQuantity_Eq[V, U, B](using Prio2)(using
+    given ctx_DeltaQuantity_Eq[V, U, B](using
+        Prio2
+    )(using
         e: Eq[V]
     ): Eq[DeltaQuantity[V, U, B]] =
         new infra.QEq[V, U, B](e)

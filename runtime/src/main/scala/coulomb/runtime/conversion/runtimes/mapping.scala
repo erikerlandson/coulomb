@@ -116,7 +116,9 @@ object meta:
                 protected val derived = ${ Expr(du) }
         }
 
-    private def utlClosure(using Quotes)(
+    private def utlClosure(using
+        Quotes
+    )(
         utl: List[quotes.reflect.TypeRepr]
     ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
         import quotes.reflect.*
@@ -127,7 +129,9 @@ object meta:
                 val (hbu, hdu) = utClosure(head)
                 (hbu ++ tbu, hdu ++ tdu)
 
-    private def utClosure(using Quotes)(
+    private def utClosure(using
+        Quotes
+    )(
         tr: quotes.reflect.TypeRepr
     ): (Set[RuntimeUnit.UnitType], Map[RuntimeUnit.UnitType, RuntimeUnit]) =
         import quotes.reflect.*
@@ -166,7 +170,9 @@ object meta:
                         )
                         null.asInstanceOf[Nothing]
 
-    def moduleUnits(using Quotes)(
+    def moduleUnits(using
+        Quotes
+    )(
         mname: String
     ): List[quotes.reflect.TypeRepr] =
         import quotes.reflect.*

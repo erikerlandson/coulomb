@@ -85,7 +85,9 @@ object meta:
         import quotes.reflect.*
         Expr(typeReprRTU(TypeRepr.of[U]))
 
-    def rtuTypeRepr(using Quotes)(
+    def rtuTypeRepr(using
+        Quotes
+    )(
         rtu: RuntimeUnit
     ): quotes.reflect.TypeRepr =
         import quotes.reflect.*
@@ -105,7 +107,9 @@ object meta:
                 val etr = rationalTE(e)
                 TypeRepr.of[coulomb.`^`].appliedTo(List(btr, etr))
 
-    def typeReprRTU(using Quotes)(
+    def typeReprRTU(using
+        Quotes
+    )(
         tr: quotes.reflect.TypeRepr
     ): RuntimeUnit =
         import quotes.reflect.*
@@ -124,7 +128,9 @@ object meta:
                 RuntimeUnit.UnitConst(v)
             case ut => typeReprUT(ut)
 
-    def typeReprUT(using Quotes)(
+    def typeReprUT(using
+        Quotes
+    )(
         tr: quotes.reflect.TypeRepr
     ): RuntimeUnit.UnitType =
         import quotes.reflect.*
@@ -142,7 +148,9 @@ object meta:
     def fqFieldSymbol(using Quotes)(path: String): quotes.reflect.Symbol =
         fqFieldSymbol(path.split('.').toIndexedSeq)
 
-    def fqTypeRepr(using Quotes)(
+    def fqTypeRepr(using
+        Quotes
+    )(
         path: Seq[String]
     ): quotes.reflect.TypeRepr =
         import quotes.reflect.*
@@ -161,7 +169,9 @@ object meta:
                 )
                 TypeRepr.of[Unit]
 
-    def fqFieldSymbol(using Quotes)(
+    def fqFieldSymbol(using
+        Quotes
+    )(
         path: Seq[String]
     ): quotes.reflect.Symbol =
         import quotes.reflect.*

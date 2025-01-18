@@ -47,7 +47,9 @@ object meta:
                 val pnames = ${ Expr(pn1) }
         }
 
-    private def collect(using Quotes)(
+    private def collect(using
+        Quotes
+    )(
         tl: List[quotes.reflect.TypeRepr]
     ): (Map[String, String], Set[String]) =
         import quotes.reflect.*
