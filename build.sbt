@@ -59,7 +59,7 @@ def commonSettings = Seq(
     "eu.timepit" %%% "singleton-ops" % "0.5.2" % Provided,
     "org.scalameta" %%% "munit" % "1.0.2" % Test,
     "org.typelevel" %%% "discipline-munit" % "1.0.9" % Test,
-    "org.scalameta" %%% "munit-scalacheck" % "1.0.0" % Test,
+    "org.scalameta" %%% "munit-scalacheck" % "1.1.0" % Test,
   ),
   testFrameworks += new TestFramework("munit.Framework"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
