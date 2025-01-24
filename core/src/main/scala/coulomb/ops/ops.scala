@@ -208,7 +208,9 @@ object ValuePromotion:
                 report.error("no ValuePromotionPolicy was found in scope")
                 null.asInstanceOf[Nothing]
 
-    private def vpp2str(using Quotes)(
+    private def vpp2str(using
+        Quotes
+    )(
         vppl: List[quotes.reflect.TypeRepr]
     ): VppSet[(String, String)] =
         import quotes.reflect.*

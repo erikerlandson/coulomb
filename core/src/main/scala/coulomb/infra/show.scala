@@ -98,7 +98,9 @@ object show:
                 ""
 
     object flatmul:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[List[quotes.reflect.TypeRepr]] =
             import quotes.reflect.*
@@ -148,7 +150,9 @@ object show:
             case _                                          => true
 
     object namedunit:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
@@ -159,7 +163,9 @@ object show:
                 case _           => None
 
     object namedSU:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
@@ -175,7 +181,9 @@ object show:
                 case _ => None
 
     object namedPU:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
@@ -199,7 +207,9 @@ object show:
                 case _ => None
 
     object namedBU:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
@@ -215,7 +225,9 @@ object show:
                 case _ => None
 
     object namedDU:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*

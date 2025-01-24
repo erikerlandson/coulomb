@@ -54,7 +54,9 @@ object meta:
         case object Constant extends SigMode
 
     object rationalTE:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             tr: quotes.reflect.TypeRepr
         ): Option[Rational] =
             import quotes.reflect.*
@@ -143,7 +145,10 @@ object meta:
         false
 
     // returns tuple: (expr-for-coef, type-of-Res)
-    def cansig(using qq: Quotes, mode: SigMode)(
+    def cansig(using
+        qq: Quotes,
+        mode: SigMode
+    )(
         uu: quotes.reflect.TypeRepr
     ): (Rational, List[(quotes.reflect.TypeRepr, Rational)]) =
         import quotes.reflect.*
@@ -198,7 +203,9 @@ object meta:
                 // treat any other type as if it were a BaseUnit
                 (Rational.const1, (u, Rational.const1) :: Nil)
 
-    def sortsig(using Quotes)(
+    def sortsig(using
+        Quotes
+    )(
         sig: List[(quotes.reflect.TypeRepr, Rational)]
     ): (
         List[(quotes.reflect.TypeRepr, Rational)],
@@ -210,14 +217,18 @@ object meta:
                 val (nsig, dsig) = sortsig(tail)
                 if (e > 0) ((u, e) :: nsig, dsig) else (nsig, (u, -e) :: dsig)
 
-    def simplify(using Quotes)(
+    def simplify(using
+        Quotes
+    )(
         u: quotes.reflect.TypeRepr
     ): quotes.reflect.TypeRepr =
         import quotes.reflect.*
         given sigmode: SigMode = SigMode.Simplify
         simplifysig(cansig(u)._2)
 
-    def simplifysig(using Quotes)(
+    def simplifysig(using
+        Quotes
+    )(
         sig: List[(quotes.reflect.TypeRepr, Rational)]
     ): quotes.reflect.TypeRepr =
         import quotes.reflect.*
@@ -229,7 +240,9 @@ object meta:
                 TypeRepr.of[/].appliedTo(List(TypeRepr.of[1], d))
             case (n, d) => TypeRepr.of[/].appliedTo(List(n, d))
 
-    def uProd(using Quotes)(
+    def uProd(using
+        Quotes
+    )(
         sig: List[(quotes.reflect.TypeRepr, Rational)]
     ): quotes.reflect.TypeRepr =
         import quotes.reflect.*
@@ -254,7 +267,9 @@ object meta:
                 case _                         => false
 
     object unitconst:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[Rational] =
             u match
@@ -268,7 +283,10 @@ object meta:
                 case _             => false
 
     object derivedunit:
-        def unapply(using qq: Quotes, mode: SigMode)(
+        def unapply(using
+            qq: Quotes,
+            mode: SigMode
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[(Rational, List[(quotes.reflect.TypeRepr, Rational)])] =
             import quotes.reflect.*
@@ -285,7 +303,9 @@ object meta:
                 case _ => None
 
     object baseunitTR:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
@@ -303,7 +323,9 @@ object meta:
                 case _ => None
 
     object derivedunitTR:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
@@ -328,7 +350,9 @@ object meta:
                 case _ => None
 
     object deltaunit:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             u: quotes.reflect.TypeRepr
         ): Option[(Rational, quotes.reflect.TypeRepr)] =
             import quotes.reflect.*
@@ -354,7 +378,9 @@ object meta:
                     Some((offset, d))
                 case _ => None
 
-    def unifyOp(using Quotes)(
+    def unifyOp(using
+        Quotes
+    )(
         sig1: List[(quotes.reflect.TypeRepr, Rational)],
         sig2: List[(quotes.reflect.TypeRepr, Rational)],
         op: (Rational, Rational) => Rational
@@ -363,7 +389,9 @@ object meta:
             case Nil            => sig1
             case (u, e) :: tail => unifyOp(insertTerm(u, e, sig1, op), tail, op)
 
-    def insertTerm(using Quotes)(
+    def insertTerm(using
+        Quotes
+    )(
         u: quotes.reflect.TypeRepr,
         e: Rational,
         sig: List[(quotes.reflect.TypeRepr, Rational)],
@@ -376,7 +404,9 @@ object meta:
                 if (ei == Rational.const0) tail else (u, ei) :: tail
             case (u0, e0) :: tail => (u0, e0) :: insertTerm(u, e, tail, op)
 
-    def unifyPow(using Quotes)(
+    def unifyPow(using
+        Quotes
+    )(
         e: Rational,
         sig: List[(quotes.reflect.TypeRepr, Rational)]
     ): List[(quotes.reflect.TypeRepr, Rational)] =
@@ -385,7 +415,9 @@ object meta:
             case Nil                         => Nil
             case (u, e0) :: tail             => (u, e0 * e) :: unifyPow(e, tail)
 
-    def typeReprList(using Quotes)(
+    def typeReprList(using
+        Quotes
+    )(
         tlist: quotes.reflect.TypeRepr
     ): List[quotes.reflect.TypeRepr] =
         import quotes.reflect.*
@@ -428,7 +460,9 @@ object meta:
         work(t)
 
     object typealias:
-        def unapply(using Quotes)(
+        def unapply(using
+            Quotes
+        )(
             t: quotes.reflect.TypeRepr
         ): Option[quotes.reflect.TypeRepr] =
             import quotes.reflect.*
