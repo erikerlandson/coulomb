@@ -816,7 +816,7 @@ DeltaUnit - Quantity =&gt; DeltaUnit</code></pre>
 
 </span><span class="comment">// strict policy does not allow implicit value or unit conversions
 </span><span class="identifier">q1</span><span> + </span><span class="identifier">q3</span><span>
-</span><span class="comment">// error:
+</span><span class="comment">// error: 
 // Addition not defined in scope for Quantity[Double, coulomb.units.accepted.Liter] and Quantity[Int, coulomb.units.si.Meter ^ (3 : Int)].
 // I found:
 // 
@@ -826,9 +826,7 @@ DeltaUnit - Quantity =&gt; DeltaUnit</code></pre>
 //       new coulomb.ops.ValueResolution.NC[Any, Any, Any](), ???, ???, ???)
 // 
 // But Found:    coulomb.ops.ValueResolution.NC[Any, Any, Any]
-// Required: coulomb.ops.ValueResolution[Double, Int].
-// q1 + q3
-//      ^^</span></code></pre>
+// Required: coulomb.ops.ValueResolution[Double, Int].</span></code></pre>
         <p>The <code>coulomb-spire</code> library provides additional predefined policies that
         support the standard Scala numeric types as well as spire&#39;s specialized types.</p>
         <div class="callout info">
