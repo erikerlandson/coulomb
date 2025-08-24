@@ -3,7 +3,7 @@ resolvers += "jgit-repo" at "https://download.eclipse.org/jgit/maven"
 addSbtPlugin("io.crashbox" % "sbt-gpg" % "0.2.1")
 addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.12.2")
 
-addSbtPlugin("com.github.sbt" % "sbt-unidoc" % "0.5.0")
+addSbtPlugin("com.github.sbt" % "sbt-unidoc" % "0.6.0")
 
 addSbtPlugin("com.github.sbt" % "sbt-site" % "1.6.0")
 addSbtPlugin("com.github.sbt" % "sbt-ghpages" % "0.7.0")
