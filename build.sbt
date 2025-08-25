@@ -36,8 +36,8 @@ ThisBuild / tlSitePublishBranch := Some("scala3")
 // use jdk 17 in ci builds
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 
-ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("snapshots")
-ThisBuild / crossScalaVersions := Seq("3.4.3")
+ThisBuild / resolvers += Resolver.sonatypeCentralSnapshots
+ThisBuild / crossScalaVersions := Seq("3.7.2")
 
 // run tests sequentially for easier failure debugging
 Test / parallelExecution := false
