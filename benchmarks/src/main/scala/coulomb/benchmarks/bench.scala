@@ -1,4 +1,4 @@
-import coulomb.testing.CoulombSuite
+package coulomb.benchmarks
 
 import scala.language.implicitConversions
 
@@ -63,7 +63,7 @@ object bmtime:
         n.toDouble.withUnit[1] / elapsed(t1)
 
 object bmdata:
-    val data = Vector.fill(1000000) { math.random().withUnit[Meter] }
+    val data = Vector.fill(100000) { math.random().withUnit[Meter] }
 
 object sumOpt:
     import algebrasopt.given
@@ -75,32 +75,6 @@ object sumReg:
     def sum1U(x: Quantity[Double, Meter], y: Quantity[Double, Meter]): Quantity[Double, Meter] = x + y
     def sum2U(x: Quantity[Double, Yard], y: Quantity[Double, Meter]): Quantity[Double, Yard] = x + y
  
-class BenchmarkSuite extends CoulombSuite:
-    override val munitTimeout =
-        scala.concurrent.duration.Duration(10, "minutes")
-
-    test("sum-1U") {
-        import scala.language.implicitConversions
-        val tp1 = bmtime.thruput(5d.withUnit[Second], 10d.withUnit[Second]) {
-            bmdata.data.foldLeft(0d.withUnit[Meter])(sumOpt.sum1U) 
-        }
-        println(s"sumOpt: ${tp1.show}")
-
-        val tp2 = bmtime.thruput(5d.withUnit[Second], 10d.withUnit[Second]) {
-            bmdata.data.foldLeft(0d.withUnit[Meter])(sumReg.sum1U) 
-        }
-        println(s"sumReg: ${tp2.show}")
-    }
-
-    test("sum-2U") {
-        import scala.language.implicitConversions
-        val tp1 = bmtime.thruput(5d.withUnit[Second], 10d.withUnit[Second]) {
-            bmdata.data.foldLeft(0d.withUnit[Yard])(sumOpt.sum2U) 
-        }
-        println(s"sumOpt: ${tp1.show}")
-
-        val tp2 = bmtime.thruput(5d.withUnit[Second], 10d.withUnit[Second]) {
-            bmdata.data.foldLeft(0d.withUnit[Yard])(sumReg.sum2U) 
-        }
-        println(s"sumReg: ${tp2.show}")
-    }
+def bench[T](name: String)(expr: => T): Unit =
+    println(s"$name:")
+    expr: Unit
