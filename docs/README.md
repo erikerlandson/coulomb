@@ -84,21 +84,60 @@ The following resources expand the concepts behind `coulomb` and typelevel unit 
 - [Algorithmic Unit Analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/)
 - [A Unit Analysis of Linear Regression](http://erikerlandson.github.io/blog/2020/05/06/unit-analysis-for-linear-regression/)
 
-## Previous versions
+## Versions and Compatibility
 
-Versions of `coulomb` beginning with 0.6 require Scala 3,
-and are not compatible with Scala 2.13.
+### `coulomb` and Scala 3
 
-`coulomb` versions <= 0.5.x require Scala 2.13.
-The 0.5.x series will continue to be supported on a maintenance basis only.
+Versions of `coulomb` beginning with `0.6` require Scala 3,
+and are **not** compatible with Scala 2.
+
+### `coulomb` and API scaladoc
+
+API documentation for all `coulomb` versions can be viewed
+[javadoc.io](https://www.javadoc.io/doc/com.manyangled).
+
+### `coulomb` 0.9.x
+
+`coulomb` `0.9` is the result of a substantial redesign of `coulomb`'s type system,
+for the purpose of simplifying the project's code and its implicit type dependencies.
+
+Some `#include` statements will need to be changed relative to previous versions.
+A few operations that previously could be done implicitly now can only be done via explicit
+method calls; most notably, value type conversions no longer happen implicitly.
+Unit type conversions still happen implicitly for value types that can represent fractional values
+(for example, Double, Float, Rational).
+
+`coulomb` `0.9` makes more extensive use of Scala 3's advanced inline code expansion and its
+metaprogramming capabilities, to improve the efficiency of the code generated under the hood.
+Its simplified implicit type dependencies make its code easier to understand and easier to 
+extend and integrate.
+
+### `coulomb` 0.6.x to 0.8.x
+
+`coulomb` versions `0.6` through `0.8` require Scala 3.
+
+You can view the `coulomb` microsite documentation for these versions locally:
+
+```bash
+$ git clone https://github.com/erikerlandson/coulomb.git
+$ cd coulomb
+$ checkout vX.Y.Z
+$ sbt docs/tlSitePreview
+$ # view in browser at: http://localhost:4242
+```
+
+### `coulomb` versions <= 0.5.x
+
+**The `0.5.x` series is no longer actively maintained.**
+The `scala2` branch of `coulomb` on github will continue to hold coulomb <= `0.5.x`
+
+`coulomb` versions <= `0.5.x` require Scala 2.13.
 
 You can browse the legacy scala doc for the `*_2.13` packages
 [here](https://www.javadoc.io/doc/com.manyangled).
 
 The legacy tutorial documentation will continue to be viewable
 [here](https://github.com/erikerlandson/coulomb/blob/scala2/README.md).
-
-The `scala2` branch of `coulomb` on github will continue to hold coulomb <= 0.5.x
 
 ## Code of Conduct
 
