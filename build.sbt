@@ -316,26 +316,14 @@ lazy val docs = project
             )
     )
 
-lazy val benchmarks = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+// sbt benchmarksJVM/run, etc
+lazy val benchmarks = crossProject(JVMPlatform, NativePlatform, JSPlatform)
     .crossType(CrossType.Pure)
     .in(file("benchmarks"))
     .settings(name := "coulomb-benchmarks")
     .dependsOn(core, units)
     .enablePlugins(NoPublishPlugin)
     .settings(commonSettings: _*)
-    .platformsSettings(JSPlatform, NativePlatform)(
-        libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.5.0" % Test
+    .platformsSettings(JSPlatform)(
+        scalaJSUseMainModuleInitializer := true
     )
-/*
-// https://github.com/sbt/sbt-jmh
-// sbt "benchmarks/Jmh/run .*Benchmark"
-lazy val benchmarks = project
-    .in(file("benchmarks"))
-    .dependsOn(core.jvm % "compile->compile;compile->test",
-        units.jvm)
-    .settings(name := "coulomb-benchmarks")
-    .enablePlugins(NoPublishPlugin)
-
-// can enable this to add benchmarks to CI
-// ThisBuild / githubWorkflowBuild += WorkflowStep.Sbt(List("benchmarks/Jmh/run .*Benchmark"))
-*/

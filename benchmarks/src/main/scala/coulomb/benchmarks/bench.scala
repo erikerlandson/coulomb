@@ -6,6 +6,7 @@ import coulomb.*
 import coulomb.syntax.*
 import coulomb.units.si.{*, given}
 import coulomb.units.us.{*, given}
+import coulomb.units.accepted.{*, given}
 
 object algebras:
     import algebra.ring.*
@@ -41,7 +42,8 @@ object bmtime:
     import algebras.given
 
     def now(): Quantity[Double, Second] =
-        val s = Instant.now.toEpochMilli.toDouble
+        //val s = Instant.now().toEpochMilli.toDouble
+        val s = System.currentTimeMillis().toDouble
         (s / 1000d).withUnit[Second]
 
     def elapsed(t0: Quantity[Double, Second]): Quantity[Double, Second] =
@@ -78,3 +80,7 @@ object sumReg:
 def bench[T](name: String)(expr: => T): Unit =
     println(s"$name:")
     expr: Unit
+
+def pctImprovement[U](v1: Quantity[Double, U], v0: Quantity[Double, U]): Quantity[Double, Percent] =
+    import algebras.given
+    ((v1 - v0) / v0).toUnit[Percent]
