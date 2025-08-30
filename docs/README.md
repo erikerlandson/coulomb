@@ -93,8 +93,12 @@ and are **not** compatible with Scala 2.
 
 ### `coulomb` and API scaladoc
 
-API documentation for all `coulomb` versions can be viewed
+API documentation for all `coulomb` versions can be viewed at
 [javadoc.io](https://www.javadoc.io/doc/com.manyangled).
+
+Versions 0.6 and later are organized
+[here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/index.html),
+where you can select a release version in drop-down menu at the top of the page.
 
 ### `coulomb` 0.9.x
 
