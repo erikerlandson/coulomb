@@ -23,27 +23,12 @@ abstract class RuntimeQuantitySuite(using CoefficientRuntime)
     import coulomb.syntax.*
 
     import algebra.instances.all.given
-    import coulomb.ops.algebra.all.{*, given}
 
     import coulomb.units.si.{*, given}
     import coulomb.units.si.prefixes.{*, given}
     import coulomb.units.us.{*, given}
 
-    test("runtimeCoefficient") {
-        import coulomb.policy.strict.given
-        runtimeCoefficient[Double](
-            RuntimeUnit.of[Kilo * Meter],
-            RuntimeUnit.of[Meter]
-        ).assertRVT[Double](1000d)
-
-        runtimeCoefficient[Double](
-            RuntimeUnit.of[Kilo * Meter],
-            RuntimeUnit.of[Second]
-        ).assertL
-    }
-
     test("toQuantity") {
-        import coulomb.policy.strict.given
         RuntimeQuantity(1d, RuntimeUnit.of[Kilo * Meter])
             .toQuantity[Float, Meter]
             .assertRQ[Float, Meter](1000f)

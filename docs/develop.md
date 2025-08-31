@@ -53,9 +53,7 @@ scala> import coulomb.*
      | import coulomb.syntax.*
      |
      | import algebra.instances.all.given
-     | import coulomb.ops.algebra.spire.all.given
      |
-     | import coulomb.policy.spire.standard.given
      | import coulomb.units.si.*
      | import coulomb.units.si.given
 
@@ -122,9 +120,25 @@ If you make changes to `build.sbt` remember to run the following:
 
 ```sh
 sbt githubWorkflowGenerate
+sbt scalafmtSbt
 ```
 
-Make sure to check in any resulting changes to github workflow yaml.
+Make sure to check in any resulting changes to build.sbt and the github workflow yaml.
+
+## Benchmarks
+
+`coulomb` implements a few benchmarks, which you can run for each compile platform:
+
+```sh
+sbt benchmarksJVM/run
+sbt benchmarksJS/run
+sbt benchmarksNative/run
+```
+
+@:callout(info)
+Benchmarks are for project performance experiments, and subject to change.
+@:@
+
 
 ## MiMa and binary compatibility
 
@@ -134,6 +148,9 @@ If you are proposing a change that breaks binary compatibility with the latest r
 
 There are two options to deal with this:
 
-- Modify your contribution so that it preserves binary compatibility. This is the preferred option.
+- Modify your contribution so that it preserves binary compatibility. **This is the preferred option.**
 - If preserving binary compatibility is infeasible, update the value of `ThisBuild / tlBaseVersion` in `build.sbt`
 
+`coulomb` is currently on a `0.x.y` versioning system,
+and so changes breaking binary compatibility require a new minor version.
+Non breaking changes result in a new patch version.

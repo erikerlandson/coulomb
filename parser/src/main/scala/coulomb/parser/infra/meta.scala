@@ -19,7 +19,7 @@ package coulomb.parser.infra
 import scala.util.{Try, Success, Failure}
 
 import coulomb.RuntimeUnit
-import coulomb.rational.Rational
+import spire.math.Rational
 
 object meta:
     import scala.quoted.*
@@ -31,7 +31,7 @@ object meta:
     import coulomb.infra.runtime.meta.{*, given}
     import coulomb.conversion.runtimes.mapping.meta.moduleUnits
 
-    import coulomb.parser.standard.RuntimeUnitDslParser
+    import coulomb.parser.dsl.RuntimeUnitDslParser
 
     def ofUTL[UTL](using Quotes, Type[UTL]): Expr[RuntimeUnitDslParser] =
         import quotes.reflect.*

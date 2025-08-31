@@ -1,6 +1,6 @@
 # coulomb-refined
 
-The `coulomb-refined` package defines policies and utilities for integrating the
+The `coulomb-refined` package defines algebra typeclasses for integrating the
 [refined](https://github.com/fthomas/refined#refined-simple-refinement-types-for-scala)
 typelevel libraries with `coulomb`.
 
@@ -8,8 +8,8 @@ typelevel libraries with `coulomb`.
 
 ### documentation
 
-You can browse the `coulomb-refined` policies
-[here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/policy/overlay/refined.html).
+You can browse the `coulomb-refined` api definitions
+[here](https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/integrations/refined/index.html).
 
 ### packages
 
@@ -21,8 +21,6 @@ libraryDependencies += "com.manyangled" %% "coulomb-refined" % "@VERSION@"
 ```
 
 ### import
-
-To import the standard coulomb policy with the refined overlay:
 
 ```scala mdoc
 // fundamental coulomb types and methods
@@ -36,24 +34,21 @@ import eu.timepit.refined.numeric.*
 
 // algebraic definitions
 import algebra.instances.all.given
-import coulomb.ops.algebra.all.{*, given}
 
-// standard policy for spire and scala types
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
-
-// overlay policy for refined integrations
-import coulomb.policy.overlay.refined.algebraic.given
+// algebra typeclasses for refined integrations
+import coulomb.integrations.refined.all.given
 
 // coulomb syntax for refined integrations
-import coulomb.syntax.refined.*
+import coulomb.integrations.refined.syntax.*
 ```
 
 ### examples
 
 Examples in this section will use the following workaround as a replacement for
-[refineMV](https://github.com/fthomas/refined/issues/932)
-until it is ported forward to Scala 3.
+[refineMV][refinedapidocs]
+until it is
+[ported forward](https://github.com/fthomas/refined/issues/932)
+to Scala 3.
 
 ```scala mdoc
 // a workaround for refineMV not being available in scala3
@@ -67,13 +62,16 @@ import workaround.*
 ```
 
 The `coulomb-refined` package supports `refined` predicates that are algebraically well-behaved for applicable operations.
-Primarily this means the predicates `Positive` and `NonNegative`.
+Primarily this means the predicates
+[Positive][refinedapidocs]
+and
+[NonNegative][refinedapidocs].
 For example, the positive doubles are an additive semigroup and multiplicative group,
 as the following code demonstrates.
 
 @:callout(info)
 The
-[table][algebraic-policy-table]
+[table][algebra-support-table]
 below summarizes the full list of supported `refined` predicates and associated algebras.
 @:@
 
@@ -97,8 +95,10 @@ pos2 / pos3
 pos2.pow[0]
 ```
 
-The standard `refined` function for refining values with run-time checking is `refineV`,
-which returns an `Either`.
+The standard `refined` function for refining values with run-time checking is
+[refineV][refinedapidocs],
+which returns an
+@:api(scala.util.Either).
 The `coulomb-refined` package supplies a similar variation `refinedVU`.
 These objects are also supported by algebras.
 
@@ -116,39 +116,13 @@ pe1 + pe1
 pe1 + pe2
 ```
 
-## Policies
+### algebra support table
 
-### policy overlays
-
-The `coulomb-refined` package currently provides a single "overlay" policy.
-An overlay policy is designed to work with any other policies currently in scope,
-and lift them into another abstraction;
-in this case, lifting policies for value type(s) `V` into `Refined[V, P]`.
-The `Refined` abstraction guarantees that a value of type `V` satisfies some predicate `P`,
-and the semantics of `V` remain otherwise unchanged.
-
-For example, given any algebra in scope for a type `V` that defines addition,
-the `coulomb-refined` overlay defines the corresponding `Refined[V, P]` addition
-like so:
-```scala
-plus(x: Refined[V, P], y: Refined[V, P]): Refined[V, P] =
-// (x.value + y.value) refined by P
-```
-
-@:callout(info)
-Because the refined algebraic policy is an overlay,
-you can use it with your choice of base policies,
-for example with
-[core policies](coulomb-core.md#coulomb-policies)
-or
-[spire policies](coulomb-spire.md#policies).
-@:@
-
-### algebraic policy table
-
-The following table summarizes the "algebraic" overlay policy.
-Examples of Fractional value types include Double, Float, BigDecimal, spire Rational, etc.
-Integral value types include Int, Long, BigInt, etc.
+The following table summarizes the algebras and operations supported by this package.
+Examples of Fractional value types include `Double`, `Float`,
+@:api(scala.math.BigDecimal),
+spire @:api(spire.math.Rational), etc.
+Integral value types include `Int`, `Long`, @:api(scala.math.BigInt), etc.
 
 | Value Type | Predicate | Add Alg | Mult Alg | `+` | `*` | `/` | `pow` (exponent) |
 | --- | --- | --- | --- | --- | --- | --- | --- |

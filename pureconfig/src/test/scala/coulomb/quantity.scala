@@ -22,12 +22,10 @@ class QuantityDSLSuite extends CoulombSuite:
     import coulomb.*
     import coulomb.syntax.*
 
-    import coulomb.policy.standard.given
     import algebra.instances.all.given
-    import coulomb.ops.algebra.all.given
 
-    import coulomb.pureconfig.*
-    import coulomb.pureconfig.policy.DSL.given
+    import coulomb.integrations.pureconfig.*
+    import coulomb.integrations.pureconfig.DSL.given
 
     import coulomb.units.si.{*, given}
     import coulomb.units.si.prefixes.{*, given}
@@ -55,12 +53,10 @@ class QuantityJSONSuite extends CoulombSuite:
     import coulomb.*
     import coulomb.syntax.*
 
-    import coulomb.policy.standard.given
     import algebra.instances.all.given
-    import coulomb.ops.algebra.all.given
 
-    import coulomb.pureconfig.*
-    import coulomb.pureconfig.policy.JSON.given
+    import coulomb.integrations.pureconfig.*
+    import coulomb.integrations.pureconfig.JSON.given
 
     import coulomb.units.si.{*, given}
     import coulomb.units.si.prefixes.{*, given}

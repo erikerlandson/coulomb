@@ -2,8 +2,9 @@
 // sbt githubWorkflowGenerate
 // and check in the updates to github workflow yamls
 
+// this line to kick off pull request from branch 'simplify-coulomb'
 // base version for assessing MIMA
-ThisBuild / tlBaseVersion := "0.8"
+ThisBuild / tlBaseVersion := "0.9"
 
 // publish settings
 // artifacts now publish to s01.oss.sonatype.org, per:
@@ -35,8 +36,8 @@ ThisBuild / tlSitePublishBranch := Some("scala3")
 // use jdk 17 in ci builds
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 
-ThisBuild / resolvers ++= Resolver.sonatypeOssRepos("snapshots")
-ThisBuild / crossScalaVersions := Seq("3.4.3")
+ThisBuild / resolvers += Resolver.sonatypeCentralSnapshots
+ThisBuild / crossScalaVersions := Seq("3.7.2")
 
 // run tests sequentially for easier failure debugging
 Test / parallelExecution := false
@@ -61,7 +62,6 @@ lazy val root = tlCrossRootProject
         runtime,
         parser,
         pureconfig,
-        spire,
         refined,
         testkit,
         unidocs
@@ -73,6 +73,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .settings(name := "coulomb-core")
     .settings(commonSettings: _*)
     .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.10.0")
+    .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
     .platformsSettings(JSPlatform, NativePlatform)(
         Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*serde.scala"
     )
@@ -150,14 +151,6 @@ lazy val pureconfig = crossProject(
         libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.8"
     )
 
-lazy val spire = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-    .crossType(CrossType.Pure)
-    .in(file("spire"))
-    .settings(name := "coulomb-spire")
-    .dependsOn(core % "compile->compile;test->test", units % Test)
-    .settings(commonSettings: _*)
-    .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
-
 lazy val refined = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .crossType(CrossType.Pure)
     .in(file("refined"))
@@ -195,7 +188,6 @@ lazy val all = project
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
-        spire.jvm,
         refined.jvm
     ) // scala repl only needs JVMPlatform subproj builds
     .settings(name := "coulomb-all")
@@ -225,7 +217,6 @@ lazy val docs = project
         runtime.jvm,
         parser.jvm,
         pureconfig.jvm,
-        spire.jvm,
         refined.jvm
     )
     .enablePlugins(TypelevelSitePlugin)
@@ -250,8 +241,32 @@ lazy val docs = project
                     )
                     .addApiLinks(
                         ApiLinks(
+                            "https://javadoc.io/doc/org.typelevel/algebra_3/latest/"
+                        ).withPackagePrefix("algebra")
+                    )
+                    .addApiLinks(
+                        ApiLinks(
+                            "https://javadoc.io/doc/org.typelevel/cats-core_3/latest/"
+                        ).withPackagePrefix("cats")
+                    )
+                    .addApiLinks(
+                        ApiLinks(
+                            "https://javadoc.io/doc/org.typelevel/spire_3/latest/"
+                        ).withPackagePrefix("spire")
+                    )
+                    .addApiLinks(
+                        ApiLinks(
                             "https://javadoc.io/doc/com.github.pureconfig/pureconfig-core_3/latest/"
                         ).withPackagePrefix("pureconfig")
+                    )
+                    .addApiLinks(
+                        // the refined api link isn't super helpful because @:api(...)
+                        // doesn't work for type defs or methods, which is most of
+                        // what refined provides
+                        ApiLinks(
+                            // refined is not publishing scaladoc for scala 3 yet
+                            "https://javadoc.io/doc/eu.timepit/refined_2.13/latest/"
+                        ).withPackagePrefix("eu.timepit.refined")
                     )
                     .addTargets(
                         // Target names need to be all lowercase.
@@ -265,6 +280,10 @@ lazy val docs = project
                             "quantitytypedef",
                             "https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb.html#Quantity[V,U]=V"
                         ),
+                        TargetDefinition.external(
+                            "refinedapidocs",
+                            "https://javadoc.io/doc/eu.timepit/refined_2.13/latest/eu/timepit/refined/index.html"
+                        ),
                         TargetDefinition.internal(
                             "coulomb-introduction",
                             VirtualPath.parse("README.md")
@@ -276,10 +295,6 @@ lazy val docs = project
                         TargetDefinition.internal(
                             "coulomb-units",
                             VirtualPath.parse("coulomb-units.md")
-                        ),
-                        TargetDefinition.internal(
-                            "coulomb-spire",
-                            VirtualPath.parse("coulomb-spire.md")
                         ),
                         TargetDefinition.internal(
                             "coulomb-refined",
@@ -301,13 +316,15 @@ lazy val docs = project
             )
     )
 
-// https://github.com/sbt/sbt-jmh
-// sbt "benchmarks/Jmh/run .*Benchmark"
-lazy val benchmarks = project
+// sbt benchmarksJVM/run, etc
+lazy val benchmarks = crossProject(JVMPlatform, NativePlatform, JSPlatform)
+    .crossType(CrossType.Pure)
     .in(file("benchmarks"))
-    .dependsOn(core.jvm % "compile->compile;compile->test")
     .settings(name := "coulomb-benchmarks")
-    .enablePlugins(NoPublishPlugin, JmhPlugin)
-
-// can enable this to add benchmarks to CI
-// ThisBuild / githubWorkflowBuild += WorkflowStep.Sbt(List("benchmarks/Jmh/run .*Benchmark"))
+    .dependsOn(core, units)
+    .enablePlugins(NoPublishPlugin)
+    .disablePlugins(MimaPlugin)
+    .settings(commonSettings: _*)
+    .platformsSettings(JSPlatform)(
+        scalaJSUseMainModuleInitializer := true
+    )

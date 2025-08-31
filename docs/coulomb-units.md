@@ -19,20 +19,6 @@ The `coulomb-units` package defines several groups of commonly used units.
 
 ## Quick Start
 
-```scala mdoc:invisible
-// fundamental coulomb types and methods
-import coulomb.*
-import coulomb.syntax.*
-
-// algebraic definitions
-import algebra.instances.all.given
-import coulomb.ops.algebra.all.given
-
-// unit and value type policies for operations
-import coulomb.policy.standard.given
-import scala.language.implicitConversions
-```
-
 ### documentation
 
 API documentation for `coulomb-units` can be viewed
@@ -54,6 +40,13 @@ In order to use a unit definition, both the unit type and its corresponding cont
 In Scala 3 one does this with the following idiom:
 
 ```scala mdoc
+// fundamental coulomb types and methods
+import coulomb.*
+import coulomb.syntax.*
+
+// algebraic definitions
+import algebra.instances.all.given
+
 // import both types and context variables ("givens")
 import coulomb.units.mksa.{*, given}
 import coulomb.units.us.{*, given}
@@ -126,25 +119,20 @@ In `coulomb-units`, standard `Quantity` of time units such as `Second`, `Minute`
 corresponds to `Duration` in `java.time`.
 Similarly, absolute time instants represented by `EpochTime` correspond to `Instant` in `java.time`.
 
-The `coulomb-units` package implements both explicit and implicit conversions between
+The `coulomb-units` package implements conversion methods between
 `coulomb` and `java.time` values, some of which are shown here:
 
 ```scala mdoc
 import java.time.{ Duration, Instant }
 import coulomb.units.time.{*, given}
 
-// explicit conversion methods
+// extension conversion methods
 import coulomb.units.javatime.*
-// implicit and explicit conversions
-import coulomb.units.javatime.conversions.all.given
 
 val dur = Duration.ofSeconds(70, 400000000)
 
 // explicit conversion from java.time duration to a coulomb quantity
 dur.toQuantity[Double, Minute]
-
-// corresponding implicit conversion
-val dq: Quantity[Double, Minute] = dur
 
 // convert back to java.time
 dq.toDuration
@@ -155,9 +143,19 @@ val ins = Instant.parse("1969-07-20T00:00:00Z")
 // days relative to standard Unix epoch
 ins.toEpochTime[Double, Day]
 
-// corresponding implicit conversion
-val et: EpochTime[Double, Day] = ins
-
 // convert back to java.time
 et.toInstant
+```
+
+Implicit conversions can also be imported:
+
+```scala mdoc
+// implicit java.time conversions
+import coulomb.units.javatime.conversion.implicits.given
+import scala.language.implicitConversions
+
+// implicit conversions
+val dq: Quantity[Double, Minute] = dur
+
+val et: EpochTime[Double, Day] = ins
 ```

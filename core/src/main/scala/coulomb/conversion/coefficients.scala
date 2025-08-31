@@ -16,8 +16,9 @@
 
 package coulomb.conversion
 
-import coulomb.rational.Rational
+import spire.math.*
 
+/** Macros for instantiating unit conversion coefficients directly as values */
 object coefficients:
     inline def coefficientRational[U1, U2]: Rational = ${
         meta.coefficientRational[U1, U2]
@@ -28,25 +29,66 @@ object coefficients:
     inline def coefficientFloat[U1, U2]: Float = ${
         meta.coefficientFloat[U1, U2]
     }
-
-    inline def coefficientNumDouble[U1, U2]: Double = ${
-        meta.coefficientNumDouble[U1, U2]
+    inline def coefficientBigDecimal[UF, UT]: BigDecimal = ${
+        meta.coefficientBigDecimal[UF, UT]
     }
-    inline def coefficientDenDouble[U1, U2]: Double = ${
-        meta.coefficientDenDouble[U1, U2]
+    inline def coefficientFloatJ[U1, U2]: java.lang.Float = ${
+        meta.coefficientFloatJ[U1, U2]
+    }
+    inline def coefficientDoubleJ[U1, U2]: java.lang.Double = ${
+        meta.coefficientDoubleJ[U1, U2]
     }
 
     inline def deltaOffsetRational[U, B]: Rational = ${
         meta.deltaOffsetRational[U, B]
     }
+    inline def deltaOffsetFloat[U, B]: Float = ${
+        meta.deltaOffsetFloat[U, B]
+    }
     inline def deltaOffsetDouble[U, B]: Double = ${
         meta.deltaOffsetDouble[U, B]
     }
-    inline def deltaOffsetFloat[U, B]: Float = ${ meta.deltaOffsetFloat[U, B] }
+    inline def deltaOffsetBigDecimal[U, B]: BigDecimal = ${
+        meta.deltaOffsetBigDecimal[U, B]
+    }
+    inline def deltaOffsetFloatJ[U, B]: java.lang.Float = ${
+        meta.deltaOffsetFloatJ[U, B]
+    }
+    inline def deltaOffsetDoubleJ[U, B]: java.lang.Double = ${
+        meta.deltaOffsetDoubleJ[U, B]
+    }
 
-    object meta:
+    private object meta:
         import scala.quoted.*
         import coulomb.infra.meta.{*, given}
+
+        given g_JavaIntToExpr: ToExpr[java.lang.Integer] with
+            def apply(v: java.lang.Integer)(using
+                Quotes
+            ): Expr[java.lang.Integer] =
+                val vd: Int = v
+                '{ java.lang.Integer.valueOf(${ Expr(vd) }) }
+
+        given g_JavaLongToExpr: ToExpr[java.lang.Long] with
+            def apply(v: java.lang.Long)(using
+                Quotes
+            ): Expr[java.lang.Long] =
+                val vd: Long = v
+                '{ java.lang.Long.valueOf(${ Expr(vd) }) }
+
+        given g_JavaFloatToExpr: ToExpr[java.lang.Float] with
+            def apply(v: java.lang.Float)(using
+                Quotes
+            ): Expr[java.lang.Float] =
+                val vd: Float = v
+                '{ java.lang.Float.valueOf(${ Expr(vd) }) }
+
+        given g_JavaDoubleToExpr: ToExpr[java.lang.Double] with
+            def apply(v: java.lang.Double)(using
+                Quotes
+            ): Expr[java.lang.Double] =
+                val vd: Double = v
+                '{ java.lang.Double.valueOf(${ Expr(vd) }) }
 
         def coefficientRational[U1, U2](using
             Quotes,
@@ -57,15 +99,6 @@ object coefficients:
             val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
             Expr(c)
 
-        def coefficientDouble[U1, U2](using
-            Quotes,
-            Type[U1],
-            Type[U2]
-        ): Expr[Double] =
-            import quotes.reflect.*
-            val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
-            Expr(c.toDouble)
-
         def coefficientFloat[U1, U2](using
             Quotes,
             Type[U1],
@@ -75,23 +108,44 @@ object coefficients:
             val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
             Expr(c.toFloat)
 
-        def coefficientNumDouble[U1, U2](using
+        def coefficientDouble[U1, U2](using
             Quotes,
             Type[U1],
             Type[U2]
         ): Expr[Double] =
             import quotes.reflect.*
             val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
-            Expr(c.n.toDouble)
+            Expr(c.toDouble)
 
-        def coefficientDenDouble[U1, U2](using
+        def coefficientFloatJ[U1, U2](using
             Quotes,
             Type[U1],
             Type[U2]
-        ): Expr[Double] =
+        ): Expr[java.lang.Float] =
             import quotes.reflect.*
             val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
-            Expr(c.d.toDouble)
+            Expr(java.lang.Float.valueOf(c.toFloat))
+
+        def coefficientDoubleJ[U1, U2](using
+            Quotes,
+            Type[U1],
+            Type[U2]
+        ): Expr[java.lang.Double] =
+            import quotes.reflect.*
+            val c = coef(TypeRepr.of[U1], TypeRepr.of[U2])
+            Expr(java.lang.Double.valueOf(c.toDouble))
+
+        def coefficientBigDecimal[UF, UT](using
+            Quotes,
+            Type[UF],
+            Type[UT]
+        ): Expr[BigDecimal] =
+            import quotes.reflect.*
+            val c: Rational = coef(TypeRepr.of[UF], TypeRepr.of[UT])
+            val bd: BigDecimal = c.toBigDecimal(
+                java.math.MathContext.DECIMAL128
+            )
+            Expr(bd)
 
         def deltaOffsetRational[U, B](using
             Quotes,
@@ -119,3 +173,34 @@ object coefficients:
             import quotes.reflect.*
             val doff = offset(TypeRepr.of[U], TypeRepr.of[B])
             Expr(doff.toFloat)
+
+        def deltaOffsetBigDecimal[U, B](using
+            Quotes,
+            Type[U],
+            Type[B]
+        ): Expr[BigDecimal] =
+            import quotes.reflect.*
+            val doff: Rational = offset(TypeRepr.of[U], TypeRepr.of[B])
+            val bd: BigDecimal =
+                doff.toBigDecimal(
+                    java.math.MathContext.DECIMAL128
+                )
+            Expr(bd)
+
+        def deltaOffsetFloatJ[U, B](using
+            Quotes,
+            Type[U],
+            Type[B]
+        ): Expr[java.lang.Float] =
+            import quotes.reflect.*
+            val doff = offset(TypeRepr.of[U], TypeRepr.of[B])
+            Expr(java.lang.Float.valueOf(doff.toFloat))
+
+        def deltaOffsetDoubleJ[U, B](using
+            Quotes,
+            Type[U],
+            Type[B]
+        ): Expr[java.lang.Double] =
+            import quotes.reflect.*
+            val doff = offset(TypeRepr.of[U], TypeRepr.of[B])
+            Expr(java.lang.Double.valueOf(doff.toDouble))

@@ -16,9 +16,11 @@
 
 package coulomb
 
+import spire.math.Rational
+
 import coulomb.{infra => _, *}
 import coulomb.syntax.*
-import coulomb.rational.Rational
+import coulomb.infra.utils.*
 import coulomb.conversion.*
 
 sealed abstract class RuntimeUnit:
@@ -57,7 +59,7 @@ sealed abstract class RuntimeUnit:
                 den.toRational match
                     case Left(e) => Left(e)
                     case Right(dv) =>
-                        if (dv == Rational.const0)
+                        if (dv == Rational.zero)
                             Left("toRational: div by zero")
                         else
                             for {
@@ -66,7 +68,7 @@ sealed abstract class RuntimeUnit:
             case RuntimeUnit.Pow(b, e) =>
                 for {
                     bv <- b.toRational
-                } yield bv.pow(e)
+                } yield bv.fpow(e)
             case _ =>
                 Left(s"toRational: bad rational expression: $this")
 
@@ -78,47 +80,24 @@ object RuntimeUnit:
     case class Pow(b: RuntimeUnit, e: Rational) extends RuntimeUnit
     inline def of[U]: RuntimeUnit = ${ infra.runtime.meta.unitRTU[U] }
 
-def runtimeCoefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
-    crt: CoefficientRuntime,
-    vc: ValueConversion[Rational, V]
-): Either[String, V] =
-    crt.coefficient[V](uf, ut)
-
-package syntax {
-    extension [V](v: V)
-        inline def withRuntimeUnit(u: RuntimeUnit): RuntimeQuantity[V] =
-            RuntimeQuantity(v, u)
-
-        inline def withRuntimeUnit[U]: RuntimeQuantity[V] =
-            RuntimeQuantity(v, RuntimeUnit.of[U])
-}
-
 case class RuntimeQuantity[V](value: V, unit: RuntimeUnit)
 
 object RuntimeQuantity:
     import algebra.ring.MultiplicativeSemigroup
-    import coulomb.ops.*
 
     inline def apply[V, U](q: Quantity[V, U]): RuntimeQuantity[V] =
         RuntimeQuantity(q.value, RuntimeUnit.of[U])
 
-    inline def apply[U](using a: Applier[U]) = a
-
-    class Applier[U]:
-        inline def apply[V](v: V): RuntimeQuantity[V] =
-            RuntimeQuantity(v, RuntimeUnit.of[U])
-    object Applier:
-        given ctx_Applier[U]: Applier[U] = new Applier[U]
-
-    extension [VL](ql: RuntimeQuantity[VL])
-        inline def toQuantity[VR, UR](using
+    extension [V](q: RuntimeQuantity[V])
+        inline def toQuantity[VT, UT](using
             crt: CoefficientRuntime,
-            vc: ValueConversion[VL, VR],
-            vcr: ValueConversion[Rational, VR],
-            mul: MultiplicativeSemigroup[VR]
-        ): Either[String, Quantity[VR, UR]] =
-            crt.coefficient[VR](ql.unit, RuntimeUnit.of[UR]).map { coef =>
-                mul.times(coef, vc(ql.value)).withUnit[UR]
+            fvt: Fractional[VT],
+            vc: ValueConversion[V, VT],
+            rvt: ValueConversion[Rational, VT],
+            mul: MultiplicativeSemigroup[VT]
+        ): Either[String, Quantity[VT, UT]] =
+            crt.coefficient[VT](q.unit, RuntimeUnit.of[UT]).map { coef =>
+                mul.times(coef, vc(q.value)).withUnit[UT]
             }
 
 trait CoefficientRuntime:
@@ -133,6 +112,7 @@ trait CoefficientRuntime:
         infra.runtime.meta.crExpr[UT](this, uf)
 
     final def coefficient[V](uf: RuntimeUnit, ut: RuntimeUnit)(using
+        fv: Fractional[V],
         vc: ValueConversion[Rational, V]
     ): Either[String, V] =
         this.coefficientRational(uf, ut).map(vc)
