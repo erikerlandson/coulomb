@@ -120,9 +120,25 @@ If you make changes to `build.sbt` remember to run the following:
 
 ```sh
 sbt githubWorkflowGenerate
+sbt scalafmtSbt
 ```
 
-Make sure to check in any resulting changes to github workflow yaml.
+Make sure to check in any resulting changes to build.sbt and the github workflow yaml.
+
+## Benchmarks
+
+`coulomb` implements a few benchmarks, which you can run for each compile platform:
+
+```sh
+sbt benchmarksJVM/run
+sbt benchmarksJS/run
+sbt benchmarksNative/run
+```
+
+@:callout(info)
+Benchmarks are for project performance experiments, and subject to change.
+@:@
+
 
 ## MiMa and binary compatibility
 
