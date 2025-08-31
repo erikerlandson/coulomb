@@ -148,6 +148,9 @@ If you are proposing a change that breaks binary compatibility with the latest r
 
 There are two options to deal with this:
 
-- Modify your contribution so that it preserves binary compatibility. This is the preferred option.
+- Modify your contribution so that it preserves binary compatibility. **This is the preferred option.**
 - If preserving binary compatibility is infeasible, update the value of `ThisBuild / tlBaseVersion` in `build.sbt`
 
+`coulomb` is currently on a `0.x.y` versioning system,
+and so changes breaking binary compatibility require a new minor version.
+Non breaking changes result in a new patch version.
