@@ -114,10 +114,10 @@ where you can select a release version in drop-down menu at the top of the page.
 for the purpose of simplifying the project's code and its implicit type dependencies.
 
 Some `#include` statements will need to be changed relative to previous versions.
-A few operations that previously could be done implicitly now can only be done via explicit
-method calls; most notably, value type conversions no longer happen implicitly.
+A few operations that previously could be done implicitly now can only be done via explicit method calls;
+**most notably, value type conversions no longer happen implicitly.**
 Unit type conversions still happen implicitly for value types that can represent fractional values
-(for example, Double, Float, Rational).
+(for example, Double, Float, BigDecimal).
 
 `coulomb` `0.9` makes more extensive use of Scala 3's advanced inline code expansion and its
 metaprogramming capabilities, to improve the efficiency of the code generated under the hood.
