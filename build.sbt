@@ -323,6 +323,7 @@ lazy val benchmarks = crossProject(JVMPlatform, NativePlatform, JSPlatform)
     .settings(name := "coulomb-benchmarks")
     .dependsOn(core, units)
     .enablePlugins(NoPublishPlugin)
+    .disablePlugins(MimaPlugin)
     .settings(commonSettings: _*)
     .platformsSettings(JSPlatform)(
         scalaJSUseMainModuleInitializer := true
