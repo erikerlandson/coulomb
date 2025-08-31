@@ -202,9 +202,11 @@ val apples = 1.withUnit[Apple] + 2.withUnit[Apple]
 val s = apples.show
 ```
 
+@:callout(info)
 Allowing arbitrary types to be manipulated as units introduces some interesting programming possibilities,
 which are discussed in
 [this blog post](http://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/).
+@:@
 
 ### Prefix Units
 
