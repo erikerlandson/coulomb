@@ -84,6 +84,14 @@ The following resources expand the concepts behind `coulomb` and typelevel unit 
 - [Algorithmic Unit Analysis](http://erikerlandson.github.io/blog/2019/05/03/algorithmic-unit-analysis/)
 - [A Unit Analysis of Linear Regression](http://erikerlandson.github.io/blog/2020/05/06/unit-analysis-for-linear-regression/)
 
+## Code of Conduct
+
+The `coulomb` project supports the
+[Scala Code of Conduct](https://typelevel.org/code-of-conduct.html).
+All contributors are expected to respect this code.
+Any violations of this code of conduct should be reported to
+[the author](https://github.com/erikerlandson/).
+
 ## Versions and Compatibility
 
 ### `coulomb` and Scala 3
@@ -142,12 +150,3 @@ You can browse the legacy scala doc for the `*_2.13` packages
 
 The legacy tutorial documentation will continue to be viewable
 [here](https://github.com/erikerlandson/coulomb/blob/scala2/README.md).
-
-## Code of Conduct
-
-The `coulomb` project supports the
-[Scala Code of Conduct](https://typelevel.org/code-of-conduct.html).
-All contributors are expected to respect this code.
-Any violations of this code of conduct should be reported to
-[the author](https://github.com/erikerlandson/).
-
