@@ -83,7 +83,6 @@
   <ul class="nav-list">
     <li class="level1 nav-leaf"><a href="coulomb-core.html">coulomb-core</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-units.html">coulomb-units</a></li>
-    <li class="level1 nav-leaf"><a href="coulomb-spire.html">coulomb-spire</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-refined.html">coulomb-refined</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-pureconfig.html">coulomb-pureconfig</a></li>
     <li class="level1 active nav-leaf"><a href="#">coulomb-runtime</a></li>
@@ -137,11 +136,6 @@
 
 </span><span class="comment">// algebraic definitions
 </span><span class="keyword">import</span><span> </span><span class="identifier">algebra</span><span>.</span><span class="identifier">instances</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">ops</span><span>.</span><span class="identifier">algebra</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
-
-</span><span class="comment">// unit and value type policies for operations
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">policy</span><span>.</span><span class="identifier">standard</span><span>.</span><span class="keyword">given</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">scala</span><span>.</span><span class="identifier">language</span><span>.</span><span class="identifier">implicitConversions</span><span>
 
 </span><span class="comment">// unit definitions
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.{*, </span><span class="keyword">given</span><span>}
@@ -150,6 +144,7 @@
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">time</span><span>.{*, </span><span class="keyword">given</span><span>}
 
 </span><span class="comment">// runtime definitions
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">runtime</span><span>.</span><span class="identifier">syntax</span><span>.*
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">conversion</span><span>.</span><span class="identifier">runtimes</span><span>.</span><span class="identifier">mapping</span><span>.</span><span class="type-name">MappingCoefficientRuntime</span></code></pre>
         
         <h3 id="examples" class="section"><a class="anchor-link left" href="#examples"><i class="icofont-laika link">&#xef71;</i></a>examples</h3>

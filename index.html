@@ -84,7 +84,6 @@
   <ul class="nav-list">
     <li class="level1 nav-leaf"><a href="coulomb-core.html">coulomb-core</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-units.html">coulomb-units</a></li>
-    <li class="level1 nav-leaf"><a href="coulomb-spire.html">coulomb-spire</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-refined.html">coulomb-refined</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-pureconfig.html">coulomb-pureconfig</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-runtime.html">coulomb-runtime</a></li>
@@ -108,8 +107,14 @@
     <li class="level2 nav-leaf"><a href="#examples">examples</a></li>
     <li class="level1 nav-leaf"><a href="#packages-2">Packages</a></li>
     <li class="level1 nav-leaf"><a href="#resources">Resources</a></li>
-    <li class="level1 nav-leaf"><a href="#previous-versions">Previous versions</a></li>
-    <li class="level1 nav-leaf"><a href="#code-of-conduct">Code of Conduct</a></li>
+    <li class="level1 nav-node"><a href="#code-of-conduct">Code of Conduct</a></li>
+    <li class="level2 nav-leaf"><a href="#gen-ai-based-contributions">gen-ai based contributions</a></li>
+    <li class="level1 nav-node"><a href="#versions-and-compatibility">Versions and Compatibility</a></li>
+    <li class="level2 nav-leaf"><a href="#coulomb-and-scala-3"><code>coulomb</code> and Scala 3</a></li>
+    <li class="level2 nav-leaf"><a href="#coulomb-and-api-scaladoc"><code>coulomb</code> and API scaladoc</a></li>
+    <li class="level2 nav-leaf"><a href="#coulomb-0-9-x"><code>coulomb</code> 0.9.x</a></li>
+    <li class="level2 nav-leaf"><a href="#coulomb-0-6-x-to-0-8-x"><code>coulomb</code> 0.6.x to 0.8.x</a></li>
+    <li class="level2 nav-leaf"><a href="#coulomb-versions-0-5-x"><code>coulomb</code> versions &lt;= 0.5.x</a></li>
   </ul>
 
   <p class="footer"></p>
@@ -137,17 +142,12 @@
         
         <h3 id="import-statements" class="section"><a class="anchor-link left" href="#import-statements"><i class="icofont-laika link">&#xef71;</i></a>import statements</h3>
         <p>Import <code>coulomb</code> definitions:</p>
-        <pre><code class="nohighlight"><span class="comment">// fundamental coulomb types and methods
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// fundamental coulomb types and methods
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.*
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">syntax</span><span>.*
 
-</span><span class="comment">// algebraic definitions
+</span><span class="comment">// algebraic typeclass definitions
 </span><span class="keyword">import</span><span> </span><span class="identifier">algebra</span><span>.</span><span class="identifier">instances</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">ops</span><span>.</span><span class="identifier">algebra</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
-
-</span><span class="comment">// unit and value type policies for operations
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">policy</span><span>.</span><span class="identifier">standard</span><span>.</span><span class="keyword">given</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">scala</span><span>.</span><span class="identifier">language</span><span>.</span><span class="identifier">implicitConversions</span><span>
 
 </span><span class="comment">// unit definitions
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.{*, </span><span class="keyword">given</span><span>}</span></code></pre>
@@ -159,8 +159,8 @@
 </span><span class="comment">// a: Quantity[Double, /[Meter, ^[Second, 2]]] = 9.8
 </span><span>
 </span><span class="comment">// time or duration
-</span><span class="keyword">val</span><span> </span><span class="identifier">t</span><span> = </span><span class="number-literal">10</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Second</span><span>]
-</span><span class="comment">// t: Quantity[Int, Second] = 10
+</span><span class="keyword">val</span><span> </span><span class="identifier">t</span><span> = </span><span class="number-literal">10.0</span><span>.</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Second</span><span>]
+</span><span class="comment">// t: Quantity[Double, Second] = 10.0
 </span><span>
 </span><span class="comment">// velocity
 </span><span class="keyword">val</span><span> </span><span class="identifier">v</span><span> = </span><span class="identifier">a</span><span> * </span><span class="identifier">t</span><span>
@@ -175,27 +175,15 @@
 
 </span><span class="comment">// Incompatible unit operations are a compile-time type error
 </span><span class="keyword">val</span><span> </span><span class="identifier">fail</span><span> = </span><span class="identifier">time</span><span> + </span><span class="identifier">dist</span><span>
-</span><span class="comment">// error:
-// Addition not defined in scope for Quantity[Int, coulomb.units.si.Second] and Quantity[Int, coulomb.units.si.Meter].
+</span><span class="comment">// error: 
+// No unit conversion in scope for value type Int, unit types coulomb.units.si.Meter =&gt; coulomb.units.si.Second.
 // I found:
 // 
-//     coulomb.policy.standard.ctx_add_1V2U[Int, coulomb.units.si.Second, Int,
-//       coulomb.units.si.Meter](&lt;:&lt;.refl[Int], scala.util.NotGiven.value,
-//       coulomb.policy.standard.ctx_Quantity_Conversion_2V2U[Int,
-//         coulomb.units.si.Meter, Int, coulomb.units.si.Second](
-//         coulomb.policy.standard.ctx_VC_Int[Int](scala.math.Numeric.IntIsIntegral),
-//         /* missing */
-//           summon[
-//             coulomb.conversion.UnitConversion[Int, coulomb.units.si.Meter,
-//               coulomb.units.si.Second]
-//           ]
-//       ),
-//     ???)
+//     coulomb.conversion.UnitConversion.g_UnitConversion[Int, coulomb.units.si.Meter,
+//       coulomb.units.si.Second](algebra.instances.all.intAlgebra)
 // 
-// But no implicit values were found that match type coulomb.conversion.UnitConversion[Int, coulomb.units.si.Meter,
-//   coulomb.units.si.Second].
-// val fail = time + dist
-//                   ^^^^</span></code></pre>
+// But given instance g_UnitConversion in object UnitConversion does not match type coulomb.conversion.UnitConversion[Int, coulomb.units.si.Meter,
+//   coulomb.units.si.Second].</span></code></pre>
         
         <h2 id="packages-2" class="section"><a class="anchor-link left" href="#packages-2"><i class="icofont-laika link">&#xef71;</i></a>Packages</h2>
         <p><code>coulomb</code> publishes the following packages</p>
@@ -214,10 +202,6 @@
             <tr>
               <td><a href="coulomb-units.html">coulomb-units</a></td>
               <td>Defines common units, including SI, MKSA, Accepted, time, temperature, and US traditional</td>
-            </tr>
-            <tr>
-              <td><a href="coulomb-spire.html">coulomb-spire</a></td>
-              <td>Defines policies for working with Spire and Scala numeric types</td>
             </tr>
             <tr>
               <td><a href="coulomb-refined.html">coulomb-refined</a></td>
@@ -249,23 +233,63 @@
           <li><a href="http://erikerlandson.github.io/blog/2020/05/06/unit-analysis-for-linear-regression/">A Unit Analysis of Linear Regression</a></li>
         </ul>
         
-        <h2 id="previous-versions" class="section"><a class="anchor-link left" href="#previous-versions"><i class="icofont-laika link">&#xef71;</i></a>Previous versions</h2>
-        <p>Versions of <code>coulomb</code> beginning with 0.6 require Scala 3,
-        and are not compatible with Scala 2.13.</p>
-        <p><code>coulomb</code> versions &lt;= 0.5.x require Scala 2.13.
-        The 0.5.x series will continue to be supported on a maintenance basis only.</p>
-        <p>You can browse the legacy scala doc for the <code>*_2.13</code> packages
-        <a href="https://www.javadoc.io/doc/com.manyangled">here</a>.</p>
-        <p>The legacy tutorial documentation will continue to be viewable
-        <a href="https://github.com/erikerlandson/coulomb/blob/scala2/README.md">here</a>.</p>
-        <p>The <code>scala2</code> branch of <code>coulomb</code> on github will continue to hold coulomb &lt;= 0.5.x</p>
-        
         <h2 id="code-of-conduct" class="section"><a class="anchor-link left" href="#code-of-conduct"><i class="icofont-laika link">&#xef71;</i></a>Code of Conduct</h2>
         <p>The <code>coulomb</code> project supports the
         <a href="https://typelevel.org/code-of-conduct.html">Scala Code of Conduct</a>.
         All contributors are expected to respect this code.
         Any violations of this code of conduct should be reported to
         <a href="https://github.com/erikerlandson/">the author</a>.</p>
+        
+        <h3 id="gen-ai-based-contributions" class="section"><a class="anchor-link left" href="#gen-ai-based-contributions"><i class="icofont-laika link">&#xef71;</i></a>gen-ai based contributions</h3>
+        <p>Contributions to <code>coulomb</code> using generative AI will be considered.
+        However: low quality &quot;vibe-coded&quot; contributions will be treated the same as any low quality code,
+        and looked upon with disfavor.</p>
+        <p>The <code>coulomb</code> project does not currently intend to support gen-ai related configurations,
+        such as <code>.cursorrules</code>, <code>CLAUDE.md</code>, etc.</p>
+        
+        <h2 id="versions-and-compatibility" class="section"><a class="anchor-link left" href="#versions-and-compatibility"><i class="icofont-laika link">&#xef71;</i></a>Versions and Compatibility</h2>
+        
+        <h3 id="coulomb-and-scala-3" class="section"><a class="anchor-link left" href="#coulomb-and-scala-3"><i class="icofont-laika link">&#xef71;</i></a><code>coulomb</code> and Scala 3</h3>
+        <p>Versions of <code>coulomb</code> beginning with <code>0.6</code> require Scala 3,
+        and are <strong>not</strong> compatible with Scala 2.</p>
+        
+        <h3 id="coulomb-and-api-scaladoc" class="section"><a class="anchor-link left" href="#coulomb-and-api-scaladoc"><i class="icofont-laika link">&#xef71;</i></a><code>coulomb</code> and API scaladoc</h3>
+        <p>API documentation for all <code>coulomb</code> versions can be viewed at
+        <a href="https://www.javadoc.io/doc/com.manyangled">javadoc.io</a>.</p>
+        <p>Versions 0.6 and later are organized
+        <a href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/index.html">here</a>,
+        where you can select a release version in drop-down menu at the top of the page.</p>
+        
+        <h3 id="coulomb-0-9-x" class="section"><a class="anchor-link left" href="#coulomb-0-9-x"><i class="icofont-laika link">&#xef71;</i></a><code>coulomb</code> 0.9.x</h3>
+        <p><code>coulomb</code> <code>0.9</code> is the result of a substantial redesign of <code>coulomb</code>&#39;s type system,
+        for the purpose of simplifying the project&#39;s code and its implicit type dependencies.</p>
+        <p>Some <code>#include</code> statements will need to be changed relative to previous versions.
+        A few operations that previously could be done implicitly now can only be done via explicit method calls;
+        <strong>most notably, value type conversions no longer happen implicitly.</strong>
+        Unit type conversions still happen implicitly for value types that can represent fractional values
+        (for example, Double, Float, BigDecimal).</p>
+        <p><code>coulomb</code> <code>0.9</code> makes more extensive use of Scala 3&#39;s advanced inline code expansion and its
+        metaprogramming capabilities, to improve the efficiency of the code generated under the hood.
+        Its simplified implicit type dependencies make its code easier to understand and easier to 
+        extend and integrate.</p>
+        
+        <h3 id="coulomb-0-6-x-to-0-8-x" class="section"><a class="anchor-link left" href="#coulomb-0-6-x-to-0-8-x"><i class="icofont-laika link">&#xef71;</i></a><code>coulomb</code> 0.6.x to 0.8.x</h3>
+        <p><code>coulomb</code> versions <code>0.6</code> through <code>0.8</code> require Scala 3.</p>
+        <p>You can view the <code>coulomb</code> microsite documentation for these versions locally:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span>$ git clone https://github.com/erikerlandson/coulomb.git
+$ </span><span class="identifier">cd</span><span> coulomb
+$ checkout vX.Y.Z
+$ sbt docs/tlSitePreview
+$ </span><span class="comment"># view in browser at: http://localhost:4242</span></code></pre>
+        
+        <h3 id="coulomb-versions-0-5-x" class="section"><a class="anchor-link left" href="#coulomb-versions-0-5-x"><i class="icofont-laika link">&#xef71;</i></a><code>coulomb</code> versions &lt;= 0.5.x</h3>
+        <p><strong>The <code>0.5.x</code> series is no longer actively maintained.</strong>
+        The <code>scala2</code> branch of <code>coulomb</code> on github will continue to hold coulomb &lt;= <code>0.5.x</code></p>
+        <p><code>coulomb</code> versions &lt;= <code>0.5.x</code> require Scala 2.13.</p>
+        <p>You can browse the legacy scala doc for the <code>*_2.13</code> packages
+        <a href="https://www.javadoc.io/doc/com.manyangled">here</a>.</p>
+        <p>The legacy tutorial documentation will continue to be viewable
+        <a href="https://github.com/erikerlandson/coulomb/blob/scala2/README.md">here</a>.</p>
 
         
 <hr class="footer-rule"/>

@@ -83,7 +83,6 @@
   <ul class="nav-list">
     <li class="level1 nav-leaf"><a href="coulomb-core.html">coulomb-core</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-units.html">coulomb-units</a></li>
-    <li class="level1 nav-leaf"><a href="coulomb-spire.html">coulomb-spire</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-refined.html">coulomb-refined</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-pureconfig.html">coulomb-pureconfig</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-runtime.html">coulomb-runtime</a></li>
@@ -108,6 +107,7 @@
     <li class="level1 nav-leaf"><a href="#scaladoc-and-unidoc">scaladoc and unidoc</a></li>
     <li class="level1 nav-leaf"><a href="#coulomb-site-documentation">coulomb site documentation</a></li>
     <li class="level1 nav-leaf"><a href="#build-sbt">build.sbt</a></li>
+    <li class="level1 nav-leaf"><a href="#benchmarks">Benchmarks</a></li>
     <li class="level1 nav-leaf"><a href="#mima-and-binary-compatibility">MiMa and binary compatibility</a></li>
   </ul>
 
@@ -162,9 +162,7 @@ scala&gt; import coulomb.*
      | import coulomb.syntax.*
      |
      | import algebra.instances.all.given
-     | import coulomb.ops.algebra.spire.all.given
      |
-     | import coulomb.policy.spire.standard.given
      | import coulomb.units.si.*
      | import coulomb.units.si.given
 
@@ -212,8 +210,19 @@ scala&gt;</span></code></pre>
         
         <h2 id="build-sbt" class="section"><a class="anchor-link left" href="#build-sbt"><i class="icofont-laika link">&#xef71;</i></a>build.sbt</h2>
         <p>If you make changes to <code>build.sbt</code> remember to run the following:</p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span>sbt githubWorkflowGenerate</span></code></pre>
-        <p>Make sure to check in any resulting changes to github workflow yaml.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span>sbt githubWorkflowGenerate
+sbt scalafmtSbt</span></code></pre>
+        <p>Make sure to check in any resulting changes to build.sbt and the github workflow yaml.</p>
+        
+        <h2 id="benchmarks" class="section"><a class="anchor-link left" href="#benchmarks"><i class="icofont-laika link">&#xef71;</i></a>Benchmarks</h2>
+        <p><code>coulomb</code> implements a few benchmarks, which you can run for each compile platform:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span>sbt benchmarksJVM/run
+sbt benchmarksJS/run
+sbt benchmarksNative/run</span></code></pre>
+        <div class="callout info">
+          <i class="icofont-laika info">&#xef4e;</i>
+          <p>Benchmarks are for project performance experiments, and subject to change.</p>
+        </div>
         
         <h2 id="mima-and-binary-compatibility" class="section"><a class="anchor-link left" href="#mima-and-binary-compatibility"><i class="icofont-laika link">&#xef71;</i></a>MiMa and binary compatibility</h2>
         <p>The <code>coulomb</code> CI workflows check all new commits for binary compatibility with the current release using
@@ -221,9 +230,12 @@ scala&gt;</span></code></pre>
         If you are proposing a change that breaks binary compatibility with the latest release, the CI tests will fail.</p>
         <p>There are two options to deal with this:</p>
         <ul>
-          <li>Modify your contribution so that it preserves binary compatibility. This is the preferred option.</li>
+          <li>Modify your contribution so that it preserves binary compatibility. <strong>This is the preferred option.</strong></li>
           <li>If preserving binary compatibility is infeasible, update the value of <code>ThisBuild / tlBaseVersion</code> in <code>build.sbt</code></li>
         </ul>
+        <p><code>coulomb</code> is currently on a <code>0.x.y</code> versioning system,
+        and so changes breaking binary compatibility require a new minor version.
+        Non breaking changes result in a new patch version.</p>
 
         
 <hr class="footer-rule"/>

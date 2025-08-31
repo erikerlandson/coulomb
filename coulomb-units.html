@@ -83,7 +83,6 @@
   <ul class="nav-list">
     <li class="level1 nav-leaf"><a href="coulomb-core.html">coulomb-core</a></li>
     <li class="level1 active nav-leaf"><a href="#">coulomb-units</a></li>
-    <li class="level1 nav-leaf"><a href="coulomb-spire.html">coulomb-spire</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-refined.html">coulomb-refined</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-pureconfig.html">coulomb-pureconfig</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-runtime.html">coulomb-runtime</a></li>
@@ -191,7 +190,14 @@
         <p>In order to use a unit definition, both the unit type and its corresponding context variable
         (aka &quot;given&quot;) must be in scope.
         In Scala 3 one does this with the following idiom:</p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// import both types and context variables (&quot;givens&quot;)
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// fundamental coulomb types and methods
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.*
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">syntax</span><span>.*
+
+</span><span class="comment">// algebraic definitions
+</span><span class="keyword">import</span><span> </span><span class="identifier">algebra</span><span>.</span><span class="identifier">instances</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
+
+</span><span class="comment">// import both types and context variables (&quot;givens&quot;)
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">mksa</span><span>.{*, </span><span class="keyword">given</span><span>}
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">us</span><span>.{*, </span><span class="keyword">given</span><span>}
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">accepted</span><span>.{*, </span><span class="keyword">given</span><span>}</span></code></pre>
@@ -258,30 +264,24 @@
         <p>In <code>coulomb-units</code>, standard <code>Quantity</code> of time units such as <code>Second</code>, <code>Minute</code> or <code>Hour</code>
         corresponds to <code>Duration</code> in <code>java.time</code>.
         Similarly, absolute time instants represented by <code>EpochTime</code> correspond to <code>Instant</code> in <code>java.time</code>.</p>
-        <p>The <code>coulomb-units</code> package implements both explicit and implicit conversions between
+        <p>The <code>coulomb-units</code> package implements conversion methods between
         <code>coulomb</code> and <code>java.time</code> values, some of which are shown here:</p>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">java</span><span>.</span><span class="identifier">time</span><span>.{ </span><span class="type-name">Duration</span><span>, </span><span class="type-name">Instant</span><span> }
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">time</span><span>.{*, </span><span class="keyword">given</span><span>}
 
-</span><span class="comment">// explicit conversion methods
+</span><span class="comment">// extension conversion methods
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">javatime</span><span>.*
-</span><span class="comment">// implicit and explicit conversions
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">javatime</span><span>.</span><span class="identifier">conversions</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">dur</span><span> = </span><span class="type-name">Duration</span><span>.</span><span class="identifier">ofSeconds</span><span>(</span><span class="number-literal">70</span><span>, </span><span class="number-literal">400000000</span><span>)
 </span><span class="comment">// dur: Duration = PT1M10.4S
 </span><span>
 </span><span class="comment">// explicit conversion from java.time duration to a coulomb quantity
 </span><span class="identifier">dur</span><span>.</span><span class="identifier">toQuantity</span><span>[</span><span class="type-name">Double</span><span>, </span><span class="type-name">Minute</span><span>]
-</span><span class="comment">// res6: Quantity[Double, Minute] = 1.1733333333333333
-</span><span>
-</span><span class="comment">// corresponding implicit conversion
-</span><span class="keyword">val</span><span> </span><span class="identifier">dq</span><span>: </span><span class="type-name">Quantity</span><span>[</span><span class="type-name">Double</span><span>, </span><span class="type-name">Minute</span><span>] = </span><span class="identifier">dur</span><span>
-</span><span class="comment">// dq: Quantity[Double, Minute] = 1.1733333333333333
+</span><span class="comment">// res6: Quantity[Double, Minute] = 1.173333333333333
 </span><span>
 </span><span class="comment">// convert back to java.time
 </span><span class="identifier">dq</span><span>.</span><span class="identifier">toDuration</span><span>
-</span><span class="comment">// res7: Duration = PT1M10.399999999S
+</span><span class="comment">// res7: Duration = PT0S
 </span><span>
 </span><span class="comment">// the day of the first human moon landing
 </span><span class="keyword">val</span><span> </span><span class="identifier">ins</span><span> = </span><span class="type-name">Instant</span><span>.</span><span class="identifier">parse</span><span>(</span><span class="string-literal">&quot;1969-07-20T00:00:00Z&quot;</span><span>)
@@ -291,13 +291,20 @@
 </span><span class="identifier">ins</span><span>.</span><span class="identifier">toEpochTime</span><span>[</span><span class="type-name">Double</span><span>, </span><span class="type-name">Day</span><span>]
 </span><span class="comment">// res8: DeltaQuantity[Double, Day, Second] = -165.0
 </span><span>
-</span><span class="comment">// corresponding implicit conversion
-</span><span class="keyword">val</span><span> </span><span class="identifier">et</span><span>: </span><span class="type-name">EpochTime</span><span>[</span><span class="type-name">Double</span><span>, </span><span class="type-name">Day</span><span>] = </span><span class="identifier">ins</span><span>
-</span><span class="comment">// et: DeltaQuantity[Double, Day, Second] = -165.0
-</span><span>
 </span><span class="comment">// convert back to java.time
 </span><span class="identifier">et</span><span>.</span><span class="identifier">toInstant</span><span>
-</span><span class="comment">// res9: Instant = 1969-07-20T00:00:00Z</span></code></pre>
+</span><span class="comment">// res9: Instant = 1970-01-01T00:00:00Z</span></code></pre>
+        <p>Implicit conversions can also be imported:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// implicit java.time conversions
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">javatime</span><span>.</span><span class="identifier">conversion</span><span>.</span><span class="identifier">implicits</span><span>.</span><span class="keyword">given</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">scala</span><span>.</span><span class="identifier">language</span><span>.</span><span class="identifier">implicitConversions</span><span>
+
+</span><span class="comment">// implicit conversions
+</span><span class="keyword">val</span><span> </span><span class="identifier">dq</span><span>: </span><span class="type-name">Quantity</span><span>[</span><span class="type-name">Double</span><span>, </span><span class="type-name">Minute</span><span>] = </span><span class="identifier">dur</span><span>
+</span><span class="comment">// dq: Quantity[Double, Minute] = 1.173333333333333
+</span><span>
+</span><span class="keyword">val</span><span> </span><span class="identifier">et</span><span>: </span><span class="type-name">EpochTime</span><span>[</span><span class="type-name">Double</span><span>, </span><span class="type-name">Day</span><span>] = </span><span class="identifier">ins</span><span>
+</span><span class="comment">// et: DeltaQuantity[Double, Day, Second] = -165.0</span></code></pre>
 
         
 <hr class="footer-rule"/>

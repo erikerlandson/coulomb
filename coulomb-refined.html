@@ -83,7 +83,6 @@
   <ul class="nav-list">
     <li class="level1 nav-leaf"><a href="coulomb-core.html">coulomb-core</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-units.html">coulomb-units</a></li>
-    <li class="level1 nav-leaf"><a href="coulomb-spire.html">coulomb-spire</a></li>
     <li class="level1 active nav-leaf"><a href="#">coulomb-refined</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-pureconfig.html">coulomb-pureconfig</a></li>
     <li class="level1 nav-leaf"><a href="coulomb-runtime.html">coulomb-runtime</a></li>
@@ -105,9 +104,7 @@
     <li class="level2 nav-leaf"><a href="#packages">packages</a></li>
     <li class="level2 nav-leaf"><a href="#import">import</a></li>
     <li class="level2 nav-leaf"><a href="#examples">examples</a></li>
-    <li class="level1 nav-node"><a href="#policies">Policies</a></li>
-    <li class="level2 nav-leaf"><a href="#policy-overlays">policy overlays</a></li>
-    <li class="level2 nav-leaf"><a href="#algebraic-policy-table">algebraic policy table</a></li>
+    <li class="level2 nav-leaf"><a href="#algebra-support-table">algebra support table</a></li>
   </ul>
 
   <p class="footer"></p>
@@ -117,15 +114,15 @@
       <main class="content">
 
         <h1 id="coulomb-refined" class="title">coulomb-refined</h1>
-        <p>The <code>coulomb-refined</code> package defines policies and utilities for integrating the
+        <p>The <code>coulomb-refined</code> package defines algebra typeclasses for integrating the
         <a href="https://github.com/fthomas/refined#refined-simple-refinement-types-for-scala">refined</a>
         typelevel libraries with <code>coulomb</code>.</p>
         
         <h2 id="quick-start" class="section"><a class="anchor-link left" href="#quick-start"><i class="icofont-laika link">&#xef71;</i></a>Quick Start</h2>
         
         <h3 id="documentation" class="section"><a class="anchor-link left" href="#documentation"><i class="icofont-laika link">&#xef71;</i></a>documentation</h3>
-        <p>You can browse the <code>coulomb-refined</code> policies
-        <a href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/policy/overlay/refined.html">here</a>.</p>
+        <p>You can browse the <code>coulomb-refined</code> api definitions
+        <a href="https://www.javadoc.io/doc/com.manyangled/coulomb-docs_3/latest/coulomb/integrations/refined/index.html">here</a>.</p>
         
         <h3 id="packages" class="section"><a class="anchor-link left" href="#packages"><i class="icofont-laika link">&#xef71;</i></a>packages</h3>
         <p>Include <code>coulomb-refined</code> with your Scala project:</p>
@@ -133,7 +130,6 @@
 </span><span class="identifier">libraryDependencies</span><span> += </span><span class="string-literal">&quot;com.manyangled&quot;</span><span> %% </span><span class="string-literal">&quot;coulomb-refined&quot;</span><span> % </span><span class="string-literal">&quot;0.8.0&quot;</span></code></pre>
         
         <h3 id="import" class="section"><a class="anchor-link left" href="#import"><i class="icofont-laika link">&#xef71;</i></a>import</h3>
-        <p>To import the standard coulomb policy with the refined overlay:</p>
         <pre><code class="nohighlight"><span class="comment">// fundamental coulomb types and methods
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.*
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">syntax</span><span>.*
@@ -145,22 +141,19 @@
 
 </span><span class="comment">// algebraic definitions
 </span><span class="keyword">import</span><span> </span><span class="identifier">algebra</span><span>.</span><span class="identifier">instances</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">ops</span><span>.</span><span class="identifier">algebra</span><span>.</span><span class="identifier">all</span><span>.{*, </span><span class="keyword">given</span><span>}
 
-</span><span class="comment">// standard policy for spire and scala types
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">policy</span><span>.</span><span class="identifier">standard</span><span>.</span><span class="keyword">given</span><span>
-</span><span class="keyword">import</span><span> </span><span class="identifier">scala</span><span>.</span><span class="identifier">language</span><span>.</span><span class="identifier">implicitConversions</span><span>
-
-</span><span class="comment">// overlay policy for refined integrations
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">policy</span><span>.</span><span class="identifier">overlay</span><span>.</span><span class="identifier">refined</span><span>.</span><span class="identifier">algebraic</span><span>.</span><span class="keyword">given</span><span>
+</span><span class="comment">// algebra typeclasses for refined integrations
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">integrations</span><span>.</span><span class="identifier">refined</span><span>.</span><span class="identifier">all</span><span>.</span><span class="keyword">given</span><span>
 
 </span><span class="comment">// coulomb syntax for refined integrations
-</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">refined</span><span>.*</span></code></pre>
+</span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">integrations</span><span>.</span><span class="identifier">refined</span><span>.</span><span class="identifier">syntax</span><span>.*</span></code></pre>
         
         <h3 id="examples" class="section"><a class="anchor-link left" href="#examples"><i class="icofont-laika link">&#xef71;</i></a>examples</h3>
         <p>Examples in this section will use the following workaround as a replacement for
-        <a href="https://github.com/fthomas/refined/issues/932">refineMV</a>
-        until it is ported forward to Scala 3.</p>
+        <a href="https://javadoc.io/doc/eu.timepit/refined_2.13/latest/eu/timepit/refined/index.html">refineMV</a>
+        until it is
+        <a href="https://github.com/fthomas/refined/issues/932">ported forward</a>
+        to Scala 3.</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="comment">// a workaround for refineMV not being available in scala3
 // https://github.com/fthomas/refined/issues/932
 </span><span class="keyword">object</span><span> </span><span class="identifier">workaround</span><span>:
@@ -170,96 +163,79 @@
 
 </span><span class="keyword">import</span><span> </span><span class="identifier">workaround</span><span>.*</span></code></pre>
         <p>The <code>coulomb-refined</code> package supports <code>refined</code> predicates that are algebraically well-behaved for applicable operations.
-        Primarily this means the predicates <code>Positive</code> and <code>NonNegative</code>.
+        Primarily this means the predicates
+        <a href="https://javadoc.io/doc/eu.timepit/refined_2.13/latest/eu/timepit/refined/index.html">Positive</a>
+        and
+        <a href="https://javadoc.io/doc/eu.timepit/refined_2.13/latest/eu/timepit/refined/index.html">NonNegative</a>.
         For example, the positive doubles are an additive semigroup and multiplicative group,
         as the following code demonstrates.</p>
         <div class="callout info">
           <i class="icofont-laika info">&#xef4e;</i>
           <p>The
-          <a href="#algebraic-policy-table">table</a>
+          <a href="#algebra-support-table">table</a>
           below summarizes the full list of supported <code>refined</code> predicates and associated algebras.</p>
         </div>
         <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">si</span><span>.{*, </span><span class="keyword">given</span><span>}
 </span><span class="keyword">import</span><span> </span><span class="identifier">coulomb</span><span>.</span><span class="identifier">units</span><span>.</span><span class="identifier">us</span><span>.{*, </span><span class="keyword">given</span><span>}
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">pos1</span><span> = </span><span class="number-literal">1d</span><span>.</span><span class="identifier">withRP</span><span>[</span><span class="type-name">Positive</span><span>].</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span>]
-</span><span class="comment">// pos1: Quantity[Refined[Double, Positive], Meter] = 1.0
+</span><span class="comment">// pos1: Quantity[(Double Refined Positive), Meter] = 1.0
 </span><span class="keyword">val</span><span> </span><span class="identifier">pos2</span><span> = </span><span class="number-literal">2d</span><span>.</span><span class="identifier">withRP</span><span>[</span><span class="type-name">Positive</span><span>].</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span>]
-</span><span class="comment">// pos2: Quantity[Refined[Double, Positive], Meter] = 2.0
+</span><span class="comment">// pos2: Quantity[(Double Refined Positive), Meter] = 2.0
 </span><span class="keyword">val</span><span> </span><span class="identifier">pos3</span><span> = </span><span class="number-literal">3d</span><span>.</span><span class="identifier">withRP</span><span>[</span><span class="type-name">Positive</span><span>].</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Second</span><span>]
-</span><span class="comment">// pos3: Quantity[Refined[Double, Positive], Second] = 3.0
+</span><span class="comment">// pos3: Quantity[(Double Refined Positive), Second] = 3.0
 </span><span>
 </span><span class="comment">// positive doubles are an additive semigroup
 </span><span class="identifier">pos1</span><span> + </span><span class="identifier">pos2</span><span>
-</span><span class="comment">// res0: Quantity[Refined[Double, Positive], Meter] = 3.0
+</span><span class="comment">// res0: Quantity[(Double Refined Positive), Meter] = 3.0
 </span><span>
 </span><span class="comment">// also a multiplicative semigroup
 </span><span class="identifier">pos1</span><span> * </span><span class="identifier">pos2</span><span>
-</span><span class="comment">// res1: Quantity[Refined[Double, Positive], ^[Meter, 2]] = 2.0
+</span><span class="comment">// res1: Quantity[(Double Refined Positive), ^[Meter, 2]] = 2.0
 </span><span class="identifier">pos2</span><span>.</span><span class="identifier">pow</span><span>[</span><span class="number-literal">2</span><span>]
-</span><span class="comment">// res2: Quantity[Refined[Double, Positive], ^[Meter, 2]] = 4.0
+</span><span class="comment">// res2: Quantity[(Double Refined Positive), ^[Meter, 2]] = 4.0
 </span><span>
 </span><span class="comment">// also a multiplicative group
 </span><span class="identifier">pos2</span><span> / </span><span class="identifier">pos3</span><span>
-</span><span class="comment">// res3: Quantity[Refined[Double, Positive], /[Meter, Second]] = 0.6666666666666666
+</span><span class="comment">// res3: Quantity[(Double Refined Positive), /[Meter, Second]] = 0.6666666666666666
 </span><span class="identifier">pos2</span><span>.</span><span class="identifier">pow</span><span>[</span><span class="number-literal">0</span><span>]
-</span><span class="comment">// res4: Quantity[Refined[Double, Positive], 1] = 1.0</span></code></pre>
-        <p>The standard <code>refined</code> function for refining values with run-time checking is <code>refineV</code>,
-        which returns an <code>Either</code>.
+</span><span class="comment">// res4: Quantity[(Double Refined Positive), 1] = 1.0</span></code></pre>
+        <p>The standard <code>refined</code> function for refining values with run-time checking is
+        <a href="https://javadoc.io/doc/eu.timepit/refined_2.13/latest/eu/timepit/refined/index.html">refineV</a>,
+        which returns an
+        <a class="api" href="https://scala-lang.org/api/3.x/scala/util/Either.html">Either</a>.
         The <code>coulomb-refined</code> package supplies a similar variation <code>refinedVU</code>.
         These objects are also supported by algebras.</p>
         <pre><code class="nohighlight"><span class="comment">// This refinement succeeds, and returns a Right value
 </span><span class="keyword">val</span><span> </span><span class="identifier">pe1</span><span> = </span><span class="identifier">refineVU</span><span>[</span><span class="type-name">Positive</span><span>, </span><span class="type-name">Meter</span><span>](</span><span class="number-literal">1</span><span>)
-</span><span class="comment">// pe1: Quantity[Either[String, Refined[Int, Positive]], Meter] = Right(
+</span><span class="comment">// pe1: Quantity[Either[String, (Int Refined Positive)], Meter] = Right(
 //   value = 1
 // )
 </span><span>
 </span><span class="comment">// This refinement fails, and returns a Left value
 </span><span class="keyword">val</span><span> </span><span class="identifier">pe2</span><span> = </span><span class="identifier">refineVU</span><span>[</span><span class="type-name">Positive</span><span>, </span><span class="type-name">Meter</span><span>](</span><span class="number-literal">0</span><span>)
-</span><span class="comment">// pe2: Quantity[Either[String, Refined[Int, Positive]], Meter] = Left(
+</span><span class="comment">// pe2: Quantity[Either[String, (Int Refined Positive)], Meter] = Left(
 //   value = &quot;Predicate failed: (0 &gt; 0).&quot;
 // )
 </span><span>
 </span><span class="comment">// positives are an additive semigroup
 </span><span class="identifier">pe1</span><span> + </span><span class="identifier">pe1</span><span>
-</span><span class="comment">// res5: Quantity[Either[String, Refined[Int, Positive]], Meter] = Right(
+</span><span class="comment">// res5: Quantity[Either[String, (Int Refined Positive)], Meter] = Right(
 //   value = 2
 // )
 </span><span>
 </span><span class="comment">// algebras operating on Left values result in a Left
 </span><span class="identifier">pe1</span><span> + </span><span class="identifier">pe2</span><span>
-</span><span class="comment">// res6: Quantity[Either[String, Refined[Int, Positive]], Meter] = Left(
+</span><span class="comment">// res6: Quantity[Either[String, (Int Refined Positive)], Meter] = Left(
 //   value = &quot;Predicate failed: (0 &gt; 0).&quot;
 // )</span></code></pre>
         
-        <h2 id="policies" class="section"><a class="anchor-link left" href="#policies"><i class="icofont-laika link">&#xef71;</i></a>Policies</h2>
-        
-        <h3 id="policy-overlays" class="section"><a class="anchor-link left" href="#policy-overlays"><i class="icofont-laika link">&#xef71;</i></a>policy overlays</h3>
-        <p>The <code>coulomb-refined</code> package currently provides a single &quot;overlay&quot; policy.
-        An overlay policy is designed to work with any other policies currently in scope,
-        and lift them into another abstraction;
-        in this case, lifting policies for value type(s) <code>V</code> into <code>Refined[V, P]</code>.
-        The <code>Refined</code> abstraction guarantees that a value of type <code>V</code> satisfies some predicate <code>P</code>,
-        and the semantics of <code>V</code> remain otherwise unchanged.</p>
-        <p>For example, given any algebra in scope for a type <code>V</code> that defines addition,
-        the <code>coulomb-refined</code> overlay defines the corresponding <code>Refined[V, P]</code> addition
-        like so:</p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">plus</span><span>(</span><span class="identifier">x</span><span>: </span><span class="type-name">Refined</span><span>[</span><span class="type-name">V</span><span>, </span><span class="type-name">P</span><span>], </span><span class="identifier">y</span><span>: </span><span class="type-name">Refined</span><span>[</span><span class="type-name">V</span><span>, </span><span class="type-name">P</span><span>]): </span><span class="type-name">Refined</span><span>[</span><span class="type-name">V</span><span>, </span><span class="type-name">P</span><span>] =
-</span><span class="comment">// (x.value + y.value) refined by P</span></code></pre>
-        <div class="callout info">
-          <i class="icofont-laika info">&#xef4e;</i>
-          <p>Because the refined algebraic policy is an overlay,
-          you can use it with your choice of base policies,
-          for example with
-          <a href="coulomb-core.html#coulomb-policies">core policies</a>
-          or
-          <a href="coulomb-spire.html#policies">spire policies</a>.</p>
-        </div>
-        
-        <h3 id="algebraic-policy-table" class="section"><a class="anchor-link left" href="#algebraic-policy-table"><i class="icofont-laika link">&#xef71;</i></a>algebraic policy table</h3>
-        <p>The following table summarizes the &quot;algebraic&quot; overlay policy.
-        Examples of Fractional value types include Double, Float, BigDecimal, spire Rational, etc.
-        Integral value types include Int, Long, BigInt, etc.</p>
+        <h3 id="algebra-support-table" class="section"><a class="anchor-link left" href="#algebra-support-table"><i class="icofont-laika link">&#xef71;</i></a>algebra support table</h3>
+        <p>The following table summarizes the algebras and operations supported by this package.
+        Examples of Fractional value types include <code>Double</code>, <code>Float</code>,
+        <a class="api" href="https://scala-lang.org/api/3.x/scala/math/BigDecimal.html">BigDecimal</a>,
+        spire <a class="api" href="https://javadoc.io/doc/org.typelevel/spire_3/latest/spire/math/Rational.html">Rational</a>, etc.
+        Integral value types include <code>Int</code>, <code>Long</code>, <a class="api" href="https://scala-lang.org/api/3.x/scala/math/BigInt.html">BigInt</a>, etc.</p>
         <table>
           <thead>
             <tr>
