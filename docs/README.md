@@ -92,6 +92,15 @@ All contributors are expected to respect this code.
 Any violations of this code of conduct should be reported to
 [the author](https://github.com/erikerlandson/).
 
+### gen-ai based contributions
+
+Contributions to `coulomb` using generative AI will be considered.
+However: low quality "vibe-coded" contributions will be treated the same as any low quality code,
+and looked upon with disfavor.
+
+The `coulomb` project does not currently intend to support gen-ai related configurations,
+such as `.cursorrules`, `CLAUDE.md`, etc.
+
 ## Versions and Compatibility
 
 ### `coulomb` and Scala 3
