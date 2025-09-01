@@ -49,10 +49,14 @@ final class QuantityVector[V, U] private (
     ): QuantityVector[V, U] =
         concat(suffix)
 
-    inline def concat[US](suffix: IterableOnce[Quantity[V, US]]): QuantityVector[V, U] =
-        val svec = Vector.from(suffix.iterator.map { (q: Quantity[V, US]) => UnitConversion[V, US, U](q.value)})
+    inline def concat[US](
+        suffix: IterableOnce[Quantity[V, US]]
+    ): QuantityVector[V, U] =
+        val svec = Vector.from(suffix.iterator.map { (q: Quantity[V, US]) =>
+            UnitConversion[V, US, U](q.value)
+        })
         QuantityVector[U](values ++ svec)
-/*
+    /*
     def concat(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
         val svec: Vector[V] = suffix match
             case qve: QuantityVector[?, ?] =>
@@ -101,7 +105,7 @@ final class QuantityVector[V, U] private (
                     case _ =>
                         Vector.from(suffix.iterator.map(cnv(_).value))
         new QuantityVector[V, U](values ++ svec)
-*/
+     */
     def map[VF, UF](
         f: Quantity[V, U] => Quantity[VF, UF]
     ): QuantityVector[VF, UF] =
