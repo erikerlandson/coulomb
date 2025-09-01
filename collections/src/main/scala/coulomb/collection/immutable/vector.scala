@@ -73,9 +73,9 @@ final class QuantityVector[V, U] private (
                 case seqe: scala.collection.Seq[?] =>
                     val seq =
                         seqe.asInstanceOf[scala.collection.Seq[Quantity[V, US]]]
-                    Vector.from(seq.map{e => uc(e.value)})
+                    Vector.from(seq.map { e => uc(e.value) })
                 case _ =>
-                    Vector.from(suffix.iterator.map{e => uc(e.value)})
+                    Vector.from(suffix.iterator.map { e => uc(e.value) })
         }
         QuantityVector[U](values ++ svec)
 
