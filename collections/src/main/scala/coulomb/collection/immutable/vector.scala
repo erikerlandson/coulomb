@@ -19,11 +19,12 @@ package coulomb.collection.immutable
 import scala.collection.{AbstractIterator, StrictOptimizedSeqOps, View, mutable}
 import scala.collection.immutable.{IndexedSeq, IndexedSeqOps}
 import scala.reflect.ClassTag
-import scala.compiletime
+import scala.compiletime.*
 
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.conversion.*
+import coulomb.infra.typeexpr
 
 final class QuantityVector[V, U] private (
     val values: Vector[V]
@@ -33,9 +34,9 @@ final class QuantityVector[V, U] private (
 
     override def className = "QuantityVector"
 
-    def length: Int = values.length
+    inline def length: Int = values.length
 
-    def apply(idx: Int): Quantity[V, U] =
+    inline def apply(idx: Int): Quantity[V, U] =
         values(idx).withUnit[U]
 
     override def iterator: Iterator[Quantity[V, U]] =
@@ -52,60 +53,32 @@ final class QuantityVector[V, U] private (
     inline def concat[US](
         suffix: IterableOnce[Quantity[V, US]]
     ): QuantityVector[V, U] =
-        val svec = Vector.from(suffix.iterator.map { (q: Quantity[V, US]) =>
-            UnitConversion[V, US, U](q.value)
-        })
+        val svec: Vector[V] = if (typeexpr.uniteq[US, U]) {
+            // if the unit types are the same, we can use the values directly
+            suffix match
+                case qve: QuantityVector[?, ?] =>
+                    qve.asInstanceOf[QuantityVector[V, US]].values
+                case seqe: scala.collection.Seq[?] =>
+                    val seq =
+                        seqe.asInstanceOf[scala.collection.Seq[Quantity[V, US]]]
+                    Vector.from(seq.map(_.value))
+                case _ =>
+                    Vector.from(suffix.iterator.map(_.value))
+        } else {
+            // if the unit types are not equivalent, we need to convert the values
+            val uc = summonInline[UnitConversion[V, US, U]]
+            suffix match
+                case qve: QuantityVector[?, ?] =>
+                    qve.asInstanceOf[QuantityVector[V, US]].values.map(uc)
+                case seqe: scala.collection.Seq[?] =>
+                    val seq =
+                        seqe.asInstanceOf[scala.collection.Seq[Quantity[V, US]]]
+                    Vector.from(seq.map{e => uc(e.value)})
+                case _ =>
+                    Vector.from(suffix.iterator.map{e => uc(e.value)})
+        }
         QuantityVector[U](values ++ svec)
-    /*
-    def concat(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
-        val svec: Vector[V] = suffix match
-            case qve: QuantityVector[?, ?] =>
-                qve.asInstanceOf[QuantityVector[V, U]].values
-            case seqe: scala.collection.Seq[?] =>
-                val seq =
-                    seqe.asInstanceOf[scala.collection.Seq[Quantity[V, U]]]
-                Vector.from(seq.map(_.value))
-            case _ =>
-                Vector.from(suffix.iterator.map(_.value))
-        new QuantityVector[V, U](values ++ svec)
 
-    def concat[US](suffix: IterableOnce[Quantity[V, US]])(using
-        cnv: scala.Conversion[Quantity[V, US], Quantity[V, U]]
-    ): QuantityVector[V, U] =
-        val svec: Vector[V] = cnv match
-            // if we have a QuantityConversion we can optimize
-            // by applying directly to raw values
-            case qce: QuantityConversion[?, ?, ?, ?] =>
-                val qc = qce.asInstanceOf[QuantityConversion[VS, US, V, U]]
-                suffix match
-                    case qve: QuantityVector[?, ?] =>
-                        qve.asInstanceOf[QuantityVector[VS, US]]
-                            .values
-                            .map(qc.raw)
-                    case seqe: scala.collection.Seq[?] =>
-                        val seq = seqe.asInstanceOf[
-                            scala.collection.Seq[Quantity[VS, US]]
-                        ]
-                        Vector.from(seq.map { e => qc.raw(e.value) })
-                    case _ =>
-                        Vector.from(suffix.iterator.map { e =>
-                            qc.raw(e.value)
-                        })
-            case _ =>
-                // if it isn't a QuantityConversion, we can only assume basic
-                // scala.Conversion function
-                suffix match
-                    case qve: QuantityVector[?, ?] =>
-                        qve.asInstanceOf[QuantityVector[VS, US]].map(cnv).values
-                    case seqe: scala.collection.Seq[?] =>
-                        val seq = seqe.asInstanceOf[
-                            scala.collection.Seq[Quantity[VS, US]]
-                        ]
-                        Vector.from(seq.map(cnv(_).value))
-                    case _ =>
-                        Vector.from(suffix.iterator.map(cnv(_).value))
-        new QuantityVector[V, U](values ++ svec)
-     */
     def map[VF, UF](
         f: Quantity[V, U] => Quantity[VF, UF]
     ): QuantityVector[VF, UF] =
