@@ -19,6 +19,7 @@ package coulomb.collection.immutable
 import scala.collection.{AbstractIterator, StrictOptimizedSeqOps, View, mutable}
 import scala.collection.immutable.{IndexedSeq, IndexedSeqOps}
 import scala.reflect.ClassTag
+import scala.compiletime
 
 import coulomb.*
 import coulomb.syntax.*
@@ -43,11 +44,15 @@ final class QuantityVector[V, U] private (
     inline def ++(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
         concat(suffix)
 
-    inline def ++[VS, US](suffix: IterableOnce[Quantity[VS, US]])(using
-        qc: scala.Conversion[Quantity[VS, US], Quantity[V, U]]
+    inline def ++[US](suffix: IterableOnce[Quantity[V, US]])(using
+        qc: scala.Conversion[Quantity[V, US], Quantity[V, U]]
     ): QuantityVector[V, U] =
         concat(suffix)
 
+    inline def concat[US](suffix: IterableOnce[Quantity[V, US]]): QuantityVector[V, U] =
+        val svec = Vector.from(suffix.iterator.map { (q: Quantity[V, US]) => UnitConversion[V, US, U](q.value)})
+        QuantityVector[U](values ++ svec)
+/*
     def concat(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
         val svec: Vector[V] = suffix match
             case qve: QuantityVector[?, ?] =>
@@ -60,8 +65,8 @@ final class QuantityVector[V, U] private (
                 Vector.from(suffix.iterator.map(_.value))
         new QuantityVector[V, U](values ++ svec)
 
-    def concat[VS, US](suffix: IterableOnce[Quantity[VS, US]])(using
-        cnv: scala.Conversion[Quantity[VS, US], Quantity[V, U]]
+    def concat[US](suffix: IterableOnce[Quantity[V, US]])(using
+        cnv: scala.Conversion[Quantity[V, US], Quantity[V, U]]
     ): QuantityVector[V, U] =
         val svec: Vector[V] = cnv match
             // if we have a QuantityConversion we can optimize
@@ -96,7 +101,7 @@ final class QuantityVector[V, U] private (
                     case _ =>
                         Vector.from(suffix.iterator.map(cnv(_).value))
         new QuantityVector[V, U](values ++ svec)
-
+*/
     def map[VF, UF](
         f: Quantity[V, U] => Quantity[VF, UF]
     ): QuantityVector[VF, UF] =
@@ -133,12 +138,6 @@ final class QuantityVector[V, U] private (
         uc: UnitConversion[V, U, UO]
     ): QuantityVector[V, UO] =
         QuantityVector[UO](values.map { v => uc(v) })
-
-    def toVU[VO, UO](using
-        vc: ValueConversion[V, VO],
-        uc: UnitConversion[VO, U, UO]
-    ): QuantityVector[VO, UO] =
-        QuantityVector[UO](values.map { v => uc(vc(v)) })
 
 object QuantityVector:
     def apply[U](using a: Applier[U]) = a
