@@ -45,8 +45,8 @@ final class QuantityVector[V, U] private (
     inline def ++(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
         concat(suffix)
 
-    inline def ++[US](suffix: IterableOnce[Quantity[V, US]])(using
-        qc: scala.Conversion[Quantity[V, US], Quantity[V, U]]
+    inline def ++[US](
+        suffix: IterableOnce[Quantity[V, US]]
     ): QuantityVector[V, U] =
         concat(suffix)
 
@@ -106,15 +106,13 @@ final class QuantityVector[V, U] private (
             .newBuilder[Quantity[VB, UB]]
             .mapResult(QuantityVector.from)
 
-    def toValue[VO](using
-        vc: ValueConversion[V, VO]
-    ): QuantityVector[VO, U] =
-        QuantityVector[U](values.map { v => vc(v) })
+    inline def toValue[VO]: QuantityVector[VO, U] =
+        val vc = summonInline[ValueConversion[V, VO]]
+        QuantityVector[U](values.map(vc))
 
-    def toUnit[UO](using
-        uc: UnitConversion[V, U, UO]
-    ): QuantityVector[V, UO] =
-        QuantityVector[UO](values.map { v => uc(v) })
+    inline def toUnit[UO]: QuantityVector[V, UO] =
+        val uc = summonInline[UnitConversion[V, U, UO]]
+        QuantityVector[UO](values.map(uc))
 
 object QuantityVector:
     def apply[U](using a: Applier[U]) = a
