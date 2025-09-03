@@ -21,10 +21,17 @@ import scala.collection.immutable.{IndexedSeq, IndexedSeqOps}
 import scala.reflect.ClassTag
 import scala.compiletime.*
 
+import algebra.ring.*
+
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.conversion.*
 import coulomb.infra.typeexpr
+
+extension [V, U](qv: QuantityVector[V, U])
+    def xsum(using alg:AdditiveMonoid[V]): Quantity[V, U] =
+        qv.values.foldLeft(alg.zero)(alg.plus(_,_)).withUnit[U]
+
 
 final class QuantityVector[V, U] private (
     val values: Vector[V]
