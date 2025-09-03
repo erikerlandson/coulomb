@@ -37,7 +37,11 @@ ThisBuild / tlSitePublishBranch := Some("scala3")
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("17"))
 
 ThisBuild / resolvers += Resolver.sonatypeCentralSnapshots
-ThisBuild / crossScalaVersions := Seq("3.7.2")
+
+// be sure to use LTS version for improved client compatibility
+// currently that is 3.3.x
+// https://www.scala-lang.org/download/all.html
+ThisBuild / crossScalaVersions := Seq("3.3.6")
 
 // run tests sequentially for easier failure debugging
 Test / parallelExecution := false
