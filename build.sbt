@@ -102,7 +102,7 @@ lazy val collections = crossProject(JVMPlatform, JSPlatform, NativePlatform)
         units % Test
     )
     .settings(
-        tlVersionIntroduced := Map("3" -> "0.9.1")
+        tlVersionIntroduced := Map("3" -> "0.9.2")
     )
     .settings(commonSettings: _*)
 
