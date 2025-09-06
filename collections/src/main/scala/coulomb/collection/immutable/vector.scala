@@ -21,17 +21,41 @@ import scala.collection.immutable.{IndexedSeq, IndexedSeqOps}
 import scala.reflect.ClassTag
 import scala.compiletime.*
 
-import algebra.ring.*
-
 import coulomb.*
 import coulomb.syntax.*
 import coulomb.conversion.*
 import coulomb.infra.typeexpr
 
-extension [V, U](qv: QuantityVector[V, U])
-    def xsum(using alg:AdditiveMonoid[V]): Quantity[V, U] =
-        qv.values.foldLeft(alg.zero)(alg.plus(_,_)).withUnit[U]
+object ops:
+    import cats.kernel.Order
+    import algebra.ring.*
+    import coulomb.infra.SimplifiedUnit
 
+    def sum[V, U](qv: QuantityVector[V, U])(using
+        alg: AdditiveMonoid[V]
+    ): Quantity[V, U] =
+        qv.values.foldLeft(alg.zero)(alg.plus(_, _)).withUnit[U]
+    def max[V, U](qv: QuantityVector[V, U])(using
+        ord: Order[V]
+    ): Quantity[V, U] =
+        qv.values.foldLeft(qv.values.head)(ord.max(_, _)).withUnit[U]
+    def min[V, U](qv: QuantityVector[V, U])(using
+        ord: Order[V]
+    ): Quantity[V, U] =
+        qv.values.foldLeft(qv.values.head)(ord.min(_, _)).withUnit[U]
+    def dot[V, U1, U2](qv1: QuantityVector[V, U1], qv2: QuantityVector[V, U2])(
+        using
+        add: AdditiveMonoid[V],
+        mult: MultiplicativeSemigroup[V],
+        su: SimplifiedUnit[U1 * U2]
+    ): Quantity[V, su.UO] =
+        val v1 = qv1.values.iterator
+        val v2 = qv2.values.iterator
+        val dp = v1
+            .zip(v2)
+            .map { case (e1, e2) => mult.times(e1, e2) }
+            .foldLeft(add.zero)(add.plus(_, _))
+        dp.withUnit[su.UO]
 
 final class QuantityVector[V, U] private (
     val values: Vector[V]
