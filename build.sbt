@@ -76,7 +76,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     .in(file("core"))
     .settings(name := "coulomb-core")
     .settings(commonSettings: _*)
-    .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.10.0")
+    .settings(libraryDependencies += "org.typelevel" %%% "algebra" % "2.13.0")
     .settings(libraryDependencies += "org.typelevel" %%% "spire" % "0.18.0")
     .platformsSettings(JSPlatform, NativePlatform)(
         Test / unmanagedSources / excludeFilter := HiddenFileFilter || "*serde.scala"
