@@ -162,10 +162,10 @@
 </span><span class="keyword">val</span><span> </span><span class="identifier">kps</span><span> = (</span><span class="identifier">k</span><span> * </span><span class="identifier">d</span><span>) / </span><span class="identifier">t</span><span>
 </span><span class="comment">// kps: Div = Div(
 //   num = Mul(
-//     lhs = UnitType(path = &quot;coulomb.units.si$.prefixes$.Kilo&quot;),
-//     rhs = UnitType(path = &quot;coulomb.units.si$.Meter&quot;)
+//     lhs = UnitType(&quot;coulomb.units.si$.prefixes$.Kilo&quot;),
+//     rhs = UnitType(&quot;coulomb.units.si$.Meter&quot;)
 //   ),
-//   den = UnitType(path = &quot;coulomb.units.si$.Second&quot;)
+//   den = UnitType(&quot;coulomb.units.si$.Second&quot;)
 // )
 </span><span>
 </span><span class="comment">// values can be displayed with toString for readability
@@ -184,10 +184,10 @@
 //   value = 1.0F,
 //   unit = Div(
 //     num = Mul(
-//       lhs = UnitType(path = &quot;coulomb.units.si$.prefixes$.Kilo&quot;),
-//       rhs = UnitType(path = &quot;coulomb.units.si$.Meter&quot;)
+//       lhs = UnitType(&quot;coulomb.units.si$.prefixes$.Kilo&quot;),
+//       rhs = UnitType(&quot;coulomb.units.si$.Meter&quot;)
 //     ),
-//     den = UnitType(path = &quot;coulomb.units.si$.Second&quot;)
+//     den = UnitType(&quot;coulomb.units.si$.Second&quot;)
 //   )
 // )
 </span><span>
@@ -221,19 +221,17 @@
         <pre><code class="nohighlight"><span class="comment">// reconstruct the equivalent Quantity
 </span><span class="identifier">rq</span><span>.</span><span class="identifier">toQuantity</span><span>[</span><span class="type-name">Float</span><span>, </span><span class="type-name">Kilo</span><span> * </span><span class="type-name">Meter</span><span> / </span><span class="type-name">Second</span><span>]
 </span><span class="comment">// res4: Either[String, Quantity[Float, /[*[Kilo, Meter], Second]]] = Right(
-//   value = 1.0F
+//   1.0F
 // )
 </span><span>
 </span><span class="comment">// valid conversions of value types or unit types will also succeed
 </span><span class="identifier">rq</span><span>.</span><span class="identifier">toQuantity</span><span>[</span><span class="type-name">Double</span><span>, </span><span class="type-name">Meter</span><span> / </span><span class="type-name">Second</span><span>]
-</span><span class="comment">// res5: Either[String, Quantity[Double, /[Meter, Second]]] = Right(
-//   value = 1000.0
-// )
+</span><span class="comment">// res5: Either[String, Quantity[Double, /[Meter, Second]]] = Right(1000.0)
 </span><span>
 </span><span class="comment">// attempting to convert to incompatible units will fail
 </span><span class="identifier">rq</span><span>.</span><span class="identifier">toQuantity</span><span>[</span><span class="type-name">Float</span><span>, </span><span class="type-name">Second</span><span>]
 </span><span class="comment">// res6: Either[String, Quantity[Float, Second]] = Left(
-//   value = &quot;non-convertible units: (Kilo*Meter)/Second, Second&quot;
+//   &quot;non-convertible units: (Kilo*Meter)/Second, Second&quot;
 // )</span></code></pre>
 
         

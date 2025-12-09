@@ -168,7 +168,7 @@
     </span><span class="string-literal">&quot;coulomb.units.info&quot;</span><span> *:
     </span><span class="type-name">EmptyTuple</span><span>
 ]
-</span><span class="comment">// dslparser: RuntimeUnitParser = repl.MdocSession$MdocApp$$anon$1@309bb36f</span></code></pre>
+</span><span class="comment">// dslparser: RuntimeUnitParser = repl.MdocSession$MdocApp$$anon$1@287f1b9c</span></code></pre>
         <p>Parsing can fail, and so the <code>parse</code> method returns an <a class="api" href="https://scala-lang.org/api/3.x/scala/util/Either.html">Either</a> object.
         In the following code, parsing a known unit <code>meter</code> results in a successful <a class="api" href="https://scala-lang.org/api/3.x/scala/util/Right.html">Right</a> value.</p>
         <p>This example illustrates that unit names parse into a corresponding fully qualified
@@ -186,9 +186,7 @@
           as illustrated in later examples.</p>
         </div>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">val</span><span> </span><span class="identifier">u1</span><span> = </span><span class="identifier">dslparser</span><span>.</span><span class="identifier">parse</span><span>(</span><span class="string-literal">&quot;meter&quot;</span><span>)
-</span><span class="comment">// u1: Either[String, RuntimeUnit] = Right(
-//   value = UnitType(path = &quot;coulomb.units.si$.Meter&quot;)
-// )
+</span><span class="comment">// u1: Either[String, RuntimeUnit] = Right(UnitType(&quot;coulomb.units.si$.Meter&quot;))
 </span><span>
 </span><span class="comment">// Most of the following examples will display with `toString` to improve readability.
 </span><span class="identifier">u1</span><span>.</span><span class="identifier">toString</span><span>
@@ -197,7 +195,7 @@
         results in a <a class="api" href="https://scala-lang.org/api/3.x/scala/util/Left.html">Left</a> value containing a parsing error message. </p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="identifier">dslparser</span><span>.</span><span class="identifier">parse</span><span>(</span><span class="string-literal">&quot;nope&quot;</span><span>)
 </span><span class="comment">// res1: Either[String, RuntimeUnit] = Left(
-//   value = &quot;Error(4, NonEmptyList(FailWith(4,unrecognized unit &#39;nope&#39;)))&quot;
+//   &quot;Error(4, NonEmptyList(FailWith(4,unrecognized unit &#39;nope&#39;)))&quot;
 // )</span></code></pre>
         <p>The reference DSL will parse any unit name that is composed of
         a prefix followed by a unit, into its correct product:</p>

@@ -383,13 +383,13 @@
         <pre><code class="nohighlight"><span class="keyword">case</span><span> </span><span class="keyword">class</span><span> </span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">T</span><span>](</span><span class="identifier">t</span><span>: </span><span class="type-name">T</span><span>)
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">w</span><span> = </span><span class="type-name">Wrapper</span><span>(</span><span class="number-literal">42f</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Meter</span><span>]
-</span><span class="comment">// w: Quantity[Wrapper[Float], Meter] = Wrapper(t = 42.0F)
+</span><span class="comment">// w: Quantity[Wrapper[Float], Meter] = Wrapper(42.0F)
 </span><span>
 </span><span class="identifier">w</span><span>.</span><span class="identifier">show</span><span>
 </span><span class="comment">// res10: String = &quot;Wrapper(42.0) m&quot;
 </span><span>
 </span><span class="keyword">val</span><span> </span><span class="identifier">w2</span><span> = </span><span class="type-name">Wrapper</span><span>(</span><span class="number-literal">37D</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Vector</span><span>[</span><span class="type-name">Int</span><span>]]
-</span><span class="comment">// w2: Quantity[Wrapper[Double], Vector[Int]] = Wrapper(t = 37.0)
+</span><span class="comment">// w2: Quantity[Wrapper[Double], Vector[Int]] = Wrapper(37.0)
 </span><span>
 </span><span class="identifier">w2</span><span>.</span><span class="identifier">show</span><span>
 </span><span class="comment">// res11: String = &quot;Wrapper(37.0) Vector[Int]&quot;</span></code></pre>
@@ -468,7 +468,7 @@
 
 </span><span class="comment">// adding Wrapper objects works now that we have defined an algebra
 </span><span class="keyword">val</span><span> </span><span class="identifier">wsum</span><span> = </span><span class="identifier">w</span><span> + </span><span class="identifier">w</span><span>
-</span><span class="comment">// wsum: Quantity[Wrapper[Float], Meter] = Wrapper(t = 84.0F)</span></code></pre>
+</span><span class="comment">// wsum: Quantity[Wrapper[Float], Meter] = Wrapper(84.0F)</span></code></pre>
         
         <h2 id="numeric-operations" class="section"><a class="anchor-link left" href="#numeric-operations"><i class="icofont-laika link">&#xef71;</i></a>Numeric Operations</h2>
         <p><code>coulomb</code> supports the following numeric operations for any value type that defines the required algebras:</p>
@@ -645,13 +645,13 @@
 </span><span class="keyword">import</span><span> </span><span class="identifier">wrapperconv</span><span>.</span><span class="keyword">given</span><span>
 
 </span><span class="keyword">val</span><span> </span><span class="identifier">wq</span><span> = </span><span class="type-name">Wrapper</span><span>(</span><span class="number-literal">1d</span><span>).</span><span class="identifier">withUnit</span><span>[</span><span class="type-name">Minute</span><span>]
-</span><span class="comment">// wq: Quantity[Wrapper[Double], Minute] = Wrapper(t = 1.0)
+</span><span class="comment">// wq: Quantity[Wrapper[Double], Minute] = Wrapper(1.0)
 </span><span>
 </span><span class="identifier">wq</span><span>.</span><span class="identifier">toUnit</span><span>[</span><span class="type-name">Second</span><span>]
-</span><span class="comment">// res32: Quantity[Wrapper[Double], Second] = Wrapper(t = 60.0)
+</span><span class="comment">// res32: Quantity[Wrapper[Double], Second] = Wrapper(60.0)
 </span><span>
 </span><span class="identifier">wq</span><span>.</span><span class="identifier">toValue</span><span>[</span><span class="type-name">Wrapper</span><span>[</span><span class="type-name">Float</span><span>]]
-</span><span class="comment">// res33: Quantity[Wrapper[Float], Minute] = Wrapper(t = 1.0F)</span></code></pre>
+</span><span class="comment">// res33: Quantity[Wrapper[Float], Minute] = Wrapper(1.0F)</span></code></pre>
         
         <h2 id="temperature-and-time" class="section"><a class="anchor-link left" href="#temperature-and-time"><i class="icofont-laika link">&#xef71;</i></a>Temperature and Time</h2>
         <p>The <code>coulomb-units</code> library defines units for temperature and time.

@@ -215,12 +215,12 @@
     bandwidth: {value: 200, unit: &quot;gigabyte / second&quot;}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@558cece8
+</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@34949383
 </span><span>
 </span><span class="comment">// this load will succeed, with automatic unit conversions
 </span><span class="keyword">val</span><span> </span><span class="identifier">conf</span><span> = </span><span class="identifier">source</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
 </span><span class="comment">// conf: Either[ConfigReaderFailures, Config] = Right(
-//   value = Config(duration = 600.0, storage = 0.1, bandwidth = 1600000.0F)
+//   Config(duration = 600.0, storage = 0.1, bandwidth = 1600000.0F)
 // )</span></code></pre>
         <p>If a configuration value has <em>incompatible</em> units,
         the load will fail with a corresponding error.</p>
@@ -232,19 +232,19 @@
     bandwidth: {value: 200, unit: &quot;gigabyte&quot;}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// bad: ConfigObjectSource = pureconfig.ConfigObjectSource@69033671
+</span><span class="comment">// bad: ConfigObjectSource = pureconfig.ConfigObjectSource@6de2a097
 </span><span>
 </span><span class="comment">// this load will fail because bandwidth units are incompatible
 </span><span class="keyword">val</span><span> </span><span class="identifier">fail</span><span> = </span><span class="identifier">bad</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
 </span><span class="comment">// fail: Either[ConfigReaderFailures, Config] = Left(
-//   value = ConfigReaderFailures(
+//   ConfigReaderFailures(
 //     head = ConvertFailure(
 //       reason = CannotConvert(
 //         value = &quot;RuntimeQuantity(200.0,Giga*Byte)&quot;,
 //         toType = &quot;Quantity&quot;,
 //         because = &quot;non-convertible units: Giga*Byte, (Mega*Bit)/Second&quot;
 //       ),
-//       origin = Some(value = ConfigOrigin(String)),
+//       origin = Some(ConfigOrigin(String)),
 //       path = &quot;bandwidth&quot;
 //     ),
 //     tail = ArraySeq()
@@ -272,31 +272,29 @@
     unit: megabyte
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// qsrc: ConfigObjectSource = pureconfig.ConfigObjectSource@2667567e
+</span><span class="comment">// qsrc: ConfigObjectSource = pureconfig.ConfigObjectSource@76dc5ae3
 </span><span>
 </span><span class="comment">// loading integer value types will succeed when type matches the config
 </span><span class="identifier">qsrc</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Quantity</span><span>[</span><span class="type-name">Int</span><span>, </span><span class="type-name">Mega</span><span> * </span><span class="type-name">Byte</span><span>]]
-</span><span class="comment">// res0: Either[ConfigReaderFailures, Quantity[Int, *[Mega, Byte]]] = Right(
-//   value = 3
-// )
+</span><span class="comment">// res0: Either[ConfigReaderFailures, Quantity[Int, *[Mega, Byte]]] = Right(3)
 </span><span>
 </span><span class="comment">// it will also succeed whenever the conversion coefficient is exactly 1.
 </span><span class="identifier">qsrc</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Quantity</span><span>[</span><span class="type-name">Long</span><span>, </span><span class="type-name">Byte</span><span> * </span><span class="type-name">Mega</span><span>]]
 </span><span class="comment">// res1: Either[ConfigReaderFailures, Quantity[Long, *[Byte, Mega]]] = Right(
-//   value = 3L
+//   3L
 // )
 </span><span>
 </span><span class="comment">// if the conversion is not exactly 1, load will fail
 </span><span class="identifier">qsrc</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Quantity</span><span>[</span><span class="type-name">Int</span><span>, </span><span class="type-name">Kilo</span><span> * </span><span class="type-name">Byte</span><span>]]
 </span><span class="comment">// res2: Either[ConfigReaderFailures, Quantity[Int, *[Kilo, Byte]]] = Left(
-//   value = ConfigReaderFailures(
+//   ConfigReaderFailures(
 //     head = ConvertFailure(
 //       reason = CannotConvert(
 //         value = &quot;RuntimeQuantity(3,Mega*Byte)&quot;,
 //         toType = &quot;Quantity&quot;,
 //         because = &quot;no safe conversion from Mega*Byte to Kilo*Byte&quot;
 //       ),
-//       origin = Some(value = ConfigOrigin(String)),
+//       origin = Some(ConfigOrigin(String)),
 //       path = &quot;&quot;
 //     ),
 //     tail = ArraySeq()
@@ -322,12 +320,12 @@
     bandwidth: {value: 200, unit: {lhs: {lhs: giga, op: &quot;*&quot;, rhs: byte}, op: &quot;/&quot;, rhs: second}}
 }
 &quot;&quot;&quot;</span><span>)
-</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@1809cb9
+</span><span class="comment">// source: ConfigObjectSource = pureconfig.ConfigObjectSource@4f43e137
 </span><span>
 </span><span class="comment">// this load will succeed, with automatic unit conversions
 </span><span class="keyword">val</span><span> </span><span class="identifier">conf</span><span> = </span><span class="identifier">source</span><span>.</span><span class="identifier">load</span><span>[</span><span class="type-name">Config</span><span>]
 </span><span class="comment">// conf: Either[ConfigReaderFailures, Config] = Right(
-//   value = Config(duration = 600.0, storage = 0.1, bandwidth = 1600000.0F)
+//   Config(duration = 600.0, storage = 0.1, bandwidth = 1600000.0F)
 // )</span></code></pre>
 
         
