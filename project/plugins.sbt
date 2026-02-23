@@ -1,6 +1,6 @@
 resolvers += Resolver.sonatypeCentralSnapshots
 
-val sbtTypelevelVersion = "0.8.4"
+val sbtTypelevelVersion = "0.8.5"
 
 addSbtPlugin("org.typelevel" % "sbt-typelevel" % sbtTypelevelVersion)
 addSbtPlugin("org.typelevel" % "sbt-typelevel-site" % sbtTypelevelVersion)
