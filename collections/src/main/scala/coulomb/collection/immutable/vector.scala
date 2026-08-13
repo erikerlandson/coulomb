@@ -1,0 +1,193 @@
+/*
+ * Copyright 2022 Erik Erlandson
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package coulomb.collection.immutable
+
+import scala.collection.{AbstractIterator, StrictOptimizedSeqOps, View, mutable}
+import scala.collection.immutable.{IndexedSeq, IndexedSeqOps}
+import scala.reflect.ClassTag
+import scala.compiletime.*
+
+import coulomb.*
+import coulomb.syntax.*
+import coulomb.conversion.*
+import coulomb.infra.typeexpr
+
+object ops:
+    import cats.kernel.Order
+    import algebra.ring.*
+    import coulomb.infra.SimplifiedUnit
+
+    def sum[V, U](qv: QuantityVector[V, U])(using
+        alg: AdditiveMonoid[V]
+    ): Quantity[V, U] =
+        qv.values.foldLeft(alg.zero)(alg.plus(_, _)).withUnit[U]
+    def max[V, U](qv: QuantityVector[V, U])(using
+        ord: Order[V]
+    ): Quantity[V, U] =
+        qv.values.foldLeft(qv.values.head)(ord.max(_, _)).withUnit[U]
+    def min[V, U](qv: QuantityVector[V, U])(using
+        ord: Order[V]
+    ): Quantity[V, U] =
+        qv.values.foldLeft(qv.values.head)(ord.min(_, _)).withUnit[U]
+    def dot[V, U1, U2](qv1: QuantityVector[V, U1], qv2: QuantityVector[V, U2])(
+        using
+        add: AdditiveMonoid[V],
+        mult: MultiplicativeSemigroup[V],
+        su: SimplifiedUnit[U1 * U2]
+    ): Quantity[V, su.UO] =
+        val v1 = qv1.values.iterator
+        val v2 = qv2.values.iterator
+        val dp = v1
+            .zip(v2)
+            .map { case (e1, e2) => mult.times(e1, e2) }
+            .foldLeft(add.zero)(add.plus(_, _))
+        dp.withUnit[su.UO]
+
+final class QuantityVector[V, U] private (
+    val values: Vector[V]
+) extends IndexedSeq[Quantity[V, U]],
+      IndexedSeqOps[Quantity[V, U], IndexedSeq, QuantityVector[V, U]],
+      StrictOptimizedSeqOps[Quantity[V, U], IndexedSeq, QuantityVector[V, U]]:
+
+    override def className = "QuantityVector"
+
+    inline def length: Int = values.length
+
+    inline def apply(idx: Int): Quantity[V, U] =
+        values(idx).withUnit[U]
+
+    override def iterator: Iterator[Quantity[V, U]] =
+        values.iterator.map(_.withUnit[U])
+
+    inline def ++(suffix: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
+        concat(suffix)
+
+    inline def ++[US](
+        suffix: IterableOnce[Quantity[V, US]]
+    ): QuantityVector[V, U] =
+        concat(suffix)
+
+    inline def concat[US](
+        suffix: IterableOnce[Quantity[V, US]]
+    ): QuantityVector[V, U] =
+        val svec: Vector[V] = if (typeexpr.uniteq[US, U]) {
+            // if the unit types are the same, we can use the values directly
+            suffix match
+                case qve: QuantityVector[?, ?] =>
+                    qve.asInstanceOf[QuantityVector[V, US]].values
+                case seqe: scala.collection.Seq[?] =>
+                    val seq =
+                        seqe.asInstanceOf[scala.collection.Seq[Quantity[V, US]]]
+                    Vector.from(seq.map(_.value))
+                case _ =>
+                    Vector.from(suffix.iterator.map(_.value))
+        } else {
+            // if the unit types are not equivalent, we need to convert the values
+            val uc = summonInline[UnitConversion[V, US, U]]
+            suffix match
+                case qve: QuantityVector[?, ?] =>
+                    qve.asInstanceOf[QuantityVector[V, US]].values.map(uc)
+                case seqe: scala.collection.Seq[?] =>
+                    val seq =
+                        seqe.asInstanceOf[scala.collection.Seq[Quantity[V, US]]]
+                    Vector.from(seq.map { e => uc(e.value) })
+                case _ =>
+                    Vector.from(suffix.iterator.map { e => uc(e.value) })
+        }
+        QuantityVector[U](values ++ svec)
+
+    def map[VF, UF](
+        f: Quantity[V, U] => Quantity[VF, UF]
+    ): QuantityVector[VF, UF] =
+        strictOptimizedMap(newSpecificBuilderQV[VF, UF], f)
+
+    def flatMap[VF, UF](
+        f: Quantity[V, U] => IterableOnce[Quantity[VF, UF]]
+    ): QuantityVector[VF, UF] =
+        strictOptimizedFlatMap(newSpecificBuilderQV[VF, UF], f)
+
+    override def empty: QuantityVector[V, U] = QuantityVector.empty[V, U]
+
+    override protected def fromSpecific(
+        it: IterableOnce[Quantity[V, U]]
+    ): QuantityVector[V, U] =
+        QuantityVector.from(it)
+
+    override protected def newSpecificBuilder
+        : mutable.Builder[Quantity[V, U], QuantityVector[V, U]] =
+        newSpecificBuilderQV[V, U]
+
+    protected def newSpecificBuilderQV[VB, UB]
+        : mutable.Builder[Quantity[VB, UB], QuantityVector[VB, UB]] =
+        mutable.ArrayBuffer
+            .newBuilder[Quantity[VB, UB]]
+            .mapResult(QuantityVector.from)
+
+    inline def toValue[VO]: QuantityVector[VO, U] =
+        val vc = summonInline[ValueConversion[V, VO]]
+        QuantityVector[U](values.map(vc))
+
+    inline def toUnit[UO]: QuantityVector[V, UO] =
+        val uc = summonInline[UnitConversion[V, U, UO]]
+        QuantityVector[UO](values.map(uc))
+
+object QuantityVector:
+    def apply[U](using a: Applier[U]) = a
+
+    class Applier[U]:
+        def apply[V](vs: IterableOnce[V]): QuantityVector[V, U] =
+            new QuantityVector[V, U](Vector.from(vs))
+        def apply[V](vs: V*): QuantityVector[V, U] =
+            new QuantityVector[V, U](Vector.from(vs))
+
+    object Applier:
+        given ctx_Applier[U]: Applier[U] = new Applier[U]
+
+    def apply[V, U](args: Quantity[V, U]*): QuantityVector[V, U] =
+        from(args)
+
+    def empty[V, U]: QuantityVector[V, U] =
+        new QuantityVector[V, U](Vector.empty[V])
+
+    def from[V, U](it: IterableOnce[Quantity[V, U]]): QuantityVector[V, U] =
+        it match
+            case qv: QuantityVector[?, ?] =>
+                // this trick works because we already know that the
+                // element type is Quantity[V, U]
+                qv.asInstanceOf[QuantityVector[V, U]]
+            case seq: scala.collection.Seq[?] =>
+                val qs = seq.asInstanceOf[scala.collection.Seq[Quantity[V, U]]]
+                new QuantityVector[V, U](Vector.from(qs.map(_.value)))
+            case _ =>
+                new QuantityVector[V, U](Vector.from(it.iterator.map(_.value)))
+
+object benchmark:
+    import java.time.*
+
+    def time[X](x: => X, n: Int = 11): Double = {
+        var t0 = Instant.now.toEpochMilli
+        val times = for {
+            _ <- 0 until n
+        } yield {
+            val _ = x
+            val t = Instant.now.toEpochMilli
+            val tt = (t - t0).toDouble / 1000.0
+            t0 = t
+            tt
+        }
+        times(times.length / 2)
+    }
