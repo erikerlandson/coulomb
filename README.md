@@ -13,7 +13,8 @@
 - [coulomb API](https://javadoc.io/doc/com.manyangled/coulomb-docs_3)
 
 ### Code of Conduct
-The `coulomb` project supports the [Scala Code of Conduct](https://typelevel.org/code-of-conduct.html);
+The `coulomb` project supports the
+[Typelevel Code of Conduct](https://typelevel.org/code-of-conduct.html);
 all contributors are expected to respect this code.
-Any violations of this code of conduct should be reported to [the author](https://github.com/erikerlandson/).
-
+Any violations of this code of conduct should be reported to the
+[Code of Conduct Committee](https://typelevel.org/code-of-conduct/#contact).
