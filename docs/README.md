@@ -87,10 +87,10 @@ The following resources expand the concepts behind `coulomb` and typelevel unit 
 ## Code of Conduct
 
 The `coulomb` project supports the
-[Scala Code of Conduct](https://typelevel.org/code-of-conduct.html).
+[Typelevel Code of Conduct](https://typelevel.org/code-of-conduct.html).
 All contributors are expected to respect this code.
 Any violations of this code of conduct should be reported to
-[the author](https://github.com/erikerlandson/).
+[the CoC Committee](https://typelevel.org/code-of-conduct/#contact).
 
 ### gen-ai based contributions
 
