@@ -152,7 +152,7 @@ lazy val pureconfig = crossProject(
     )
     .settings(commonSettings: _*)
     .settings(
-        libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.10"
+        libraryDependencies += "com.github.pureconfig" %%% "pureconfig-core" % "0.17.11"
     )
 
 lazy val refined = crossProject(JVMPlatform, JSPlatform, NativePlatform)
