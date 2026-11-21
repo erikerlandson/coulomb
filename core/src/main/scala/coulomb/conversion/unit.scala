@@ -101,7 +101,39 @@ object UnitConversion:
     inline given g_UnitConversion[V, UF, UT](using
         MultiplicativeSemigroup[V]
     ): UnitConversion[V, UF, UT] =
-        new G_UnitConversion[V, UF, UT](Coefficient[V, UF, UT])
+        inline erasedValue[V] match
+            case _: Float =>
+                new G_UnitConversion_Float[UF, UT](Coefficient[Float, UF, UT])
+                    .asInstanceOf[UnitConversion[V, UF, UT]]
+            case _: Double =>
+                new G_UnitConversion_Double[UF, UT](Coefficient[Double, UF, UT])
+                    .asInstanceOf[UnitConversion[V, UF, UT]]
+            case _: java.lang.Float =>
+                new G_UnitConversion_JFloat[UF, UT](
+                    Coefficient[java.lang.Float, UF, UT]
+                ).asInstanceOf[UnitConversion[V, UF, UT]]
+            case _: java.lang.Double =>
+                new G_UnitConversion_JDouble[UF, UT](
+                    Coefficient[java.lang.Double, UF, UT]
+                ).asInstanceOf[UnitConversion[V, UF, UT]]
+            case _ =>
+                new G_UnitConversion[V, UF, UT](Coefficient[V, UF, UT])
+
+    class G_UnitConversion_Float[UF, UT](coef: Float)
+        extends UnitConversion[Float, UF, UT]:
+        def apply(v: Float): Float = coef * v
+
+    class G_UnitConversion_Double[UF, UT](coef: Double)
+        extends UnitConversion[Double, UF, UT]:
+        def apply(v: Double): Double = coef * v
+
+    class G_UnitConversion_JFloat[UF, UT](coef: java.lang.Float)
+        extends UnitConversion[java.lang.Float, UF, UT]:
+        def apply(v: java.lang.Float): java.lang.Float = coef * v
+
+    class G_UnitConversion_JDouble[UF, UT](coef: java.lang.Double)
+        extends UnitConversion[java.lang.Double, UF, UT]:
+        def apply(v: java.lang.Double): java.lang.Double = coef * v
 
     /**
      * An implicitly instantiated UnitConversion typeclass.
